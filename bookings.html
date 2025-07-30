@@ -1,33 +1,35 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Bookings</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Bookings</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; }
+    header { background-color: #34495e; color: white; padding: 10px 20px; display: flex; align-items: center; }
+    header img { height: 40px; margin-right: 15px; }
+    header h1 { font-size: 20px; margin: 0; }
+    .container { padding: 20px; }
+  </style>
   <script>
     const clinicID = localStorage.getItem("clinicID") || "onesto";
     const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
   const logoEl = document.getElementById("clinic-logo");
-  logoEl.src = logoPath;
-  logoEl.onerror = () => logoEl.style.display = "none";
+  if (logoEl) {
+    logoEl.src = logoPath;
+    logoEl.onerror = () => logoEl.style.display = "none";
+  }
 });
 
   </script>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
-    header { background: #222; color: #fff; padding: 10px; display: flex; align-items: center; }
-    header img { height: 40px; margin-right: 10px; }
-    header h1 { font-size: 20px; margin: 0; }
-    main { padding: 20px; }
-  </style>
 </head>
 <body>
   <header>
     <img id="clinic-logo" alt="Clinic Logo" />
-    <h1>Appointments</h1>
-  </header>  <main>
-    <p>View and manage your patient bookings here.</p>
-    <!-- Booking content goes here -->
-  </main>
+    <h1>Patient Bookings</h1>
+  </header>
+  <div class="container">
+    <p>Manage your patient bookings here.</p>
+    <!-- Booking management UI -->
+  </div>
 </body>
 </html>
