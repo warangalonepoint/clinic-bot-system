@@ -1,66 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Dashboard</title>
-  <link rel="icon" href="assets/favicon.png" />
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      padding: 20px;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    #clinic-logo {
-      height: 60px;
-      border-radius: 8px;
-    }
-    h1 {
-      font-size: 24px;
-      color: #333;
-    }
-    .content {
-      margin-top: 30px;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f8f8f8; }
+    header { background: #2c3e50; color: #fff; padding: 10px 20px; display: flex; align-items: center; }
+    header img { height: 40px; margin-right: 15px; }
+    header h1 { margin: 0; font-size: 22px; }
+    .container { padding: 20px; }
   </style>
-</head>
-<body>
-
-  <div class="header">
-    <img id="clinic-logo" alt="Clinic Logo" src="assets/default-logo.png" />
-    <h1>Welcome to Your Clinic Dashboard</h1>
-  </div>
-
-  <div class="content">
-    <p>This is the main dashboard for clinic management.</p>
-    <!-- You can insert appointment stats, today’s schedule, etc. here -->
-  </div>
-
   <script>
     const clinicID = localStorage.getItem("clinicID") || "onesto";
+    const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
+  const logoEl = document.getElementById("clinic-logo");
+  if (logoEl) {
+    logoEl.src = logoPath;
+    logoEl.onerror = () => logoEl.style.display = "none";
+  }
+});
 
-    fetch("clinics/clinics.json")
-      .then((res) => res.json())
-      .then((clinics) => {
-        const clinic = clinics.find((c) => c.id === clinicID);
-        const logoImg = document.getElementById("clinic-logo");
-        if (clinic && clinic.logo) {
-          logoImg.src = `clinics/${clinic.id}/${clinic.logo}`;
-        } else {
-          logoImg.src = "assets/default-logo.png";
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load logo", err);
-        document.getElementById("clinic-logo").src = "assets/default-logo.png";
-      });
   </script>
-
+</head>
+<body>
+  <header>
+    <img id="clinic-logo" alt="Clinic Logo" />
+    <h1>Clinic Dashboard</h1>
+  </header>
+  <div class="container">
+    <p>Welcome to your clinic dashboard.</p>
+    <!-- Dashboard content will be injected here -->
+  </div>
 </body>
 </html>
