@@ -1,108 +1,140 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Appointment - Clinic Bot</title>
+  <meta charset="UTF-8" />
+  <title>Book an Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #111; color: #fff; }
-    h1 { color: #0ff; }
-    select, input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-    button { padding: 10px 15px; border: none; background: #0f0; color: #000; border-radius: 5px; cursor: pointer; }
-    .slot-btn { background: #0f0; color: #000; padding: 8px 12px; border-radius: 6px; margin: 5px; }
-    #confirmForm { display: none; margin-top: 20px; background: #222; padding: 15px; border-radius: 8px; color: #fff; }
-    #logLine { background: #222; padding: 10px; margin-top: 15px; border-radius: 5px; word-wrap: break-word; color: #0f0; font-family: monospace; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #00e0ff;
+    }
+
+    #bookingUI {
+      display: none;
+    }
+
+    select, input {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    button {
+      background-color: #00ff90;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #error {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>📅 Book an Appointment</h1><label for="clinic">Select Clinic:</label> <select id="clinic"> <option>OneStop</option> <option>CityCare</option> <option>HopeWell</option> <option>LifePoint</option> </select>
+  <h1>🗓️ Book an Appointment</h1>
+  <div id="error">Checking clinic access...</div>
 
-<label for="date">Choose Date:</label> <input type="date" id="date" onchange="loadTimeSlots()">
+  <div id="bookingUI">
+    <label>Patient Name:</label>
+    <input type="text" id="name" placeholder="Enter your name" required />
 
-  <div id="slots"></div>  <div id="confirmForm">
-    <h3>Confirm Your Booking</h3>
-    <p>Time: <strong id="selectedTime"></strong></p>
-    <input type="text" id="patientName" placeholder="Your Name"><br>
-    <input type="text" id="reason" placeholder="Reason for Visit"><br>
-    <button onclick="submitBooking()">Confirm & Go to WhatsApp</button>
-    <div id="logLine"></div>
-    <button onclick="copyLogLine()">📋 Copy Log Line</button>
-  </div>  <script>
-    let selectedTime = "";
-    let latestLogLine = "";
+    <label>Reason for Visit:</label>
+    <input type="text" id="reason" placeholder="E.g., Consultation" required />
 
-    async function loadTimeSlots() {
-      const clinic = document.querySelector("#clinic").value;
-      const date = document.querySelector("#date").value;
-      const slotDiv = document.querySelector("#slots");
-      slotDiv.innerHTML = "<p>Loading...</p>";
+    <label>Select Time Slot:</label>
+    <select id="slotDropdown"></select>
 
-      const clinicPath = clinic.replace(/\s+/g, '');
-      const notesURL = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinicPath}/Notes.csv`;
-      const logsURL = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinicPath}/logs.csv`;
+    <button onclick="book()">Book via WhatsApp</button>
+  </div>
+
+  <script>
+    async function checkTrialAccess() {
+      const params = new URLSearchParams(window.location.search);
+      const clinicID = params.get("clinic");
+
+      if (!clinicID) {
+        document.getElementById("error").textContent = "❌ No clinic ID specified.";
+        return;
+      }
 
       try {
-        const [notesRes, logsRes] = await Promise.all([
-          fetch(notesURL),
-          fetch(logsURL)
-        ]);
+        const res = await fetch("plans.json");
+        const plans = await res.json();
+        const clinic = plans.find(c => c.clinicID === clinicID);
 
-        const notesCSV = await notesRes.text();
-        const logsCSV = await logsRes.text();
-
-        const notesRows = notesCSV.trim().split("\n").slice(1).map(r => r.split(","));
-        const logsRows = logsCSV.trim().split("\n").slice(1).map(r => r.split(","));
-
-        const bookedTimes = logsRows
-          .filter(r => r[1] === date)
-          .map(r => r[2]);
-
-        const available = notesRows.filter(([d, t, s]) =>
-          d === date && s === "Available" && !bookedTimes.includes(t)
-        );
-
-        if (available.length === 0) {
-          slotDiv.innerHTML = "<p>No slots available.</p>";
+        if (!clinic) {
+          document.getElementById("error").textContent = "❌ Clinic not found.";
           return;
         }
 
-        slotDiv.innerHTML = available.map(([_, t]) =>
-          `<button onclick="selectSlot('${t}')" class="slot-btn">${t}</button>`
-        ).join("");
+        if (clinic.plan === "Trial" && clinic.trialStart) {
+          const trialDate = new Date(clinic.trialStart);
+          const today = new Date();
+          const daysPassed = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
 
-      } catch (e) {
-        slotDiv.innerHTML = "<p>Error loading slots.</p>";
+          if (daysPassed >= 3 || clinic.status === "locked") {
+            window.location.href = "trial-expired.html";
+            return;
+          }
+        }
+
+        document.getElementById("error").style.display = "none";
+        document.getElementById("bookingUI").style.display = "block";
+        loadSlots(clinicID);
+
+      } catch (err) {
+        document.getElementById("error").textContent = "❌ Error checking clinic access.";
+        console.error(err);
       }
     }
 
-    function selectSlot(time) {
-      selectedTime = time;
-      document.querySelector("#selectedTime").innerText = time;
-      document.querySelector("#confirmForm").style.display = "block";
+    async function loadSlots(clinicID) {
+      try {
+        const res = await fetch("https://warangalonepoint.github.io/clinic-admin/Slots.csv");
+        const text = await res.text();
+        const rows = text.trim().split("\n").slice(1);
+        const dropdown = document.getElementById("slotDropdown");
+        rows.forEach(row => {
+          const [date, time, status, clinic] = row.split(",");
+          if (status === "Available" && clinic === clinicID) {
+            const option = document.createElement("option");
+            option.value = `${date} ${time}`;
+            option.textContent = `${date} – ${time}`;
+            dropdown.appendChild(option);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to load slots:", err);
+      }
     }
 
-    function submitBooking() {
-      const name = document.querySelector("#patientName").value;
-      const reason = document.querySelector("#reason").value;
-      const clinic = document.querySelector("#clinic").value;
-      const date = document.querySelector("#date").value;
+    function book() {
+      const name = document.getElementById("name").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const slot = document.getElementById("slotDropdown").value;
 
-      if (!name || !reason || !selectedTime) {
+      if (!name || !reason || !slot) {
         alert("Please fill all fields.");
         return;
       }
 
-      const log = `${clinic},${date},${selectedTime},${name},${reason}`;
-      latestLogLine = log;
-      document.querySelector("#logLine").innerText = log;
-
-      const logURL = `https://wa.me/919390664577?text=Hi,%20I%20want%20to%20book%20a%20slot%20on%20${date}%20at%20${selectedTime}%20for%20${name}.%20Reason:%20${reason}`;
-      window.open(logURL, "_blank");
+      const msg = encodeURIComponent(`Hello, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nSlot: ${slot}`);
+      window.location.href = `https://wa.me/919390664577?text=${msg}`;
     }
 
-    function copyLogLine() {
-      navigator.clipboard.writeText(latestLogLine).then(() => {
-        alert("Log line copied to clipboard! Paste into logs.csv");
-      });
-    }
-  </script></body>
+    checkTrialAccess();
+  </script>
+</body>
 </html>
