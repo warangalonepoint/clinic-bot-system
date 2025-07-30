@@ -1,2 +1,22 @@
-{ "name": "WarangalOneStop BookingBot", "short_name": "BookingBot", "start_url": "index.html", "display": "standalone", "background_color": "#000000", "theme_color": "#1f1f1f", "description": "Simple WhatsApp Booking System for Clinics", "orientation": "portrait", "icons": [ { "src": "assets/logos/citycare-logo-192.png", "type": "image/png", "sizes": "192x192" }, { "src": "assets/logos/citycare-logo-512.png", "type": "image/png", "sizes": "512x512" } ] }
-
+{
+  "name": "WarangalOneStop BookingBot",
+  "short_name": "BookingBot",
+  "description": "Simple WhatsApp Booking for Busy Clinics — No App Needed. Book via slot picker, manage logs, and control staff easily.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/logos/bookingbot-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/logos/bookingbot-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
