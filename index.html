@@ -3,72 +3,79 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clinic Login – BookingBot</title>
+  <title>BookingBot Admin Login</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="assets/logos/bookingbot-icon-192.png" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#111" />
   <style>
     body {
-      background-color: #000;
+      background-color: #111;
       color: #fff;
       font-family: Arial, sans-serif;
+      padding: 30px;
       text-align: center;
-      padding-top: 50px;
     }
     input, button {
       padding: 10px;
       margin: 10px;
-      border-radius: 6px;
-      border: none;
       font-size: 16px;
+      border-radius: 8px;
+      border: none;
     }
     button {
-      background: #28a745;
-      color: #fff;
+      background-color: #4CAF50;
+      color: white;
       cursor: pointer;
     }
     button:hover {
-      background: #218838;
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
-  <h1>Clinic Login</h1>
-  <input id="clinicId" placeholder="Enter Clinic ID" />
-  <input id="pin" type="password" placeholder="Enter PIN" />
+  <h2>📅 WarangalOneStop BookingBot</h2>
+  <p>🔒 Admin Login (PIN Required)</p>
+  <input type="password" id="pinInput" placeholder="Enter 4-digit PIN" maxlength="4" />
   <br>
-  <button onclick="login()">Login</button>
+  <button onclick="checkPIN()">Login</button>
 
   <script>
-    async function login() {
-      const clinicId = document.getElementById('clinicId').value.trim();
-      const pin = document.getElementById('pin').value.trim();
+    async function checkPIN() {
+      const pin = document.getElementById("pinInput").value.trim();
+      if (!pin) return alert("Enter your PIN");
 
-      if (!clinicId || !pin) return alert("Please enter Clinic ID and PIN");
+      // Trial check
+      const installDateKey = "bookingbot_install_date";
+      const today = new Date();
+      let installDate = localStorage.getItem(installDateKey);
 
-      const response = await fetch('data/clinics.json');
-      const clinics = await response.json();
+      if (!installDate) {
+        localStorage.setItem(installDateKey, today.toISOString());
+        installDate = today.toISOString();
+      }
 
-      const clinic = clinics.find(c => c.id === clinicId && c.pin === pin);
-      if (!clinic) return alert("Invalid credentials");
-
-      // Trial expiry check
-      const today = new Date().toISOString().split('T')[0];
-      if (clinic.trial_expiry_date && today > clinic.trial_expiry_date) {
-        localStorage.setItem('clinicId', clinicId);
-        window.location.href = 'trial-expired.html';
+      const installed = new Date(installDate);
+      const diffDays = Math.floor((today - installed) / (1000 * 60 * 60 * 24));
+      if (diffDays > 2) {
+        window.location.href = "trial-expired.html";
         return;
       }
 
-      localStorage.setItem('clinicId', clinicId);
-      window.location.href = 'dashboard.html';
+      // Route based on PIN
+      if (pin === "2525") {
+        window.location.href = "admin-dashboard.html";
+      } else if (pin === "0000") {
+        window.location.href = "clinic-dashboard.html";
+      } else {
+        alert("Invalid PIN");
+      }
     }
 
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('Service Worker registered:', reg))
-        .catch(err => console.error('SW error:', err));
+        .then(reg => console.log('SW registered:', reg))
+        .catch(err => console.log('SW registration failed:', err));
     }
   </script>
 </body>
