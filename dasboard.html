@@ -4,62 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Dashboard</title>
-  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/favicon.png" />
   <style>
     body {
-      background: #111;
-      color: #fff;
-      font-family: sans-serif;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
       padding: 20px;
     }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #clinic-logo {
+      height: 60px;
+      border-radius: 8px;
+    }
     h1 {
-      color: #f90;
+      font-size: 24px;
+      color: #333;
     }
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .nav {
+    .content {
       margin-top: 30px;
     }
   </style>
 </head>
 <body>
-  <h1>🏥 Clinic Dashboard</h1>
 
-  <div class="nav">
-    <button onclick="goTo('bookings.html')">📅 View Bookings</button>
-    <button onclick="goTo('logs.html')">📈 Booking Logs</button>
-    <button onclick="goTo('notes-history.html')">🗂 Patient Notes</button>
-    <button onclick="goTo('reset-pin.html')">🔑 Reset PIN</button>
+  <div class="header">
+    <img id="clinic-logo" alt="Clinic Logo" src="assets/default-logo.png" />
+    <h1>Welcome to Your Clinic Dashboard</h1>
+  </div>
+
+  <div class="content">
+    <p>This is the main dashboard for clinic management.</p>
+    <!-- You can insert appointment stats, today’s schedule, etc. here -->
   </div>
 
   <script>
-    function goTo(page) {
-      window.location.href = page;
-    }
-  </script>
+    const clinicID = localStorage.getItem("clinicID") || "onesto";
 
-  <!-- Register PWA -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
-    }
-  </script>
-
-  <!-- Trial Lock Logic -->
-  <script>
-    const clinicId = localStorage.getItem('clinic_id') || 'OneStop';
-    fetch('plans.json')
-      .then(res => res.json())
-      .then(data => {
-        const plan = data[clinicId];
-        if (!plan || !plan.isTrialActive || new Date() > new Date(plan.expiryDate)) {
-          window.location.href = "trial-expired.html";
+    fetch("clinics/clinics.json")
+      .then((res) => res.json())
+      .then((clinics) => {
+        const clinic = clinics.find((c) => c.id === clinicID);
+        const logoImg = document.getElementById("clinic-logo");
+        if (clinic && clinic.logo) {
+          logoImg.src = `clinics/${clinic.id}/${clinic.logo}`;
+        } else {
+          logoImg.src = "assets/default-logo.png";
         }
+      })
+      .catch((err) => {
+        console.error("Failed to load logo", err);
+        document.getElementById("clinic-logo").src = "assets/default-logo.png";
       });
   </script>
+
 </body>
 </html>
