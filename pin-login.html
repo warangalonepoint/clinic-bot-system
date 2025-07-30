@@ -1,58 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>PIN Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #000;
-      color: #0f0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    input, button {
-      margin: 10px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    button {
-      background: #0f0;
-      color: #000;
-      border: none;
-      border-radius: 5px;
-    }
-  </style>
-</head>
-<body>
-  <h2>🔐 Enter Clinic PIN</h2>
-  <input id="pinInput" type="password" placeholder="Enter PIN">
-  <button onclick="checkPIN()">Login</button>
-  <p id="message"></p>
+<script>
+  async function validatePIN() {
+    const enteredPIN = document.getElementById("pinInput").value.trim();
+    const plansURL = "https://warangalonepoint.github.io/clinic-bot-system/plans.json";
 
-  <script>
-    const planMapUrl = 'https://warangalonepoint.github.io/clinic-bot-system/plans.json';
+    try {
+      const res = await fetch(plansURL);
+      const plans = await res.json();
 
-    function checkPIN() {
-      const pin = document.getElementById('pinInput').value.trim();
+      const match = plans.find(item => item.pin === enteredPIN);
 
-      fetch(planMapUrl)
-        .then(res => res.json())
-        .then(data => {
-          const match = data.find(entry => entry.pin === pin);
-          if (match) {
-            localStorage.setItem('clinicID', match.clinicID);
-            localStorage.setItem('plan', match.plan);
-            window.location.href = 'dashboard.html'; // or bookings.html if preferred
-          } else {
-            document.getElementById('message').textContent = '❌ Invalid PIN';
-          }
-        });
+      if (!match) {
+        alert("❌ Invalid PIN. Please try again.");
+        return;
+      }
+
+      const { clinicID, plan } = match;
+
+      // Save to localStorage
+      localStorage.setItem("clinicID", clinicID);
+      localStorage.setItem("pricingPlan", plan);
+
+      // Redirect to dashboard
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      console.error("Error fetching plans:", err);
+      alert("⚠️ Could not load plan data. Try again.");
     }
-  </script>
-</body>
-</html>
+  }
+</script>
