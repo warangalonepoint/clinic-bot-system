@@ -1,0 +1,2 @@
+{ "name": "WarangalOneStop BookingBot", "short_name": "BookingBot", "start_url": "index.html", "display": "standalone", "background_color": "#000000", "theme_color": "#1f1f1f", "description": "Simple WhatsApp Booking System for Clinics", "orientation": "portrait", "icons": [ { "src": "assets/logos/citycare-logo-192.png", "type": "image/png", "sizes": "192x192" }, { "src": "assets/logos/citycare-logo-512.png", "type": "image/png", "sizes": "512x512" } ] }
+
