@@ -1,121 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Book Appointment</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment - Clinic Bot</title>
   <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #0f0;
-      margin-bottom: 30px;
-    }
-    label {
-      display: block;
-      margin: 15px 0 5px;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      margin-bottom: 15px;
-    }
-    .slot-btn {
-      background: #0f0;
-      color: #000;
-      font-weight: bold;
-      border: none;
-      padding: 10px 14px;
-      border-radius: 6px;
-      margin: 5px;
-      cursor: pointer;
-    }
-    #slots {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    body { font-family: sans-serif; padding: 20px; background: #111; color: #fff; }
+    h1 { color: #0ff; }
+    select, input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+    button { padding: 10px 15px; border: none; background: #0f0; color: #000; border-radius: 5px; cursor: pointer; }
+    .slot-btn { background: #0f0; color: #000; padding: 8px 12px; border-radius: 6px; margin: 5px; }
+    #confirmForm { display: none; margin-top: 20px; background: #222; padding: 15px; border-radius: 8px; color: #fff; }
   </style>
 </head>
 <body>
+  <h1>📅 Book an Appointment</h1><label for="clinic">Select Clinic:</label> <select id="clinic"> <option>OneStop</option> <option>CityCare</option> <option>HopeWell</option> <option>LifePoint</option> </select>
 
-  <h1>📅 Book an Appointment</h1>
+<label for="date">Choose Date:</label> <input type="date" id="date" onchange="loadTimeSlots()">
 
-  <label for="clinic">Select Clinic:</label>
-  <select id="clinic">
-    <option value="OneStop">OneStop Clinic</option>
-  </select>
+  <div id="slots"></div>  <div id="confirmForm">
+    <h3>Confirm Your Booking</h3>
+    <p>Time: <strong id="selectedTime"></strong></p>
+    <input type="text" id="patientName" placeholder="Your Name"><br>
+    <input type="text" id="reason" placeholder="Reason for Visit"><br>
+    <button onclick="submitBooking()">Confirm & Go to WhatsApp</button>
+  </div>  <script>
+    let selectedTime = "";
 
-  <label for="date">Select Date:</label>
-  <input type="date" id="date" />
-
-  <label for="name">Your Name:</label>
-  <input type="text" id="name" placeholder="Enter your name" />
-
-  <label for="reason">Reason for Visit:</label>
-  <input type="text" id="reason" placeholder="e.g. Fever, Check-up" />
-
-  <h3>Available Time Slots:</h3>
-  <div id="slots">
-    <!-- Slots will load here -->
-  </div>
-
-  <script>
     async function loadTimeSlots() {
       const clinic = document.querySelector("#clinic").value;
       const date = document.querySelector("#date").value;
       const slotDiv = document.querySelector("#slots");
-
-      if (!clinic || !date) return;
-
       slotDiv.innerHTML = "<p>Loading...</p>";
-      const url = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinic}/Notes.csv`;
+
+      const clinicPath = clinic.replace(/\s+/g, '');
+      const url = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinicPath}/Notes.csv`;
 
       try {
-        const response = await fetch(url);
-        const text = await response.text();
-        const rows = text.trim().split("\n").slice(1);
+        const res = await fetch(url);
+        const csv = await res.text();
+        const rows = csv.trim().split("\n").slice(1);
+        const available = rows.map(r => r.split(","))
+          .filter(([d, t, s]) => d === date && s === "Available");
 
-        const availableSlots = rows
-          .map(r => r.split(","))
-          .filter(([d, t, s]) => d === date && s.trim() === "Available");
-
-        if (availableSlots.length === 0) {
+        if (available.length === 0) {
           slotDiv.innerHTML = "<p>No slots available.</p>";
           return;
         }
 
-        slotDiv.innerHTML = availableSlots.map(([_, time]) => `
-          <button class="slot-btn" onclick="selectSlot('${time}')">${time}</button>
-        `).join("");
-      } catch (err) {
+        slotDiv.innerHTML = available.map(([_, t]) =>
+          `<button onclick="selectSlot('${t}')" class="slot-btn">${t}</button>`
+        ).join("");
+
+      } catch (e) {
         slotDiv.innerHTML = "<p>Error loading slots.</p>";
-        console.error(err);
       }
     }
 
     function selectSlot(time) {
-      const name = document.querySelector("#name").value.trim();
-      const reason = document.querySelector("#reason").value.trim();
-      if (!name || !reason) {
-        alert("Please fill in your name and reason before selecting a slot.");
+      selectedTime = time;
+      document.querySelector("#selectedTime").innerText = time;
+      document.querySelector("#confirmForm").style.display = "block";
+    }
+
+    function submitBooking() {
+      const name = document.querySelector("#patientName").value;
+      const reason = document.querySelector("#reason").value;
+      const clinic = document.querySelector("#clinic").value;
+      const date = document.querySelector("#date").value;
+
+      if (!name || !reason || !selectedTime) {
+        alert("Please fill all fields.");
         return;
       }
 
-      alert(`Booking confirmed for ${time}`);
-      // In Sprint 2, this will redirect to WhatsApp or save to logs
+      const logURL = `https://wa.me/919390664577?text=Hi,%20I%20want%20to%20book%20a%20slot%20on%20${date}%20at%20${selectedTime}%20for%20${name}.%20Reason:%20${reason}`;
+      window.open(logURL, "_blank");
+
+      alert(`Save this manually:\nClinic: ${clinic}\nName: ${name}\nDate: ${date}\nTime: ${selectedTime}\nReason: ${reason}`);
     }
-
-    document.querySelector("#date").addEventListener("change", loadTimeSlots);
-  </script>
-
-</body>
+  </script></body>
 </html>
