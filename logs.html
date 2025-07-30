@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Clinic Logs with Doctor Notes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Clinic Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
+      background-color: #000;
       font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
+      color: #0f0;
       margin: 0;
       padding: 20px;
     }
     h1 {
-      color: #0f0;
+      color: #0ff;
       text-align: center;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      font-size: 15px;
+      color: #fff;
     }
     th, td {
       border: 1px solid #333;
@@ -28,35 +28,57 @@
       text-align: center;
     }
     th {
-      background-color: #222;
+      background-color: #111;
       color: #0f0;
     }
-    td input {
-      width: 95%;
+    tr:nth-child(even) {
+      background-color: #111;
+    }
+    input.note {
+      width: 100%;
       padding: 4px;
       background: #222;
       color: #0f0;
-      border: 1px solid #555;
+      border: 1px solid #333;
     }
-    .button {
+    .summary-box {
+      background-color: #111;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #333;
+    }
+    button {
+      background-color: #0f0;
+      color: #000;
+      padding: 10px 16px;
       margin: 10px 5px;
-      padding: 10px 15px;
-      background-color: #00cc66;
-      color: white;
       font-weight: bold;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-    .button:hover {
-      background-color: #00994d;
+    button:hover {
+      background-color: #0c0;
+    }
+    textarea {
+      background-color: #000;
+      color: #0f0;
+      width: 100%;
+      height: 80px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🩺 Clinic Logs – Add Doctor Notes</h1>
-  <button class="button" onclick="exportNotes()">💾 Export Doctor Notes CSV</button>
+  <h1>📋 Clinic Logs</h1>
+
+  <div class="summary-box" id="summary"></div>
+
+  <div style="text-align:center;">
+    <button onclick="exportCSV()">📁 Export Logs as CSV</button>
+    <button onclick="emailBackup()">✉️ Email Backup</button>
+  </div>
 
   <table id="logsTable">
     <thead>
@@ -66,60 +88,104 @@
         <th>Patient</th>
         <th>Reason</th>
         <th>Clinic</th>
-        <th>Doctor Note</th>
+        <th>Doctor Notes</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <script>
-    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+<script>
+const csvUrl = 'https://warangalonepoint.github.io/clinic-bot-system/logs.csv';
+const notesKey = 'doctor_notes'; // localStorage key (can also write to backend later)
 
-    fetch(CSV_URL)
-      .then(res => res.text())
-      .then(data => {
-        const rows = data.trim().split('\n').slice(1); // skip header
-        const tbody = document.querySelector("#logsTable tbody");
+// Load doctor notes from localStorage or initialize
+let notesData = JSON.parse(localStorage.getItem(notesKey) || '{}');
 
-        rows.forEach(row => {
-          const [date, time, patient, reason, clinic] = row.split(',');
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${patient}</td>
-            <td>${reason}</td>
-            <td>${clinic}</td>
-            <td><input type="text" placeholder="Enter note..." data-date="${date}" data-time="${time}" data-patient="${patient}" data-clinic="${clinic}"></td>
-          `;
-          tbody.appendChild(tr);
-        });
+function loadLogs() {
+  fetch(csvUrl)
+    .then(response => response.text())
+    .then(csv => {
+      const rows = csv.trim().split('\n').slice(1); // skip header
+      const data = rows.map(row => row.split(','));
+
+      const tbody = document.querySelector('#logsTable tbody');
+      tbody.innerHTML = '';
+
+      const bookingsByClinic = {};
+      const uniquePatients = new Set();
+      const hourCount = {};
+
+      data.forEach(([date, time, patient, reason, status]) => {
+        const hour = time.split(':')[0];
+        hourCount[hour] = (hourCount[hour] || 0) + 1;
+        bookingsByClinic[status] = (bookingsByClinic[status] || 0) + 1;
+        uniquePatients.add(patient);
+
+        const noteId = `${date}_${time}_${patient}`;
+        const note = notesData[noteId] || '';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${date}</td>
+          <td>${time}</td>
+          <td>${patient}</td>
+          <td>${reason}</td>
+          <td>${status}</td>
+          <td><input class="note" value="${note}" data-id="${noteId}" onchange="saveNote(this)" /></td>
+        `;
+        tbody.appendChild(tr);
       });
 
-    function exportNotes() {
-      const inputs = document.querySelectorAll("input");
-      let csv = "Date,Time,Patient,Clinic,Note\n";
+      const peakHour = Object.entries(hourCount).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'N/A';
+      const totalBookings = data.length;
+      const summaryHTML = `
+        <h3>📊 Daily Booking Summary</h3>
+        <p><strong>Date:</strong> ${new Date().toISOString().split('T')[0]}</p>
+        <p><strong>Total Bookings:</strong> ${totalBookings}</p>
+        <p><strong>Unique Patients:</strong> ${uniquePatients.size}</p>
+        <p><strong>Peak Hour:</strong> ${peakHour}:00</p>
+        <p><strong>Clinics Summary:</strong><br/>${Object.entries(bookingsByClinic).map(([clinic, count]) => `${clinic}: ${count} bookings`).join('<br/>')}</p>
+      `;
+      document.getElementById('summary').innerHTML = summaryHTML;
+    });
+}
 
-      inputs.forEach(input => {
-        if (input.value.trim() !== "") {
-          const date = input.dataset.date;
-          const time = input.dataset.time;
-          const patient = input.dataset.patient;
-          const clinic = input.dataset.clinic;
-          const note = input.value.replace(/,/g, ';'); // avoid breaking CSV
-          csv += `${date},${time},${patient},${clinic},${note}\n`;
-        }
-      });
+function saveNote(input) {
+  const id = input.getAttribute('data-id');
+  notesData[id] = input.value;
+  localStorage.setItem(notesKey, JSON.stringify(notesData));
+}
 
-      const blob = new Blob([csv], { type: "text/csv" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "DoctorNotesExport.csv";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  </script>
+function exportCSV() {
+  const rows = [['Date','Time','Patient','Reason','Clinic','Notes']];
+  const inputs = document.querySelectorAll('tbody tr');
+
+  inputs.forEach(tr => {
+    const cells = [...tr.children].map(td => td.textContent.trim());
+    const note = tr.querySelector('input').value;
+    rows.push([...cells.slice(0, 5), note]);
+  });
+
+  const csv = rows.map(e => e.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'DoctorNotesExport.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function emailBackup() {
+  const email = prompt('Enter email address to send backup:');
+  if (!email) return alert('Cancelled.');
+  exportCSV(); // Export locally first
+  alert('📩 Simulated email sent to ' + email + ' (manual for now)');
+}
+
+loadLogs();
+</script>
 
 </body>
 </html>
