@@ -2,93 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clinic PIN Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/logos/bookingbot-icon-192.png" />
+  <title>WarangalOneStop BookingBot</title>
   <style>
     body {
-      background-color: #111;
-      font-family: 'Segoe UI', sans-serif;
+      background-color: #000;
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
     }
-
     h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #f0ad4e;
+      color: #00c1d4;
     }
-
-    input[type="password"] {
-      padding: 10px;
-      font-size: 18px;
-      border-radius: 8px;
+    .button {
+      padding: 12px 20px;
+      background-color: #00c1d4;
+      color: #000;
       border: none;
-      margin-bottom: 20px;
-      width: 80%;
-      max-width: 300px;
-    }
-
-    button {
-      background-color: #f0ad4e;
-      color: #111;
-      padding: 10px 20px;
-      border: none;
+      border-radius: 5px;
       font-size: 18px;
-      border-radius: 8px;
       cursor: pointer;
-    }
-
-    p#error {
-      color: red;
-      margin-top: 15px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Enter Your Clinic PIN</h1>
-  <input type="password" id="pinInput" placeholder="Clinic PIN" />
-  <button onclick="login()">Login</button>
-  <p id="error"></p>
+  <h1>Welcome to WarangalOneStop BookingBot</h1>
+  <p>Book appointments, manage staff, and control everything via WhatsApp + Dashboard</p>
+  <button class="button" onclick="location.href='public-booking.html'">Book Now</button>
 
   <script>
-    async function login() {
-      const pin = document.getElementById('pinInput').value.trim();
-      const errorEl = document.getElementById('error');
-
-      try {
-        const response = await fetch('plans.json');
-        const plans = await response.json();
-
-        const clinic = plans.find(c => c.pin === pin);
-
-        if (!clinic) {
-          errorEl.textContent = "Invalid PIN. Try again.";
-          return;
-        }
-
-        // Check for trial expiry
-        if (clinic.plan === "Trial" && clinic.trialStart) {
-          const today = new Date();
-          const trialDate = new Date(clinic.trialStart);
-          const daysDiff = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
-
-          if (daysDiff >= 3 || clinic.status === "locked") {
-            window.location.href = "trial-expired.html";
-            return;
-          }
-        }
-
-        // Redirect to their dashboard
-        window.location.href = `dashboard.html?clinic=${clinic.clinicID}`;
-      } catch (err) {
-        errorEl.textContent = "Error loading clinic data.";
-        console.error(err);
-      }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('service-worker.js')
+        .then(() => console.log('✅ Service Worker Registered'))
+        .catch(err => console.error('❌ SW registration failed:', err));
     }
   </script>
 </body>
