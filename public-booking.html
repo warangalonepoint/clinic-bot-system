@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book an Appointment</title>
+  <style>
+    body {
+      background-color: #111;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ff99;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #00ff99;
+      color: #111;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      font-weight: bold;
+      width: 100%;
+    }
+    .slot {
+      background: #333;
+      padding: 8px;
+      border-radius: 5px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 Book an Appointment</h1>
+
+  <label for="clinic">Select Clinic:</label>
+  <select id="clinic"></select>
+
+  <label for="date">Select Date:</label>
+  <input type="date" id="date" />
+
+  <label for="name">Your Name:</label>
+  <input type="text" id="name" placeholder="Enter your name" />
+
+  <label for="reason">Reason for Visit:</label>
+  <input type="text" id="reason" placeholder="e.g. Fever, Check-up" />
+
+  <div id="slots-container">
+    <label>Available Time Slots:</label>
+    <div id="slots"></div>
+  </div>
+
+  <script>
+    const clinicsURL = "https://warangalonepoint.github.io/clinic-bot-system/config/clinics.json";
+
+    async function loadClinics() {
+      const res = await fetch(clinicsURL);
+      const clinics = await res.json();
+      const select = document.getElementById("clinic");
+      clinics.forEach(clinic => {
+        const option = document.createElement("option");
+        option.value = clinic.id;
+        option.textContent = clinic.name;
+        select.appendChild(option);
+      });
+    }
+
+    async function loadSlots() {
+      const clinicId = document.getElementById("clinic").value;
+      const date = document.getElementById("date").value;
+      const slotsContainer = document.getElementById("slots");
+      slotsContainer.innerHTML = "<em>Loading...</em>";
+      const url = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinicId}/Slots.csv`;
+
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        const rows = text.split("\n").slice(1); // skip header
+        const available = rows
+          .map(r => r.split(","))
+          .filter(r => r[0] === date && r[2]?.trim() !== "Booked");
+        if (available.length === 0) {
+          slotsContainer.innerHTML = "<p>No available slots for selected date.</p>";
+          return;
+        }
+        slotsContainer.innerHTML = "";
+        available.forEach(row => {
+          const slot = document.createElement("div");
+          slot.className = "slot";
+          slot.textContent = row[1]; // time
+          slot.onclick = () => {
+            const name = document.getElementById("name").value;
+            const reason = document.getElementById("reason").value;
+            if (!name || !reason) return alert("Enter name and reason first.");
+            const msg = `Hi, I want to book an appointment at ${clinicId} on ${row[0]} at ${row[1]}.\nName: ${name}\nReason: ${reason}`;
+            const link = `https://wa.me/${row[3]}?text=${encodeURIComponent(msg)}`;
+            window.open(link, "_blank");
+          };
+          slotsContainer.appendChild(slot);
+        });
+      } catch {
+        slotsContainer.innerHTML = "<p>Unable to load slots.</p>";
+      }
+    }
+
+    document.getElementById("clinic").addEventListener("change", loadSlots);
+    document.getElementById("date").addEventListener("change", loadSlots);
+
+    loadClinics();
+  </script>
+</body>
+</html>
