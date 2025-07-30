@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -37,9 +36,7 @@
   <p>🔒 Admin Login (PIN Required)</p>
   <input type="password" id="pinInput" placeholder="Enter 4-digit PIN" maxlength="4" />
   <br>
-  <button onclick="checkPIN()">Login</button>
-
-  <script>
+  <button onclick="checkPIN()">Login</button>  <script>
     async function checkPIN() {
       const pin = document.getElementById("pinInput").value.trim();
       if (!pin) return alert("Enter your PIN");
@@ -77,6 +74,5 @@
         .then(reg => console.log('SW registered:', reg))
         .catch(err => console.log('SW registration failed:', err));
     }
-  </script>
-</body>
+  </script></body>
 </html>
