@@ -1,78 +1,35 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BookingBot Admin Login</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="assets/logos/bookingbot-icon-192.png" />
-  <meta name="theme-color" content="#111" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic Login</title>
   <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      text-align: center;
-    }
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-    }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
+    header { background: #222; color: #fff; padding: 10px; display: flex; align-items: center; }
+    header img { height: 40px; margin-right: 10px; }
+    header h1 { margin: 0; font-size: 20px; }
+    .container { padding: 20px; }
   </style>
+  <script>
+    const clinicID = localStorage.getItem("clinicID") || "onesto";
+    const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
+  const logoEl = document.getElementById("clinic-logo");
+  if (logoEl) {
+    logoEl.src = logoPath;
+    logoEl.onerror = () => logoEl.style.display = "none";
+  }
+});
+
+  </script>
 </head>
 <body>
-  <h2>📅 WarangalOneStop BookingBot</h2>
-  <p>🔒 Admin Login (PIN Required)</p>
-  <input type="password" id="pinInput" placeholder="Enter 4-digit PIN" maxlength="4" />
-  <br>
-  <button onclick="checkPIN()">Login</button>  <script>
-    async function checkPIN() {
-      const pin = document.getElementById("pinInput").value.trim();
-      if (!pin) return alert("Enter your PIN");
-
-      // Trial check
-      const installDateKey = "bookingbot_install_date";
-      const today = new Date();
-      let installDate = localStorage.getItem(installDateKey);
-
-      if (!installDate) {
-        localStorage.setItem(installDateKey, today.toISOString());
-        installDate = today.toISOString();
-      }
-
-      const installed = new Date(installDate);
-      const diffDays = Math.floor((today - installed) / (1000 * 60 * 60 * 24));
-      if (diffDays > 2) {
-        window.location.href = "trial-expired.html";
-        return;
-      }
-
-      // Route based on PIN
-      if (pin === "2525") {
-        window.location.href = "admin-dashboard.html";
-      } else if (pin === "0000") {
-        window.location.href = "clinic-dashboard.html";
-      } else {
-        alert("Invalid PIN");
-      }
-    }
-
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('SW registered:', reg))
-        .catch(err => console.log('SW registration failed:', err));
-    }
-  </script></body>
+  <header>
+    <img id="clinic-logo" alt="Clinic Logo" />
+    <h1>Clinic Login</h1>
+  </header>
+  <div class="container">
+    <!-- Login content goes here -->
+    <p>Please enter your PIN to access the dashboard.</p>
+  </div>
+</body>
 </html>
