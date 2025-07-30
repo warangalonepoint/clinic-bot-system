@@ -2,30 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const logoContainer = document.getElementById("logo-container");
-      const clinicId = "OneStop";
-      const img = new Image();
-      img.src = `assets/logos/${clinicId}.png`;
-      img.alt = "Clinic Logo";
-      img.onload = () => logoContainer.appendChild(img);
-      img.onerror = () => {
-        const fallback = new Image();
-        fallback.src = `assets/logos/default.png`;
-        fallback.alt = "Default Logo";
-        logoContainer.appendChild(fallback);
-      };
-    });
-  </script>
+  <link rel="icon" href="logo.png" type="image/png">
+  <meta name="theme-color" content="#000000" />
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #clinicLogo {
+      max-width: 180px;
+      padding: 10px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    .info {
+      margin-top: 20px;
+    }
+    .locked {
+      color: red;
+      font-size: 18px;
+      margin-top: 40px;
+      text-align: center;
+    }
+  </style>
 </head>
-<body style="background:#111; color:white; font-family:sans-serif; padding:20px;">
-  <h2>📊 Dashboard</h2>
-  <div id="logo-container" style="margin-bottom:20px;"></div>
-  <p>This is the dashboard page content.</p>
+<body>
+  <header>
+    <img id="clinicLogo" src="logo.png" alt="Clinic Logo">
+    <h1>📊 Dashboard</h1>
+  </header>
+
+  <div class="info" id="mainContent">
+    <!-- Actual dashboard content goes here -->
+    <p>Welcome to your clinic dashboard. Use the menu to manage your system.</p>
+  </div>
+
+  <div class="locked" id="lockedMessage" style="display: none;">
+    🔒 Your 3-day free trial has expired.<br>
+    Contact the admin to unlock full access.
+  </div>
+
+  <script>
+    async function checkTrialStatus() {
+      try {
+        const response = await fetch('plans.json');
+        const plans = await response.json();
+        const url = window.location.href;
+        const clinicKey = url.split("/")[2].split(".")[0]; // fallback logic
+
+        const plan = plans[clinicKey] || {};
+        const expiry = new Date(plan.expiry || '1970-01-01');
+        const today = new Date();
+        const override = plan.overrideLock === true;
+
+        if (today > expiry && !override) {
+          document.getElementById("mainContent").style.display = "none";
+          document.getElementById("lockedMessage").style.display = "block";
+        }
+      } catch (e) {
+        console.error("Trial check failed:", e);
+      }
+    }
+
+    checkTrialStatus();
+  </script>
 </body>
 </html>
