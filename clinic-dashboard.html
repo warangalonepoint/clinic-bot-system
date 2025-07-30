@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clinic Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="assets/icons/favicon.png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+    }
+
+    header {
+      background-color: #222;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      height: 50px;
+    }
+
+    .clinic-info {
+      text-align: right;
+    }
+
+    .clinic-info h2, .clinic-info p {
+      margin: 2px 0;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background-color: #1c1c1c;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+
+    th {
+      background-color: #333;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .badge {
+      background-color: #28a745;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/icons/favicon.png" class="logo" id="clinicLogo" />
+    <div class="clinic-info">
+      <h2 id="clinicName">Clinic Name</h2>
+      <p id="clinicAddress">Address</p>
+      <span id="planBadge" class="badge">Plan</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="section">
+      <h3>📅 Today's Appointments</h3>
+      <table id="slotsTable">
+        <thead><tr><th>Time</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>📜 Booking Logs</h3>
+      <table id="logsTable">
+        <thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Reason</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>🗒️ Doctor Notes</h3>
+      <table id="notesTable">
+        <thead><tr><th>Date</th><th>Note</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const today = new Date().toISOString().split('T')[0];
+    const clinicID = localStorage.getItem("clinicID") || "unknown";
+
+    async function loadClinicInfo() {
+      const res = await fetch("config/clinics.json");
+      const data = await res.json();
+      const clinic = data.find(c => c.id === clinicID);
+
+      if (!clinic) {
+        alert("Clinic not found.");
+        return;
+      }
+
+      document.getElementById("clinicName").textContent = clinic.name;
+      document.getElementById("clinicAddress").textContent = clinic.address;
+      document.getElementById("planBadge").textContent = clinic.plan.toUpperCase();
+      document.getElementById("clinicLogo").src = clinic.logo;
+    }
+
+    async function loadCSV(path) {
+      const res = await fetch(path);
+      const text = await res.text();
+      const rows = text.trim().split("\n").slice(1).map(row => row.split(","));
+      return rows;
+    }
+
+    async function loadDashboard() {
+      loadClinicInfo();
+
+      const slots = await loadCSV(`clinics/${clinicID}/Slots.csv`);
+      const logs = await loadCSV(`clinics/${clinicID}/Logs.csv`);
+      const notes = await loadCSV(`clinics/${clinicID}/Notes.csv`);
+
+      const slotsTable = document.querySelector("#slotsTable tbody");
+      slotsTable.innerHTML = "";
+      slots.filter(row => row[2] === today).forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td>`;
+        slotsTable.appendChild(tr);
+      });
+
+      const logsTable = document.querySelector("#logsTable tbody");
+      logsTable.innerHTML = "";
+      logs.filter(row => row[0] === today).forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td>`;
+        logsTable.appendChild(tr);
+      });
+
+      const notesTable = document.querySelector("#notesTable tbody");
+      notesTable.innerHTML = "";
+      notes.filter(row => row[0] === today).forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td>`;
+        notesTable.appendChild(tr);
+      });
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
