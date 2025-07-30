@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clinic Dashboard</title>
+  <link rel="icon" href="assets/logos/bookingbot-icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    .hidden { display: none; }
+    .clinic-logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      margin: 10px auto;
+    }
+    .status-msg {
+      color: #f39c12;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Clinic Dashboard</h1>
+  <img id="clinicLogo" class="clinic-logo" src="" alt="Clinic Logo" />
+  <p id="clinicName"></p>
+  <p id="planStatus" class="status-msg"></p>
+
+  <div id="dashboardContent" class="hidden">
+    <button onclick="location.href='bookings.html'">📅 View Appointments</button>
+    <button onclick="location.href='logs.html'">📊 Booking Logs</button>
+    <button onclick="location.href='staff.html'">👥 Staff Panel</button>
+    <button onclick="location.href='notes-history.html'">📝 Doctor Notes</button>
+  </div>
+
+  <script>
+    const currentClinicId = localStorage.getItem("clinic_id");
+    fetch("clinics.json")
+      .then(res => res.json())
+      .then(data => {
+        const clinic = data.find(c => c.id === currentClinicId);
+        if (!clinic) {
+          alert("Unknown Clinic");
+          return;
+        }
+
+        document.getElementById("clinicName").textContent = clinic.name || "Unnamed Clinic";
+        document.getElementById("clinicLogo").src = clinic.logo || "assets/logos/default.png";
+
+        // Trial check
+        const expiry = new Date(clinic.trial_expiry);
+        const today = new Date();
+        if (today > expiry) {
+          // Lock access
+          window.location.href = "trial-expired.html";
+        } else {
+          document.getElementById("dashboardContent").classList.remove("hidden");
+          const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+          document.getElementById("planStatus").textContent =
+            `🆓 Trial: ${daysLeft} day(s) left (Expires on ${clinic.trial_expiry})`;
+        }
+      })
+      .catch(err => {
+        console.error("Error loading clinic data:", err);
+        alert("Failed to load clinic info.");
+      });
+  </script>
+</body>
+</html>
