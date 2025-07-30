@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clinic PIN Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background-color: #111;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #f0ad4e;
+    }
+
+    input[type="password"] {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 20px;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    button {
+      background-color: #f0ad4e;
+      color: #111;
+      padding: 10px 20px;
+      border: none;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    p#error {
+      color: red;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Enter Your Clinic PIN</h1>
+  <input type="password" id="pinInput" placeholder="Clinic PIN" />
+  <button onclick="login()">Login</button>
+  <p id="error"></p>
+
+  <script>
+    async function login() {
+      const pin = document.getElementById('pinInput').value.trim();
+      const errorEl = document.getElementById('error');
+
+      try {
+        const response = await fetch('plans.json');
+        const plans = await response.json();
+
+        const clinic = plans.find(c => c.pin === pin);
+
+        if (!clinic) {
+          errorEl.textContent = "Invalid PIN. Try again.";
+          return;
+        }
+
+        // Check for trial expiry
+        if (clinic.plan === "Trial" && clinic.trialStart) {
+          const today = new Date();
+          const trialDate = new Date(clinic.trialStart);
+          const daysDiff = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
+
+          if (daysDiff >= 3 || clinic.status === "locked") {
+            window.location.href = "trial-expired.html";
+            return;
+          }
+        }
+
+        // Redirect to their dashboard
+        window.location.href = `dashboard.html?clinic=${clinic.clinicID}`;
+      } catch (err) {
+        errorEl.textContent = "Error loading clinic data.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
