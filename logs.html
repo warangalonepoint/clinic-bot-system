@@ -2,173 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>📋 Clinic Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Logs</title>
+  <link rel="manifest" href="manifest.json" />
   <style>
     body {
       background-color: #111;
-      color: #fff;
       font-family: Arial, sans-serif;
+      color: #fff;
       padding: 20px;
     }
-
     h1 {
-      color: #4fe;
-    }
-
-    .summary, .log-table {
-      margin-top: 20px;
-      border: 1px solid #444;
-      padding: 20px;
-      background: #222;
-      border-radius: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #333;
-      text-align: left;
-    }
-
-    th {
-      background-color: #333;
       color: #0f0;
     }
-
-    button {
-      padding: 10px 15px;
-      margin-right: 10px;
-      background: #0f0;
-      border: none;
-      border-radius: 5px;
-      color: #000;
-      font-weight: bold;
+    #logTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
-
-    #status {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #f66;
+    #logTable th, #logTable td {
+      padding: 10px;
+      border: 1px solid #444;
+      text-align: left;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Clinic Logs</h1>
-  <p id="status">Checking trial status...</p>
+  <h1>📊 Booking Logs</h1>
+  <table id="logTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Patient</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody id="logBody"></tbody>
+  </table>
 
-  <div class="summary" id="summaryPanel" style="display:none;">
-    <h2>📊 Daily Booking Summary</h2>
-    <p id="summaryText">Loading...</p>
-  </div>
-
-  <div class="log-table" id="logTable" style="display:none;">
-    <h3>🗂️ All Logs</h3>
-    <table id="logsTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Patient</th>
-          <th>Reason</th>
-          <th>Clinic</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
+  <!-- Load and display logs -->
   <script>
-    async function checkTrialStatus() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const clinicID = urlParams.get("clinic");
+    const clinicId = localStorage.getItem('clinic_id') || 'OneStop';
+    const logsPath = `logs/${clinicId}/logs.csv`;
 
-      if (!clinicID) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      try {
-        const response = await fetch("plans.json");
-        const plans = await response.json();
-        const clinic = plans.find(c => c.clinicID === clinicID);
-
-        if (!clinic) {
-          document.getElementById("status").textContent = "❌ Invalid clinic ID.";
-          return;
-        }
-
-        if (clinic.plan === "Trial" && clinic.trialStart) {
-          const trialDate = new Date(clinic.trialStart);
-          const today = new Date();
-          const days = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
-
-          if (days >= 3 || clinic.status === "locked") {
-            window.location.href = "trial-expired.html";
-            return;
-          }
-        }
-
-        document.getElementById("status").innerHTML = `✅ Access granted for <b>${clinicID}</b> (${clinic.plan})`;
-        document.getElementById("summaryPanel").style.display = "block";
-        document.getElementById("logTable").style.display = "block";
-
-        loadLogs(clinicID);
-
-      } catch (e) {
-        document.getElementById("status").textContent = "❌ Error loading plan data.";
-        console.error(e);
-      }
-    }
-
-    async function loadLogs(clinicID) {
-      try {
-        const response = await fetch("logs.csv");
-        const text = await response.text();
-        const lines = text.trim().split("\n").slice(1); // remove header
-        const logs = lines.map(line => {
-          const [date, time, patient, reason, status] = line.split(",");
-          return { date, time, patient, reason, status };
-        }).filter(entry => entry.status === clinicID);
-
-        // Summary
-        const total = logs.length;
-        const uniquePatients = [...new Set(logs.map(l => l.patient))].length;
-        const times = logs.map(l => l.time);
-        const peakHour = times.sort()[0] || "N/A";
-
-        document.getElementById("summaryText").innerHTML = `
-          Date: ${new Date().toISOString().slice(0,10)}<br>
-          Total Bookings: ${total}<br>
-          Unique Patients: ${uniquePatients}<br>
-          Peak Hour: ${peakHour}<br>
-        `;
-
-        // Table
-        const tbody = document.querySelector("#logsTable tbody");
-        tbody.innerHTML = "";
-        logs.forEach(log => {
-          const row = `<tr>
-            <td>${log.date}</td>
-            <td>${log.time}</td>
-            <td>${log.patient}</td>
-            <td>${log.reason}</td>
-            <td>${log.status}</td>
-          </tr>`;
-          tbody.innerHTML += row;
+    fetch(logsPath)
+      .then(response => response.text())
+      .then(csv => {
+        const rows = csv.trim().split('\n').slice(1);
+        const table = document.getElementById('logBody');
+        rows.forEach(row => {
+          const cols = row.split(',');
+          const tr = document.createElement('tr');
+          cols.forEach(col => {
+            const td = document.createElement('td');
+            td.textContent = col;
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
         });
+      })
+      .catch(() => {
+        document.getElementById('logBody').innerHTML = `<tr><td colspan="4">No logs found.</td></tr>`;
+      });
+  </script>
 
-      } catch (e) {
-        console.error("Error loading logs:", e);
-      }
+  <!-- PWA: Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js');
     }
+  </script>
 
-    checkTrialStatus();
+  <!-- Trial Lock Check -->
+  <script>
+    fetch('plans.json')
+      .then(res => res.json())
+      .then(data => {
+        const plan = data[clinicId];
+        if (!plan || !plan.isTrialActive || new Date() > new Date(plan.expiryDate)) {
+          window.location.href = "trial-expired.html";
+        }
+      });
   </script>
 </body>
 </html>
