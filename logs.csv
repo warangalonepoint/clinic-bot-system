@@ -1,0 +1,17 @@
+Date,Time,Patient,Reason,Status
+2025-07-30,09:00,Anjali,General Checkup,clinic05
+2025-07-30,09:10,Arjun,Consultation,clinic02
+2025-07-30,09:20,Divya,Consultation,clinic03
+2025-07-30,09:30,Kiran,Fever,clinic04
+2025-07-30,09:40,Kiran,General Checkup,clinic04
+2025-07-30,09:50,Manoj,Follow-up,clinic01
+2025-07-30,10:00,Pooja,General Checkup,clinic03
+2025-07-30,10:10,Neha,Consultation,clinic01
+2025-07-30,10:20,Sneha,Follow-up,clinic02
+2025-07-30,10:30,Ravi,Consultation,clinic03
+2025-07-30,10:40,Neha,Consultation,clinic01
+2025-07-30,10:50,Ravi,Follow-up,clinic03
+2025-07-30,11:00,Sneha,Follow-up,clinic02
+2025-07-30,11:10,Arjun,Consultation,clinic05
+2025-07-30,11:20,Kiran,Fever,clinic04
+2025-07-30,11:30,Pooja,General Checkup,clinic01
