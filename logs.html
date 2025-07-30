@@ -2,123 +2,182 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Logs</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       background-color: #111;
       color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 20px;
       margin: 0;
+      padding: 20px;
     }
-    h1 {
+
+    h2 {
       text-align: center;
-      color: #00ffcc;
+      color: #00f5b3;
+      font-size: 28px;
+      margin-bottom: 20px;
     }
+
+    .summary {
+      background: #222;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #222;
+      margin-top: 10px;
     }
+
     th, td {
-      padding: 10px;
       border: 1px solid #444;
+      padding: 10px;
       text-align: left;
     }
+
     th {
-      background-color: #333;
+      background-color: #222;
+      color: #00f5b3;
     }
+
+    tr:nth-child(even) {
+      background-color: #1a1a1a;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
     .btn {
-      background-color: #00cc88;
+      background-color: #00f5b3;
+      color: #000;
+      padding: 10px 20px;
       border: none;
-      color: white;
-      padding: 10px 16px;
-      margin: 5px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
-      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
     }
+
     .btn:hover {
-      background-color: #00b37a;
+      background-color: #00c291;
     }
-    .export-section {
-      text-align: center;
-      margin-top: 20px;
+
+    ul {
+      padding-left: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Clinic Logs</h1>
 
-  <div class="export-section">
-    <button onclick="downloadLogs()" class="btn">📁 Export Logs as CSV</button>
-    <a href="#" id="emailLink" class="btn">📧 Email Backup</a>
+  <h2>📋 Clinic Logs</h2>
+
+  <div class="button-row">
+    <button class="btn" onclick="exportCSV()">📂 Export Logs as CSV</button>
+    <a class="btn" href="mailto:?subject=Clinic Logs Backup&body=Please attach the logs CSV file." target="_blank">📧 Email Backup</a>
   </div>
 
-  <table id="logTable">
+  <div class="summary" id="summaryPanel">
+    <h3>📊 Daily Booking Summary</h3>
+    <p><strong>Date:</strong> <span id="summaryDate">-</span></p>
+    <p><strong>Total Bookings:</strong> <span id="totalBookings">0</span></p>
+    <p><strong>Unique Patients:</strong> <span id="uniquePatients">0</span></p>
+    <p><strong>Peak Hour:</strong> <span id="peakHour">-</span></p>
+    <p><strong>Clinics Summary:</strong></p>
+    <ul id="clinicWiseSummary"></ul>
+  </div>
+
+  <table id="logsTable">
     <thead>
       <tr>
         <th>Date</th>
         <th>Time</th>
         <th>Patient</th>
         <th>Reason</th>
-        <th>Status</th>
+        <th>Clinic</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- Logs will be inserted here -->
-    </tbody>
+    <tbody></tbody>
   </table>
 
   <script>
-    const clinicId = localStorage.getItem("selectedClinic") || "OneStop";
+    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
 
-    function loadLogs() {
-      const url = `https://warangalonepoint.github.io/clinic-admin/logs.csv`;
+    async function fetchCSV() {
+      const response = await fetch(CSV_URL);
+      const text = await response.text();
+      const rows = text.trim().split('\n').slice(1).map(row => row.split(','));
+      return rows;
+    }
 
-      fetch(url)
-        .then(res => res.text())
-        .then(csv => {
-          const rows = csv.trim().split("\n").slice(1); // skip header
-          const table = document.querySelector("#logTable tbody");
-          table.innerHTML = "";
+    function populateTable(data) {
+      const tbody = document.querySelector('#logsTable tbody');
+      tbody.innerHTML = '';
 
-          rows.forEach(row => {
-            const cols = row.split(",");
-            const tr = document.createElement("tr");
-            cols.forEach(col => {
-              const td = document.createElement("td");
-              td.textContent = col.trim();
-              tr.appendChild(td);
-            });
-            table.appendChild(tr);
-          });
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          tr.appendChild(td);
         });
+        tbody.appendChild(tr);
+      });
     }
 
-    function downloadLogs() {
-      fetch('https://warangalonepoint.github.io/clinic-admin/logs.csv')
-        .then(res => res.text())
-        .then(data => {
-          const blob = new Blob([data], { type: 'text/csv' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${clinicId}_logs_backup.csv`;
-          a.click();
-        });
+    function calculateSummary(data) {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('summaryDate').textContent = today;
+
+      const bookingsToday = data.filter(row => row[0] === today);
+      const totalBookings = bookingsToday.length;
+      const uniquePatients = new Set(bookingsToday.map(row => row[2])).size;
+
+      const hours = {};
+      const clinics = {};
+
+      bookingsToday.forEach(row => {
+        const hour = row[1].split(':')[0] + ":00";
+        hours[hour] = (hours[hour] || 0) + 1;
+        const clinic = row[4];
+        clinics[clinic] = (clinics[clinic] || 0) + 1;
+      });
+
+      const peakHour = Object.entries(hours).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+
+      document.getElementById('totalBookings').textContent = totalBookings;
+      document.getElementById('uniquePatients').textContent = uniquePatients;
+      document.getElementById('peakHour').textContent = peakHour;
+
+      const clinicSummary = document.getElementById('clinicWiseSummary');
+      clinicSummary.innerHTML = '';
+      Object.entries(clinics).forEach(([clinic, count]) => {
+        const li = document.createElement('li');
+        li.textContent = `${clinic}: ${count} bookings`;
+        clinicSummary.appendChild(li);
+      });
     }
 
-    function prepareEmailLink() {
-      const subject = encodeURIComponent(`${clinicId} Logs Backup`);
-      const body = encodeURIComponent(`Hi,\n\nPlease find the daily logs for ${clinicId} attached.\n\n- WarangalOneStop BookingBot`);
-      document.getElementById("emailLink").href = `mailto:?subject=${subject}&body=${body}`;
+    function exportCSV() {
+      const link = document.createElement("a");
+      link.href = CSV_URL;
+      link.download = "clinic_logs.csv";
+      link.click();
     }
 
-    loadLogs();
-    prepareEmailLink();
+    fetchCSV().then(data => {
+      populateTable(data);
+      calculateSummary(data);
+    });
   </script>
+
 </body>
 </html>
