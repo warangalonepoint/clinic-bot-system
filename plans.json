@@ -1,0 +1,17 @@
+[
+  {
+    "clinicID": "clinic01",
+    "pin": "1111",
+    "plan": "Free"
+  },
+  {
+    "clinicID": "clinic02",
+    "pin": "2222",
+    "plan": "Basic"
+  },
+  {
+    "clinicID": "clinic03",
+    "pin": "3333",
+    "plan": "Pro"
+  }
+]
