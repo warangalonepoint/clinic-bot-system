@@ -2,45 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clinic Login – BookingBot</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="assets/logos/bookingbot-icon-192.png" />
-  <title>WarangalOneStop BookingBot</title>
+  <meta name="theme-color" content="#000000" />
   <style>
     body {
       background-color: #000;
       color: #fff;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 50px;
+      padding-top: 50px;
     }
-    h1 {
-      color: #00c1d4;
-    }
-    .button {
-      padding: 12px 20px;
-      background-color: #00c1d4;
-      color: #000;
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 6px;
       border: none;
-      border-radius: 5px;
-      font-size: 18px;
+      font-size: 16px;
+    }
+    button {
+      background: #28a745;
+      color: #fff;
       cursor: pointer;
-      margin-top: 20px;
+    }
+    button:hover {
+      background: #218838;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to WarangalOneStop BookingBot</h1>
-  <p>Book appointments, manage staff, and control everything via WhatsApp + Dashboard</p>
-  <button class="button" onclick="location.href='public-booking.html'">Book Now</button>
+  <h1>Clinic Login</h1>
+  <input id="clinicId" placeholder="Enter Clinic ID" />
+  <input id="pin" type="password" placeholder="Enter PIN" />
+  <br>
+  <button onclick="login()">Login</button>
 
   <script>
+    async function login() {
+      const clinicId = document.getElementById('clinicId').value.trim();
+      const pin = document.getElementById('pin').value.trim();
+
+      if (!clinicId || !pin) return alert("Please enter Clinic ID and PIN");
+
+      const response = await fetch('data/clinics.json');
+      const clinics = await response.json();
+
+      const clinic = clinics.find(c => c.id === clinicId && c.pin === pin);
+      if (!clinic) return alert("Invalid credentials");
+
+      // Trial expiry check
+      const today = new Date().toISOString().split('T')[0];
+      if (clinic.trial_expiry_date && today > clinic.trial_expiry_date) {
+        localStorage.setItem('clinicId', clinicId);
+        window.location.href = 'trial-expired.html';
+        return;
+      }
+
+      localStorage.setItem('clinicId', clinicId);
+      window.location.href = 'dashboard.html';
+    }
+
+    // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('service-worker.js')
-        .then(() => console.log('✅ Service Worker Registered'))
-        .catch(err => console.error('❌ SW registration failed:', err));
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registered:', reg))
+        .catch(err => console.error('SW error:', err));
     }
   </script>
 </body>
