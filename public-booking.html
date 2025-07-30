@@ -10,6 +10,7 @@
     button { padding: 10px 15px; border: none; background: #0f0; color: #000; border-radius: 5px; cursor: pointer; }
     .slot-btn { background: #0f0; color: #000; padding: 8px 12px; border-radius: 6px; margin: 5px; }
     #confirmForm { display: none; margin-top: 20px; background: #222; padding: 15px; border-radius: 8px; color: #fff; }
+    #logLine { background: #222; padding: 10px; margin-top: 15px; border-radius: 5px; word-wrap: break-word; color: #0f0; font-family: monospace; }
   </style>
 </head>
 <body>
@@ -23,8 +24,11 @@
     <input type="text" id="patientName" placeholder="Your Name"><br>
     <input type="text" id="reason" placeholder="Reason for Visit"><br>
     <button onclick="submitBooking()">Confirm & Go to WhatsApp</button>
+    <div id="logLine"></div>
+    <button onclick="copyLogLine()">📋 Copy Log Line</button>
   </div>  <script>
     let selectedTime = "";
+    let latestLogLine = "";
 
     async function loadTimeSlots() {
       const clinic = document.querySelector("#clinic").value;
@@ -73,10 +77,18 @@
         return;
       }
 
+      const log = `${clinic},${date},${selectedTime},${name},${reason}`;
+      latestLogLine = log;
+      document.querySelector("#logLine").innerText = log;
+
       const logURL = `https://wa.me/919390664577?text=Hi,%20I%20want%20to%20book%20a%20slot%20on%20${date}%20at%20${selectedTime}%20for%20${name}.%20Reason:%20${reason}`;
       window.open(logURL, "_blank");
+    }
 
-      alert(`Save this manually:\nClinic: ${clinic}\nName: ${name}\nDate: ${date}\nTime: ${selectedTime}\nReason: ${reason}`);
+    function copyLogLine() {
+      navigator.clipboard.writeText(latestLogLine).then(() => {
+        alert("Log line copied to clipboard! Paste into logs.csv");
+      });
     }
   </script></body>
 </html>
