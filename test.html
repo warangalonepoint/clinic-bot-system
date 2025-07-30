@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic System Auto Test</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; padding: 2rem; }
+    h1 { color: #00ffcc; }
+    .test-result { border: 1px solid #333; margin: 1rem 0; padding: 1rem; border-radius: 8px; }
+    .pass { background: #002f1f; border-left: 5px solid #0f0; }
+    .fail { background: #2f0000; border-left: 5px solid #f00; }
+    .checking { background: #1f1f1f; border-left: 5px solid #ff0; }
+    .test-result h2 { margin: 0; }
+    .green { color: #0f0; }
+    .red { color: #f00; }
+    .yellow { color: #ff0; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Clinic Admin System - Auto Test</h1>
+  <div id="testArea"></div>  <script>
+    const tests = [
+      { name: "Index Page", url: "index.html" },
+      { name: "Dashboard Page", url: "dashboard.html" },
+      { name: "Bookings Page", url: "bookings.html" },
+      { name: "Logs Page", url: "logs.html" },
+      { name: "Clinic Dashboard", url: "clinic-dashboard.html" },
+      { name: "Public Booking", url: "public-booking.html" }
+    ];
+
+    const testArea = document.getElementById("testArea");
+
+    async function runTests() {
+      for (let test of tests) {
+        const div = document.createElement("div");
+        div.className = "test-result checking";
+        div.innerHTML = `<h2>Checking: ${test.name}</h2>`;
+        testArea.appendChild(div);
+
+        try {
+          const res = await fetch(test.url);
+          const text = await res.text();
+
+          if (res.ok && text.includes("clinic-logo")) {
+            div.className = "test-result pass";
+            div.innerHTML = `<h2>${test.name}</h2><p class="green">✅ Page loaded and logo found.</p>`;
+          } else {
+            div.className = "test-result fail";
+            div.innerHTML = `<h2>${test.name}</h2><p class="red">❌ Page loaded but logo not found.</p>`;
+          }
+        } catch (err) {
+          div.className = "test-result fail";
+          div.innerHTML = `<h2>${test.name}</h2><p class="red">❌ Error loading page: ${err.message}</p>`;
+        }
+      }
+    }
+
+    runTests();
+  </script></body>
+</html>
