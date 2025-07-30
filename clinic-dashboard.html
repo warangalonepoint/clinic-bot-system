@@ -3,67 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <title>Clinic Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
-      background-color: #111;
+      background-color: #121212;
       color: #fff;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
 
     h1 {
-      color: #f0ad4e;
-      font-size: 24px;
+      color: #00ffd5;
+    }
+
+    .section {
+      background: #222;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+
+    #status {
+      color: #0f0;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>👨‍⚕️ Welcome to Clinic Dashboard</h1>
-  <p id="clinicStatus">Checking trial status...</p>
+  <h1>📋 Clinic Dashboard</h1>
+  <div id="status">Checking access...</div>
+
+  <div id="dashboardContent" class="section" style="display:none;">
+    <p>Welcome to your dashboard. You can manage bookings, view logs, and update your clinic settings.</p>
+    <!-- Add your dashboard tools here -->
+  </div>
 
   <script>
-    async function verifyAccess() {
+    async function checkAccess() {
       const urlParams = new URLSearchParams(window.location.search);
-      const clinicID = urlParams.get('clinic');
+      const clinicID = urlParams.get("clinic");
 
       if (!clinicID) {
-        window.location.href = 'index.html';
+        window.location.href = "index.html";
         return;
       }
 
       try {
-        const response = await fetch('plans.json');
+        const response = await fetch("plans.json");
         const plans = await response.json();
         const clinic = plans.find(c => c.clinicID === clinicID);
 
         if (!clinic) {
-          document.getElementById('clinicStatus').textContent = "Invalid clinic.";
+          document.getElementById("status").textContent = "❌ Invalid clinic ID.";
           return;
         }
 
         if (clinic.plan === "Trial" && clinic.trialStart) {
           const trialDate = new Date(clinic.trialStart);
           const today = new Date();
-          const days = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
+          const daysPassed = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
 
-          if (days >= 3 || clinic.status === "locked") {
-            window.location.href = 'trial-expired.html';
+          if (daysPassed >= 3 || clinic.status === "locked") {
+            window.location.href = "trial-expired.html";
             return;
           }
         }
 
-        document.getElementById('clinicStatus').textContent = `✅ Access granted: ${clinicID} (${clinic.plan} Plan)`;
-
-        // TODO: Load dashboard data here
+        document.getElementById("status").innerHTML = `✅ Access granted for <b>${clinicID}</b> (${clinic.plan})`;
+        document.getElementById("dashboardContent").style.display = "block";
 
       } catch (err) {
-        document.getElementById('clinicStatus').textContent = "Error verifying access.";
+        document.getElementById("status").textContent = "❌ Error checking access.";
         console.error(err);
       }
     }
 
-    verifyAccess();
+    checkAccess();
   </script>
 </body>
 </html>
