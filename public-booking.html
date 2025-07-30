@@ -37,14 +37,28 @@
       slotDiv.innerHTML = "<p>Loading...</p>";
 
       const clinicPath = clinic.replace(/\s+/g, '');
-      const url = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinicPath}/Notes.csv`;
+      const notesURL = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinicPath}/Notes.csv`;
+      const logsURL = `https://warangalonepoint.github.io/clinic-bot-system/clinics/${clinicPath}/logs.csv`;
 
       try {
-        const res = await fetch(url);
-        const csv = await res.text();
-        const rows = csv.trim().split("\n").slice(1);
-        const available = rows.map(r => r.split(","))
-          .filter(([d, t, s]) => d === date && s === "Available");
+        const [notesRes, logsRes] = await Promise.all([
+          fetch(notesURL),
+          fetch(logsURL)
+        ]);
+
+        const notesCSV = await notesRes.text();
+        const logsCSV = await logsRes.text();
+
+        const notesRows = notesCSV.trim().split("\n").slice(1).map(r => r.split(","));
+        const logsRows = logsCSV.trim().split("\n").slice(1).map(r => r.split(","));
+
+        const bookedTimes = logsRows
+          .filter(r => r[1] === date)
+          .map(r => r[2]);
+
+        const available = notesRows.filter(([d, t, s]) =>
+          d === date && s === "Available" && !bookedTimes.includes(t)
+        );
 
         if (available.length === 0) {
           slotDiv.innerHTML = "<p>No slots available.</p>";
