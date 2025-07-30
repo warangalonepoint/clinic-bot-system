@@ -1,140 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Book an Appointment</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #00e0ff;
-    }
-
-    #bookingUI {
-      display: none;
-    }
-
-    select, input {
-      padding: 10px;
-      font-size: 16px;
-      width: 100%;
-      margin: 10px 0;
-    }
-
-    button {
-      background-color: #00ff90;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #error {
-      color: red;
-      font-weight: bold;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Booking - WarangalOneStop</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>🗓️ Book an Appointment</h1>
-  <div id="error">Checking clinic access...</div>
-
-  <div id="bookingUI">
-    <label>Patient Name:</label>
-    <input type="text" id="name" placeholder="Enter your name" required />
-
-    <label>Reason for Visit:</label>
-    <input type="text" id="reason" placeholder="E.g., Consultation" required />
-
-    <label>Select Time Slot:</label>
-    <select id="slotDropdown"></select>
-
-    <button onclick="book()">Book via WhatsApp</button>
-  </div>
-
-  <script>
-    async function checkTrialAccess() {
-      const params = new URLSearchParams(window.location.search);
-      const clinicID = params.get("clinic");
-
-      if (!clinicID) {
-        document.getElementById("error").textContent = "❌ No clinic ID specified.";
-        return;
-      }
-
-      try {
-        const res = await fetch("plans.json");
-        const plans = await res.json();
-        const clinic = plans.find(c => c.clinicID === clinicID);
-
-        if (!clinic) {
-          document.getElementById("error").textContent = "❌ Clinic not found.";
-          return;
+  <h1>Book Your Appointment</h1>
+  <p>Please choose a slot to confirm your appointment.</p>  <!-- Booking UI Goes Here -->  <!-- Service Worker Registration -->  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js');
+      });
+    }
+  </script>  <!-- Trial Lock Check -->  <script>
+    fetch('plans.json')
+      .then(res => res.json())
+      .then(data => {
+        const clinicId = localStorage.getItem('clinic_id') || 'OneStop';
+        const plan = data[clinicId];
+        if (!plan || !plan.isTrialActive || new Date() > new Date(plan.expiryDate)) {
+          window.location.href = "trial-expired.html";
         }
-
-        if (clinic.plan === "Trial" && clinic.trialStart) {
-          const trialDate = new Date(clinic.trialStart);
-          const today = new Date();
-          const daysPassed = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
-
-          if (daysPassed >= 3 || clinic.status === "locked") {
-            window.location.href = "trial-expired.html";
-            return;
-          }
-        }
-
-        document.getElementById("error").style.display = "none";
-        document.getElementById("bookingUI").style.display = "block";
-        loadSlots(clinicID);
-
-      } catch (err) {
-        document.getElementById("error").textContent = "❌ Error checking clinic access.";
-        console.error(err);
-      }
-    }
-
-    async function loadSlots(clinicID) {
-      try {
-        const res = await fetch("https://warangalonepoint.github.io/clinic-admin/Slots.csv");
-        const text = await res.text();
-        const rows = text.trim().split("\n").slice(1);
-        const dropdown = document.getElementById("slotDropdown");
-        rows.forEach(row => {
-          const [date, time, status, clinic] = row.split(",");
-          if (status === "Available" && clinic === clinicID) {
-            const option = document.createElement("option");
-            option.value = `${date} ${time}`;
-            option.textContent = `${date} – ${time}`;
-            dropdown.appendChild(option);
-          }
-        });
-      } catch (err) {
-        console.error("Failed to load slots:", err);
-      }
-    }
-
-    function book() {
-      const name = document.getElementById("name").value.trim();
-      const reason = document.getElementById("reason").value.trim();
-      const slot = document.getElementById("slotDropdown").value;
-
-      if (!name || !reason || !slot) {
-        alert("Please fill all fields.");
-        return;
-      }
-
-      const msg = encodeURIComponent(`Hello, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nSlot: ${slot}`);
-      window.location.href = `https://wa.me/919390664577?text=${msg}`;
-    }
-
-    checkTrialAccess();
-  </script>
-</body>
+      });
+  </script></body>
 </html>
