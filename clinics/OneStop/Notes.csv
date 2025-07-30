@@ -1,1 +1,5 @@
-
+Date,Time,Status
+2025-07-31,09:00 AM,Available
+2025-07-31,09:10 AM,Available
+2025-07-31,09:20 AM,Booked
+...
