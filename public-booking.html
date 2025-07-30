@@ -2,27 +2,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Public Booking - WarangalOneStop</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+  <title>Public Booking</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background-color: #f9f9f9; }
+    header { background-color: #2c3e50; color: #fff; padding: 15px; display: flex; align-items: center; }
+    header img { height: 40px; margin-right: 15px; }
+    header h1 { font-size: 22px; margin: 0; }
+    main { padding: 20px; }
+  </style>
+  <script>
+    const clinicID = localStorage.getItem("clinicID") || "onesto";
+    const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
+  const logoEl = document.getElementById("clinic-logo");
+  if (logoEl) {
+    logoEl.src = logoPath;
+    logoEl.onerror = () => logoEl.style.display = "none";
+  }
+});
+
+  </script>
 </head>
 <body>
-  <h1>Book Your Appointment</h1>
-  <p>Please choose a slot to confirm your appointment.</p>  <!-- Booking UI Goes Here -->  <!-- Service Worker Registration -->  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js');
-      });
-    }
-  </script>  <!-- Trial Lock Check -->  <script>
-    fetch('plans.json')
-      .then(res => res.json())
-      .then(data => {
-        const clinicId = localStorage.getItem('clinic_id') || 'OneStop';
-        const plan = data[clinicId];
-        if (!plan || !plan.isTrialActive || new Date() > new Date(plan.expiryDate)) {
-          window.location.href = "trial-expired.html";
-        }
-      });
-  </script></body>
+  <header>
+    <img id="clinic-logo" alt="Clinic Logo">
+    <h1>Book Your Appointment</h1>
+  </header>
+  <main>
+    <p>Use the form below to book your appointment.</p>
+    <!-- Booking form and logic go here -->
+  </main>
+</body>
 </html>
