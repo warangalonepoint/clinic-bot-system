@@ -1,84 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clinic Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <style>
-    body {
-      background-color: #121212;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #00ffd5;
-    }
-
-    .section {
-      background: #222;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 10px;
-    }
-
-    #status {
-      color: #0f0;
-      font-weight: bold;
-    }
-  </style>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>📋 Clinic Dashboard</h1>
-  <div id="status">Checking access...</div>
-
-  <div id="dashboardContent" class="section" style="display:none;">
-    <p>Welcome to your dashboard. You can manage bookings, view logs, and update your clinic settings.</p>
-    <!-- Add your dashboard tools here -->
-  </div>
-
-  <script>
-    async function checkAccess() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const clinicID = urlParams.get("clinic");
-
-      if (!clinicID) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      try {
-        const response = await fetch("plans.json");
-        const plans = await response.json();
-        const clinic = plans.find(c => c.clinicID === clinicID);
-
-        if (!clinic) {
-          document.getElementById("status").textContent = "❌ Invalid clinic ID.";
-          return;
-        }
-
-        if (clinic.plan === "Trial" && clinic.trialStart) {
-          const trialDate = new Date(clinic.trialStart);
-          const today = new Date();
-          const daysPassed = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
-
-          if (daysPassed >= 3 || clinic.status === "locked") {
-            window.location.href = "trial-expired.html";
-            return;
-          }
-        }
-
-        document.getElementById("status").innerHTML = `✅ Access granted for <b>${clinicID}</b> (${clinic.plan})`;
-        document.getElementById("dashboardContent").style.display = "block";
-
-      } catch (err) {
-        document.getElementById("status").textContent = "❌ Error checking access.";
-        console.error(err);
-      }
+  <h1>Clinic Dashboard</h1>
+  <p>Welcome to the clinic's internal dashboard.</p>  <!-- Clinic Dashboard UI goes here -->  <!-- Service Worker Registration -->  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js');
+      });
     }
-
-    checkAccess();
-  </script>
-</body>
+  </script>  <!-- Trial Lock Check -->  <script>
+    fetch('plans.json')
+      .then(res => res.json())
+      .then(data => {
+        const clinicId = localStorage.getItem('clinic_id') || 'OneStop';
+        const plan = data[clinicId];
+        if (!plan || !plan.isTrialActive || new Date() > new Date(plan.expiryDate)) {
+          window.location.href = "trial-expired.html";
+        }
+      });
+  </script></body>
 </html>
