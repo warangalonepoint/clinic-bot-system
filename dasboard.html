@@ -1,33 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - WarangalOneStop</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic Dashboard</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #f90;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .nav {
+      margin-top: 30px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to WarangalOneStop Clinic Dashboard</h1>
-  <p>Your full admin tools go here.</p>
+  <h1>🏥 Clinic Dashboard</h1>
 
-  <!-- Add your dashboard content below -->
+  <div class="nav">
+    <button onclick="goTo('bookings.html')">📅 View Bookings</button>
+    <button onclick="goTo('logs.html')">📈 Booking Logs</button>
+    <button onclick="goTo('notes-history.html')">🗂 Patient Notes</button>
+    <button onclick="goTo('reset-pin.html')">🔑 Reset PIN</button>
+  </div>
 
-  <!-- PWA service worker registration -->
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js');
-      });
+    function goTo(page) {
+      window.location.href = page;
     }
   </script>
 
-  <!-- Trial Lock Check -->
+  <!-- Register PWA -->
   <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js');
+    }
+  </script>
+
+  <!-- Trial Lock Logic -->
+  <script>
+    const clinicId = localStorage.getItem('clinic_id') || 'OneStop';
     fetch('plans.json')
       .then(res => res.json())
       .then(data => {
-        const clinicId = localStorage.getItem('clinic_id') || 'OneStop'; // Adjust as needed
         const plan = data[clinicId];
         if (!plan || !plan.isTrialActive || new Date() > new Date(plan.expiryDate)) {
           window.location.href = "trial-expired.html";
