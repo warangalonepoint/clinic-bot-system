@@ -2,190 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clinic Logs</title>
+  <title>📋 Clinic Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
-      background-color: #000;
+      background-color: #111;
+      color: #fff;
       font-family: Arial, sans-serif;
-      color: #0f0;
-      margin: 0;
       padding: 20px;
     }
+
     h1 {
-      color: #0ff;
-      text-align: center;
+      color: #4fe;
     }
+
+    .summary, .log-table {
+      margin-top: 20px;
+      border: 1px solid #444;
+      padding: 20px;
+      background: #222;
+      border-radius: 10px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      color: #fff;
+      margin-top: 10px;
     }
+
     th, td {
-      border: 1px solid #333;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #111;
-      color: #0f0;
-    }
-    tr:nth-child(even) {
-      background-color: #111;
-    }
-    input.note {
-      width: 100%;
-      padding: 4px;
-      background: #222;
-      color: #0f0;
-      border: 1px solid #333;
-    }
-    .summary-box {
-      background-color: #111;
       padding: 10px;
-      margin-bottom: 20px;
       border: 1px solid #333;
+      text-align: left;
     }
+
+    th {
+      background-color: #333;
+      color: #0f0;
+    }
+
     button {
-      background-color: #0f0;
-      color: #000;
-      padding: 10px 16px;
-      margin: 10px 5px;
-      font-weight: bold;
+      padding: 10px 15px;
+      margin-right: 10px;
+      background: #0f0;
       border: none;
       border-radius: 5px;
-      cursor: pointer;
+      color: #000;
+      font-weight: bold;
     }
-    button:hover {
-      background-color: #0c0;
-    }
-    textarea {
-      background-color: #000;
-      color: #0f0;
-      width: 100%;
-      height: 80px;
+
+    #status {
       margin-top: 10px;
+      font-size: 14px;
+      color: #f66;
     }
   </style>
 </head>
 <body>
-
   <h1>📋 Clinic Logs</h1>
+  <p id="status">Checking trial status...</p>
 
-  <div class="summary-box" id="summary"></div>
-
-  <div style="text-align:center;">
-    <button onclick="exportCSV()">📁 Export Logs as CSV</button>
-    <button onclick="emailBackup()">✉️ Email Backup</button>
+  <div class="summary" id="summaryPanel" style="display:none;">
+    <h2>📊 Daily Booking Summary</h2>
+    <p id="summaryText">Loading...</p>
   </div>
 
-  <table id="logsTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Patient</th>
-        <th>Reason</th>
-        <th>Clinic</th>
-        <th>Doctor Notes</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="log-table" id="logTable" style="display:none;">
+    <h3>🗂️ All Logs</h3>
+    <table id="logsTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Patient</th>
+          <th>Reason</th>
+          <th>Clinic</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-<script>
-const csvUrl = 'https://warangalonepoint.github.io/clinic-bot-system/logs.csv';
-const notesKey = 'doctor_notes'; // localStorage key (can also write to backend later)
+  <script>
+    async function checkTrialStatus() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const clinicID = urlParams.get("clinic");
 
-// Load doctor notes from localStorage or initialize
-let notesData = JSON.parse(localStorage.getItem(notesKey) || '{}');
+      if (!clinicID) {
+        window.location.href = "index.html";
+        return;
+      }
 
-function loadLogs() {
-  fetch(csvUrl)
-    .then(response => response.text())
-    .then(csv => {
-      const rows = csv.trim().split('\n').slice(1); // skip header
-      const data = rows.map(row => row.split(','));
+      try {
+        const response = await fetch("plans.json");
+        const plans = await response.json();
+        const clinic = plans.find(c => c.clinicID === clinicID);
 
-      const tbody = document.querySelector('#logsTable tbody');
-      tbody.innerHTML = '';
+        if (!clinic) {
+          document.getElementById("status").textContent = "❌ Invalid clinic ID.";
+          return;
+        }
 
-      const bookingsByClinic = {};
-      const uniquePatients = new Set();
-      const hourCount = {};
+        if (clinic.plan === "Trial" && clinic.trialStart) {
+          const trialDate = new Date(clinic.trialStart);
+          const today = new Date();
+          const days = Math.floor((today - trialDate) / (1000 * 60 * 60 * 24));
 
-      data.forEach(([date, time, patient, reason, status]) => {
-        const hour = time.split(':')[0];
-        hourCount[hour] = (hourCount[hour] || 0) + 1;
-        bookingsByClinic[status] = (bookingsByClinic[status] || 0) + 1;
-        uniquePatients.add(patient);
+          if (days >= 3 || clinic.status === "locked") {
+            window.location.href = "trial-expired.html";
+            return;
+          }
+        }
 
-        const noteId = `${date}_${time}_${patient}`;
-        const note = notesData[noteId] || '';
+        document.getElementById("status").innerHTML = `✅ Access granted for <b>${clinicID}</b> (${clinic.plan})`;
+        document.getElementById("summaryPanel").style.display = "block";
+        document.getElementById("logTable").style.display = "block";
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${date}</td>
-          <td>${time}</td>
-          <td>${patient}</td>
-          <td>${reason}</td>
-          <td>${status}</td>
-          <td><input class="note" value="${note}" data-id="${noteId}" onchange="saveNote(this)" /></td>
+        loadLogs(clinicID);
+
+      } catch (e) {
+        document.getElementById("status").textContent = "❌ Error loading plan data.";
+        console.error(e);
+      }
+    }
+
+    async function loadLogs(clinicID) {
+      try {
+        const response = await fetch("logs.csv");
+        const text = await response.text();
+        const lines = text.trim().split("\n").slice(1); // remove header
+        const logs = lines.map(line => {
+          const [date, time, patient, reason, status] = line.split(",");
+          return { date, time, patient, reason, status };
+        }).filter(entry => entry.status === clinicID);
+
+        // Summary
+        const total = logs.length;
+        const uniquePatients = [...new Set(logs.map(l => l.patient))].length;
+        const times = logs.map(l => l.time);
+        const peakHour = times.sort()[0] || "N/A";
+
+        document.getElementById("summaryText").innerHTML = `
+          Date: ${new Date().toISOString().slice(0,10)}<br>
+          Total Bookings: ${total}<br>
+          Unique Patients: ${uniquePatients}<br>
+          Peak Hour: ${peakHour}<br>
         `;
-        tbody.appendChild(tr);
-      });
 
-      const peakHour = Object.entries(hourCount).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'N/A';
-      const totalBookings = data.length;
-      const summaryHTML = `
-        <h3>📊 Daily Booking Summary</h3>
-        <p><strong>Date:</strong> ${new Date().toISOString().split('T')[0]}</p>
-        <p><strong>Total Bookings:</strong> ${totalBookings}</p>
-        <p><strong>Unique Patients:</strong> ${uniquePatients.size}</p>
-        <p><strong>Peak Hour:</strong> ${peakHour}:00</p>
-        <p><strong>Clinics Summary:</strong><br/>${Object.entries(bookingsByClinic).map(([clinic, count]) => `${clinic}: ${count} bookings`).join('<br/>')}</p>
-      `;
-      document.getElementById('summary').innerHTML = summaryHTML;
-    });
-}
+        // Table
+        const tbody = document.querySelector("#logsTable tbody");
+        tbody.innerHTML = "";
+        logs.forEach(log => {
+          const row = `<tr>
+            <td>${log.date}</td>
+            <td>${log.time}</td>
+            <td>${log.patient}</td>
+            <td>${log.reason}</td>
+            <td>${log.status}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
 
-function saveNote(input) {
-  const id = input.getAttribute('data-id');
-  notesData[id] = input.value;
-  localStorage.setItem(notesKey, JSON.stringify(notesData));
-}
+      } catch (e) {
+        console.error("Error loading logs:", e);
+      }
+    }
 
-function exportCSV() {
-  const rows = [['Date','Time','Patient','Reason','Clinic','Notes']];
-  const inputs = document.querySelectorAll('tbody tr');
-
-  inputs.forEach(tr => {
-    const cells = [...tr.children].map(td => td.textContent.trim());
-    const note = tr.querySelector('input').value;
-    rows.push([...cells.slice(0, 5), note]);
-  });
-
-  const csv = rows.map(e => e.join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'DoctorNotesExport.csv';
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function emailBackup() {
-  const email = prompt('Enter email address to send backup:');
-  if (!email) return alert('Cancelled.');
-  exportCSV(); // Export locally first
-  alert('📩 Simulated email sent to ' + email + ' (manual for now)');
-}
-
-loadLogs();
-</script>
-
+    checkTrialStatus();
+  </script>
 </body>
 </html>
