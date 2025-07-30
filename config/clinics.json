@@ -1,1 +1,18 @@
-
+[
+  {
+    "id": "onestop",
+    "name": "OneStop Clinic",
+    "pin": "1111",
+    "logo": "assets/logos/onestop.png",
+    "address": "Bhadrakali Temple Road, Warangal",
+    "plan": "free"
+  },
+  {
+    "id": "citycare",
+    "name": "CityCare Hospital",
+    "pin": "2222",
+    "logo": "assets/logos/citycare.png",
+    "address": "Hanamkonda X Road, Warangal",
+    "plan": "basic"
+  }
+]
