@@ -1,19 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Logs Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic Logs Dashboard</title>
   <style>
     body {
-      background: #121212;
-      color: #fff;
+      background-color: #0d1117;
+      color: white;
       font-family: Arial, sans-serif;
       padding: 20px;
     }
     h1 {
       text-align: center;
-      color: #00e676;
+      color: #4dc1ff;
+    }
+    .filter-section, .export-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    input, select, button {
+      padding: 8px;
+      font-size: 14px;
     }
     table {
       width: 100%;
@@ -22,59 +32,178 @@
     }
     th, td {
       padding: 10px;
-      border: 1px solid #444;
+      border: 1px solid #333;
       text-align: left;
     }
     th {
-      background: #1e1e1e;
-      color: #00e5ff;
+      background-color: #1c1f26;
     }
     tr:nth-child(even) {
-      background: #1a1a1a;
+      background-color: #161b22;
+    }
+    .token-summary {
+      text-align: center;
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .clickable {
+      color: #4dc1ff;
+      text-decoration: underline;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Patient Booking Logs</h1>
-  <table id="logsTable">
+  <h1>Clinic Booking Logs</h1>  <div class="filter-section">
+    <select id="clinicDropdown"></select>
+    <button onclick="filterToday()">Today</button>
+    <button onclick="filterYesterday()">Yesterday</button>
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+    <button onclick="applyDateRange()">Apply</button>
+    <button onclick="resetFilters()">Reset</button>
+  </div>  <div id="tokenSummary" class="token-summary"></div>  <div class="export-section">
+    <button onclick="exportToExcel()">Export to Excel</button>
+    <button onclick="exportToPDF()">Export to PDF</button>
+  </div>  <table id="logsTable">
     <thead>
       <tr>
-        <th>Token</th>
-        <th>Name</th>
         <th>Date</th>
         <th>Time</th>
+        <th>Patient Name</th>
         <th>Reason</th>
-        <th>Status</th>
-        <th>Reminder</th>
         <th>Contact</th>
+        <th>Clinic</th>
+        <th>Token No</th>
+        <th>Reminder Sent</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody></tbody>
-  </table>
+  </table>  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
+    async function fetchCSV() {
+      const response = await fetch("logs.csv");
+      const text = await response.text();
+      const rows = text.trim().split("\n").map(row => row.split(","));
+      const headers = rows[0];
+      const data = rows.slice(1).map(row => Object.fromEntries(row.map((val, i) => [headers[i], val])));
+      return data;
+    }
 
-  <script>
-    fetch("logs.csv")
-      .then(response => response.text())
-      .then(data => {
-        const rows = data.trim().split("\n").slice(1); // skip header
-        const tbody = document.querySelector("#logsTable tbody");
+    function getTodayDateFormatted() {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
+    }
 
-        rows.forEach(row => {
-          const [name, date, time, reason, status, reminder, contact, token] = row.split(",");
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${token || '-'}</td>
-            <td>${name}</td>
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${reason}</td>
-            <td>${status}</td>
-            <td>${reminder}</td>
-            <td><a href="tel:${contact}">${contact}</a></td>
-          `;
-          tbody.appendChild(tr);
-        });
+    function countTodayTokens(data, selectedClinic) {
+      const today = getTodayDateFormatted();
+      return data.filter(row => row["Clinic"] === selectedClinic && formatDate(row["Date"]) === today).length;
+    }
+
+    function showTokenSummary(data) {
+      const selectedClinic = document.getElementById("clinicDropdown").value;
+      const tokenCount = countTodayTokens(data, selectedClinic);
+      document.getElementById("tokenSummary").innerHTML = `🔢 Next Token No. for <b>${selectedClinic}</b> today: <span style="color:#00ff88;font-size:22px;">#${tokenCount + 1}</span>`;
+    }
+
+    function populateClinicDropdown(data) {
+      const clinics = [...new Set(data.map(row => row.Clinic))];
+      const dropdown = document.getElementById("clinicDropdown");
+      dropdown.innerHTML = clinics.map(clinic => `<option value="${clinic}">${clinic}</option>`).join("");
+    }
+
+    function populateTable(data) {
+      const tbody = document.querySelector("#logsTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row["Date"]}</td>
+          <td>${row["Time"]}</td>
+          <td>${row["Patient Name"]}</td>
+          <td>${row["Reason"]}</td>
+          <td><a href="tel:${row["Contact"]}" class="clickable">${row["Contact"]}</a></td>
+          <td>${row["Clinic"]}</td>
+          <td>${row["Token No"]}</td>
+          <td>${row["Reminder Sent"]}</td>
+          <td><button onclick="sendReminder('${row["Contact"]}')">Send Reminder</button></td>
+        `;
+        tbody.appendChild(tr);
       });
-  </script>
-</body>
+    }
+
+    function formatDate(dateStr) {
+      const [day, month, year] = dateStr.split("-");
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    async function loadLogs() {
+      const data = await fetchCSV();
+      populateClinicDropdown(data);
+      populateTable(data);
+      showTokenSummary(data);
+    }
+
+    function filterToday() {
+      const today = getTodayDateFormatted();
+      document.getElementById("startDate").value = today;
+      document.getElementById("endDate").value = today;
+      applyDateRange();
+    }
+
+    function filterYesterday() {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      document.getElementById("startDate").value = yesterday;
+      document.getElementById("endDate").value = yesterday;
+      applyDateRange();
+    }
+
+    async function applyDateRange() {
+      const start = document.getElementById("startDate").value;
+      const end = document.getElementById("endDate").value;
+      const clinic = document.getElementById("clinicDropdown").value;
+      const data = await fetchCSV();
+      const filtered = data.filter(row => {
+        const d = formatDate(row["Date"]);
+        return d >= start && d <= end && row.Clinic === clinic;
+      });
+      populateTable(filtered);
+      showTokenSummary(data);
+    }
+
+    async function resetFilters() {
+      document.getElementById("startDate").value = "";
+      document.getElementById("endDate").value = "";
+      const data = await fetchCSV();
+      populateTable(data);
+      showTokenSummary(data);
+    }
+
+    function sendReminder(contact) {
+      const link = `https://wa.me/${contact.replace(/[^0-9]/g, '')}?text=Reminder: Your appointment is confirmed. Token No. shown above.`;
+      window.open(link, '_blank');
+    }
+
+    function exportToExcel() {
+      const table = document.getElementById("logsTable");
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Logs" });
+      XLSX.writeFile(wb, "clinic_logs.xlsx");
+    }
+
+    async function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Clinic Logs", 10, 10);
+      const data = [...document.querySelectorAll("#logsTable tbody tr")].map(tr =>
+        [...tr.children].map(td => td.textContent.trim())
+      );
+      doc.autoTable({
+        head: [["Date", "Time", "Patient", "Reason", "Contact", "Clinic", "Token", "Reminder Sent"]],
+        body: data
+      });
+      doc.save("clinic_logs.pdf");
+    }
+
+    window.onload = loadLogs;
+  </script></body>
 </html>
