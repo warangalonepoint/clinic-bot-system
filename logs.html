@@ -2,114 +2,137 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📋 Appointment Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 14px; }
-    th { background-color: #f2f2f2; }
-    .btn { background-color: green; color: white; padding: 6px 12px; border: none; margin-right: 10px; cursor: pointer; }
-    .btn:hover { opacity: 0.9; }
-    select, input[type="date"] { padding: 5px; font-size: 14px; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fff;
+      padding: 10px;
+      color: #111;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    button {
+      background: green;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      margin: 4px 2px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+    input, select {
+      padding: 5px;
+      font-size: 14px;
+      margin: 4px;
+    }
+    .highlight {
+      background: #dff0d8;
+    }
   </style>
 </head>
 <body>
-
-  <h1>📋 Appointment Logs</h1>
-  <div>
-    ✅ <strong>Bookings Today:</strong> <span id="todayCount">0</span>
-    | <strong>Next Token:</strong> <span id="nextToken">1</span>
-  </div><br>
-
-  <button class="btn" onclick="filterByToday()">Today</button>
-  <button class="btn" onclick="filterByYesterday()">Yesterday</button>
-  <input type="date" id="dateFilter" />
-  <button class="btn" onclick="applyCustomDate()">Apply</button>
-  <button class="btn" onclick="exportCSV()">📄 Export CSV</button>
-  <button class="btn" onclick="exportPDF()">🖨 Export PDF</button>
+  <h2>📋 Appointment Logs</h2>
+  <div id="summary" style="font-weight:bold; margin-bottom:10px;"></div>
+  <button onclick="filterDate('today')">Today</button>
+  <button onclick="filterDate('yesterday')">Yesterday</button>
+  <input type="date" id="startDate" />
+  <input type="date" id="endDate" />
+  <button onclick="filterDate('custom')">Apply</button>
+  <button onclick="exportCSV()">📁 Export CSV</button>
+  <button onclick="exportPDF()">🖨️ Export PDF</button>
 
   <table id="logTable">
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Name</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Clinic</th>
-        <th>Token</th>
-        <th>Reminder</th>
+        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Clinic</th><th>Token</th><th>Reminder</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
     let allData = [];
 
-    async function fetchData() {
-      const res = await fetch(CSV_URL);
-      const csvText = await res.text();
-      const parsed = Papa.parse(csvText.trim(), { header: true });
-      allData = parsed.data;
-      renderTable(allData);
+    function fetchData() {
+      const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+      fetch(csvUrl)
+        .then(res => res.text())
+        .then(csv => {
+          const parsed = Papa.parse(csv, { header: true });
+          allData = parsed.data.filter(row => row.Date && row.Time);
+          renderTable(allData);
+        });
     }
 
     function renderTable(data) {
       const tbody = document.querySelector("#logTable tbody");
       tbody.innerHTML = "";
-
+      let tokenCount = 0;
       const today = new Date().toISOString().split("T")[0];
-      let todayCount = 0;
-      let maxToken = 0;
+      let todayBookings = 0;
 
-      data.forEach(row => {
-        const rowDate = formatDate(row.Date);
-        if (rowDate === today) todayCount++;
-        if (!isNaN(parseInt(row.Token))) {
-          maxToken = Math.max(maxToken, parseInt(row.Token));
+      data.forEach((row, index) => {
+        const tr = document.createElement("tr");
+
+        if (row.Date === today) {
+          tokenCount = Math.max(tokenCount, parseInt(row.Token || "0"));
+          todayBookings++;
         }
 
-        const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${row.Date}</td>
           <td>${row.Time}</td>
           <td>${row.Name}</td>
           <td>${row.Reason}</td>
           <td><a href="tel:${row.Contact}">${row.Contact}</a></td>
-          <td>${row.Clinic}</td>
-          <td>${row.Token}</td>
-          <td>${row.Reminder}</td>
+          <td>${row.Clinic || ""}</td>
+          <td>${row.Token || ""}</td>
+          <td>${row.Reminder || ""}</td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById("todayCount").textContent = todayCount;
-      document.getElementById("nextToken").textContent = maxToken + 1;
+      document.getElementById("summary").innerText = `✅ Bookings Today: ${todayBookings} | Next Token: ${tokenCount + 1}`;
     }
 
-    function filterByToday() {
-      const today = formatDisplayDate(new Date());
-      const filtered = allData.filter(row => row.Date === today);
-      renderTable(filtered);
-    }
-
-    function filterByYesterday() {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      const yesterday = formatDisplayDate(d);
-      const filtered = allData.filter(row => row.Date === yesterday);
-      renderTable(filtered);
-    }
-
-    function applyCustomDate() {
-      const d = document.getElementById("dateFilter").value;
-      const filtered = allData.filter(row => row.Date === d);
+    function filterDate(type) {
+      let filtered = [];
+      const today = new Date();
+      if (type === "today") {
+        const d = today.toISOString().split("T")[0];
+        filtered = allData.filter(e => e.Date === d);
+      } else if (type === "yesterday") {
+        today.setDate(today.getDate() - 1);
+        const d = today.toISOString().split("T")[0];
+        filtered = allData.filter(e => e.Date === d);
+      } else {
+        const sd = document.getElementById("startDate").value;
+        const ed = document.getElementById("endDate").value;
+        filtered = allData.filter(e => e.Date >= sd && e.Date <= ed);
+      }
       renderTable(filtered);
     }
 
@@ -134,15 +157,10 @@
       doc.save("logs-export.pdf");
     }
 
-    function formatDisplayDate(d) {
-      return d.toISOString().split("T")[0];
-    }
-
-    function formatDate(str) {
-      const parts = str.split("-");
-      return `${parts[2]}-${parts[1]}-${parts[0]}` === new Date().toISOString().split("T")[0] ? new Date().toISOString().split("T")[0] : str;
-    }
-
+    fetchData();
+  </script>
+</body>
+</html>
     fetchData();
   </script>
 
