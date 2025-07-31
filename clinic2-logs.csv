@@ -1,51 +1,6 @@
 Date,Time,Name,Reason,Contact,Clinic,Token,Reminder,Reminder Sent
-01-08-2025,09:00,Ravi,Fever,9000000001,Clinic 1,1,Booked,Yes
-01-08-2025,09:10,Priya,Headache,9000000002,Clinic 1,2,Booked,Yes
-01-08-2025,09:20,Suresh,Check-up,9000000003,Clinic 1,3,Booked,Yes
-01-08-2025,09:30,Kavita,Pain,9000000004,Clinic 1,4,Booked,No
-01-08-2025,09:40,Raj,Cold,9000000005,Clinic 1,5,Booked,Yes
-01-08-2025,09:50,Meena,Flu,9000000006,Clinic 1,6,Booked,Yes
-01-08-2025,10:00,Varun,Fever,9000000007,Clinic 1,7,Booked,Yes
-01-08-2025,10:10,Pooja,Check-up,9000000008,Clinic 1,8,Booked,Yes
-01-08-2025,10:20,Nikhil,Follow-up,9000000009,Clinic 1,9,Booked,No
-01-08-2025,10:30,Anjali,Stomach Pain,9000000010,Clinic 1,10,Booked,Yes
-02-08-2025,09:00,Harsha,Cold,9000000011,Clinic 2,1,Booked,Yes
-02-08-2025,09:10,Sneha,Check-up,9000000012,Clinic 2,2,Booked,Yes
-02-08-2025,09:20,Rohit,Back Pain,9000000013,Clinic 2,3,Booked,Yes
-02-08-2025,09:30,Sana,Cough,9000000014,Clinic 2,4,Booked,No
-02-08-2025,09:40,Deepak,Skin Issue,9000000015,Clinic 2,5,Booked,Yes
-02-08-2025,09:50,Neha,Cold,9000000016,Clinic 2,6,Booked,Yes
-02-08-2025,10:00,Ajay,Follow-up,9000000017,Clinic 2,7,Booked,Yes
-02-08-2025,10:10,Divya,Pain,9000000018,Clinic 2,8,Booked,No
-02-08-2025,10:20,Karan,Check-up,9000000019,Clinic 2,9,Booked,Yes
-02-08-2025,10:30,Manju,General,9000000020,Clinic 2,10,Booked,Yes
-03-08-2025,09:00,Vikram,Cold,9000000021,Clinic 3,1,Booked,Yes
-03-08-2025,09:10,Alka,Cough,9000000022,Clinic 3,2,Booked,Yes
-03-08-2025,09:20,Riya,Flu,9000000023,Clinic 3,3,Booked,No
-03-08-2025,09:30,Arjun,Fever,9000000024,Clinic 3,4,Booked,Yes
-03-08-2025,09:40,Geeta,Check-up,9000000025,Clinic 3,5,Booked,Yes
-03-08-2025,09:50,Amit,Back Pain,9000000026,Clinic 3,6,Booked,No
-03-08-2025,10:00,Shruti,Cold,9000000027,Clinic 3,7,Booked,Yes
-03-08-2025,10:10,Tarun,Follow-up,9000000028,Clinic 3,8,Booked,Yes
-03-08-2025,10:20,Chitra,Diabetes,9000000029,Clinic 3,9,Booked,No
-03-08-2025,10:30,Prem,Headache,9000000030,Clinic 3,10,Booked,Yes
-04-08-2025,09:00,Nisha,Flu,9000000031,Clinic 1,1,Booked,Yes
-04-08-2025,09:10,Sameer,Check-up,9000000032,Clinic 1,2,Booked,Yes
-04-08-2025,09:20,Tanya,Cold,9000000033,Clinic 1,3,Booked,No
-04-08-2025,09:30,Farhan,Fever,9000000034,Clinic 1,4,Booked,Yes
-04-08-2025,09:40,Deepti,Check-up,9000000035,Clinic 1,5,Booked,Yes
-04-08-2025,09:50,Yash,Stomach Pain,9000000036,Clinic 1,6,Booked,No
-04-08-2025,10:00,Isha,Flu,9000000037,Clinic 1,7,Booked,Yes
-04-08-2025,10:10,Ramesh,Follow-up,9000000038,Clinic 1,8,Booked,Yes
-04-08-2025,10:20,Sunita,General,9000000039,Clinic 1,9,Booked,Yes
-04-08-2025,10:30,Kapil,Pain,9000000040,Clinic 1,10,Booked,Yes
-05-08-2025,09:00,Mahesh,Cold,9000000041,Clinic 2,1,Booked,Yes
-05-08-2025,09:10,Asha,Fever,9000000042,Clinic 2,2,Booked,Yes
-05-08-2025,09:20,Anand,Cough,9000000043,Clinic 2,3,Booked,No
-05-08-2025,09:30,Radha,Back Pain,9000000044,Clinic 2,4,Booked,Yes
-05-08-2025,09:40,Kishore,Check-up,9000000045,Clinic 2,5,Booked,Yes
-05-08-2025,09:50,Pinky,General,9000000046,Clinic 2,6,Booked,Yes
-05-08-2025,10:00,Shyam,Cold,9000000047,Clinic 2,7,Booked,Yes
-05-08-2025,10:10,Bina,Follow-up,9000000048,Clinic 2,8,Booked,No
-05-08-2025,10:20,Kavya,Fever,9000000049,Clinic 2,9,Booked,Yes
-05-08-2025,10:30,Gautam,Stomach Pain,9000000050,Clinic 2,10,Booked,Yes
+2025-07-31,10:00,Prakash Sharma,Headache,+919866667777,clinic2,1,"Reminder: Prakash, your appointment is at 10:00. Token No: #1",X
+2025-07-31,10:10,Neha Verma,Cough,+919877778888,clinic2,2,"Reminder: Neha, your appointment is at 10:10. Token No: #2",X
+2025-07-31,10:20,Kiran Rao,Injury,+919888889999,clinic2,3,"Reminder: Kiran, your appointment is at 10:20. Token No: #3",X
+2025-07-31,10:30,Rani Devi,Checkup,+919899990000,clinic2,4,"Reminder: Rani, your appointment is at 10:30. Token No: #4",X
+2025-07-31,10:40,Sameer Khan,Dental,+919811112222,clinic2,5,"Reminder: Sameer, your appointment is at 10:40. Token No: #5",X
