@@ -2,69 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard - Clinic Admin</title>
+  <title>Clinic Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background: #000;
-      color: #fff;
+      background: #0f0f0f;
+      color: white;
       font-family: Arial, sans-serif;
-      text-align: center;
       padding: 20px;
-    }
-    img {
-      height: 70px;
-      margin-bottom: 15px;
-    }
-    .panel {
-      background: #111;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #0ff;
-      margin: auto;
-      max-width: 400px;
     }
     h1 {
-      color: #00e6e6;
+      color: #4dc1ff;
     }
-    input[type="password"], button {
-      padding: 10px;
-      margin: 10px 0;
-      width: 90%;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
+    .section {
+      margin: 20px 0;
     }
-    button {
-      background: #00e6e6;
-      color: #000;
-      cursor: pointer;
+    .locked {
+      color: red;
+      font-weight: bold;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <img src="logo-bookings.png" alt="Logo" />
-  <h1>Clinic Admin Dashboard</h1>
-
-  <div class="panel">
-    <h2>🔒 Enter Admin PIN</h2>
-    <input type="password" placeholder="Enter PIN" id="pinInput" />
-    <button onclick="verifyPIN()">Access Dashboard</button>
+  <h1>Clinic Dashboard</h1>
+  <div class="section">
+    <p>Welcome to your clinic control panel. You can manage appointments, staff, logs, and patient summaries from here.</p>
   </div>
 
-  <script src="trial.js"></script>
-  <script>
-    const VALID_PIN = "2525"; // Update this PIN as needed
+  <div class="section" id="dashboardContent" style="display:none;">
+    <ul>
+      <li><a href="bookings.html" style="color:#4dc1ff;">📅 View Appointments</a></li>
+      <li><a href="logs.html" style="color:#4dc1ff;">📊 Booking Logs</a></li>
+      <li><a href="reset-pin.html" style="color:#4dc1ff;">🔑 Reset PIN</a></li>
+    </ul>
+  </div>
 
-    function verifyPIN() {
-      const entered = document.getElementById("pinInput").value;
-      if (entered === VALID_PIN) {
-        alert("Access granted!");
-        window.location.href = "bookings.html"; // Redirect after correct PIN
-      } else {
-        alert("Incorrect PIN.");
-      }
-    }
+  <div id="lockedMessage" class="locked"></div>
+
+  <script>
+    // Extract PIN from URL or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const pin = urlParams.get('pin') || localStorage.getItem('pin');
+
+    fetch("plans.json")
+      .then(response => response.json())
+      .then(plans => {
+        if (pin && plans[pin]) {
+          const planInfo = plans[pin];
+          if (planInfo.overrideLock === true || planInfo.plan !== "locked") {
+            document.getElementById("dashboardContent").style.display = "block";
+            localStorage.setItem('pin', pin); // Store for future access
+          } else {
+            document.getElementById("lockedMessage").innerHTML = "🚫 Your plan is locked. Please contact support.";
+          }
+        } else {
+          document.getElementById("lockedMessage").innerHTML = "⚠️ Invalid or missing PIN. <a href='reset-pin.html' style='color:#4dc1ff;'>Reset PIN</a>";
+        }
+      })
+      .catch(error => {
+        console.error("Error loading plans.json:", error);
+        document.getElementById("lockedMessage").innerHTML = "⚠️ Unable to verify plan. Please try again later.";
+      });
   </script>
 </body>
 </html>
