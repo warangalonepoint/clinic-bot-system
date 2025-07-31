@@ -2,98 +2,107 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BookingBot Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clinic PIN Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background: #0d0d0d;
-      color: #f2f2f2;
       font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #fff;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
     }
 
-    h1 {
-      color: #00ffcc;
-      font-size: 28px;
+    .login-box {
+      background: #222;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .login-box h2 {
+      margin-bottom: 24px;
+      font-size: 22px;
+      color: #f0ad4e;
     }
 
     input[type="password"] {
+      width: 100%;
       padding: 12px;
-      font-size: 18px;
+      margin-bottom: 20px;
       border: none;
-      border-radius: 6px;
-      width: 220px;
-      text-align: center;
-      margin-top: 15px;
-      background-color: #1c1c1c;
+      border-radius: 8px;
+      background: #333;
       color: #fff;
+      font-size: 16px;
     }
 
     button {
-      margin-top: 20px;
-      padding: 10px 24px;
-      font-size: 16px;
-      background-color: #00ffcc;
-      color: #000;
+      background: #f0ad4e;
       border: none;
-      border-radius: 6px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
       cursor: pointer;
+      width: 100%;
     }
 
     .error {
-      color: #ff5e5e;
-      margin-top: 15px;
-      font-size: 14px;
+      color: red;
+      margin-top: 12px;
     }
 
     footer {
-      position: absolute;
-      bottom: 15px;
-      font-size: 13px;
-      color: #777;
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: #888;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
-  <h1>🔐 Clinic Access Login</h1>
-
-  <input type="password" id="pinInput" placeholder="Enter PIN" />
-  <button onclick="login()">Login</button>
-  <div class="error" id="errorMsg"></div>
+  <div class="login-box">
+    <h2>Enter Clinic PIN</h2>
+    <input type="password" id="pinInput" placeholder="PIN" />
+    <button onclick="verifyPIN()">Login</button>
+    <div id="error" class="error"></div>
+  </div>
 
   <footer>Powered by WarangalOneStop BookingBot</footer>
 
   <script>
-    function login() {
+    async function verifyPIN() {
       const pin = document.getElementById("pinInput").value.trim();
-      fetch("plans.json")
-        .then(res => res.json())
-        .then(data => {
-          if (data[pin]) {
-            const plan = data[pin].plan;
-            if (plan === "free") {
-              window.location.href = "freeplan.html?pin=" + pin;
-            } else if (plan === "paid") {
-              window.location.href = "paidplan.html?pin=" + pin;
-            } else if (plan === "premium") {
-              window.location.href = "premiumplan.html?pin=" + pin;
-            } else {
-              showError("Invalid plan assigned.");
-            }
-          } else {
-            showError("Incorrect PIN.");
-          }
-        })
-        .catch(() => showError("Error loading plans."));
-    }
+      const error = document.getElementById("error");
+      if (!pin) {
+        error.textContent = "Please enter a PIN.";
+        return;
+      }
 
-    function showError(msg) {
-      document.getElementById("errorMsg").innerText = msg;
+      try {
+        const res = await fetch("plans.json");
+        const plans = await res.json();
+
+        if (plans[pin]) {
+          localStorage.setItem("clinicPIN", pin);
+          window.location.href = "clinic-dashboard.html?pin=" + pin;
+        } else {
+          error.textContent = "Invalid PIN. Please try again.";
+        }
+      } catch (err) {
+        error.textContent = "Error loading plans. Please try again.";
+        console.error(err);
+      }
     }
   </script>
 </body>
