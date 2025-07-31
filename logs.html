@@ -3,96 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <title>Appointment Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    body {
-      background-color: #121212;
-      color: #ffffff;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    .container {
-      margin-top: 30px;
-    }
-    table {
-      background-color: #1e1e1e;
-    }
-    th {
-      background-color: #2c2c2c;
-      color: #f0ad4e;
-    }
-    td, th {
-      vertical-align: middle !important;
-    }
-    .status-booked {
-      color: #28a745;
-      font-weight: bold;
-    }
-    .status-cancelled {
-      color: #dc3545;
-      font-weight: bold;
-    }
-    .reminder-yes {
-      color: #0dcaf0;
-      font-weight: bold;
-    }
-    .reminder-no {
-      color: #ffc107;
-      font-weight: bold;
-    }
+    body { background-color: #111; color: #fff; padding: 20px; font-family: Arial, sans-serif; }
+    table { color: #fff; }
+    .btn { margin-right: 10px; margin-bottom: 10px; }
+    h2 { color: #f0ad4e; margin-bottom: 20px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2 class="text-center mb-4">📋 Appointment Logs Dashboard</h2>
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center" id="logsTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Patient Name</th>
-            <th>Reason</th>
-            <th>Status</th>
-            <th>Reminder Sent</th>
-          </tr>
-        </thead>
-        <tbody id="logBody">
-          <tr><td colspan="6">Loading logs...</td></tr>
-        </tbody>
-      </table>
-    </div>
+  <h2>Appointment Logs</h2>
+
+  <div class="mb-3">
+    <button class="btn btn-success" onclick="exportToExcel()">Export to Excel</button>
+    <button class="btn btn-danger" onclick="exportToPDF()">Export to PDF</button>
   </div>
 
+  <div class="table-responsive">
+    <table id="logsTable" class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Patient Name</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Reminder Sent</th>
+        </tr>
+      </thead>
+      <tbody id="logsBody"></tbody>
+    </table>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
   <script>
-    fetch('https://warangalonepoint.github.io/clinic-bot-system/logs.csv')
+    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+
+    fetch(CSV_URL)
       .then(response => response.text())
       .then(csv => {
-        const rows = csv.trim().split('\n').slice(1); // remove header
-        const tableBody = document.getElementById('logBody');
-        tableBody.innerHTML = '';
-
-        rows.forEach(row => {
-          const [date, time, patient, reason, status, reminder] = row.split(',');
-          const statusClass = status === "Booked" ? "status-booked" : "status-cancelled";
-          const reminderClass = reminder === "Yes" ? "reminder-yes" : "reminder-no";
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${patient}</td>
-            <td>${reason}</td>
-            <td class="${statusClass}">${status}</td>
-            <td class="${reminderClass}">${reminder}</td>
-          `;
-          tableBody.appendChild(tr);
+        const data = Papa.parse(csv, { header: true }).data;
+        const tbody = document.getElementById("logsBody");
+        data.forEach(row => {
+          if (row.Date) {
+            const tr = document.createElement("tr");
+            Object.values(row).forEach(value => {
+              const td = document.createElement("td");
+              td.textContent = value;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          }
         });
-      })
-      .catch(error => {
-        document.getElementById('logBody').innerHTML = `<tr><td colspan="6">⚠️ Failed to load logs.csv</td></tr>`;
-        console.error(error);
       });
+
+    function exportToExcel() {
+      const table = document.getElementById("logsTable");
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Logs" });
+      XLSX.writeFile(wb, "AppointmentLogs.xlsx");
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.autoTable({ html: '#logsTable' });
+      doc.save("AppointmentLogs.pdf");
+    }
   </script>
 </body>
 </html>
