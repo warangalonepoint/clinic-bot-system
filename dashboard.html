@@ -2,63 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic System Auto Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Clinic Admin</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: #fff; padding: 2rem; }
-    h1 { color: #00ffcc; }
-    .test-result { border: 1px solid #333; margin: 1rem 0; padding: 1rem; border-radius: 8px; }
-    .pass { background: #002f1f; border-left: 5px solid #0f0; }
-    .fail { background: #2f0000; border-left: 5px solid #f00; }
-    .checking { background: #1f1f1f; border-left: 5px solid #ff0; }
-    .test-result h2 { margin: 0; }
-    .green { color: #0f0; }
-    .red { color: #f00; }
-    .yellow { color: #ff0; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    img {
+      height: 70px;
+      margin-bottom: 15px;
+    }
+    .panel {
+      background: #111;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #0ff;
+      margin: auto;
+      max-width: 400px;
+    }
+    h1 {
+      color: #00e6e6;
+    }
+    input[type="password"], button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 90%;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      background: #00e6e6;
+      color: #000;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>🔍 Clinic Admin System - Auto Test</h1>
-  <div id="testArea"></div>
+  <img src="logo-bookings.png" alt="Logo" />
+  <h1>Clinic Admin Dashboard</h1>
 
+  <div class="panel">
+    <h2>🔒 Enter Admin PIN</h2>
+    <input type="password" placeholder="Enter PIN" id="pinInput" />
+    <button onclick="verifyPIN()">Access Dashboard</button>
+  </div>
+
+  <script src="trial.js"></script>
   <script>
-    const tests = [
-      { name: "Index Page", url: "index.html" },
-      { name: "Dashboard Page", url: "dashboard.html" },
-      { name: "Bookings Page", url: "bookings.html" },
-      { name: "Logs Page", url: "logs.html" },
-      { name: "Clinic Dashboard", url: "clinic-dashboard.html" },
-      { name: "Public Booking", url: "public-booking.html" }
-    ];
+    const VALID_PIN = "2525"; // Update this PIN as needed
 
-    const testArea = document.getElementById("testArea");
-
-    async function runTests() {
-      for (let test of tests) {
-        const div = document.createElement("div");
-        div.className = "test-result checking";
-        div.innerHTML = `<h2>Checking: ${test.name}</h2>`;
-        testArea.appendChild(div);
-
-        try {
-          const res = await fetch(test.url);
-          const text = await res.text();
-
-          if (res.ok && text.includes("clinic-logo")) {
-            div.className = "test-result pass";
-            div.innerHTML = `<h2>${test.name}</h2><p class="green">✅ Page loaded and logo found.</p>`;
-          } else {
-            div.className = "test-result fail";
-            div.innerHTML = `<h2>${test.name}</h2><p class="red">❌ Page loaded but logo not found.</p>`;
-          }
-        } catch (err) {
-          div.className = "test-result fail";
-          div.innerHTML = `<h2>${test.name}</h2><p class="red">❌ Error loading page: ${err.message}</p>`;
-        }
+    function verifyPIN() {
+      const entered = document.getElementById("pinInput").value;
+      if (entered === VALID_PIN) {
+        alert("Access granted!");
+        window.location.href = "bookings.html"; // Redirect after correct PIN
+      } else {
+        alert("Incorrect PIN.");
       }
     }
-
-    runTests();
   </script>
 </body>
 </html>
