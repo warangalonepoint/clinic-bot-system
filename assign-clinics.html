@@ -2,118 +2,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Plan Assignment Tool</title>
+  <title>Admin PIN Panel</title>
   <style>
     body {
-      background: #0e0e0e;
-      color: white;
+      background-color: #121212;
       font-family: Arial, sans-serif;
-      padding: 20px;
+      color: #fff;
+      padding: 40px;
     }
     h1 {
-      color: #00d1ff;
+      text-align: center;
+      color: #4dc1ff;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 30px;
     }
     th, td {
-      border: 1px solid #333;
-      padding: 10px;
+      padding: 12px;
+      border: 1px solid #555;
       text-align: center;
     }
     th {
-      background-color: #1a1a1a;
+      background-color: #1e1e1e;
     }
-    input, select {
-      padding: 8px;
-      width: 90%;
-      font-size: 14px;
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 8px;
     }
-    button {
+    .btn-delete {
+      background-color: crimson;
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      cursor: pointer;
+    }
+    .btn-save {
       background-color: #28a745;
       color: white;
-      padding: 10px 20px;
       border: none;
+      padding: 10px 20px;
       cursor: pointer;
-      margin-top: 20px;
-    }
-    textarea {
-      width: 100%;
-      height: 250px;
-      margin-top: 20px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Admin Plan Assignment Tool</h1>  <table id="planTable">
+  <h1>Admin PIN & Plan Management</h1>  <div style="text-align:center">
+    <input type="text" id="pin" placeholder="Enter PIN">
+    <select id="plan">
+      <option value="freeplan.html">Free</option>
+      <option value="paidplan.html">Paid</option>
+      <option value="premiumplan.html">Premium</option>
+    </select>
+    <button class="btn-save" onclick="addPIN()">Add / Update</button>
+  </div>  <table id="pinTable">
     <thead>
       <tr>
-        <th>Clinic Name</th>
         <th>PIN</th>
         <th>Plan</th>
-        <th>Override Lock</th>
+        <th>Action</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td><input type="text" value="Clinic 1"></td>
-        <td><input type="text" value="1234"></td>
-        <td>
-          <select>
-            <option>free</option>
-            <option>paid</option>
-            <option>premium</option>
-          </select>
-        </td>
-        <td><input type="checkbox"></td>
-      </tr>
-      <tr>
-        <td><input type="text" value="Clinic 2"></td>
-        <td><input type="text" value="2525"></td>
-        <td>
-          <select>
-            <option>free</option>
-            <option selected>paid</option>
-            <option>premium</option>
-          </select>
-        </td>
-        <td><input type="checkbox"></td>
-      </tr>
-      <tr>
-        <td><input type="text" value="Clinic 3"></td>
-        <td><input type="text" value="8888"></td>
-        <td>
-          <select>
-            <option>free</option>
-            <option>paid</option>
-            <option selected>premium</option>
-          </select>
-        </td>
-        <td><input type="checkbox"></td>
-      </tr>
-    </tbody>
-  </table><button onclick="generateJSON()">📦 Generate plans.json</button>
+    <tbody></tbody>
+  </table>  <script>
+    let pins = {};
 
-  <textarea id="output" placeholder="Generated JSON will appear here..."></textarea>  <script>
-    function generateJSON() {
-      const rows = document.querySelectorAll('#planTable tbody tr');
-      const plans = {};
-      rows.forEach(row => {
-        const name = row.cells[0].querySelector('input').value.trim();
-        const pin = row.cells[1].querySelector('input').value.trim();
-        const plan = row.cells[2].querySelector('select').value;
-        const override = row.cells[3].querySelector('input').checked;
-        if (pin) {
-          plans[pin] = {
-            clinic: name,
-            plan: plan,
-            overrideLock: override
-          };
-        }
-      });
-      document.getElementById('output').value = JSON.stringify(plans, null, 2);
+    function loadPlans() {
+      fetch('plans.json')
+        .then(res => res.json())
+        .then(data => {
+          pins = data;
+          renderTable();
+        });
     }
+
+    function renderTable() {
+      const tbody = document.querySelector("#pinTable tbody");
+      tbody.innerHTML = '';
+      Object.entries(pins).forEach(([pin, plan]) => {
+        const row = `<tr>
+          <td>${pin}</td>
+          <td>${plan}</td>
+          <td><button class='btn-delete' onclick="deletePIN('${pin}')">Delete</button></td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function addPIN() {
+      const pin = document.getElementById("pin").value.trim();
+      const plan = document.getElementById("plan").value;
+      if (!pin) return alert("PIN cannot be empty.");
+      pins[pin] = plan;
+      saveToFile();
+    }
+
+    function deletePIN(pin) {
+      delete pins[pin];
+      saveToFile();
+    }
+
+    function saveToFile() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pins, null, 2));
+      const dl = document.createElement("a");
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", "plans.json");
+      dl.click();
+      renderTable();
+    }
+
+    loadPlans();
   </script></body>
 </html>
