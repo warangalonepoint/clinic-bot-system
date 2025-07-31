@@ -4,145 +4,98 @@
   <meta charset="UTF-8" />
   <title>Clinic Logs Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
+      background-color: #111;
       color: #fff;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
     h1 {
       color: #00e6e6;
       text-align: center;
     }
-    #summary {
-      margin: 30px 0;
-      padding: 20px;
-      background-color: #1c1c1c;
-      border-radius: 10px;
-    }
-    .summary-item {
-      margin: 10px 0;
-      font-size: 18px;
-    }
-    canvas {
-      background: #222;
-      padding: 10px;
-      border-radius: 10px;
+    table {
       width: 100%;
-      max-width: 600px;
-      margin: auto;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
-    label, input {
-      font-size: 16px;
-      margin: 10px;
+    th, td {
+      border: 1px solid #444;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #222;
+    }
+    .btn {
+      background-color: #00e6e6;
+      color: #111;
+      padding: 6px 12px;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .sent {
+      background-color: #4caf50 !important;
+      color: #fff !important;
     }
   </style>
 </head>
 <body>
-  <h1>📊 Daily Booking Summary</h1>
-
-  <div id="filters">
-    <label>
-      <input type="radio" name="filter" value="today" checked /> Today
-    </label>
-    <label>
-      <input type="radio" name="filter" value="yesterday" /> Yesterday
-    </label>
-    <label>
-      <input type="radio" name="filter" value="custom" /> Custom Range:
-      <input type="date" id="startDate" />
-      <input type="date" id="endDate" />
-    </label>
-    <button onclick="loadAndRender()">Apply</button>
-  </div>
-
-  <div id="summary">
-    <div class="summary-item">🗓️ Selected Range: <span id="range"></span></div>
-    <div class="summary-item">📋 Total Bookings: <span id="totalBookings"></span></div>
-  </div>
-
-  <canvas id="bookingChart" height="100"></canvas>
+  <h1>📋 Booking Logs + WhatsApp Reminders</h1>
+  <table id="logsTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Time</th>
+        <th>Contact</th>
+        <th>Reminder</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    async function loadAndRender() {
-      const response = await fetch('https://warangalonepoint.github.io/clinic-bot-system/logs.csv');
-      const text = await response.text();
-      const lines = text.trim().split('\n');
-      const header = lines.shift(); // Remove header
+    async function loadLogs() {
+      const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/logs.csv");
+      const csv = await res.text();
+      const lines = csv.trim().split("\n").slice(1); // remove header
+      const tbody = document.querySelector("#logsTable tbody");
+      tbody.innerHTML = "";
 
-      const rows = lines.map(line => {
-        const parts = line.split(',');
-        return {
-          date: parts[0].trim(),
-          name: parts[1]?.trim(),
-          time: parts[2]?.trim()
-        };
-      });
+      lines.forEach((line, idx) => {
+        const [date, name, time, contact, reminderStatus] = line.split(",");
+        const row = document.createElement("tr");
 
-      const filterType = document.querySelector('input[name="filter"]:checked').value;
-      let start = null, end = null;
-
-      const today = new Date();
-      const yest = new Date();
-      yest.setDate(today.getDate() - 1);
-
-      if (filterType === 'today') {
-        start = end = today.toISOString().split('T')[0];
-      } else if (filterType === 'yesterday') {
-        start = end = yest.toISOString().split('T')[0];
-      } else {
-        start = document.getElementById('startDate').value;
-        end = document.getElementById('endDate').value;
-      }
-
-      document.getElementById('range').textContent = `${start} to ${end}`;
-
-      const filtered = rows.filter(row => {
-        return row.date >= start && row.date <= end;
-      });
-
-      document.getElementById('totalBookings').textContent = filtered.length;
-
-      const dailyMap = {};
-      filtered.forEach(row => {
-        if (!dailyMap[row.date]) dailyMap[row.date] = 0;
-        dailyMap[row.date]++;
-      });
-
-      const chartLabels = Object.keys(dailyMap);
-      const chartData = Object.values(dailyMap);
-
-      renderChart(chartLabels, chartData);
-    }
-
-    let bookingChart = null;
-    function renderChart(labels, data) {
-      const ctx = document.getElementById('bookingChart').getContext('2d');
-      if (bookingChart) bookingChart.destroy();
-      bookingChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Bookings',
-            data: data,
-            backgroundColor: '#00e6e6'
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${name}</td>
+          <td>${time}</td>
+          <td>
+            <a href="tel:${contact.trim()}">${contact.trim()}</a>
+          </td>
+          <td>
+            <button class="btn ${reminderStatus === 'Sent' ? 'sent' : ''}" onclick="sendReminder(this, '${contact.trim()}', '${name}', ${idx})">
+              ${reminderStatus === 'Sent' ? 'Sent ✅' : 'Send Reminder'}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
       });
     }
 
-    window.onload = loadAndRender;
+    function sendReminder(button, contact, name, rowIndex) {
+      const encodedMessage = encodeURIComponent(`Hello ${name}, this is a reminder for your appointment today at our clinic.`);
+      const link = `https://wa.me/91${contact}?text=${encodedMessage}`;
+      window.open(link, '_blank');
+
+      button.textContent = "Sent ✅";
+      button.classList.add("sent");
+    }
+
+    window.onload = loadLogs;
   </script>
 </body>
 </html>
