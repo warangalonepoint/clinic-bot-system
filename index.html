@@ -3,76 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <title>Clinic PIN Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #111;
-      color: #fff;
-      font-family: sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
+      color: #fff;
       margin: 0;
     }
+
+    .login-box {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 350px;
+      width: 90%;
+    }
+
     h1 {
       margin-bottom: 20px;
-      color: #4CAF50;
+      font-size: 26px;
+      color: #00eaff;
     }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
+
+    input[type="password"] {
+      width: 100%;
+      padding: 14px;
+      margin: 20px 0;
       border: none;
-      margin-bottom: 10px;
-      width: 200px;
+      border-radius: 8px;
+      font-size: 16px;
     }
+
     button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4CAF50;
+      width: 100%;
+      padding: 12px;
+      background-color: #00eaff;
+      color: #000;
       border: none;
-      border-radius: 5px;
-      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
+
+    button:hover {
+      background-color: #00bcd4;
+    }
+
     .error {
+      color: #ff5c5c;
       margin-top: 10px;
-      color: #ff4444;
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      font-size: 12px;
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
-  <h1>Clinic Login</h1>
-  <input id="pin" type="password" placeholder="Enter your PIN" />
-  <button onclick="login()">Login</button>
-  <div class="error" id="error"></div>
+  <div class="login-box">
+    <h1>Clinic PIN Login</h1>
+    <input type="password" id="pinInput" placeholder="Enter PIN" />
+    <button onclick="login()">Login</button>
+    <div class="error" id="errorMsg"></div>
+    <div class="footer-note">Powered by WarangalOneStop.in</div>
+  </div>
 
   <script>
-    async function login() {
-      const pin = document.getElementById('pin').value.trim();
-      const errorBox = document.getElementById('error');
+    const plans = {
+      "1234": { clinic: "Clinic 1", plan: "free" },
+      "2525": { clinic: "Clinic 2", plan: "paid" },
+      "9999": { clinic: "Clinic 3", plan: "premium" }
+    };
+
+    function login() {
+      const pin = document.getElementById("pinInput").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
 
       if (!pin) {
-        errorBox.textContent = 'PIN is required.';
+        errorMsg.textContent = "Please enter your PIN.";
         return;
       }
 
-      try {
-        const res = await fetch('plans.json');
-        const plans = await res.json();
-
-        if (plans[pin]) {
-          localStorage.setItem('clinic', plans[pin].clinic);
-          localStorage.setItem('plan', plans[pin].plan || 'free');
-          window.location.href = 'clinic-dashboard.html';
+      if (plans[pin]) {
+        const plan = plans[pin].plan;
+        if (plan === "free") {
+          window.location.href = `freeplan.html?pin=${pin}`;
+        } else if (plan === "paid") {
+          window.location.href = `paidplan.html?pin=${pin}`;
+        } else if (plan === "premium") {
+          window.location.href = `premiumplan.html?pin=${pin}`;
         } else {
-          errorBox.textContent = 'Invalid PIN. Please try again.';
+          errorMsg.textContent = "Invalid plan assigned.";
         }
-      } catch (err) {
-        console.error(err);
-        errorBox.textContent = 'Error loading plans. Try again.';
+      } else {
+        errorMsg.textContent = "Invalid PIN. Please try again.";
       }
     }
   </script>
