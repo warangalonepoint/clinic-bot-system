@@ -1,54 +1,110 @@
-<script>
-const urlParams = new URLSearchParams(window.location.search);
-const pin = urlParams.get("pin");
-
-fetch('plans.json')
-  .then(response => response.json())
-  .then(plans => {
-    if (plans[pin]) {
-      document.getElementById("planName").textContent = plans[pin].plan;
-      document.getElementById("clinicName").textContent = plans[pin].clinic;
-
-      // 👇 Load and show today's appointments
-      const csvFile = `${plans[pin].logs}`;
-      const today = new Date().toISOString().split("T")[0];
-
-      fetch(csvFile)
-        .then(response => response.text())
-        .then(data => {
-          const rows = data.split("\n").slice(1); // skip header
-          let html = "";
-
-          rows.forEach(row => {
-            const [date, time, name, reason, contact, clinic, token, reminder, reminderSent] = row.split(",");
-            if (date === today) {
-              html += `
-                <tr>
-                  <td>${time}</td>
-                  <td>${name}</td>
-                  <td>${reason}</td>
-                  <td><a href="tel:${contact.trim()}">${contact.trim()}</a></td>
-                  <td>${reminderSent || ""}</td>
-                </tr>`;
-            }
-          });
-
-          document.getElementById("appointments").innerHTML = html || "<tr><td colspan='5'>No bookings today</td></tr>";
-        });
-
-    } else {
-      alert("Invalid PIN. Access Denied.");
-      window.location.href = "index.html";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      padding: 20px;
     }
-  });
-</script><h2>📋 Clinic Dashboard – Today's Appointments</h2>
-<p>Date: <span id="todayDate"></span></p>
-<table border="1" style="width:100%;color:white;">
-  <thead>
-    <tr><th>Time</th><th>Patient Name</th><th>Reason</th><th>Contact</th><th>Status</th></tr>
-  </thead>
-  <tbody id="appointments"></tbody>
-</table>
-<script>
-  document.getElementById("todayDate").textContent = new Date().toISOString().split("T")[0];
-</script>
+    h1, h2 {
+      color: #00b6ff;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #222;
+    }
+    td a {
+      color: #00eaff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 Clinic Dashboard – Today's Appointments</h1>
+  <div class="section">
+    <p><strong>Plan:</strong> <span id="planName">Loading...</span></p>
+    <p><strong>Clinic:</strong> <span id="clinicName">Loading...</span></p>
+    <p><strong>Date:</strong> <span id="todayDate"></span></p>
+  </div>
+
+  <div class="section">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Patient Name</th>
+          <th>Reason</th>
+          <th>Contact</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="appointments">
+        <tr><td colspan="5">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pin = urlParams.get("pin");
+    document.getElementById("todayDate").textContent = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split("T")[0];
+
+    fetch('plans.json')
+      .then(response => response.json())
+      .then(plans => {
+        if (plans[pin]) {
+          const clinicInfo = plans[pin];
+          document.getElementById("planName").textContent = clinicInfo.plan;
+          document.getElementById("clinicName").textContent = clinicInfo.clinic;
+
+          const csvFile = clinicInfo.logs || "logs.csv";
+
+          fetch(csvFile)
+            .then(response => response.text())
+            .then(data => {
+              const rows = data.split("\n").slice(1);
+              let html = "";
+
+              rows.forEach(row => {
+                const [date, time, name, reason, contact, clinic, token, reminder, reminderSent] = row.split(",");
+                if (date === today) {
+                  html += `
+                    <tr>
+                      <td>${time}</td>
+                      <td>${name}</td>
+                      <td>${reason}</td>
+                      <td><a href="tel:${contact.trim()}">${contact.trim()}</a></td>
+                      <td>${(reminderSent || "").trim()}</td>
+                    </tr>`;
+                }
+              });
+
+              document.getElementById("appointments").innerHTML = html || `<tr><td colspan="5">No bookings for today</td></tr>`;
+            });
+
+        } else {
+          alert("Invalid PIN. Access Denied.");
+          window.location.href = "index.html";
+        }
+      });
+  </script>
+</body>
+</html>
