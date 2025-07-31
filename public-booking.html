@@ -1,35 +1,156 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Public Booking</title>
+  <meta charset="UTF-8" />
+  <title>Book Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background-color: #f9f9f9; }
-    header { background-color: #2c3e50; color: #fff; padding: 15px; display: flex; align-items: center; }
-    header img { height: 40px; margin-right: 15px; }
-    header h1 { font-size: 22px; margin: 0; }
-    main { padding: 20px; }
-  </style>
-  <script>
-    const clinicID = localStorage.getItem("clinicID") || "onesto";
-    const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
-  const logoEl = document.getElementById("clinic-logo");
-  if (logoEl) {
-    logoEl.src = logoPath;
-    logoEl.onerror = () => logoEl.style.display = "none";
-  }
-});
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      padding: 1em;
+    }
 
-  </script>
+    img {
+      height: 60px;
+      display: block;
+      margin: 0 auto 1em;
+    }
+
+    h1 {
+      color: #f0ad4e;
+      text-align: center;
+    }
+
+    label, select, input, button {
+      display: block;
+      width: 100%;
+      margin: 0.5em 0;
+      padding: 0.5em;
+      font-size: 1em;
+    }
+
+    button {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #expiredMessage {
+      text-align: center;
+      color: red;
+      font-weight: bold;
+      margin-top: 2em;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <img id="clinic-logo" alt="Clinic Logo">
-    <h1>Book Your Appointment</h1>
-  </header>
-  <main>
-    <p>Use the form below to book your appointment.</p>
-    <!-- Booking form and logic go here -->
-  </main>
+  <img id="clinicLogo" src="" alt="Clinic Logo" />
+  <h1>Book an Appointment</h1>
+
+  <div id="expiredMessage" class="hidden">Trial expired. Contact admin.</div>
+
+  <div id="bookingForm">
+    <label for="bookingDate">Select Date:</label>
+    <select id="bookingDate"><option value="">-- Select Date --</option></select>
+
+    <label for="bookingTime">Select Time Slot:</label>
+    <select id="bookingTime"><option value="">-- Select Time --</option></select>
+
+    <label for="patientName">Your Name:</label>
+    <input type="text" id="patientName" placeholder="Enter your full name" />
+
+    <label for="reason">Reason for Visit:</label>
+    <input type="text" id="reason" placeholder="Optional (e.g., Fever, Check-up)" />
+
+    <button onclick="bookNow()">Book via WhatsApp</button>
+  </div>
+
+  <script src="trial.js"></script>
+  <script>
+    const CLINIC_ID = "onesto"; // change as needed
+    const LOGO_PATH = `clinics/${CLINIC_ID}/logo-bookings.png`;
+    const SLOTS_CSV = `clinics/${CLINIC_ID}/slots.csv`;
+    const LOGS_CSV = `clinics/${CLINIC_ID}/logs.csv`;
+    const WHATSAPP_NUMBER = "919390664577";
+
+    document.getElementById("clinicLogo").src = LOGO_PATH;
+
+    async function init() {
+      const expired = await checkTrialExpiry(CLINIC_ID);
+      if (expired) {
+        document.getElementById("bookingForm").classList.add("hidden");
+        document.getElementById("expiredMessage").classList.remove("hidden");
+        return;
+      }
+
+      const [slotData, logData] = await Promise.all([
+        fetch(SLOTS_CSV).then(res => res.text()),
+        fetch(LOGS_CSV).then(res => res.text())
+      ]);
+
+      const logs = logData.trim().split("\n").slice(1).map(r => r.split(",")[1]); // times
+      const slotRows = slotData.trim().split("\n").slice(1).map(r => r.split(","));
+      const byDate = {};
+
+      for (let row of slotRows) {
+        const [date, time] = row;
+        if (!byDate[date]) byDate[date] = [];
+        if (!logs.includes(time)) {
+          byDate[date].push(time);
+        }
+      }
+
+      const dateDropdown = document.getElementById("bookingDate");
+      for (let d in byDate) {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        dateDropdown.appendChild(opt);
+      }
+
+      dateDropdown.addEventListener("change", () => {
+        const selected = dateDropdown.value;
+        const times = byDate[selected] || [];
+        const timeDropdown = document.getElementById("bookingTime");
+        timeDropdown.innerHTML = `<option value="">-- Select Time --</option>`;
+        times.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.textContent = t;
+          timeDropdown.appendChild(opt);
+        });
+      });
+    }
+
+    function bookNow() {
+      const date = document.getElementById("bookingDate").value;
+      const time = document.getElementById("bookingTime").value;
+      const name = document.getElementById("patientName").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+
+      if (!date || !time || !name) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      const msg = `Appointment Request:
+🧑 Name: ${name}
+📅 Date: ${date}
+⏰ Time: ${time}
+📋 Reason: ${reason || 'N/A'}
+Clinic ID: ${CLINIC_ID}`;
+
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+    }
+
+    init();
+  </script>
 </body>
 </html>
