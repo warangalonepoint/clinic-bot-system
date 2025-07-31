@@ -1,45 +1,41 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Premium Booking | BookingBot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premium Booking Page</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="logos/logo-premium.png">
+  <link rel="manifest" href="manifest.json" />
+  <script src="trial.js"></script>
   <style>
     body {
-      background-color: #f5f5f5;
+      background-color: #0d1117;
+      color: #c9d1d9;
       font-family: Arial, sans-serif;
-      margin: 0;
       padding: 20px;
     }
-    h2 {
-      color: #222;
+    h1 {
+      color: #58a6ff;
       text-align: center;
+      margin-bottom: 20px;
     }
-    .form-container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    select, input, textarea, button {
-      width: 100%;
-      margin: 10px 0;
+    input, select, textarea, button {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
       padding: 12px;
       border-radius: 6px;
-      border: 1px solid #ccc;
+      border: none;
       font-size: 16px;
     }
+    textarea {
+      resize: vertical;
+      height: 80px;
+    }
     button {
-      background-color: #28a745;
-      color: #fff;
+      background-color: #238636;
+      color: white;
       font-weight: bold;
       cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
     }
     .hidden {
       display: none;
@@ -47,83 +43,85 @@
   </style>
 </head>
 <body>
-  <h2>Book Your Appointment</h2>
-  <div class="form-container">
-    <label for="date">Choose Date</label>
-    <select id="date"></select><label for="slot">Choose Slot</label>
-<select id="slot"></select>
+  <h1>Premium Appointment Booking</h1>
+  <input type="text" id="patientName" placeholder="Your Full Name" />
+  <input type="text" id="contactNumber" placeholder="Mobile Number" />
+  <input type="text" id="reason" placeholder="Reason for Visit" />
+  <textarea id="notes" placeholder="Any additional notes (optional)"></textarea>
+  <select id="slotDropdown">
+    <option value="">Loading available slots...</option>
+  </select>
+  <button onclick="previewBooking()">Proceed to Confirmation</button>
 
-<label for="name">Your Name</label>
-<input type="text" id="name" placeholder="Enter your name">
+  <div id="confirmSection" class="hidden">
+    <h2>Confirm Your Booking</h2>
+    <div id="confirmText"></div>
+    <button onclick="confirmBooking()">Book via WhatsApp</button>
+  </div>
 
-<label for="reason">Reason for Visit</label>
-<textarea id="reason" placeholder="E.g., General Checkup"></textarea>
+  <script>
+    let selectedData = {};
 
-<button onclick="confirmBooking()">Confirm & Book via WhatsApp</button>
+    async function loadSlots() {
+      const slotRes = await fetch('Slots.csv');
+      const slotText = await slotRes.text();
+      const slots = slotText.trim().split('\n').slice(1);
 
-  </div>  <script src="trial.js"></script>  <script>
-    const slotsCSV = "clinics/onesto/Slots.csv";
-    const logsCSV = "clinics/onesto/logs.csv";
-    const today = new Date();
-    const dateSelector = document.getElementById("date");
-    const slotSelector = document.getElementById("slot");
+      const logRes = await fetch('logs.csv');
+      const logText = await logRes.text();
+      const booked = logText.trim().split('\n').slice(1).map(row => row.split(',')[1]);
 
-    for (let i = 0; i < 7; i++) {
-      let d = new Date(today);
-      d.setDate(today.getDate() + i);
-      let formatted = d.toISOString().split('T')[0];
-      let opt = document.createElement("option");
-      opt.value = formatted;
-      opt.textContent = formatted;
-      dateSelector.appendChild(opt);
+      const dropdown = document.getElementById('slotDropdown');
+      dropdown.innerHTML = '<option value="">Select Slot</option>';
+      slots.forEach(row => {
+        const [date, time] = row.split(',');
+        const label = `${date.trim()} - ${time.trim()}`;
+        if (!booked.includes(time.trim())) {
+          const option = document.createElement('option');
+          option.value = label;
+          option.textContent = label;
+          dropdown.appendChild(option);
+        }
+      });
     }
 
-    dateSelector.addEventListener("change", loadSlots);
-    loadSlots();
+    function previewBooking() {
+      const name = document.getElementById('patientName').value.trim();
+      const number = document.getElementById('contactNumber').value.trim();
+      const reason = document.getElementById('reason').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+      const slot = document.getElementById('slotDropdown').value;
 
-    function loadSlots() {
-      fetch(slotsCSV)
-        .then(r => r.text())
-        .then(csv => {
-          const date = dateSelector.value;
-          const lines = csv.split("\n").filter(Boolean);
-          const booked = new Set();
-          fetch(logsCSV)
-            .then(r => r.text())
-            .then(logData => {
-              const logLines = logData.split("\n").filter(Boolean);
-              for (let l of logLines) {
-                const parts = l.split(",");
-                if (parts[1] === date) booked.add(parts[2]);
-              }
-              slotSelector.innerHTML = "";
-              for (let line of lines) {
-                const [slotDate, time] = line.split(",");
-                if (slotDate === date && !booked.has(time)) {
-                  let opt = document.createElement("option");
-                  opt.value = time;
-                  opt.textContent = time;
-                  slotSelector.appendChild(opt);
-                }
-              }
-            });
-        });
-    }
-
-    function confirmBooking() {
-      const name = document.getElementById("name").value.trim();
-      const reason = document.getElementById("reason").value.trim();
-      const slot = slotSelector.value;
-      const date = dateSelector.value;
-
-      if (!name || !reason || !slot || !date) {
-        alert("Please fill all fields");
+      if (!name || !number || !reason || !slot) {
+        alert('Please fill all required fields.');
         return;
       }
 
-      const message = `Appointment Request:%0AName: ${name}%0ADate: ${date}%0ASlot: ${slot}%0AReason: ${reason}`;
-      const url = `https://wa.me/919390664577?text=${message}`;
-      window.open(url, '_blank');
+      selectedData = { name, number, reason, slot, notes };
+
+      const preview = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Contact:</strong> ${number}</p>
+        <p><strong>Slot:</strong> ${slot}</p>
+        <p><strong>Reason:</strong> ${reason}</p>
+        <p><strong>Notes:</strong> ${notes || "None"}</p>
+      `;
+
+      document.getElementById('confirmText').innerHTML = preview;
+      document.getElementById('confirmSection').classList.remove('hidden');
     }
-  </script></body>
+
+    function confirmBooking() {
+      const msg = `Hi, I am ${selectedData.name}. I would like to book the slot: ${selectedData.slot}.
+Reason: ${selectedData.reason}
+Contact: ${selectedData.number}
+Notes: ${selectedData.notes || "None"}`;
+
+      const url = `https://wa.me/919390664577?text=${encodeURIComponent(msg)}`;
+      window.location.href = url;
+    }
+
+    loadSlots();
+  </script>
+</body>
 </html>
