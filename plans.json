@@ -1,18 +1,22 @@
 {
   "1111": {
     "clinic": "clinic1",
-    "plan": "free"
+    "plan": "free",
+    "file": "clinic1-logs.csv"
   },
   "2222": {
     "clinic": "clinic2",
-    "plan": "paid"
+    "plan": "paid",
+    "file": "clinic2-logs.csv"
   },
   "3333": {
     "clinic": "clinic3",
-    "plan": "premium"
+    "plan": "premium",
+    "file": "clinic3-logs.csv"
   },
   "2525": {
     "clinic": "onestop",
-    "plan": "full"
+    "plan": "full",
+    "file": "onestop-logs.csv"
   }
 }
