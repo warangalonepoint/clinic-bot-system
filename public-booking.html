@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book Appointment – WarangalOneStop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      background: #111;
+      font-family: Arial, sans-serif;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      color: #00e1ff;
+    }
+    select, input, button {
+      font-size: 16px;
+      margin: 10px 0;
+      padding: 10px;
+      width: 90%;
+      max-width: 300px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background: #00c2ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Book Your Appointment</h2>
+
+  <input type="text" id="name" placeholder="Your Name" />
+  <input type="text" id="reason" placeholder="Reason for Visit" />
+  <select id="slotDropdown"></select>
+  <br />
+  <button onclick="bookSlot()">Book Now</button>
+
+  <script>
+    const slotsCSV = "https://warangalonepoint.github.io/clinic-bot-system/Slots.csv";
+    const logsCSV = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+    const selectedClinic = "Clinic 1"; // Change this dynamically if needed
+
+    async function fetchCSV(url) {
+      const res = await fetch(url);
+      return await res.text();
+    }
+
+    async function loadSlots() {
+      const slotsText = await fetchCSV(slotsCSV);
+      const logsText = await fetchCSV(logsCSV);
+
+      const today = new Date().toLocaleDateString("en-GB").split("/").join("-");
+      const logs = logsText.trim().split("\n").slice(1).map(row => row.split(","));
+      const bookedTimes = logs.filter(row => row[0] === today && row[5] === selectedClinic).map(row => row[1]);
+
+      const slots = slotsText.trim().split("\n").slice(1).map(row => row.split(",")[0]);
+      const available = slots.filter(time => !bookedTimes.includes(time));
+
+      const dropdown = document.getElementById("slotDropdown");
+      dropdown.innerHTML = "";
+      available.forEach(time => {
+        const opt = document.createElement("option");
+        opt.value = time;
+        opt.textContent = time;
+        dropdown.appendChild(opt);
+      });
+    }
+
+    async function bookSlot() {
+      const name = document.getElementById("name").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const time = document.getElementById("slotDropdown").value;
+      if (!name || !reason || !time) return alert("Fill all fields");
+
+      const logsText = await fetchCSV(logsCSV);
+      const today = new Date().toLocaleDateString("en-GB").split("/").join("-");
+      const logs = logsText.trim().split("\n").slice(1).map(row => row.split(","));
+      const todaysBookings = logs.filter(row => row[0] === today && row[5] === selectedClinic);
+      const token = todaysBookings.length + 1;
+
+      // Simulate saving logic
+      const logURL = `confirmation.html?token=${token}`;
+      window.location.href = logURL;
+    }
+
+    loadSlots();
+  </script>
+</body>
+</html>
