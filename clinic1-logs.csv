@@ -1,5 +1,31 @@
-Date,Time,Name,Reason,Contact,Clinic,Token,Reminder Sent
-2025-07-31,09:00,Rajesh Kumar,Consultation,+919876543210,clinic1,1,
-2025-07-31,09:10,Anita Reddy,General Checkup,+919812345678,clinic1,2,
-2025-07-31,09:20,Manoj Das,Fever,+918765432198,clinic1,3,
-2025-07-31,09:30,Swetha Rao,Diabetes Follow-up,+919999888877,clinic1,4,
+Date,Time,Name,Reason,Contact,Clinic,Token,Reminder,Reminder Sent
+2025-08-01,09:00,Anil Kumar,Fever,+919876543210,Clinic 1,1,Yes,No
+2025-08-01,09:10,Sneha Rao,Cold,+919812345678,Clinic 1,2,Yes,Yes
+2025-08-01,09:20,Ravi Teja,Checkup,+918765432109,Clinic 1,3,Yes,No
+2025-08-01,09:30,Pooja Rani,Injury,+918901234567,Clinic 1,4,Yes,Yes
+2025-08-01,09:40,Imran Ali,Back Pain,+917654321098,Clinic 1,5,Yes,Yes
+2025-08-01,09:50,Harsha Sai,Diabetes,+919800000111,Clinic 1,6,Yes,No
+2025-08-01,10:00,Nikita Sharma,Stomach Ache,+918790123456,Clinic 1,7,Yes,No
+2025-08-01,10:10,Ramesh Goud,Follow-up,+918888888888,Clinic 1,8,Yes,Yes
+2025-08-01,10:20,Deepa K,Injury,+917777777777,Clinic 1,9,Yes,Yes
+2025-08-01,10:30,Vinay Kumar,Cold,+919666666666,Clinic 1,10,Yes,No
+2025-08-01,10:40,Kiran Reddy,Fever,+919555555555,Clinic 1,11,Yes,No
+2025-08-01,10:50,Meghana S,Consultation,+919444444444,Clinic 1,12,Yes,Yes
+2025-08-01,11:00,Anusha M,Checkup,+919333333333,Clinic 1,13,Yes,Yes
+2025-08-01,11:10,Naveen C,Injury,+919222222222,Clinic 1,14,Yes,Yes
+2025-08-01,11:20,Alekhya K,Cold,+919111111111,Clinic 1,15,Yes,No
+2025-08-01,11:30,Bharath G,Checkup,+918999999999,Clinic 1,16,Yes,No
+2025-08-01,11:40,Sudha P,Consultation,+918888888888,Clinic 1,17,Yes,Yes
+2025-08-01,11:50,Karthik V,Stomach,+918777777777,Clinic 1,18,Yes,No
+2025-08-01,12:00,Yamini S,Back Pain,+918666666666,Clinic 1,19,Yes,Yes
+2025-08-01,12:10,Narsimha T,General,+918555555555,Clinic 1,20,Yes,No
+2025-08-01,12:20,Asha Rao,Diabetes,+918444444444,Clinic 1,21,Yes,Yes
+2025-08-01,12:30,Rajeshwari G,Consult,+918333333333,Clinic 1,22,Yes,No
+2025-08-01,12:40,Tejaswini R,Fever,+918222222222,Clinic 1,23,Yes,Yes
+2025-08-01,12:50,Sunil D,Checkup,+918111111111,Clinic 1,24,Yes,No
+2025-08-01,13:00,Keerthi M,Injury,+918000000000,Clinic 1,25,Yes,No
+2025-08-01,13:10,Ganesh K,Diabetes,+917999999999,Clinic 1,26,Yes,Yes
+2025-08-01,13:20,Rithika J,Checkup,+917888888888,Clinic 1,27,Yes,No
+2025-08-01,13:30,Manoj B,General,+917777777777,Clinic 1,28,Yes,Yes
+2025-08-01,13:40,Revathi D,Consult,+917666666666,Clinic 1,29,Yes,No
+2025-08-01,13:50,Nikhil M,Cold,+917555555555,Clinic 1,30,Yes,No
