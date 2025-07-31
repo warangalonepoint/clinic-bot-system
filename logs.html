@@ -1,136 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Appointment Logs</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #fff;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #000;
-    }
-    .filter {
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      padding: 8px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    button, select, input {
-      margin: 4px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    .highlight {
-      color: green;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
+<script>
+    const csvUrl = 'logs.csv';
+    let allData = [];
 
-  <h1>📋 Appointment Logs</h1>
-  <div class="filter">
-    <div class="highlight" id="stats"></div>
-    <br/>
-    <button onclick="filterToday()">Today</button>
-    <button onclick="filterYesterday()">Yesterday</button>
-    <br/><br/>
-    <input type="date" id="startDate"> to 
-    <input type="date" id="endDate">
-    <button onclick="filterDateRange()">Apply</button>
-    <br/><br/>
-    <button onclick="exportCSV()">📁 Export CSV</button>
-    <button onclick="exportPDF()">🧾 Export PDF</button>
-  </div>
-
-  <table id="logTable">
-    <thead>
-      <tr>
-        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th>
-        <th>Contact</th><th>Clinic</th><th>Token</th><th>Reminder</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    const url = 'logs.csv';
-    let originalData = [];
-
-    fetch(url)
+    fetch(csvUrl)
       .then(res => res.text())
       .then(csv => {
         const parsed = Papa.parse(csv, { header: true });
-        originalData = parsed.data;
-        renderTable(originalData);
+        allData = parsed.data.filter(row => row.Date); // Skip empty rows
+        updateSummary(allData);
+        renderTable(allData);
       });
+
+    function updateSummary(data) {
+      const today = new Date().toISOString().split("T")[0];
+      const todayCount = data.filter(r => r.Date === today).length;
+      const todayTokens = data.filter(r => r.Date === today).map(r => parseInt(r.Token)).filter(n => !isNaN(n));
+      const nextToken = todayTokens.length > 0 ? Math.max(...todayTokens) + 1 : 1;
+      document.getElementById("stats").textContent = `✅ Bookings Today: ${todayCount} | Next Token: ${nextToken}`;
+    }
 
     function renderTable(data) {
       const tbody = document.querySelector("#logTable tbody");
       tbody.innerHTML = "";
-      let todayCount = 0;
-      const today = new Date().toISOString().split("T")[0];
-
       data.forEach(row => {
-        if (!row.Date) return;
         const tr = document.createElement("tr");
-        Object.values(row).forEach(cell => {
-          const td = document.createElement("td");
-          td.textContent = cell;
-          tr.appendChild(td);
-        });
+        tr.innerHTML = `
+          <td>${row.Date}</td>
+          <td>${row.Time}</td>
+          <td>${row.Name}</td>
+          <td>${row.Reason}</td>
+          <td>${row.Contact}</td>
+          <td>${row.Clinic}</td>
+          <td>${row.Token}</td>
+          <td>${row["Reminder Sent"]}</td>
+        `;
         tbody.appendChild(tr);
-
-        if (row.Date === today) todayCount++;
       });
-
-      const nextToken = todayCount + 1;
-      document.getElementById("stats").textContent = `✅ Bookings Today: ${todayCount} | Next Token: ${nextToken}`;
     }
 
     function filterToday() {
       const today = new Date().toISOString().split("T")[0];
-      const filtered = originalData.filter(row => row.Date === today);
+      const filtered = allData.filter(r => r.Date === today);
       renderTable(filtered);
     }
 
     function filterYesterday() {
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-      const filtered = originalData.filter(row => row.Date === yesterday);
+      const y = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+      const filtered = allData.filter(r => r.Date === y);
       renderTable(filtered);
     }
 
     function filterDateRange() {
       const start = document.getElementById("startDate").value;
       const end = document.getElementById("endDate").value;
-      const filtered = originalData.filter(row => row.Date >= start && row.Date <= end);
+      const filtered = allData.filter(r => r.Date >= start && r.Date <= end);
       renderTable(filtered);
     }
 
     function exportCSV() {
-      const csv = Papa.unparse(originalData);
-      const blob = new Blob([csv], { type: "text/csv" });
+      const csv = Papa.unparse(allData);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "AppointmentLogs.csv";
+      link.setAttribute("href", url);
+      link.setAttribute("download", "AppointmentLogs.csv");
       link.click();
     }
 
@@ -139,10 +72,18 @@
       const doc = new jsPDF();
       doc.text("Appointment Logs", 10, 10);
       let y = 20;
-      originalData.forEach((row, index) => {
-        const line = `${row.Date} | ${row.Time} | ${row.Name} | ${row.Reason} | ${row.Contact}`;
+      allData.forEach(r => {
+        const line = `${r.Date} | ${r.Time} | ${r.Name} | ${r.Reason} | ${r.Contact}`;
         doc.text(line, 10, y);
         y += 8;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+      doc.save("AppointmentLogs.pdf");
+    }
+  </script>        y += 8;
         if (y > 270) {
           doc.addPage();
           y = 20;
