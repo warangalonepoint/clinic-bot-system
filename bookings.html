@@ -2,120 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clinic Bookings</title>
+  <title>Booking Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
-      background-color: #111;
+      background: #111;
       color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
-
-    h1 {
-      font-size: 24px;
-      color: #00d9ff;
-      margin-bottom: 10px;
+    h2 {
+      color: #4CAF50;
+      text-align: center;
     }
-
-    .status {
-      margin: 10px 0;
-      font-size: 16px;
-    }
-
-    .booking-table {
+    table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      font-size: 15px;
     }
-
-    .booking-table th,
-    .booking-table td {
-      border: 1px solid #444;
+    th, td {
       padding: 10px;
+      border: 1px solid #444;
       text-align: left;
     }
-
-    .booking-table th {
+    th {
       background-color: #222;
-      color: #00d9ff;
     }
-
-    .booking-table td {
-      background-color: #1a1a1a;
-    }
-
-    .note {
-      color: #888;
-      font-size: 14px;
-      margin-top: 15px;
+    .back {
+      background: #4CAF50;
+      border: none;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>📅 Booked Appointments</h1>
-  <div class="status">Loading booking data...</div>
-
-  <table class="booking-table" id="bookingTable" style="display: none;">
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Patient</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Status</th>
-        <th>Token</th>
-      </tr>
-    </thead>
-    <tbody id="bookingTableBody"></tbody>
-  </table>
-
-  <p class="note">Only today’s bookings will appear. Sheet must be updated regularly.</p>
+  <button class="back" onclick="goBack()">⬅ Back</button>
+  <h2>📋 Bookings</h2>
+  <div id="logContainer">Loading logs...</div>
 
   <script>
-    const params = new URLSearchParams(location.search);
-    const pin = params.get("pin");
-    const today = new Date().toISOString().split("T")[0];
-    const logsUrl = `https://warangalonepoint.github.io/clinic-bot-system/clinic2-logs.csv`;
+    const clinic = localStorage.getItem('clinic');
+    const plan = localStorage.getItem('plan');
 
-    fetch(logsUrl)
-      .then(res => res.text())
-      .then(text => {
-        const rows = text.trim().split("\n").slice(1);
-        const tableBody = document.getElementById("bookingTableBody");
-        const table = document.getElementById("bookingTable");
-        const status = document.querySelector(".status");
-        let found = false;
+    if (!clinic || !plan) {
+      window.location.href = "index.html";
+    }
 
-        rows.forEach(row => {
-          const [time, patient, reason, contact, statusVal, token, date] = row.split(",");
-          if (date === today) {
-            found = true;
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${time}</td>
-              <td>${patient}</td>
-              <td>${reason}</td>
-              <td><a href="tel:${contact}" style="color:lightgreen">${contact}</a></td>
-              <td>${statusVal}</td>
-              <td>${token}</td>
-            `;
-            tableBody.appendChild(tr);
-          }
+    const csvPath = `${clinic}-logs.csv`;
+    const logContainer = document.getElementById("logContainer");
+
+    fetch(csvPath)
+      .then(res => {
+        if (!res.ok) throw new Error("File not found");
+        return res.text();
+      })
+      .then(data => {
+        const rows = data.trim().split("\n").map(row => row.split(","));
+        let html = "<table><tr>";
+        rows[0].forEach(col => html += `<th>${col}</th>`);
+        html += "</tr>";
+        rows.slice(1).forEach(row => {
+          html += "<tr>";
+          row.forEach(cell => html += `<td>${cell}</td>`);
+          html += "</tr>";
         });
-
-        if (found) {
-          table.style.display = "table";
-          status.innerText = `Showing bookings for ${today}`;
-        } else {
-          status.innerText = "No bookings for today.";
-        }
+        html += "</table>";
+        logContainer.innerHTML = html;
       })
       .catch(err => {
-        document.querySelector(".status").innerText = "Error loading bookings.";
-        console.error(err);
+        logContainer.innerHTML = "<p style='color:red;'>No logs found.</p>";
       });
+
+    function goBack() {
+      window.location.href = "clinic-dashboard.html";
+    }
   </script>
 </body>
 </html>
