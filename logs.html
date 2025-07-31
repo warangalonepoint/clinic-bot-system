@@ -1,35 +1,114 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Logs</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logs Dashboard - Clinic Admin</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f7f7f7; }
-    header { background-color: #2c3e50; color: white; padding: 10px 20px; display: flex; align-items: center; }
-    header img { height: 40px; margin-right: 15px; }
-    header h1 { font-size: 20px; margin: 0; }
-    .container { padding: 20px; }
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    img {
+      height: 60px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      color: #00ffff;
+    }
+    #summary {
+      background: #111;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+    #logList {
+      background: #111;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .log-entry {
+      margin: 10px 0;
+      padding: 10px;
+      background: #222;
+      border-left: 5px solid #00e6e6;
+      border-radius: 5px;
+    }
+    button {
+      background: #00e6e6;
+      color: #000;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
   </style>
-  <script>
-    const clinicID = localStorage.getItem("clinicID") || "onesto";
-    const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
-  const logoEl = document.getElementById("clinic-logo");
-  if (logoEl) {
-    logoEl.src = logoPath;
-    logoEl.onerror = () => logoEl.style.display = "none";
-  }
-});
-
-  </script>
 </head>
 <body>
   <header>
-    <img id="clinic-logo" alt="Clinic Logo">
-    <h1>Booking Logs</h1>
+    <img src="logo-bookings.png" alt="Logo" />
+    <h1>📊 Booking Logs</h1>
   </header>
-  <div class="container">
-    <p>Logs and summaries will be shown here.</p>
-    <!-- Logs UI & Chart will go here -->
+
+  <div id="summary">
+    <h2>📅 Daily Summary</h2>
+    <p id="summaryContent">Loading summary...</p>
   </div>
+
+  <div id="logList">
+    <h2>🧾 All Logs</h2>
+    <div id="logsContainer">Loading logs...</div>
+    <button onclick="downloadLogs()">⬇ Export Logs</button>
+  </div>
+
+  <script src="trial.js"></script>
+  <script>
+    const LOGS_CSV = "Logs.csv";
+
+    async function loadLogs() {
+      try {
+        const res = await fetch(LOGS_CSV);
+        const text = await res.text();
+        const rows = text.trim().split("\n").slice(1); // skip header
+        const container = document.getElementById("logsContainer");
+        const summary = {};
+
+        container.innerHTML = "";
+        rows.forEach(row => {
+          const cols = row.split(",");
+          const [timestamp, name, reason, slot] = cols;
+          const date = new Date(timestamp).toISOString().split("T")[0];
+          summary[date] = (summary[date] || 0) + 1;
+
+          const div = document.createElement("div");
+          div.className = "log-entry";
+          div.innerHTML = `<strong>${name}</strong> booked <em>${slot}</em><br/><small>${reason} | ${timestamp}</small>`;
+          container.appendChild(div);
+        });
+
+        const summaryContent = Object.entries(summary)
+          .map(([date, count]) => `<p>${date}: ${count} bookings</p>`)
+          .join("");
+        document.getElementById("summaryContent").innerHTML = summaryContent || "No bookings yet.";
+      } catch (err) {
+        document.getElementById("logsContainer").innerText = "Error loading logs.";
+        document.getElementById("summaryContent").innerText = "Error loading summary.";
+        console.error(err);
+      }
+    }
+
+    function downloadLogs() {
+      window.open(LOGS_CSV, "_blank");
+    }
+
+    loadLogs();
+  </script>
 </body>
 </html>
