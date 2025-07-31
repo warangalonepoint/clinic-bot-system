@@ -1,119 +1,135 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin PIN Panel</title>
+  <meta charset="UTF-8" />
+  <title>Assign Clinics (plans.json Editor)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #121212;
       font-family: Arial, sans-serif;
+      background-color: #121212;
       color: #fff;
-      padding: 40px;
+      padding: 20px;
     }
-    h1 {
-      text-align: center;
+    h2 {
       color: #4dc1ff;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 30px;
+      margin-top: 20px;
+      background-color: #1e1e1e;
     }
     th, td {
       padding: 12px;
-      border: 1px solid #555;
-      text-align: center;
+      border: 1px solid #444;
+      text-align: left;
     }
-    th {
-      background-color: #1e1e1e;
-    }
-    input, select, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 8px;
-    }
-    .btn-delete {
-      background-color: crimson;
+    input, select {
+      padding: 8px;
+      background-color: #2c2c2c;
       color: white;
-      border: none;
-      padding: 5px 15px;
-      cursor: pointer;
+      border: 1px solid #666;
+      width: 100%;
     }
-    .btn-save {
-      background-color: #28a745;
-      color: white;
-      border: none;
+    button {
       padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #28a745;
+      border: none;
+      color: white;
       cursor: pointer;
-      margin-top: 10px;
+    }
+    .json-output {
+      white-space: pre-wrap;
+      background: #1e1e1e;
+      padding: 10px;
+      margin-top: 20px;
+      border: 1px solid #333;
     }
   </style>
 </head>
 <body>
-  <h1>Admin PIN & Plan Management</h1>  <div style="text-align:center">
-    <input type="text" id="pin" placeholder="Enter PIN">
-    <select id="plan">
-      <option value="freeplan.html">Free</option>
-      <option value="paidplan.html">Paid</option>
-      <option value="premiumplan.html">Premium</option>
-    </select>
-    <button class="btn-save" onclick="addPIN()">Add / Update</button>
-  </div>  <table id="pinTable">
-    <thead>
-      <tr>
-        <th>PIN</th>
-        <th>Plan</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>  <script>
-    let pins = {};
 
-    function loadPlans() {
-      fetch('plans.json')
-        .then(res => res.json())
-        .then(data => {
-          pins = data;
-          renderTable();
-        });
-    }
+<h2>🛠️ Assign Clinics – PIN & Plan Control</h2>
 
-    function renderTable() {
-      const tbody = document.querySelector("#pinTable tbody");
-      tbody.innerHTML = '';
-      Object.entries(pins).forEach(([pin, plan]) => {
-        const row = `<tr>
-          <td>${pin}</td>
-          <td>${plan}</td>
-          <td><button class='btn-delete' onclick="deletePIN('${pin}')">Delete</button></td>
-        </tr>`;
-        tbody.innerHTML += row;
-      });
-    }
+<input type="file" id="jsonFile" accept=".json">
+<br/><br/>
 
-    function addPIN() {
-      const pin = document.getElementById("pin").value.trim();
-      const plan = document.getElementById("plan").value;
-      if (!pin) return alert("PIN cannot be empty.");
-      pins[pin] = plan;
-      saveToFile();
-    }
+<table id="editorTable">
+  <thead>
+    <tr>
+      <th>Clinic</th>
+      <th>PIN</th>
+      <th>Plan</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-    function deletePIN(pin) {
-      delete pins[pin];
-      saveToFile();
-    }
+<button onclick="downloadUpdatedJSON()">💾 Download Updated plans.json</button>
 
-    function saveToFile() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pins, null, 2));
-      const dl = document.createElement("a");
-      dl.setAttribute("href", dataStr);
-      dl.setAttribute("download", "plans.json");
-      dl.click();
-      renderTable();
-    }
+<script>
+let plansData = {};
 
-    loadPlans();
-  </script></body>
+document.getElementById("jsonFile").addEventListener("change", function (e) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    plansData = JSON.parse(reader.result);
+    populateTable();
+  };
+  reader.readAsText(e.target.files[0]);
+});
+
+function populateTable() {
+  const tbody = document.querySelector("#editorTable tbody");
+  tbody.innerHTML = "";
+
+  Object.entries(plansData).forEach(([clinic, { pin, plan }]) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td><input value="${clinic}" data-clinic="${clinic}" onchange="updateClinicKey(this)"></td>
+      <td><input value="${pin}" data-clinic="${clinic}" data-field="pin" onchange="updateField(this)"></td>
+      <td>
+        <select data-clinic="${clinic}" data-field="plan" onchange="updateField(this)">
+          <option value="free" ${plan === "free" ? "selected" : ""}>Free</option>
+          <option value="paid" ${plan === "paid" ? "selected" : ""}>Paid</option>
+          <option value="premium" ${plan === "premium" ? "selected" : ""}>Premium</option>
+        </select>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+function updateField(element) {
+  const clinic = element.getAttribute("data-clinic");
+  const field = element.getAttribute("data-field");
+  plansData[clinic][field] = element.value.trim();
+}
+
+function updateClinicKey(input) {
+  const oldKey = input.getAttribute("data-clinic");
+  const newKey = input.value.trim();
+
+  if (oldKey !== newKey && newKey) {
+    plansData[newKey] = plansData[oldKey];
+    delete plansData[oldKey];
+    populateTable();
+  }
+}
+
+function downloadUpdatedJSON() {
+  const blob = new Blob([JSON.stringify(plansData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "plans.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
 </html>
