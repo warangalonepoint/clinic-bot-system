@@ -1,39 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Paid Plan - BookingBot</title>
-  <link rel="manifest" href="manifest.json" />
-  <script src="service-worker.js"></script>
-  <style>
-    body {
-      background-color: #101010;
-      color: #fff;
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      color: #4dc1ff;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paid Plan Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Paid Plan Activated</h1>
-  <p>Welcome to the BookingBot - Paid Version</p>
-  <ul>
-    <li>📅 View Bookings</li>
-    <li>📋 Access Logs Panel</li>
-    <li>⬇️ Export to Excel</li>
-    <li>📲 Send WhatsApp Reminders</li>
-  </ul>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js');
-      });
-    }
-  </script>
-</body>
+  <header>
+    <h1>Paid Plan - Booking Logs</h1>
+    <a href="index.html">🔒 Logout</a>
+  </header>  <section>
+    <div class="filters">
+      <button onclick="filterToday()">Today</button>
+      <button onclick="filterYesterday()">Yesterday</button>
+      <input type="date" id="fromDate" /> to
+      <input type="date" id="toDate" />
+      <button onclick="applyCustomRange()">Apply</button>
+      <button onclick="resetFilters()">Reset</button>
+    </div>
+  </section>  <section>
+    <table id="logsTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Name</th>
+          <th>Reason</th>
+          <th>Contact</th>
+          <th>Reminder</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Logs will be inserted here -->
+      </tbody>
+    </table>
+  </section>  <section>
+    <h2>📊 Daily Summary</h2>
+    <div id="summary">
+      <p>Total Bookings: <span id="totalBookings">0</span></p>
+      <p>Reminders Sent: <span id="remindersSent">0</span></p>
+      <p>Top Reasons:
+        <ul id="topReasons"></ul>
+      </p>
+    </div>
+    <canvas id="summaryChart" height="100"></canvas>
+  </section>  <section>
+    <div class="export-buttons">
+      <button onclick="exportToExcel()">Export to Excel</button>
+      <button onclick="exportToPDF()">Export to PDF</button>
+    </div>
+  </section>  <footer>
+    <p>Powered by WarangalOneStop BookingBot</p>
+  </footer>  <script src="logs.js"></script></body>
 </html>
