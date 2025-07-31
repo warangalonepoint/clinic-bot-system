@@ -1,26 +1,21 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Logs Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Logs</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
-      background-color: #0a0a0a;
-      color: white;
+      background-color: #121212;
+      color: #fff;
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
       padding: 20px;
-      background-color: #111;
+    }
+    h1 {
       text-align: center;
-      font-size: 24px;
-      font-weight: bold;
       color: #4dc1ff;
-    }
-    main {
-      padding: 20px;
     }
     table {
       width: 100%;
@@ -28,104 +23,157 @@
       margin-top: 20px;
     }
     th, td {
-      border: 1px solid #444;
       padding: 10px;
-      text-align: center;
+      border: 1px solid #444;
+      text-align: left;
     }
     th {
       background-color: #222;
-      color: #00e0ff;
     }
-    tr:nth-child(even) {
-      background-color: #1a1a1a;
+    a {
+      color: #4dc1ff;
     }
-    .filter-section {
-      margin-top: 20px;
+    .filter-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      align-items: center;
+      margin-bottom: 20px;
     }
-    .filter-section label,
-    .filter-section input,
-    .filter-section button {
+    .filter-bar input, .filter-bar button {
+      padding: 8px;
       font-size: 16px;
-      padding: 6px;
     }
-    .filter-section button {
-      background-color: #28a745;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .no-logs {
-      margin-top: 20px;
-      text-align: center;
-      color: #ccc;
-      font-size: 18px;
+    .btn-export {
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <header>Clinic Booking Logs</header>
-  <main>
-    <div class="filter-section">
-      <button onclick="filterByDate('today')">Today</button>
-      <button onclick="filterByDate('yesterday')">Yesterday</button>
-      <label for="from">From:</label>
-      <input type="date" id="from" />
-      <label for="to">To:</label>
-      <input type="date" id="to" />
-      <button onclick="applyCustomRange()">Apply</button>
-    </div>
-    <div id="log-table"></div>
-  </main>  <script>
-    async function loadCSV() {
-      const res = await fetch("logs.csv");
-      const data = await res.text();
-      return data.trim().split("\n").map(row => row.split(","));
-    }
+  <h1>Booking Logs Dashboard</h1>
+
+  <div class="filter-bar">
+    <button onclick="filterByToday()">Today</button>
+    <button onclick="filterByYesterday()">Yesterday</button>
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+    <button onclick="filterByDateRange()">Apply</button>
+    <button onclick="resetFilter()">Reset</button>
+    <button onclick="exportToExcel()" class="btn-export">Export Excel</button>
+    <button onclick="exportToPDF()" class="btn-export">Export PDF</button>
+  </div>
+
+  <table id="logTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Name</th>
+        <th>Reason</th>
+        <th>Contact</th>
+        <th>Reminder Sent</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+    let fullData = [];
 
     function formatDate(date) {
-      const d = new Date(date);
-      return d.toISOString().split('T')[0];
+      return date.toISOString().split('T')[0];
     }
 
-    function displayLogs(logs) {
-      const container = document.getElementById("log-table");
-      if (logs.length === 0) {
-        container.innerHTML = '<div class="no-logs">No bookings found for selected dates.</div>';
-        return;
-      }
-      let html = '<table><thead><tr>';
-      logs[0].forEach(h => html += `<th>${h}</th>`);
-      html += '</tr></thead><tbody>';
-      for (let i = 1; i < logs.length; i++) {
-        html += '<tr>' + logs[i].map(cell => `<td>${cell}</td>`).join('') + '</tr>';
-      }
-      html += '</tbody></table>';
-      container.innerHTML = html;
+    function parseDateDDMMYYYY(ddmmyyyy) {
+      const [day, month, year] = ddmmyyyy.split("-");
+      return new Date(`${year}-${month}-${day}`);
     }
 
-    async function filterByDate(type) {
-      const allLogs = await loadCSV();
-      const today = new Date();
-      let compareDate = new Date();
-      if (type === 'yesterday') compareDate.setDate(today.getDate() - 1);
-      const filterDate = formatDate(compareDate);
-      const filtered = [allLogs[0], ...allLogs.filter(row => row[0] === filterDate)];
-      displayLogs(filtered);
+    function loadCSV() {
+      fetch(csvUrl)
+        .then(res => res.text())
+        .then(text => {
+          const lines = text.trim().split("\n").slice(1); // skip header
+          fullData = lines.map(line => {
+            const [Date, Time, Name, Reason, Contact, Reminder] = line.split(",");
+            return { Date, Time, Name, Reason, Contact, Reminder };
+          });
+          renderTable(fullData);
+        });
     }
 
-    async function applyCustomRange() {
-      const from = document.getElementById("from").value;
-      const to = document.getElementById("to").value;
-      if (!from || !to) return alert("Select both from and to dates");
-      const allLogs = await loadCSV();
-      const filtered = [allLogs[0], ...allLogs.filter(row => row[0] >= from && row[0] <= to)];
-      displayLogs(filtered);
+    function renderTable(data) {
+      const tbody = document.querySelector("#logTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.Date}</td>
+          <td>${row.Time}</td>
+          <td>${row.Name}</td>
+          <td>${row.Reason}</td>
+          <td><a href="tel:${row.Contact}" style="color:#0f0;">${row.Contact}</a></td>
+          <td>${row.Reminder}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    loadCSV().then(displayLogs);
-  </script></body>
+    function filterByToday() {
+      const today = formatDate(new Date());
+      const filtered = fullData.filter(row => {
+        const d = parseDateDDMMYYYY(row.Date);
+        return formatDate(d) === today;
+      });
+      renderTable(filtered);
+    }
+
+    function filterByYesterday() {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yDate = formatDate(yesterday);
+      const filtered = fullData.filter(row => {
+        const d = parseDateDDMMYYYY(row.Date);
+        return formatDate(d) === yDate;
+      });
+      renderTable(filtered);
+    }
+
+    function filterByDateRange() {
+      const start = new Date(document.getElementById("startDate").value);
+      const end = new Date(document.getElementById("endDate").value);
+      const filtered = fullData.filter(row => {
+        const d = parseDateDDMMYYYY(row.Date);
+        return d >= start && d <= end;
+      });
+      renderTable(filtered);
+    }
+
+    function resetFilter() {
+      renderTable(fullData);
+    }
+
+    function exportToExcel() {
+      const ws = XLSX.utils.json_to_sheet(fullData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Logs");
+      XLSX.writeFile(wb, "BookingLogs.xlsx");
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Booking Logs", 14, 16);
+      const rows = fullData.map(r => [r.Date, r.Time, r.Name, r.Reason, r.Contact, r.Reminder]);
+      doc.autoTable({
+        head: [["Date", "Time", "Name", "Reason", "Contact", "Reminder"]],
+        body: rows,
+        startY: 20
+      });
+      doc.save("BookingLogs.pdf");
+    }
+
+    loadCSV();
+  </script>
+</body>
 </html>
