@@ -1,6 +1,5 @@
-Date,Time,Name,Reason,Contact,Clinic,Token,Reminder,Reminder Sent
-2025-07-31,12:00,Rajesh Kumar,Consultation,+919812300000,onestop,1,"Reminder: Rajesh, your appointment is at 12:00. Token No: #1",X
-2025-07-31,12:10,Anita Reddy,General Checkup,+919812311111,onestop,2,"Reminder: Anita, your appointment is at 12:10. Token No: #2",X
-2025-07-31,12:20,Manoj Das,Fever,+919812322222,onestop,3,"Reminder: Manoj, your appointment is at 12:20. Token No: #3",X
-2025-07-31,12:30,Swetha Rao,Diabetes Follow-up,+919812333333,onestop,4,"Reminder: Swetha, your appointment is at 12:30. Token No: #4",X
-2025-07-31,12:40,Naveen Chandra,Eye Irritation,+919812344444,onestop,5,"Reminder: Naveen, your appointment is at 12:40. Token No: #5",X
+Date,Time,Name,Reason,Contact,Clinic,Token,Reminder Sent
+2025-07-31,09:00,Rajesh Kumar,Consultation,+919876543210,onestop,1,
+2025-07-31,09:10,Anita Reddy,General Checkup,+919812345678,onestop,2,
+2025-07-31,09:20,Manoj Das,Fever,+918765432198,onestop,3,
+2025-07-31,09:30,Swetha Rao,Diabetes Follow-up,+919999888877,onestop,4,
