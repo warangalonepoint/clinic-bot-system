@@ -1,22 +1,17 @@
 {
-  "clinic1": {
+  "1234": {
+    "clinic": "Clinic 1",
     "plan": "free",
-    "expires": "2025-08-04",
-    "overrideLock": false
+    "overrideLock": true
   },
-  "clinic2": {
+  "2525": {
+    "clinic": "Clinic 2",
     "plan": "paid",
-    "expires": "2025-08-04",
-    "overrideLock": false
+    "overrideLock": true
   },
-  "clinic3": {
+  "9999": {
+    "clinic": "Clinic 3",
     "plan": "premium",
-    "expires": "2025-08-04",
-    "overrideLock": false
-  },
-  "demoClinic": {
-    "plan": "premium",
-    "expires": "2025-08-31",
     "overrideLock": true
   }
 }
