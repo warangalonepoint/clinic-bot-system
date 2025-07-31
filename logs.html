@@ -1,159 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Booking Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic Logs Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      background: #111;
-      color: #eee;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
+      background-color: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
-
     h1 {
       color: #4dc1ff;
-      font-size: 24px;
-      text-align: center;
     }
-
-    #logTable {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      overflow-x: auto;
-      font-size: 14px;
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
     }
-
-    #logTable th, #logTable td {
-      border: 1px solid #444;
-      padding: 8px 10px;
-      text-align: left;
-    }
-
-    #logTable th {
-      background: #222;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    #logTable td {
-      background: #1a1a1a;
-    }
-
-    .icon {
-      cursor: pointer;
-      text-align: center;
-      font-size: 18px;
-    }
-
-    .icon:hover {
-      color: #4dc1ff;
-    }
-
-    .export-btn {
-      margin: 10px 10px 0 0;
-      padding: 10px 18px;
-      border: none;
-      font-size: 14px;
-      background: #4dc1ff;
-      color: black;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .footer {
-      margin-top: 30px;
-      font-size: 12px;
-      text-align: center;
-      color: #888;
-    }
-
-    .loader {
-      text-align: center;
-      margin-top: 40px;
+    .filters input,
+    .filters button {
+      padding: 10px;
       font-size: 16px;
+      border: none;
+      border-radius: 5px;
     }
-
-    @media (max-width: 600px) {
-      #logTable {
-        font-size: 12px;
-      }
-
-      .export-btn {
-        width: 100%;
-        margin-bottom: 10px;
-      }
+    .filters button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    #summary {
+      margin: 20px 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #00ff90;
+    }
+    canvas {
+      max-width: 100%;
+      background-color: #1a1a1a;
+      padding: 10px;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Appointment Logs</h1>
-
-  <div style="text-align:center">
-    <button class="export-btn" onclick="exportToExcel()">📊 Export Excel</button>
-    <button class="export-btn" onclick="exportToPDF()">🧾 Export PDF</button>
-  </div>
-
-  <div class="loader" id="loading">Loading logs...</div>
-
-  <div style="overflow-x:auto">
-    <table id="logTable" style="display:none">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Patient Name</th>
-          <th>Reason</th>
-          <th>Contact</th>
-          <th>Reminder</th>
-        </tr>
-      </thead>
-      <tbody id="logBody"></tbody>
-    </table>
-  </div>
-
-  <div class="footer">Powered by WarangalOneStop BookingBot</div>
+  <h1>📈 Daily Booking Summary</h1>  <div class="filters">
+    <button onclick="filterToday()">Today</button>
+    <button onclick="filterYesterday()">Yesterday</button>
+    <input type="date" id="fromDate" />
+    <input type="date" id="toDate" />
+    <button onclick="applyCustomRange()">Apply Range</button>
+  </div>  <div id="summary">Total Bookings: 0</div><canvas id="bookingChart" height="100"></canvas>
 
   <script>
-    async function loadLogs() {
-      const res = await fetch('https://warangalonepoint.github.io/clinic-bot-system/logs.csv');
-      const csv = await res.text();
-      const lines = csv.trim().split('\n').slice(1);
-      const tbody = document.getElementById('logBody');
-      lines.forEach(row => {
-        const cols = row.split(',');
-        const tr = document.createElement('tr');
-        cols.forEach((col, idx) => {
-          const td = document.createElement('td');
-          td.textContent = col.trim();
-          tr.appendChild(td);
-        });
+    const bookings = [
+      { date: "2025-07-28", count: 5 },
+      { date: "2025-07-29", count: 10 },
+      { date: "2025-07-30", count: 8 },
+      { date: "2025-07-31", count: 15 },
+      { date: "2025-08-01", count: 12 },
+    ]; // This should come from your logs.csv parser
 
-        // Add icons for contact and reminder
-        if (cols.length >= 5) {
-          tr.children[4].innerHTML = `<a href="tel:${cols[4]}" class="icon" title="Call Patient">📞</a>`;
+    function formatDate(d) {
+      return d.toISOString().split('T')[0];
+    }
+
+    function filterToday() {
+      const today = formatDate(new Date());
+      updateChart(bookings.filter(b => b.date === today));
+    }
+
+    function filterYesterday() {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yDate = formatDate(yesterday);
+      updateChart(bookings.filter(b => b.date === yDate));
+    }
+
+    function applyCustomRange() {
+      const from = document.getElementById("fromDate").value;
+      const to = document.getElementById("toDate").value;
+      const filtered = bookings.filter(b => b.date >= from && b.date <= to);
+      updateChart(filtered);
+    }
+
+    const ctx = document.getElementById("bookingChart").getContext("2d");
+    let chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: "Bookings",
+            data: [],
+            backgroundColor: "#4dc1ff"
+          }
+        ]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
         }
-        tr.children[5].innerHTML = `<span class="icon" title="Send Reminder via WhatsApp">📲</span>`;
+      }
+    });
 
-        tbody.appendChild(tr);
-      });
-      document.getElementById('logTable').style.display = 'table';
-      document.getElementById('loading').style.display = 'none';
+    function updateChart(data) {
+      chart.data.labels = data.map(b => b.date);
+      chart.data.datasets[0].data = data.map(b => b.count);
+      chart.update();
+
+      document.getElementById("summary").textContent = `Total Bookings: ${data.reduce(
+        (sum, b) => sum + b.count,
+        0
+      )}`;
     }
 
-    function exportToExcel() {
-      window.location.href = 'https://warangalonepoint.github.io/clinic-bot-system/logs.csv';
-    }
-
-    function exportToPDF() {
-      alert("PDF export coming soon in next sprint 🚀");
-    }
-
-    loadLogs();
-  </script>
-</body>
+    // Default view: last 5 days
+    updateChart(bookings);
+  </script></body>
 </html>
