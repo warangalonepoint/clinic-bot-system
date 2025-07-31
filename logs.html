@@ -1,14 +1,19 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logs Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Logs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
       background: #111;
-      color: #fff;
+      color: white;
+      font-family: Arial, sans-serif;
       padding: 20px;
+    }
+    h1 {
+      color: #4dc1ff;
     }
     table {
       width: 100%;
@@ -16,87 +21,55 @@
       margin-top: 20px;
     }
     th, td {
-      padding: 10px;
-      border: 1px solid #444;
-      text-align: center;
+      padding: 12px;
+      border: 1px solid #333;
+      text-align: left;
     }
     th {
       background-color: #222;
     }
-    input[type="text"] {
-      background: #222;
-      color: white;
-      border: 1px solid #444;
-      padding: 5px;
-      width: 90%;
+    .filter-section, .summary-section {
+      margin-bottom: 20px;
     }
-    .save-button {
-      background-color: #4CAF50;
-      color: white;
+    .filter-section label, .summary-section label {
+      margin-right: 10px;
+    }
+    .btn {
       padding: 10px 15px;
+      background-color: #28a745;
+      color: white;
       border: none;
       cursor: pointer;
-      margin-top: 20px;
-    }
-    .save-button:hover {
-      background-color: #45a049;
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Logs Dashboard</h1>
+  <h1>Booking Logs</h1>  <div class="filter-section">
+    <label><input type="radio" name="dateFilter" value="today" checked> Today</label>
+    <label><input type="radio" name="dateFilter" value="yesterday"> Yesterday</label>
+    <label><input type="radio" name="dateFilter" value="custom"> Custom Range</label>
+    <input type="date" id="startDate"> to <input type="date" id="endDate">
+    <button class="btn" onclick="applyFilter()">Apply</button>
+  </div>  <div class="summary-section">
+    <strong>Total Bookings:</strong> <span id="totalBookings">0</span><br>
+    <strong>Reminders Sent:</strong> <span id="remindersSent">0</span><br>
+    <strong>Top Reasons:</strong> <span id="topReasons">-</span>
+  </div><button class="btn" onclick="exportToExcel()">Export to Excel</button> <button class="btn" onclick="exportToPDF()">Export to PDF</button>
+
   <table id="logsTable">
     <thead>
       <tr>
         <th>Date</th>
         <th>Time</th>
-        <th>Patient</th>
+        <th>Patient Name</th>
         <th>Reason</th>
+        <th>Contact</th>
         <th>Reminder Sent</th>
-        <th>Doctor Notes</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>01-08-2025</td>
-        <td>10:00 AM</td>
-        <td>John Doe</td>
-        <td>Checkup</td>
-        <td>Yes</td>
-        <td><input type="text" value="" /></td>
-      </tr>
-      <tr>
-        <td>01-08-2025</td>
-        <td>10:20 AM</td>
-        <td>Jane Smith</td>
-        <td>Fever</td>
-        <td>No</td>
-        <td><input type="text" value="" /></td>
-      </tr>
-      <!-- Add more sample rows as needed -->
+    <tbody id="logsBody">
+      <!-- Dynamic rows will be injected here -->
     </tbody>
-  </table>
-  <button class="save-button" onclick="downloadNotes()">Save Notes as CSV</button>
-  <script>
-    function downloadNotes() {
-      const rows = document.querySelectorAll("#logsTable tbody tr");
-      let csv = "Date,Time,Patient,Reason,Reminder Sent,Doctor Notes\n";
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        const date = cells[0].innerText;
-        const time = cells[1].innerText;
-        const patient = cells[2].innerText;
-        const reason = cells[3].innerText;
-        const reminder = cells[4].innerText;
-        const note = cells[5].querySelector("input").value.replace(/,/g, ';');
-        csv += `${date},${time},${patient},${reason},${reminder},${note}\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'logs_with_notes.csv';
-      link.click();
-    }
-  </script>
-</body>
+  </table>  <script src="logs.js"></script></body>
 </html>
