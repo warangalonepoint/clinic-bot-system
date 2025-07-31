@@ -1,52 +1,31 @@
-Date,Time,Patient Name,Reason,Status,Reminder Sent
-31-07-2025,10:00 AM,Aarav Sharma,Fever,Booked,Yes
-31-07-2025,10:10 AM,Diya Mehra,Checkup,Booked,Yes
-31-07-2025,10:20 AM,Vedant Reddy,Injury,Booked,No
-30-07-2025,5:00 PM,Kavya Patel,Consultation,Booked,Yes
-30-07-2025,5:10 PM,Anaya Singh,Flu,Booked,Yes
-30-07-2025,5:20 PM,Ishaan Kumar,Headache,Booked,No
-29-07-2025,6:00 PM,Meera Jain,Back Pain,Booked,Yes
-29-07-2025,6:10 PM,Atharv Das,General Checkup,Booked,No
-29-07-2025,6:20 PM,Sanya Ghosh,Cough,Booked,Yes
-28-07-2025,4:00 PM,Reyansh Verma,Cold,Booked,Yes
-28-07-2025,4:10 PM,Prisha Rao,Follow-up,Booked,No
-28-07-2025,4:20 PM,Ritvik Joshi,Vaccination,Booked,Yes
-27-07-2025,11:00 AM,Navya Nair,Injury,Booked,Yes
-27-07-2025,11:10 AM,Tanvi Bansal,Dental Pain,Booked,No
-27-07-2025,11:20 AM,Ayaan Shetty,Consultation,Booked,Yes
-26-07-2025,3:00 PM,Ira Kapoor,Allergy,Booked,Yes
-26-07-2025,3:10 PM,Arjun Pillai,Chest Pain,Booked,No
-26-07-2025,3:20 PM,Kiara Sen,Flu,Booked,Yes
-25-07-2025,9:00 AM,Dev Bhatt,Checkup,Booked,Yes
-25-07-2025,9:10 AM,Rhea Iyer,Back Pain,Booked,No
-25-07-2025,9:20 AM,Nikhil Sinha,Headache,Booked,Yes
-24-07-2025,6:00 PM,Mira Khanna,Eye Pain,Booked,Yes
-24-07-2025,6:10 PM,Aditya Roy,Throat Infection,Booked,Yes
-24-07-2025,6:20 PM,Avni Jaiswal,Follow-up,Booked,No
-23-07-2025,5:00 PM,Vihaan Gupta,Cold,Booked,Yes
-23-07-2025,5:10 PM,Anika Deshmukh,General Checkup,Booked,Yes
-23-07-2025,5:20 PM,Manan Agarwal,Flu,Booked,No
-22-07-2025,10:00 AM,Saanvi Malhotra,Dental Issue,Booked,Yes
-22-07-2025,10:10 AM,Rudra Goel,Consultation,Booked,Yes
-22-07-2025,10:20 AM,Ishita Chopra,Fever,Booked,No
-21-07-2025,11:00 AM,Tanishq Rathi,Headache,Booked,Yes
-21-07-2025,11:10 AM,Krisha Dubey,Back Pain,Booked,Yes
-21-07-2025,11:20 AM,Om Sharma,Consultation,Booked,No
-20-07-2025,4:00 PM,Jiya Saxena,Flu,Booked,Yes
-20-07-2025,4:10 PM,Aarush Chawla,Fever,Booked,Yes
-20-07-2025,4:20 PM,Myra Pandey,Follow-up,Booked,No
-19-07-2025,3:00 PM,Arnav Mathur,Cold,Booked,Yes
-19-07-2025,3:10 PM,Sharvani Joshi,Dental,Booked,Yes
-19-07-2025,3:20 PM,Yug Sharma,Injury,Booked,No
-18-07-2025,5:00 PM,Advika Reddy,Consultation,Booked,Yes
-18-07-2025,5:10 PM,Neil Bhatia,Flu,Booked,No
-18-07-2025,5:20 PM,Trisha Menon,Eye Pain,Booked,Yes
-17-07-2025,10:00 AM,Shaurya Singh,Allergy,Booked,Yes
-17-07-2025,10:10 AM,Aalia Shah,Cold,Booked,No
-17-07-2025,10:20 AM,Yuvaan Yadav,Fever,Booked,Yes
-16-07-2025,9:00 AM,Amaya Raj,Injury,Booked,Yes
-16-07-2025,9:10 AM,Aryan Das,Back Pain,Booked,Yes
-16-07-2025,9:20 AM,Inaaya Mehta,Consultation,Booked,No
-15-07-2025,2:00 PM,Zayan Khan,Cough,Booked,Yes
-15-07-2025,2:10 PM,Pari Kaur,Checkup,Booked,Yes
-15-07-2025,2:20 PM,Atharva Patil,Flu,Booked,No
+Name,Date,Time,Reason,Status,Reminder,Contact,Token
+Ravi,01-08-2025,17:00,Fever,Booked,Yes,9876543210,1
+Priya,01-08-2025,17:10,Cough,Booked,Yes,9123456780,2
+Suresh,01-08-2025,17:20,Checkup,Booked,Yes,9998887776,3
+Kavita,01-08-2025,17:30,Consultation,Booked,Yes,9876500001,4
+Raj,01-08-2025,17:40,Headache,Booked,Yes,9887766554,5
+Meena,01-08-2025,17:50,Cold & Flu,Booked,Yes,9123400002,6
+Varun,01-08-2025,18:00,Follow-up,Booked,Yes,9001234567,7
+Pooja,01-08-2025,18:10,Injury,Booked,Yes,9988776655,8
+Nikhil,01-08-2025,18:20,Back Pain,Booked,Yes,9876543211,9
+Anjali,01-08-2025,18:30,Diabetes,Booked,Yes,9123456789,10
+Harsha,01-08-2025,18:40,Checkup,Booked,Yes,9000011223,11
+Sneha,01-08-2025,18:50,Acidity,Booked,Yes,9112233445,12
+Rohit,01-08-2025,19:00,Fever,Booked,Yes,9999999999,13
+Sana,01-08-2025,19:10,General,Booked,Yes,9345678901,14
+Deepak,01-08-2025,19:20,Injury,Booked,Yes,8888777666,15
+Lakshmi,01-08-2025,19:30,Pregnancy,Booked,Yes,9332211445,16
+Vamsi,01-08-2025,19:40,Chest Pain,Booked,Yes,9888997766,17
+Gayatri,01-08-2025,19:50,Skin Allergy,Booked,Yes,9223344556,18
+Kiran,01-08-2025,20:00,Dental,Booked,Yes,9000090000,19
+Bhavya,01-08-2025,20:10,ENT,Booked,Yes,9111222333,20
+Imran,01-08-2025,20:20,Cough,Booked,Yes,9887765443,21
+Manasa,01-08-2025,20:30,Checkup,Booked,Yes,9111144444,22
+Ramesh,01-08-2025,20:40,Injury,Booked,Yes,9991112233,23
+Divya,01-08-2025,20:50,General,Booked,Yes,9888123456,24
+Chandu,01-08-2025,21:00,Fever,Booked,Yes,9555123456,25
+Lavanya,01-08-2025,21:10,Back Pain,Booked,Yes,9333111222,26
+Teja,01-08-2025,21:20,Infection,Booked,Yes,9444422222,27
+Neha,01-08-2025,21:30,Cold,Booked,Yes,9334455667,28
+Santosh,01-08-2025,21:40,Follow-up,Booked,Yes,9110091100,29
+Monika,01-08-2025,21:50,Consultation,Booked,Yes,9666699999,30
