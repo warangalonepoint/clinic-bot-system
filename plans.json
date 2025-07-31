@@ -1,0 +1,18 @@
+[
+  {
+    "pin": "1111",
+    "clinic": "clinic1"
+  },
+  {
+    "pin": "2222",
+    "clinic": "clinic2"
+  },
+  {
+    "pin": "3333",
+    "clinic": "clinic3"
+  },
+  {
+    "pin": "2525",
+    "clinic": "onestop"
+  }
+]
