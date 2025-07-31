@@ -2,110 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sync Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
-      background: #111;
-      color: #fff;
+      background-color: #fafafa;
       font-family: Arial, sans-serif;
-      padding: 20px;
-      margin: 0;
-    }
-
-    h1 {
-      color: #f39c12;
       text-align: center;
+      padding: 50px;
     }
-
-    .container {
-      max-width: 480px;
-      margin: 20px auto;
-      background: #222;
+    .panel {
+      background: #fff;
+      padding: 30px;
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: auto;
     }
-
-    label {
-      font-weight: bold;
-      display: block;
+    h1 {
+      color: #333;
+    }
+    p {
+      font-size: 18px;
+      color: #666;
+    }
+    .info-box {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 8px;
       margin-top: 20px;
-    }
-
-    input[type="file"] {
-      background: #333;
-      padding: 8px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      width: 100%;
-      color: #fff;
-    }
-
-    button {
-      background-color: #00b894;
-      color: #fff;
-      border: none;
-      padding: 12px;
-      margin-top: 15px;
-      font-size: 16px;
-      width: 100%;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #019875;
-    }
-
-    #status {
-      margin-top: 15px;
-      text-align: center;
-      color: #00cec9;
-      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>📤 Manual Sync Dashboard</h1>
-
-  <div class="container">
-    <label for="logsFile">Upload Logs CSV (logs.csv)</label>
-    <input type="file" id="logsFile" accept=".csv" />
-
-    <label for="slotsFile">Upload Slots CSV (slots.csv)</label>
-    <input type="file" id="slotsFile" accept=".csv" />
-
-    <button onclick="simulateUpload()">Upload Both Files</button>
-    <p id="status">Waiting for upload...</p>
+  <div class="panel">
+    <h1>🔄 Sync Panel</h1>
+    <p>This utility page was used for syncing data manually from Google Sheets or CSV.</p>
+    <div class="info-box">
+      <p><strong>Current Version:</strong> Using GitHub CSV hosting.</p>
+      <p>No manual sync required anymore.</p>
+    </div>
   </div>
-
-  <script>
-    function simulateUpload() {
-      const logsFile = document.getElementById("logsFile").files[0];
-      const slotsFile = document.getElementById("slotsFile").files[0];
-
-      if (!logsFile && !slotsFile) {
-        document.getElementById("status").textContent = "⚠️ Please choose at least one file.";
-        return;
-      }
-
-      document.getElementById("status").textContent = "⏳ Uploading (simulated)...";
-
-      setTimeout(() => {
-        document.getElementById("status").textContent = "✅ Upload complete. (Simulated only)";
-      }, 1500);
-    }
-
-    // Placeholder: Real GitHub upload can be implemented via token + API
-    /*
-      Use GitHub API to:
-      1. Authenticate via personal access token
-      2. Fetch repo file path (e.g., logs.csv in clinic-bot-system)
-      3. Update file content using PUT request with base64-encoded file
-      4. Commit with message and push
-    */
-  </script>
+</body>
+</html>  </script>
 </body>
 </html>
