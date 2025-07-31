@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Assign Clinics Panel</title>
+  <title>Assign Clinic Plans</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -74,16 +74,9 @@
   <button onclick="savePlans()">💾 Save to plans.json</button>
 
   <script>
+    let plans = []; // FIXED: make it let, not const
+
     const tableBody = document.getElementById("tableBody");
-
-    let plans = [];
-
-    fetch("plans.json")
-      .then(res => res.json())
-      .then(data => {
-        plans = data;
-        renderTable();
-      });
 
     function renderTable() {
       tableBody.innerHTML = "";
@@ -116,6 +109,18 @@
       a.download = "plans.json";
       a.click();
     }
+
+    // Fetch existing plans
+    fetch("plans.json")
+      .then(res => res.json())
+      .then(data => {
+        plans = data;
+        renderTable();
+      })
+      .catch(() => {
+        plans = [];
+        renderTable();
+      });
   </script>
 </body>
 </html>
