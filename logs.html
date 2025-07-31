@@ -2,132 +2,191 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Appointment Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: Arial, sans-serif; background-color: #111; color: #fff; margin: 0; padding: 10px; }
-    h2 { color: #00d9ff; text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-    th, td { border: 1px solid #444; padding: 8px; text-align: center; }
-    th { background-color: #222; color: #00d9ff; }
-    .send-btn { background: #00d9ff; color: #000; padding: 5px 10px; border: none; cursor: pointer; }
-    .send-btn:hover { background: #00b5cc; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 10px;
+    }
+    h2 {
+      text-align: center;
+      color: #4fc3f7;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background: #222;
+      color: #f0ad4e;
+    }
+    button {
+      background: #4fc3f7;
+      color: #000;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    #filters {
+      margin: 10px 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #filters input, #filters select {
+      padding: 5px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
-  <h2>📋 Appointment Logs — Loading...</h2>
-  <table id="logsTable">
-    <thead>
-      <tr>
-        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th>
-        <th>Token</th><th>Reminder</th><th>Reminder Sent</th>
-      </tr>
-    </thead>
-    <tbody id="logBody"></tbody>
-  </table>
 
-  <script type="text/javascript">
-    const urlParams = new URLSearchParams(window.location.search);
-    const pin = urlParams.get('pin');
-    const clinicMap = {
-      "1234": "clinic1",
-      "2525": "clinic2",
-      "9999": "clinic3"
-    };
-    const clinicName = clinicMap[pin] || "clinic1"; // fallback
-    const csvPath = `${clinicName}-logs.csv`;
+<h2>📋 Appointment Logs — Loading...</h2>
 
-    async function loadLogs() {
-      const res = await fetch(csvPath);
-      const data = await res.text();
-      const rows = data.trim().split("\n").slice(1); // skip header
-      const tbody = document.getElementById("logBody");
-      rows.forEach(line => {
-        const [date, time, name, reason, contact, token, reminder, sent] = line.split(",");
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${date}</td><td>${time}</td><td>${name}</td><td>${reason}</td>
-          <td><a href="tel:${contact}" style="color:#00f">${contact}</a></td>
-          <td>${token}</td><td>${reminder}</td><td>${sent}</td>
-        `;
-        tbody.appendChild(tr);
+<div id="filters">
+  <label>
+    Date Filter:
+    <select id="dateFilter">
+      <option value="today">Today</option>
+      <option value="yesterday">Yesterday</option>
+      <option value="custom">Custom Range</option>
+      <option value="all">All</option>
+    </select>
+  </label>
+  <input type="date" id="startDate" style="display:none;" />
+  <input type="date" id="endDate" style="display:none;" />
+  <button onclick="applyFilter()">Apply</button>
+  <button onclick="exportCSV()">⬇ Export CSV</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Name</th>
+      <th>Reason</th>
+      <th>Contact</th>
+      <th>Token</th>
+      <th>Reminder</th>
+      <th>Reminder Sent</th>
+      <th>Send</th>
+    </tr>
+  </thead>
+  <tbody id="logBody"></tbody>
+</table>
+
+<script>
+let logData = [];
+let clinic = "default";
+
+// Get PIN from URL
+const params = new URLSearchParams(window.location.search);
+const pin = params.get("pin");
+
+// Fetch plan and clinic info
+fetch("plans.json")
+  .then(res => res.json())
+  .then(plans => {
+    const found = plans.find(p => p.pin === pin);
+    if (!found) return alert("Invalid PIN.");
+    clinic = found.clinic;
+    document.title = `Appointment Logs – ${clinic}`;
+    loadLogs(`clinic-${clinic}-logs.csv`);
+  });
+
+function loadLogs(csvPath) {
+  fetch(csvPath)
+    .then(r => r.text())
+    .then(csv => {
+      const lines = csv.trim().split("\n");
+      const headers = lines[0].split(",");
+      logData = lines.slice(1).map(line => {
+        const values = line.split(",");
+        const entry = {};
+        headers.forEach((h, i) => entry[h.trim()] = values[i]?.trim() || "");
+        return entry;
       });
-    }
-    loadLogs();
-  </script>
-</body>
-</html>        tr.innerHTML = `
-          <td>${entry.Date}</td>
-          <td>${entry.Time}</td>
-          <td>${entry.Name}</td>
-          <td>${entry.Reason}</td>
-          <td><a href="tel:${entry.Contact}">${entry.Contact}</a></td>
-          <td>#${entry.Token}</td>
-          <td>${entry.Reminder}</td>
-          <td>${entry.ReminderSent || "❌"}</td>
-          <td>
-            <button class="reminder-btn" onclick="sendReminder('${entry.Contact}','${entry.Name}','${entry.Time}','${entry.Token}')">Send</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function sendReminder(contact, name, time, token) {
-      const msg = `Reminder: ${name}, your appointment is at ${time}. Token No: #${token}.`;
-      const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
-      window.open(link, "_blank");
-    }
-
-    function applyFilters() {
-      const filter = document.getElementById("dateFilter").value;
-      const now = new Date();
-      let filtered = [];
-
-      if (filter === "today") {
-        const today = now.toLocaleDateString("en-GB");
-        filtered = logs.filter(entry => entry.Date === today);
-      } else if (filter === "yesterday") {
-        const yest = new Date(now);
-        yest.setDate(now.getDate() - 1);
-        const yDate = yest.toLocaleDateString("en-GB");
-        filtered = logs.filter(entry => entry.Date === yDate);
-      } else if (filter === "custom") {
-        const sd = document.getElementById("startDate").value;
-        const ed = document.getElementById("endDate").value;
-        if (sd && ed) {
-          const [start, end] = [new Date(sd), new Date(ed)];
-          filtered = logs.filter(entry => {
-            const logDate = new Date(entry.Date.split("-").reverse().join("-"));
-            return logDate >= start && logDate <= end;
-          });
-        }
-      } else {
-        filtered = logs;
-      }
-
-      renderTable(filtered);
-    }
-
-    document.getElementById("dateFilter").addEventListener("change", e => {
-      const isCustom = e.target.value === "custom";
-      document.getElementById("startDate").style.display = isCustom ? "inline-block" : "none";
-      document.getElementById("endDate").style.display = isCustom ? "inline-block" : "none";
+      renderTable(logData);
     });
+}
 
-    function exportCSV() {
-      const rows = [["Date","Time","Name","Reason","Contact","Token","Reminder","Reminder Sent"]];
-      logs.forEach(entry => {
-        rows.push([entry.Date, entry.Time, entry.Name, entry.Reason, entry.Contact, entry.Token, entry.Reminder, entry.ReminderSent || "❌"]);
-      });
-      const csvContent = rows.map(e => e.join(",")).join("\n");
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${clinic}-logs.csv`;
-      a.click();
-    }
-  </script>
+function renderTable(data) {
+  const tbody = document.getElementById("logBody");
+  tbody.innerHTML = "";
+  data.forEach(entry => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${entry.Date}</td>
+      <td>${entry.Time}</td>
+      <td>${entry.Name}</td>
+      <td>${entry.Reason}</td>
+      <td><a href="tel:${entry.Contact}" style="color:#4fc3f7;">${entry.Contact}</a></td>
+      <td>${entry.Token || '-'}</td>
+      <td>${entry.Reminder || '-'}</td>
+      <td>${entry["Reminder Sent"] || '❌'}</td>
+      <td><button onclick="sendReminder('${entry.Contact}','${entry.Time}','${entry.Token || ''}')">Send</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function sendReminder(contact, time, token) {
+  const msg = `Reminder: Your appointment is at ${time}. Token No: ${token}`;
+  const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
+  window.open(link, "_blank");
+}
+
+function applyFilter() {
+  const type = document.getElementById("dateFilter").value;
+  let filtered = logData;
+
+  if (type === "today" || type === "yesterday") {
+    const today = new Date();
+    const target = new Date(today);
+    if (type === "yesterday") target.setDate(today.getDate() - 1);
+    const dateStr = target.toISOString().split("T")[0];
+    filtered = logData.filter(e => e.Date === dateStr);
+  } else if (type === "custom") {
+    const sd = document.getElementById("startDate").value;
+    const ed = document.getElementById("endDate").value;
+    filtered = logData.filter(e => e.Date >= sd && e.Date <= ed);
+  }
+
+  renderTable(filtered);
+}
+
+function exportCSV() {
+  const headers = ["Date","Time","Name","Reason","Contact","Token","Reminder","Reminder Sent"];
+  const rows = logData.map(e => headers.map(h => `"${e[h] || ''}"`).join(","));
+  const csv = [headers.join(","), ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `clinic-${clinic}-logs.csv`;
+  a.click();
+}
+
+document.getElementById("dateFilter").addEventListener("change", () => {
+  const type = document.getElementById("dateFilter").value;
+  const showCustom = type === "custom";
+  document.getElementById("startDate").style.display = showCustom ? "inline" : "none";
+  document.getElementById("endDate").style.display = showCustom ? "inline" : "none";
+});
+</script>
+
 </body>
 </html>
