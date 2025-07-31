@@ -1,101 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clinic Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #0e0e0e;
-      color: #fff;
       font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
       padding: 20px;
     }
     h1 {
-      color: #4dc1ff;
-      text-align: center;
-      margin-bottom: 20px;
+      color: #00d8ff;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #1c1c1c;
+    .section {
+      margin-bottom: 30px;
     }
-    th, td {
-      padding: 10px;
-      border: 1px solid #333;
-      text-align: left;
-    }
-    th {
-      background-color: #222;
-    }
-    tr:nth-child(even) {
-      background-color: #2b2b2b;
-    }
-    .status {
-      padding: 6px 10px;
-      border-radius: 4px;
-    }
-    .done {
-      background-color: #28a745;
-      color: white;
-    }
-    .pending {
-      background-color: #ffc107;
-      color: #000;
-    }
-    .header {
-      margin-bottom: 10px;
-      font-size: 18px;
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #00d8ff;
+      color: black;
+      border: none;
+      cursor: pointer;
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Clinic Dashboard – Today's Appointments</h1>
-  <div class="header" id="today"></div>
-  <table id="dashboardTable">
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Patient Name</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <h1>Welcome to Clinic Dashboard</h1>
+  <div class="section">
+    <p><strong>Plan:</strong> <span id="planName">Loading...</span></p>
+    <p><strong>Clinic:</strong> <span id="clinicName">Loading...</span></p>
+  </div>  <div class="section">
+    <button onclick="location.href='bookings.html'">View Bookings</button>
+    <button onclick="location.href='logs.html'">View Logs</button>
+    <button onclick="location.href='reset-pin.html'">Reset PIN</button>
+  </div>  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pin = urlParams.get("pin");
 
-  <script>
-    const todayDate = new Date().toISOString().split("T")[0];
-    document.getElementById("today").textContent = "Date: " + todayDate;
-
-    async function loadDashboard() {
-      const res = await fetch("logs.csv");
-      const text = await res.text();
-      const rows = text.trim().split("\n").slice(1);
-
-      const tbody = document.querySelector("#dashboardTable tbody");
-      tbody.innerHTML = "";
-
-      rows.forEach(row => {
-        const [date, name, reason, slot, contact, status] = row.split(",");
-        const rowDate = new Date(date.split("-").reverse().join("-")).toISOString().split("T")[0];
-        if (rowDate === todayDate) {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${slot}</td>
-            <td>${name}</td>
-            <td>${reason}</td>
-            <td><a href="tel:${contact}">${contact}</a></td>
-            <td><span class="status ${status === "Done" ? "done" : "pending"}">${status || "Pending"}</span></td>
-          `;
-          tbody.appendChild(tr);
+    fetch('plans.json')
+      .then(response => response.json())
+      .then(plans => {
+        if (plans[pin]) {
+          document.getElementById("planName").textContent = plans[pin].plan;
+          document.getElementById("clinicName").textContent = plans[pin].clinic;
+        } else {
+          alert("Invalid PIN. Access Denied.");
+          window.location.href = "index.html";
         }
       });
-    }
-
-    loadDashboard();
-  </script>
-</body>
+  </script></body>
 </html>
