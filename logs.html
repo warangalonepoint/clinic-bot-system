@@ -1,49 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clinic Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic Booking Logs</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
+      background-color: #111;
       color: #fff;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
-    h1 {
-      color: #4CAF50;
-      font-size: 24px;
-    }
-    #error {
-      color: red;
-      font-weight: bold;
+    h1, h2 {
+      text-align: center;
+      color: #f0ad4e;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      margin-top: 20px;
     }
     th, td {
-      border: 1px solid #555;
-      padding: 8px;
+      padding: 10px;
+      border: 1px solid #444;
       text-align: left;
     }
     th {
-      background-color: #333;
-    }
-    tr:nth-child(even) {
       background-color: #222;
     }
-    .hidden {
-      display: none;
+    .actions {
+      margin-top: 20px;
+      text-align: center;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      background-color: #f0ad4e;
+      border: none;
+      color: #111;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    canvas {
+      background-color: #fff;
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #summaryPanel {
+      margin-top: 20px;
+      background: #1f1f1f;
+      padding: 15px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <h1 id="clinicTitle">Loading...</h1>
-  <div id="error" class="hidden">❌ Invalid or missing PIN. Access Denied.</div>
-  <table id="logsTable" class="hidden">
+  <h1>Clinic Logs Dashboard</h1>  <div class="actions">
+    <button onclick="exportToExcel()">Export to Excel</button>
+    <button onclick="exportToPDF()">Export to PDF</button>
+  </div>  <div id="summaryPanel">
+    <h2>Daily Summary</h2>
+    <p id="totalBookings"></p>
+    <p id="nextToken"></p>
+    <p id="reminderCount"></p>
+  </div><canvas id="bookingChart" width="400" height="150"></canvas>
+
+  <table id="logsTable">
     <thead>
       <tr>
         <th>Date</th>
@@ -57,92 +82,78 @@
         <th>Reminder Sent</th>
       </tr>
     </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+    <tbody></tbody>
+  </table>  <script>
+    const csvPath = "https://warangalonepoint.github.io/clinic-bot-system/clinic1-logs.csv"; // Adjust dynamically per clinic
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const pin = urlParams.get("pin");
+    async function loadCSV(path) {
+      const res = await fetch(path);
+      const text = await res.text();
+      const rows = text.trim().split('\n').map(r => r.split(','));
+      return rows;
+    }
 
-    const plansURL = "plans.json"; // must be in same folder or adjust path
-    const clinicTitle = document.getElementById("clinicTitle");
-    const errorBox = document.getElementById("error");
-    const table = document.getElementById("logsTable");
-    const tableBody = document.getElementById("tableBody");
+    function updateSummaryAndChart(data) {
+      const today = new Date().toISOString().split('T')[0];
+      const todayLogs = data.filter(row => row[0] === today);
+      document.getElementById("totalBookings").innerText = `Total Bookings Today: ${todayLogs.length}`;
+      const maxToken = Math.max(...todayLogs.map(r => parseInt(r[6] || 0)));
+      document.getElementById("nextToken").innerText = `Next Available Token: ${maxToken + 1}`;
+      const reminders = todayLogs.filter(r => r[8] === 'Yes').length;
+      document.getElementById("reminderCount").innerText = `Reminders Sent Today: ${reminders}`;
 
-    if (!pin) {
-      clinicTitle.textContent = "Access Denied";
-      errorBox.classList.remove("hidden");
-    } else {
-      fetch(plansURL)
-        .then(res => res.json())
-        .then(data => {
-          if (!data[pin]) {
-            clinicTitle.textContent = "Invalid PIN";
-            errorBox.classList.remove("hidden");
-            return;
-          }
+      const dateCount = {};
+      data.forEach(row => {
+        const date = row[0];
+        if (!dateCount[date]) dateCount[date] = 0;
+        dateCount[date]++;
+      });
+      const chart = new Chart(document.getElementById("bookingChart"), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(dateCount),
+          datasets: [{ label: 'Bookings', data: Object.values(dateCount), backgroundColor: '#f0ad4e' }]
+        }
+      });
+    }
 
-          const clinicName = data[pin].clinic || "Clinic";
-          const file = data[pin].file || "logs.csv";
-
-          clinicTitle.textContent = `📋 Logs for ${clinicName}`;
-
-          fetch(file)
-            .then(res => res.text())
-            .then(csv => {
-              const rows = csv.trim().split("\n").slice(1); // skip header
-              tableBody.innerHTML = "";
-              for (let row of rows) {
-                const cols = row.split(",");
-                const tr = document.createElement("tr");
-                cols.forEach(col => {
-                  const td = document.createElement("td");
-                  td.textContent = col.trim();
-                  tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-              }
-              table.classList.remove("hidden");
-            })
-            .catch(() => {
-              clinicTitle.textContent = "❌ Log file not found!";
-              errorBox.classList.remove("hidden");
-            });
-        })
-        .catch(() => {
-          clinicTitle.textContent = "❌ Failed to load plans.json!";
-          errorBox.classList.remove("hidden");
+    function populateTable(rows) {
+      const tbody = document.querySelector("#logsTable tbody");
+      tbody.innerHTML = "";
+      rows.slice(1).forEach(r => {
+        const tr = document.createElement("tr");
+        r.forEach(col => {
+          const td = document.createElement("td");
+          td.textContent = col;
+          tr.appendChild(td);
         });
-    }
-  </script>
-</body>
-</html>      const filtered = allData.filter(d => d.Date === yest);
-      renderTable(filtered);
-      updateSummary(filtered);
+        tbody.appendChild(tr);
+      });
     }
 
-    function applyFilter() {
-      const sd = document.getElementById("startDate").value;
-      const ed = document.getElementById("endDate").value;
-      if (!sd || !ed) return alert("Please select valid date range");
-      const filtered = allData.filter(d => d.Date >= sd && d.Date <= ed);
-      renderTable(filtered);
-      updateSummary(filtered);
+    function exportToExcel() {
+      const table = document.getElementById("logsTable");
+      const wb = XLSX.utils.table_to_book(table);
+      XLSX.writeFile(wb, "clinic-logs.xlsx");
     }
 
-    function exportCSV() {
-      const csv = Papa.unparse(allData);
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "AppointmentLogs.csv";
-      a.click();
-    }
-
-    async function exportPDF() {
+    function exportToPDF() {
       const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Clinic Logs", 10, 10);
+      const rows = [...document.querySelectorAll("#logsTable tbody tr")].map(tr =>
+        [...tr.children].map(td => td.textContent)
+      );
+      doc.autoTable({ head: [['Date','Time','Name','Reason','Contact','Clinic','Token','Reminder','Reminder Sent']], body: rows });
+      doc.save("clinic-logs.pdf");
+    }
+
+    loadCSV(csvPath).then(data => {
+      populateTable(data);
+      updateSummaryAndChart(data);
+    });
+  </script></body>
+</html>      const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const headers = [["Date", "Time", "Name", "Reason", "Contact", "Clinic", "Token", "Reminder"]];
       const rows = allData.map(d => [d.Date, d.Time, d.Name, d.Reason, d.Contact, d.Clinic, d.Token, d["Reminder Sent"]]);
