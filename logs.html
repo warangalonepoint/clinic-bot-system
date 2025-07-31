@@ -1,148 +1,152 @@
+<!-- logs.html v47 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Booking Logs</title>
+  <meta charset="UTF-8">
+  <title>Clinic Booking Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #111; color: #fff; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #444; padding: 8px; text-align: left; }
-    th { background-color: #222; color: #4dc1ff; }
-    .filters { margin-top: 20px; }
-    button { margin-right: 10px; padding: 8px 16px; background-color: #28a745; border: none; color: white; cursor: pointer; }
-    input[type="date"] { padding: 6px; margin-right: 10px; }
-    .hidden { display: none; }
-    .clinic-name { font-size: 18px; color: #4dc1ff; font-weight: bold; }
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #4caf50;
+      text-align: center;
+    }
+    #logsTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    #logsTable th, #logsTable td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+    }
+    #logsTable th {
+      background: #222;
+      color: #0f0;
+    }
+    input, select, button {
+      padding: 6px;
+      margin: 4px;
+    }
+    .top-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-  <div class="clinic-name" id="clinicName"></div>
 
-  <div class="filters">
-    <button onclick="filterByToday()">Today</button>
-    <button onclick="filterByYesterday()">Yesterday</button>
-    <input type="date" id="startDate">
-    <input type="date" id="endDate">
-    <button onclick="filterByRange()">Apply</button>
-  </div>
+<h2>📋 Booking Logs</h2>
+<div class="top-bar">
+  <button onclick="filterDate('today')">Today</button>
+  <button onclick="filterDate('yesterday')">Yesterday</button>
+  <input type="date" id="startDate"> to 
+  <input type="date" id="endDate">
+  <button onclick="filterDate('custom')">Apply</button>
+</div>
 
-  <table id="logsTable">
-    <thead>
-      <tr>
-        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Clinic</th><th>Token</th><th>Reminder</th><th>Reminder Sent</th>
-      </tr>
-    </thead>
-    <tbody id="logsBody"></tbody>
-  </table>
+<table id="logsTable">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Name</th>
+      <th>Reason</th>
+      <th>Contact</th>
+      <th>Token</th>
+      <th>Reminder</th>
+    </tr>
+  </thead>
+  <tbody id="logsBody"></tbody>
+</table>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const pin = urlParams.get("pin") || "1234";
+<script>
+let logData = [];
+let clinic = '';
 
-    const plansJson = "https://warangalonepoint.github.io/clinic-bot-system/plans.json";
-    let fullLogs = [];
-
-    async function loadLogs() {
-      const res = await fetch(plansJson);
-      const plans = await res.json();
-      const clinicInfo = plans[pin];
-      if (!clinicInfo) return alert("Invalid PIN");
-      document.getElementById("clinicName").textContent = `📍 ${clinicInfo.clinic} — ${clinicInfo.plan.toUpperCase()} Plan`;
-
-      const file = `https://warangalonepoint.github.io/clinic-bot-system/${clinicInfo.clinic.toLowerCase().replace(/\s/g, '')}-logs.csv`;
-      const csv = await fetch(file).then(r => r.text());
-      fullLogs = csv.trim().split("\n").slice(1).map(line => {
-        const [date, time, name, reason, contact, clinic, token, reminder, sent] = line.split(",");
-        return { date, time, name, reason, contact, clinic, token, reminder, sent };
-      });
-      displayLogs(fullLogs);
-    }
-
-    function displayLogs(logs) {
-      const body = document.getElementById("logsBody");
-      body.innerHTML = "";
-      logs.forEach(log => {
-        const row = `<tr>
-          <td>${log.date}</td><td>${log.time}</td><td>${log.name}</td><td>${log.reason}</td><td>${log.contact}</td>
-          <td>${log.clinic}</td><td>${log.token}</td><td>${log.reminder}</td><td>${log.sent}</td>
-        </tr>`;
-        body.innerHTML += row;
-      });
-    }
-
-    function filterByToday() {
-      const today = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
-      const filtered = fullLogs.filter(log => log.date === today);
-      displayLogs(filtered);
-    }
-
-    function filterByYesterday() {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      const yest = d.toLocaleDateString('en-GB').replace(/\//g, "-");
-      const filtered = fullLogs.filter(log => log.date === yest);
-      displayLogs(filtered);
-    }
-
-    function filterByRange() {
-      const start = new Date(document.getElementById("startDate").value);
-      const end = new Date(document.getElementById("endDate").value);
-      const filtered = fullLogs.filter(log => {
-        const [dd, mm, yyyy] = log.date.split("-");
-        const logDate = new Date(`${yyyy}-${mm}-${dd}`);
-        return logDate >= start && logDate <= end;
-      });
-      displayLogs(filtered);
-    }
-
-    loadLogs();
-  </script>
-</body>
-</html>
-function sendReminder(contact, time, token) {
-  const msg = `Reminder: Your appointment is at ${time}. Token No: ${token}`;
-  const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
-  window.open(link, "_blank");
+function getPIN() {
+  const url = new URL(window.location.href);
+  return url.searchParams.get("pin") || '';
 }
 
-function applyFilter() {
-  const type = document.getElementById("dateFilter").value;
-  let filtered = logData;
+function loadPlansJson(pin) {
+  fetch('plans.json')
+    .then(res => res.json())
+    .then(plans => {
+      const plan = plans.find(p => p.pin === pin);
+      if (!plan) {
+        alert("Invalid PIN");
+        return;
+      }
+      clinic = plan.clinic;
+      loadLogs(clinic);
+    })
+    .catch(() => alert("Error loading plans.json"));
+}
 
-  if (type === "today" || type === "yesterday") {
+function loadLogs(clinic) {
+  fetch(`${clinic}-logs.csv`)
+    .then(res => res.text())
+    .then(csv => {
+      const rows = csv.trim().split('\n').slice(1);
+      logData = rows.map(r => {
+        const [Date, Time, Name, Reason, Contact, Token, Reminder] = r.split(',');
+        return { Date, Time, Name, Reason, Contact, Token, Reminder };
+      });
+      renderTable(logData);
+    })
+    .catch(() => alert("Error loading logs"));
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('logsBody');
+  tbody.innerHTML = '';
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.Date}</td>
+      <td>${row.Time}</td>
+      <td>${row.Name}</td>
+      <td>${row.Reason}</td>
+      <td><a href="tel:${row.Contact}" style="color:#0cf;">${row.Contact}</a></td>
+      <td>${row.Token}</td>
+      <td>${row.Reminder || ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterDate(type) {
+  let filtered = [];
+  if (type === 'today' || type === 'yesterday') {
     const today = new Date();
-    const target = new Date(today);
-    if (type === "yesterday") target.setDate(today.getDate() - 1);
-    const dateStr = target.toISOString().split("T")[0];
+    if (type === 'yesterday') today.setDate(today.getDate() - 1);
+    const dateStr = today.toISOString().split('T')[0];
     filtered = logData.filter(e => e.Date === dateStr);
-  } else if (type === "custom") {
-    const sd = document.getElementById("startDate").value;
-    const ed = document.getElementById("endDate").value;
+  } else {
+    const sd = document.getElementById('startDate').value;
+    const ed = document.getElementById('endDate').value;
     filtered = logData.filter(e => e.Date >= sd && e.Date <= ed);
   }
-
   renderTable(filtered);
 }
 
-function exportCSV() {
-  const headers = ["Date","Time","Name","Reason","Contact","Token","Reminder","Reminder Sent"];
-  const rows = logData.map(e => headers.map(h => `"${e[h] || ''}"`).join(","));
-  const csv = [headers.join(","), ...rows].join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `clinic-${clinic}-logs.csv`;
-  a.click();
+const pin = getPIN();
+if (!pin) {
+  alert("PIN missing from URL");
+} else {
+  loadPlansJson(pin);
 }
+</script>
 
-document.getElementById("dateFilter").addEventListener("change", () => {
-  const type = document.getElementById("dateFilter").value;
-  const showCustom = type === "custom";
-  document.getElementById("startDate").style.display = showCustom ? "inline" : "none";
-  document.getElementById("endDate").style.display = showCustom ? "inline" : "none";
-});
+</body>
+</html>});
 </script>
 
 </body>
