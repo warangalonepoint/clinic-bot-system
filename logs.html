@@ -2,147 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appointment Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Logs</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      margin: 0;
-      padding: 10px;
-    }
-    h2 {
-      text-align: center;
-      color: #4fc3f7;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    th, td {
-      padding: 8px;
-      border: 1px solid #444;
-      text-align: left;
-    }
-    th {
-      background: #222;
-      color: #f0ad4e;
-    }
-    button {
-      background: #4fc3f7;
-      color: #000;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    #filters {
-      margin: 10px 0;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    #filters input, #filters select {
-      padding: 5px;
-      font-size: 14px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #111; color: #fff; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+    th { background-color: #222; color: #4dc1ff; }
+    .filters { margin-top: 20px; }
+    button { margin-right: 10px; padding: 8px 16px; background-color: #28a745; border: none; color: white; cursor: pointer; }
+    input[type="date"] { padding: 6px; margin-right: 10px; }
+    .hidden { display: none; }
+    .clinic-name { font-size: 18px; color: #4dc1ff; font-weight: bold; }
   </style>
 </head>
 <body>
+  <div class="clinic-name" id="clinicName"></div>
 
-<h2>📋 Appointment Logs — Loading...</h2>
+  <div class="filters">
+    <button onclick="filterByToday()">Today</button>
+    <button onclick="filterByYesterday()">Yesterday</button>
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+    <button onclick="filterByRange()">Apply</button>
+  </div>
 
-<div id="filters">
-  <label>
-    Date Filter:
-    <select id="dateFilter">
-      <option value="today">Today</option>
-      <option value="yesterday">Yesterday</option>
-      <option value="custom">Custom Range</option>
-      <option value="all">All</option>
-    </select>
-  </label>
-  <input type="date" id="startDate" style="display:none;" />
-  <input type="date" id="endDate" style="display:none;" />
-  <button onclick="applyFilter()">Apply</button>
-  <button onclick="exportCSV()">⬇ Export CSV</button>
-</div>
+  <table id="logsTable">
+    <thead>
+      <tr>
+        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Clinic</th><th>Token</th><th>Reminder</th><th>Reminder Sent</th>
+      </tr>
+    </thead>
+    <tbody id="logsBody"></tbody>
+  </table>
 
-<table>
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Name</th>
-      <th>Reason</th>
-      <th>Contact</th>
-      <th>Token</th>
-      <th>Reminder</th>
-      <th>Reminder Sent</th>
-      <th>Send</th>
-    </tr>
-  </thead>
-  <tbody id="logBody"></tbody>
-</table>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pin = urlParams.get("pin") || "1234";
 
-<script>
-let logData = [];
-let clinic = "default";
+    const plansJson = "https://warangalonepoint.github.io/clinic-bot-system/plans.json";
+    let fullLogs = [];
 
-// Get PIN from URL
-const params = new URLSearchParams(window.location.search);
-const pin = params.get("pin");
+    async function loadLogs() {
+      const res = await fetch(plansJson);
+      const plans = await res.json();
+      const clinicInfo = plans[pin];
+      if (!clinicInfo) return alert("Invalid PIN");
+      document.getElementById("clinicName").textContent = `📍 ${clinicInfo.clinic} — ${clinicInfo.plan.toUpperCase()} Plan`;
 
-// Fetch plan and clinic info
-fetch("plans.json")
-  .then(res => res.json())
-  .then(plans => {
-    const found = plans.find(p => p.pin === pin);
-    if (!found) return alert("Invalid PIN.");
-    clinic = found.clinic;
-    document.title = `Appointment Logs – ${clinic}`;
-    loadLogs(`clinic-${clinic}-logs.csv`);
-  });
-
-function loadLogs(csvPath) {
-  fetch(csvPath)
-    .then(r => r.text())
-    .then(csv => {
-      const lines = csv.trim().split("\n");
-      const headers = lines[0].split(",");
-      logData = lines.slice(1).map(line => {
-        const values = line.split(",");
-        const entry = {};
-        headers.forEach((h, i) => entry[h.trim()] = values[i]?.trim() || "");
-        return entry;
+      const file = `https://warangalonepoint.github.io/clinic-bot-system/${clinicInfo.clinic.toLowerCase().replace(/\s/g, '')}-logs.csv`;
+      const csv = await fetch(file).then(r => r.text());
+      fullLogs = csv.trim().split("\n").slice(1).map(line => {
+        const [date, time, name, reason, contact, clinic, token, reminder, sent] = line.split(",");
+        return { date, time, name, reason, contact, clinic, token, reminder, sent };
       });
-      renderTable(logData);
-    });
-}
+      displayLogs(fullLogs);
+    }
 
-function renderTable(data) {
-  const tbody = document.getElementById("logBody");
-  tbody.innerHTML = "";
-  data.forEach(entry => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${entry.Date}</td>
-      <td>${entry.Time}</td>
-      <td>${entry.Name}</td>
-      <td>${entry.Reason}</td>
-      <td><a href="tel:${entry.Contact}" style="color:#4fc3f7;">${entry.Contact}</a></td>
-      <td>${entry.Token || '-'}</td>
-      <td>${entry.Reminder || '-'}</td>
-      <td>${entry["Reminder Sent"] || '❌'}</td>
-      <td><button onclick="sendReminder('${entry.Contact}','${entry.Time}','${entry.Token || ''}')">Send</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
+    function displayLogs(logs) {
+      const body = document.getElementById("logsBody");
+      body.innerHTML = "";
+      logs.forEach(log => {
+        const row = `<tr>
+          <td>${log.date}</td><td>${log.time}</td><td>${log.name}</td><td>${log.reason}</td><td>${log.contact}</td>
+          <td>${log.clinic}</td><td>${log.token}</td><td>${log.reminder}</td><td>${log.sent}</td>
+        </tr>`;
+        body.innerHTML += row;
+      });
+    }
 
+    function filterByToday() {
+      const today = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
+      const filtered = fullLogs.filter(log => log.date === today);
+      displayLogs(filtered);
+    }
+
+    function filterByYesterday() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const yest = d.toLocaleDateString('en-GB').replace(/\//g, "-");
+      const filtered = fullLogs.filter(log => log.date === yest);
+      displayLogs(filtered);
+    }
+
+    function filterByRange() {
+      const start = new Date(document.getElementById("startDate").value);
+      const end = new Date(document.getElementById("endDate").value);
+      const filtered = fullLogs.filter(log => {
+        const [dd, mm, yyyy] = log.date.split("-");
+        const logDate = new Date(`${yyyy}-${mm}-${dd}`);
+        return logDate >= start && logDate <= end;
+      });
+      displayLogs(filtered);
+    }
+
+    loadLogs();
+  </script>
+</body>
+</html>
 function sendReminder(contact, time, token) {
   const msg = `Reminder: Your appointment is at ${time}. Token No: ${token}`;
   const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
