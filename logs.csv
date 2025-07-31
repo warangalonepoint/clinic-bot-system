@@ -1,31 +1,50 @@
-Name,Date,Time,Reason,Status,Reminder,Contact,Token
-Ravi,01-08-2025,17:00,Fever,Booked,Yes,9876543210,1
-Priya,01-08-2025,17:10,Cough,Booked,Yes,9123456780,2
-Suresh,01-08-2025,17:20,Checkup,Booked,Yes,9998887776,3
-Kavita,01-08-2025,17:30,Consultation,Booked,Yes,9876500001,4
-Raj,01-08-2025,17:40,Headache,Booked,Yes,9887766554,5
-Meena,01-08-2025,17:50,Cold & Flu,Booked,Yes,9123400002,6
-Varun,01-08-2025,18:00,Follow-up,Booked,Yes,9001234567,7
-Pooja,01-08-2025,18:10,Injury,Booked,Yes,9988776655,8
-Nikhil,01-08-2025,18:20,Back Pain,Booked,Yes,9876543211,9
-Anjali,01-08-2025,18:30,Diabetes,Booked,Yes,9123456789,10
-Harsha,01-08-2025,18:40,Checkup,Booked,Yes,9000011223,11
-Sneha,01-08-2025,18:50,Acidity,Booked,Yes,9112233445,12
-Rohit,01-08-2025,19:00,Fever,Booked,Yes,9999999999,13
-Sana,01-08-2025,19:10,General,Booked,Yes,9345678901,14
-Deepak,01-08-2025,19:20,Injury,Booked,Yes,8888777666,15
-Lakshmi,01-08-2025,19:30,Pregnancy,Booked,Yes,9332211445,16
-Vamsi,01-08-2025,19:40,Chest Pain,Booked,Yes,9888997766,17
-Gayatri,01-08-2025,19:50,Skin Allergy,Booked,Yes,9223344556,18
-Kiran,01-08-2025,20:00,Dental,Booked,Yes,9000090000,19
-Bhavya,01-08-2025,20:10,ENT,Booked,Yes,9111222333,20
-Imran,01-08-2025,20:20,Cough,Booked,Yes,9887765443,21
-Manasa,01-08-2025,20:30,Checkup,Booked,Yes,9111144444,22
-Ramesh,01-08-2025,20:40,Injury,Booked,Yes,9991112233,23
-Divya,01-08-2025,20:50,General,Booked,Yes,9888123456,24
-Chandu,01-08-2025,21:00,Fever,Booked,Yes,9555123456,25
-Lavanya,01-08-2025,21:10,Back Pain,Booked,Yes,9333111222,26
-Teja,01-08-2025,21:20,Infection,Booked,Yes,9444422222,27
-Neha,01-08-2025,21:30,Cold,Booked,Yes,9334455667,28
-Santosh,01-08-2025,21:40,Follow-up,Booked,Yes,9110091100,29
-Monika,01-08-2025,21:50,Consultation,Booked,Yes,9666699999,30
+Date,Time,Name,Reason,Clinic,Contact,Reminder Sent,Token
+01-08-2025,09:00,Arjun Rao,Fever,Clinic 1,9000000001,✅,1
+01-08-2025,09:10,Sruthi G,Headache,Clinic 1,9000000002,✅,2
+01-08-2025,09:20,Kiran M,Check-up,Clinic 1,9000000003,✅,3
+01-08-2025,09:30,Latha K,Pain,Clinic 1,9000000004,❌,4
+01-08-2025,09:40,Revanth A,Cold,Clinic 1,9000000005,✅,5
+01-08-2025,09:50,Meena T,Flu,Clinic 1,9000000006,✅,6
+01-08-2025,10:00,Vikram D,Fever,Clinic 1,9000000007,✅,7
+01-08-2025,10:10,Nandita R,Check-up,Clinic 1,9000000008,✅,8
+01-08-2025,10:20,Anil K,Follow-up,Clinic 1,9000000009,❌,9
+01-08-2025,10:30,Sahana B,Stomach Pain,Clinic 1,9000000010,✅,10
+
+02-08-2025,09:00,Varun M,Cold,Clinic 2,9000000011,✅,1
+02-08-2025,09:10,Pooja N,Check-up,Clinic 2,9000000012,✅,2
+02-08-2025,09:20,Karthik R,Back Pain,Clinic 2,9000000013,✅,3
+02-08-2025,09:30,Deepa S,Cough,Clinic 2,9000000014,✅,4
+02-08-2025,09:40,Suresh J,Skin Issue,Clinic 2,9000000015,❌,5
+02-08-2025,09:50,Geetha A,Headache,Clinic 2,9000000016,✅,6
+02-08-2025,10:00,Manoj C,Dental Pain,Clinic 2,9000000017,✅,7
+02-08-2025,10:10,Shalini V,Fever,Clinic 2,9000000018,✅,8
+02-08-2025,10:20,Rajesh N,Check-up,Clinic 2,9000000019,✅,9
+02-08-2025,10:30,Anita M,Cold,Clinic 2,9000000020,❌,10
+
+03-08-2025,09:00,Sriya A,Cold,Clinic 1,9000000021,✅,1
+03-08-2025,09:10,Devraj P,Stomach Ache,Clinic 1,9000000022,✅,2
+03-08-2025,09:20,Sharanya R,Check-up,Clinic 1,9000000023,✅,3
+03-08-2025,09:30,Faizan K,Pain,Clinic 1,9000000024,✅,4
+03-08-2025,09:40,Divya M,Follow-up,Clinic 1,9000000025,✅,5
+03-08-2025,09:50,Harsha Y,Cold,Clinic 1,9000000026,✅,6
+03-08-2025,10:00,Madhavi T,Headache,Clinic 1,9000000027,❌,7
+03-08-2025,10:10,Ravi K,Check-up,Clinic 1,9000000028,✅,8
+03-08-2025,10:20,Anuja D,Cough,Clinic 1,9000000029,✅,9
+03-08-2025,10:30,Sameer B,Skin Rash,Clinic 1,9000000030,✅,10
+
+04-08-2025,09:00,Sneha T,Flu,Clinic 3,9000000031,✅,1
+04-08-2025,09:10,Aravind S,Fever,Clinic 3,9000000032,✅,2
+04-08-2025,09:20,Meher R,Headache,Clinic 3,9000000033,✅,3
+04-08-2025,09:30,Tanvi G,Check-up,Clinic 3,9000000034,❌,4
+04-08-2025,09:40,Pranav L,Back Pain,Clinic 3,9000000035,✅,5
+04-08-2025,09:50,Nikita F,Cold,Clinic 3,9000000036,✅,6
+04-08-2025,10:00,Yash T,Cough,Clinic 3,9000000037,✅,7
+04-08-2025,10:10,Neha U,Follow-up,Clinic 3,9000000038,✅,8
+04-08-2025,10:20,Sandhya V,Fever,Clinic 3,9000000039,✅,9
+04-08-2025,10:30,Dinesh B,Tooth Pain,Clinic 3,9000000040,✅,10
+
+05-08-2025,09:00,Nirmala I,Check-up,Clinic 2,9000000041,✅,1
+05-08-2025,09:10,Santosh P,Chest Pain,Clinic 2,9000000042,✅,2
+05-08-2025,09:20,Ashwini Q,Cough,Clinic 2,9000000043,✅,3
+05-08-2025,09:30,Vamsi E,Skin Issue,Clinic 2,9000000044,✅,4
+05-08-2025,09:40,Monica W,Check-up,Clinic 2,9000000045,✅,5
