@@ -2,111 +2,198 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>📋 Appointment Logs</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appointment Logs</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #fff;
+      font-family: Arial, sans-serif;
       padding: 10px;
-      color: #111;
+      margin: 0;
     }
     h2 {
       text-align: center;
-      color: #333;
+      margin-bottom: 10px;
+    }
+    .summary {
+      text-align: center;
+      font-weight: bold;
+      color: green;
+      margin-bottom: 10px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .controls input,
+    .controls select,
+    .controls button {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+    button {
+      cursor: pointer;
+    }
+    .green {
+      background-color: #28a745;
+      color: white;
+      border: none;
+    }
+    .yellow {
+      background-color: #ffc107;
+      color: black;
+      border: none;
     }
     table {
-      border-collapse: collapse;
       width: 100%;
-      margin-top: 10px;
+      border-collapse: collapse;
+      font-size: 14px;
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 6px 8px;
+      padding: 8px;
       text-align: left;
-      font-size: 14px;
     }
     th {
-      background: #f0f0f0;
+      background-color: #f4f4f4;
     }
-    button {
-      background: green;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      margin: 4px 2px;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 4px;
-    }
-    input, select {
-      padding: 5px;
-      font-size: 14px;
-      margin: 4px;
-    }
-    .highlight {
-      background: #dff0d8;
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
   </style>
 </head>
 <body>
+
   <h2>📋 Appointment Logs</h2>
-  <div id="summary" style="font-weight:bold; margin-bottom:10px;"></div>
-  <button onclick="filterDate('today')">Today</button>
-  <button onclick="filterDate('yesterday')">Yesterday</button>
-  <input type="date" id="startDate" />
-  <input type="date" id="endDate" />
-  <button onclick="filterDate('custom')">Apply</button>
-  <button onclick="exportCSV()">📁 Export CSV</button>
-  <button onclick="exportPDF()">🖨️ Export PDF</button>
+  <div class="summary" id="summary">Loading...</div>
+
+  <div class="controls">
+    <button class="green" onclick="filterDate('today')">Today</button>
+    <button class="green" onclick="filterDate('yesterday')">Yesterday</button>
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+    <button class="green" onclick="filterDate('range')">Apply</button>
+    <button class="green" onclick="exportCSV()">📁 Export CSV</button>
+    <button class="green" onclick="exportPDF()">📄 Export PDF</button>
+  </div>
 
   <table id="logTable">
     <thead>
       <tr>
-        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Clinic</th><th>Token</th><th>Reminder</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Name</th>
+        <th>Reason</th>
+        <th>Contact</th>
+        <th>Clinic</th>
+        <th>Token</th>
+        <th>Reminder</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
   <script>
+    let logData = [];
     let allData = [];
+    const csvUrl = "logs.csv";
 
     function fetchData() {
-      const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
-      fetch(csvUrl)
-        .then(res => res.text())
-        .then(csv => {
-          const parsed = Papa.parse(csv, { header: true });
-          allData = parsed.data.filter(row => row.Date && row.Time);
-          renderTable(allData);
-        });
+      Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        complete: function(results) {
+          logData = results.data.filter(row => row.Date); // skip empty
+          allData = logData;
+          updateSummary(logData);
+          renderTable(logData);
+        }
+      });
+    }
+
+    function updateSummary(data) {
+      const today = new Date().toISOString().split("T")[0];
+      const todayCount = data.filter(r => r.Date === today).length;
+      const todayTokens = data
+        .filter(r => r.Date === today)
+        .map(r => parseInt(r.Token))
+        .filter(n => !isNaN(n));
+      const nextToken = todayTokens.length > 0 ? Math.max(...todayTokens) + 1 : 1;
+      document.getElementById("summary").textContent = `✅ Bookings Today: ${todayCount} | Next Token: ${nextToken}`;
     }
 
     function renderTable(data) {
       const tbody = document.querySelector("#logTable tbody");
       tbody.innerHTML = "";
-      let tokenCount = 0;
-      const today = new Date().toISOString().split("T")[0];
-      let todayBookings = 0;
-
-      data.forEach((row, index) => {
+      data.forEach(row => {
         const tr = document.createElement("tr");
-
-        if (row.Date === today) {
-          tokenCount = Math.max(tokenCount, parseInt(row.Token || "0"));
-          todayBookings++;
-        }
-
         tr.innerHTML = `
           <td>${row.Date}</td>
           <td>${row.Time}</td>
           <td>${row.Name}</td>
           <td>${row.Reason}</td>
+          <td>${row.Contact}</td>
+          <td>${row.Clinic}</td>
+          <td>${row.Token}</td>
+          <td>${row.Reminder || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      const csv = Papa.unparse(allData);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "logs-export.csv");
+      link.click();
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const headers = [["Date", "Time", "Name", "Reason", "Contact", "Clinic", "Token", "Reminder"]];
+      const rows = allData.map(r => [r.Date, r.Time, r.Name, r.Reason, r.Contact, r.Clinic, r.Token, r.Reminder || ""]);
+      doc.autoTable({ head: headers, body: rows });
+      doc.save("logs-export.pdf");
+    }
+
+    function filterDate(type) {
+      let filtered = [];
+      const today = new Date();
+      if (type === 'today') {
+        const d = today.toISOString().split("T")[0];
+        filtered = logData.filter(e => e.Date === d);
+      } else if (type === 'yesterday') {
+        today.setDate(today.getDate() - 1);
+        const d = today.toISOString().split("T")[0];
+        filtered = logData.filter(e => e.Date === d);
+      } else {
+        const sd = document.getElementById("startDate").value;
+        const ed = document.getElementById("endDate").value;
+        if (!sd || !ed) return alert("Select valid date range");
+        filtered = logData.filter(e => e.Date >= sd && e.Date <= ed);
+      }
+      allData = filtered;
+      updateSummary(filtered);
+      renderTable(filtered);
+    }
+
+    fetchData();
+  </script>
+
+</body>
+</html>          <td>${row.Reason}</td>
           <td><a href="tel:${row.Contact}">${row.Contact}</a></td>
           <td>${row.Clinic || ""}</td>
           <td>${row.Token || ""}</td>
