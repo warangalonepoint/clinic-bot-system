@@ -2,48 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Booking Confirmed</title>
+  <title>Booking Confirmed – WarangalOneStop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background: #101010;
-      color: #fff;
       font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
       text-align: center;
-      padding: 40px;
+      padding: 30px;
     }
+
     h1 {
-      color: #4caf50;
-      font-size: 28px;
+      color: #0f0;
+      font-size: 26px;
     }
-    .details {
-      margin-top: 30px;
-      font-size: 18px;
+
+    .token-box {
+      background: #222;
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 10px;
+      width: fit-content;
+      display: inline-block;
     }
-    .token {
-      margin-top: 20px;
+
+    .token-box span {
       font-size: 22px;
-      color: #ffd700;
+      color: #00e1ff;
+    }
+
+    .next-steps {
+      margin-top: 30px;
+      font-size: 16px;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+      padding: 10px 18px;
+      background: #00c2ff;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>✅ Booking Confirmed</h1>
-  <div class="details">
-    <p><strong>Patient:</strong> <span id="patient"></span></p>
-    <p><strong>Clinic:</strong> <span id="clinic"></span></p>
-    <p><strong>Date:</strong> <span id="date"></span></p>
-    <p><strong>Time:</strong> <span id="time"></span></p>
-    <div class="token"><strong>🪪 Token No:</strong> <span id="token"></span></div>
+  <h1>✅ Booking Confirmed!</h1>
+
+  <div class="token-box">
+    <div>Your Token Number:</div>
+    <span id="token">#—</span>
   </div>
 
+  <div class="next-steps">
+    Please arrive 10 minutes early and wait for your turn based on the token number.
+    <br />If the doctor is late, follow token order.
+  </div>
+
+  <button class="back-btn" onclick="goBack()">← Book Another</button>
+
   <script>
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById("patient").textContent = params.get("name");
-    document.getElementById("clinic").textContent = params.get("clinic");
-    document.getElementById("date").textContent = params.get("date");
-    document.getElementById("time").textContent = params.get("time");
-    document.getElementById("token").textContent = params.get("token") || "Not Assigned";
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token") || "—";
+    document.getElementById("token").innerText = "#" + token;
+
+    function goBack() {
+      window.location.href = "public-booking.html";
+    }
   </script>
 </body>
 </html>
