@@ -1,105 +1,150 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Logs Dashboard - Clinic Admin</title>
+  <title>Logs Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #000;
-      color: #fff;
       font-family: Arial, sans-serif;
-      padding: 20px;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 1em;
     }
+
     header {
-      text-align: center;
-      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    img {
-      height: 60px;
-      margin-bottom: 10px;
+
+    #clinicLogo {
+      height: 50px;
     }
+
     h1 {
-      color: #00ffff;
+      color: #f0ad4e;
     }
-    #summary {
-      background: #111;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-    }
-    #logList {
-      background: #111;
-      padding: 15px;
-      border-radius: 10px;
-    }
-    .log-entry {
+
+    select, button {
+      padding: 8px;
       margin: 10px 0;
-      padding: 10px;
-      background: #222;
-      border-left: 5px solid #00e6e6;
-      border-radius: 5px;
     }
-    button {
-      background: #00e6e6;
-      color: #000;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      margin-top: 10px;
-      cursor: pointer;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+
+    th, td {
+      border: 1px solid #555;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #222;
+    }
+
+    .summary {
+      margin-top: 1em;
+      font-weight: bold;
+      color: #0f0;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo-bookings.png" alt="Logo" />
-    <h1>📊 Booking Logs</h1>
-  </header>  <div id="summary">
-    <h2>🗕️ Daily Summary</h2>
-    <p id="summaryContent">Loading summary...</p>
-  </div>  <div id="logList">
-    <h2>🧾 All Logs</h2>
-    <div id="logsContainer">Loading logs...</div>
-    <button onclick="downloadLogs()">⬇ Export Logs</button>
-  </div>  <script src="trial.js"></script>  <script>
-    const LOGS_CSV = "Logs.csv";
+    <img id="clinicLogo" src="" alt="Clinic Logo" />
+    <h1>Booking Logs</h1>
+  </header>
 
-    async function loadLogs() {
-      try {
-        const res = await fetch(LOGS_CSV);
-        const text = await res.text();
-        const rows = text.trim().split("\n").slice(1); // skip header
-        const container = document.getElementById("logsContainer");
-        const summary = {};
+  <div id="trialMessage" style="color: red; font-weight: bold; display: none;">Trial expired. Contact admin to activate your plan.</div>
 
-        container.innerHTML = "";
-        rows.forEach(row => {
-          const cols = row.split(",");
-          const [timestamp, name, reason, slot] = cols;
-          const date = new Date(timestamp).toISOString().split("T")[0];
-          summary[date] = (summary[date] || 0) + 1;
+  <label for="logDate">Filter by Date:</label>
+  <select id="logDate">
+    <option value="">-- Select Date --</option>
+  </select>
 
-          const div = document.createElement("div");
-          div.className = "log-entry";
-          div.innerHTML = `<strong>${name}</strong> booked <em>${slot}</em><br/><small>${reason} | ${timestamp}</small>`;
-          container.appendChild(div);
+  <div class="summary" id="dailySummary"></div>
+
+  <table id="logsTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Patient Name</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button onclick="exportLogs()">Export Logs</button>
+
+  <script src="trial.js"></script>
+  <script>
+    const CLINIC_ID = "onesto"; // change per clinic if needed
+    const LOGO_URL = `clinics/${CLINIC_ID}/logo-bookings.png`;
+    const LOGS_URL = `clinics/${CLINIC_ID}/logs.csv`;
+
+    document.getElementById("clinicLogo").src = LOGO_URL;
+
+    function fetchLogs() {
+      fetch(LOGS_URL)
+        .then(res => res.text())
+        .then(csv => {
+          const rows = csv.trim().split("\n").slice(1); // Skip header
+          const logs = rows.map(r => {
+            const [date, time, name, reason] = r.split(",");
+            return { date, time, name, reason };
+          });
+
+          const dates = [...new Set(logs.map(l => l.date))];
+          const dropdown = document.getElementById("logDate");
+          dates.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d;
+            opt.textContent = d;
+            dropdown.appendChild(opt);
+          });
+
+          dropdown.addEventListener("change", () => renderLogs(logs, dropdown.value));
         });
+    }
 
-        const summaryContent = Object.entries(summary)
-          .map(([date, count]) => `<p>${date}: ${count} bookings</p>`)
-          .join("");
-        document.getElementById("summaryContent").innerHTML = summaryContent || "No bookings yet.";
-      } catch (err) {
-        document.getElementById("logsContainer").innerText = "Error loading logs.";
-        document.getElementById("summaryContent").innerText = "Error loading summary.";
-        console.error(err);
+    function renderLogs(logs, selectedDate) {
+      const tbody = document.querySelector("#logsTable tbody");
+      tbody.innerHTML = "";
+
+      const filtered = logs.filter(l => l.date === selectedDate);
+      document.getElementById("dailySummary").textContent = `Total Bookings: ${filtered.length}`;
+
+      filtered.forEach(log => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${log.date}</td>
+          <td>${log.time}</td>
+          <td>${log.name}</td>
+          <td>${log.reason}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function exportLogs() {
+      window.open(LOGS_URL, "_blank");
+    }
+
+    checkTrialExpiry(CLINIC_ID).then(expired => {
+      if (expired) {
+        document.body.innerHTML = '<h2 style="color:red;text-align:center;">Trial expired. Contact admin to activate your plan.</h2>';
+      } else {
+        fetchLogs();
       }
-    }
-
-    function downloadLogs() {
-      window.open(LOGS_CSV, "_blank");
-    }
-
-    loadLogs();
-  </script></body>
+    });
+  </script>
+</body>
 </html>
