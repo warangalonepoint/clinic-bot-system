@@ -1,56 +1,69 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Paid Plan Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paid Plan - BookingBot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0e0e0e;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #4caf50;
+    }
+    .features {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px auto;
+      max-width: 650px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    strong {
+      color: #ffa726;
+    }
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+    }
+    .back a {
+      color: #4dc1ff;
+      text-decoration: none;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Paid Plan - Booking Logs</h1>
-    <a href="index.html">🔒 Logout</a>
-  </header>  <section>
-    <div class="filters">
-      <button onclick="filterToday()">Today</button>
-      <button onclick="filterYesterday()">Yesterday</button>
-      <input type="date" id="fromDate" /> to
-      <input type="date" id="toDate" />
-      <button onclick="applyCustomRange()">Apply</button>
-      <button onclick="resetFilters()">Reset</button>
-    </div>
-  </section>  <section>
-    <table id="logsTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Name</th>
-          <th>Reason</th>
-          <th>Contact</th>
-          <th>Reminder</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Logs will be inserted here -->
-      </tbody>
-    </table>
-  </section>  <section>
-    <h2>📊 Daily Summary</h2>
-    <div id="summary">
-      <p>Total Bookings: <span id="totalBookings">0</span></p>
-      <p>Reminders Sent: <span id="remindersSent">0</span></p>
-      <p>Top Reasons:
-        <ul id="topReasons"></ul>
-      </p>
-    </div>
-    <canvas id="summaryChart" height="100"></canvas>
-  </section>  <section>
-    <div class="export-buttons">
-      <button onclick="exportToExcel()">Export to Excel</button>
-      <button onclick="exportToPDF()">Export to PDF</button>
-    </div>
-  </section>  <footer>
-    <p>Powered by WarangalOneStop BookingBot</p>
-  </footer>  <script src="logs.js"></script></body>
+  <h1>Paid Plan Activated ✅</h1>
+
+  <div class="features">
+    <h2>Included Features</h2>
+    <ul>
+      <li>📋 Public Booking Page with Patient Name + Reason Input</li>
+      <li>📆 Real-time Available Slots (CSV-based)</li>
+      <li>📲 WhatsApp Redirect Booking with Confirmation Message</li>
+      <li>🧾 Booking Logs Dashboard with Export to Excel/PDF</li>
+      <li>🔔 Send WhatsApp Reminders to Patients</li>
+      <li>📱 Fully Mobile-Responsive Interface</li>
+      <li>🌐 Add-to-Home-Screen PWA Support</li>
+      <li>🔒 PIN-Based Admin Access</li>
+    </ul>
+    <p><strong>Note:</strong> This plan is ideal for small clinics and professionals who want a semi-automated booking system with admin controls, reports, and no monthly costs.</p>
+  </div>
+
+  <div class="back">
+    <a href="test.html">🔙 Back to PIN Activation</a>
+  </div>
+</body>
 </html>
