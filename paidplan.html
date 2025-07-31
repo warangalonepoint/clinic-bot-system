@@ -2,87 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Paid Plan Booking | BookingBot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="manifest" href="manifest.json" />
-  <script src="trial.js"></script>
+  <title>Paid Plan - Clinic System</title>
   <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      color: #00d9ff;
-      text-align: center;
-    }
-    input, select, button {
-      display: block;
-      width: 90%;
-      margin: 10px auto;
-      padding: 12px;
-      border-radius: 6px;
-      border: none;
-      font-size: 16px;
-    }
-    button {
-      background-color: #28a745;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    body { background: #0e0e0e; color: white; font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    img { width: 100px; margin-bottom: 20px; }
+    h1 { color: #00ffff; }
   </style>
 </head>
 <body>
-  <h1>Book Appointment</h1>
-  <input type="text" id="patientName" placeholder="Your Name" />
-  <input type="text" id="reason" placeholder="Reason for Visit" />
-  <select id="slotDropdown">
-    <option value="">Loading slots...</option>
-  </select>
-  <button onclick="bookSlot()">Confirm & Book</button>
-
-  <script>
-    async function loadSlots() {
-      const slotRes = await fetch('Slots.csv');
-      const slotText = await slotRes.text();
-      const slots = slotText.trim().split('\n').slice(1); // skip header
-
-      const logRes = await fetch('logs.csv');
-      const logText = await logRes.text();
-      const booked = logText.trim().split('\n').slice(1).map(row => row.split(',')[1]);
-
-      const dropdown = document.getElementById('slotDropdown');
-      dropdown.innerHTML = '<option value="">Select Slot</option>';
-      slots.forEach(row => {
-        const [date, time] = row.split(',');
-        const label = `${date.trim()} - ${time.trim()}`;
-        if (!booked.includes(time.trim())) {
-          const option = document.createElement('option');
-          option.value = label;
-          option.textContent = label;
-          dropdown.appendChild(option);
-        }
-      });
-    }
-
-    function bookSlot() {
-      const name = document.getElementById('patientName').value.trim();
-      const reason = document.getElementById('reason').value.trim();
-      const slot = document.getElementById('slotDropdown').value;
-
-      if (!name || !reason || !slot) {
-        alert('Please fill all fields and select a slot');
-        return;
-      }
-
-      const message = `Hi, I am ${name}. I want to book this slot: ${slot}. Reason: ${reason}`;
-      const url = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
-      window.location.href = url;
-    }
-
-    loadSlots();
-  </script>
+  <img src="assets/logos/logo-dashboard.png" alt="Log" />
+  <h1>🔍 Clinic Admin System - Auto Test</h1>
+  <p>This is the <strong>Paid Plan</strong>. Intermediate features enabled.</p>
 </body>
 </html>
+
+
+
