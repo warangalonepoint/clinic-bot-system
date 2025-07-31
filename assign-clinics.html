@@ -1,12 +1,13 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assign Clinics Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assign Clinics</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #0f0f0f;
+      background-color: #111;
       color: #fff;
       padding: 20px;
     }
@@ -19,128 +20,129 @@
       margin-top: 20px;
     }
     th, td {
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #444;
-      text-align: left;
     }
     th {
       background-color: #222;
     }
+    tr.invalid td {
+      background-color: #660000;
+    }
     input, select {
-      padding: 8px;
       width: 100%;
-      background: #1c1c1c;
+      padding: 6px;
+      background: #222;
       color: white;
-      border: 1px solid #555;
+      border: 1px solid #444;
     }
     button {
       padding: 10px 20px;
-      background: #28a745;
+      background-color: #28a745;
       color: white;
       border: none;
       cursor: pointer;
+      margin-top: 15px;
     }
-    .danger {
-      background-color: #dc3545;
+    #errorBox {
+      color: red;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Assign Clinics Tool (Admin Only)</h1>  <table id="clinicTable">
+  <h1>Assign Clinics</h1>
+  <table id="clinicTable">
     <thead>
       <tr>
         <th>PIN</th>
         <th>Clinic Name</th>
         <th>Plan</th>
         <th>Override Lock</th>
-        <th>Actions</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody></tbody>
-  </table>  <br>
-  <button onclick="addClinicRow()">➕ Add New Clinic Row</button>
-  <button onclick="saveJSON()">💾 Save plans.json</button>  <script>
-    const plansPath = 'https://warangalonepoint.github.io/clinic-bot-system/plans.json';
-    let plans = {};
+  </table>
 
-    async function loadPlans() {
-      const res = await fetch(plansPath);
-      plans = await res.json();
-      const tbody = document.querySelector("#clinicTable tbody");
-      tbody.innerHTML = '';
-      Object.entries(plans).forEach(([pin, details]) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input value="${pin}" data-original="${pin}" /></td>
-          <td><input value="${details.clinic || ''}" /></td>
-          <td>
-            <select>
-              <option value="free" ${details.plan === 'free' ? 'selected' : ''}>Free</option>
-              <option value="paid" ${details.plan === 'paid' ? 'selected' : ''}>Paid</option>
-              <option value="premium" ${details.plan === 'premium' ? 'selected' : ''}>Premium</option>
-            </select>
-          </td>
-          <td>
-            <select>
-              <option value="true" ${details.overrideLock ? 'selected' : ''}>true</option>
-              <option value="false" ${!details.overrideLock ? 'selected' : ''}>false</option>
-            </select>
-          </td>
-          <td><button class="danger" onclick="deleteClinicRow(this)">🗑️ Delete</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+  <button onclick="addClinicRow()">Add Clinic</button>
+  <button onclick="saveClinics()">Save</button>
+  <pre id="output"></pre>
+  <div id="errorBox"></div>
 
-    function addClinicRow() {
-      const tbody = document.querySelector("#clinicTable tbody");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><input /></td>
-        <td><input /></td>
-        <td>
-          <select>
-            <option value="free">Free</option>
-            <option value="paid">Paid</option>
-            <option value="premium">Premium</option>
-          </select>
-        </td>
-        <td>
-          <select>
-            <option value="true">true</option>
-            <option value="false">false</option>
-          </select>
-        </td>
-        <td><button class="danger" onclick="deleteClinicRow(this)">🗑️ Delete</button></td>
+  <script>
+    const allowedPlans = ["free", "paid", "premium"];
+
+    function addClinicRow(pin = "", clinic = "", plan = "free", overrideLock = true) {
+      const table = document.querySelector("#clinicTable tbody");
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td><input type="text" class="pin" value="${pin}"></td>
+        <td><input type="text" class="clinic" value="${clinic}"></td>
+        <td><select class="plan">
+          <option value="free" ${plan === "free" ? "selected" : ""}>free</option>
+          <option value="paid" ${plan === "paid" ? "selected" : ""}>paid</option>
+          <option value="premium" ${plan === "premium" ? "selected" : ""}>premium</option>
+        </select></td>
+        <td><input type="checkbox" class="lock" ${overrideLock ? "checked" : ""}></td>
+        <td><button onclick="deleteRow(this)">🗑</button></td>
       `;
-      tbody.appendChild(tr);
+
+      table.appendChild(row);
     }
 
-    function deleteClinicRow(btn) {
-      const tr = btn.closest("tr");
-      tr.remove();
+    function deleteRow(btn) {
+      btn.closest("tr").remove();
     }
 
-    function saveJSON() {
-      const rows = document.querySelectorAll("#clinicTable tbody tr");
-      const newPlans = {};
-      for (let row of rows) {
-        const inputs = row.querySelectorAll("input, select");
-        const pin = inputs[0].value.trim();
-        if (!pin) continue;
-        newPlans[pin] = {
-          clinic: inputs[1].value.trim(),
-          plan: inputs[2].value.trim(),
-          overrideLock: inputs[3].value === 'true'
-        };
+    function validateRows() {
+      const pins = {};
+      let hasError = false;
+      document.querySelector("#errorBox").textContent = "";
+      document.querySelectorAll("#clinicTable tbody tr").forEach((row, i) => {
+        const pin = row.querySelector(".pin").value.trim();
+        const clinic = row.querySelector(".clinic").value.trim();
+        const plan = row.querySelector(".plan").value.trim();
+        row.classList.remove("invalid");
+
+        if (!pin || !clinic || !plan || !allowedPlans.includes(plan)) {
+          row.classList.add("invalid");
+          hasError = true;
+        } else if (pins[pin]) {
+          row.classList.add("invalid");
+          hasError = true;
+        } else {
+          pins[pin] = true;
+        }
+      });
+
+      if (hasError) {
+        document.querySelector("#errorBox").textContent = "❌ Fix errors before saving. Duplicate or invalid data found.";
       }
-      const blob = new Blob([JSON.stringify(newPlans, null, 2)], { type: 'application/json' });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "plans.json";
-      a.click();
+
+      return !hasError;
     }
 
-    loadPlans();
-  </script></body>
+    function saveClinics() {
+      if (!validateRows()) return;
+
+      const data = {};
+      document.querySelectorAll("#clinicTable tbody tr").forEach(row => {
+        const pin = row.querySelector(".pin").value.trim();
+        const clinic = row.querySelector(".clinic").value.trim();
+        const plan = row.querySelector(".plan").value.trim();
+        const lock = row.querySelector(".lock").checked;
+        data[pin] = { clinic, plan, overrideLock: lock };
+      });
+
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Load default (optional)
+    addClinicRow("1234", "Clinic 1", "free");
+    addClinicRow("2525", "Clinic 2", "paid");
+    addClinicRow("9999", "Clinic 3", "premium");
+  </script>
+</body>
 </html>
