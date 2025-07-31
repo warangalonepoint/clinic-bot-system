@@ -2,111 +2,157 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Appointment Logs</title>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 10px;
-      margin: 0;
+      background: #fff;
+      padding: 20px;
     }
-    h2 {
+    h1 {
       text-align: center;
-      margin-bottom: 10px;
+      color: #000;
     }
-    .summary {
+    .filter {
+      margin-bottom: 10px;
       text-align: center;
-      font-weight: bold;
-      color: green;
-      margin-bottom: 10px;
-    }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .controls input,
-    .controls select,
-    .controls button {
-      padding: 6px 12px;
-      font-size: 14px;
-    }
-    button {
-      cursor: pointer;
-    }
-    .green {
-      background-color: #28a745;
-      color: white;
-      border: none;
-    }
-    .yellow {
-      background-color: #ffc107;
-      color: black;
-      border: none;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      margin-top: 10px;
     }
     th, td {
-      border: 1px solid #ccc;
       padding: 8px;
-      text-align: left;
+      border: 1px solid #ccc;
+      text-align: center;
     }
     th {
-      background-color: #f4f4f4;
+      background: #f0f0f0;
     }
-    @media (max-width: 600px) {
-      .controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
+    button, select, input {
+      margin: 4px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .highlight {
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <h2>📋 Appointment Logs</h2>
-  <div class="summary" id="summary">Loading...</div>
-
-  <div class="controls">
-    <button class="green" onclick="filterDate('today')">Today</button>
-    <button class="green" onclick="filterDate('yesterday')">Yesterday</button>
-    <input type="date" id="startDate">
+  <h1>📋 Appointment Logs</h1>
+  <div class="filter">
+    <div class="highlight" id="stats"></div>
+    <br/>
+    <button onclick="filterToday()">Today</button>
+    <button onclick="filterYesterday()">Yesterday</button>
+    <br/><br/>
+    <input type="date" id="startDate"> to 
     <input type="date" id="endDate">
-    <button class="green" onclick="filterDate('range')">Apply</button>
-    <button class="green" onclick="exportCSV()">📁 Export CSV</button>
-    <button class="green" onclick="exportPDF()">📄 Export PDF</button>
+    <button onclick="filterDateRange()">Apply</button>
+    <br/><br/>
+    <button onclick="exportCSV()">📁 Export CSV</button>
+    <button onclick="exportPDF()">🧾 Export PDF</button>
   </div>
 
   <table id="logTable">
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Name</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Clinic</th>
-        <th>Token</th>
-        <th>Reminder</th>
+        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th>
+        <th>Contact</th><th>Clinic</th><th>Token</th><th>Reminder</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    let logData = [];
-    let allData = [];
-    const csvUrl = "logs.csv";
+    const url = 'logs.csv';
+    let originalData = [];
 
-    function fetchData() {
+    fetch(url)
+      .then(res => res.text())
+      .then(csv => {
+        const parsed = Papa.parse(csv, { header: true });
+        originalData = parsed.data;
+        renderTable(originalData);
+      });
+
+    function renderTable(data) {
+      const tbody = document.querySelector("#logTable tbody");
+      tbody.innerHTML = "";
+      let todayCount = 0;
+      const today = new Date().toISOString().split("T")[0];
+
+      data.forEach(row => {
+        if (!row.Date) return;
+        const tr = document.createElement("tr");
+        Object.values(row).forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+
+        if (row.Date === today) todayCount++;
+      });
+
+      const nextToken = todayCount + 1;
+      document.getElementById("stats").textContent = `✅ Bookings Today: ${todayCount} | Next Token: ${nextToken}`;
+    }
+
+    function filterToday() {
+      const today = new Date().toISOString().split("T")[0];
+      const filtered = originalData.filter(row => row.Date === today);
+      renderTable(filtered);
+    }
+
+    function filterYesterday() {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+      const filtered = originalData.filter(row => row.Date === yesterday);
+      renderTable(filtered);
+    }
+
+    function filterDateRange() {
+      const start = document.getElementById("startDate").value;
+      const end = document.getElementById("endDate").value;
+      const filtered = originalData.filter(row => row.Date >= start && row.Date <= end);
+      renderTable(filtered);
+    }
+
+    function exportCSV() {
+      const csv = Papa.unparse(originalData);
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "AppointmentLogs.csv";
+      link.click();
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Appointment Logs", 10, 10);
+      let y = 20;
+      originalData.forEach((row, index) => {
+        const line = `${row.Date} | ${row.Time} | ${row.Name} | ${row.Reason} | ${row.Contact}`;
+        doc.text(line, 10, y);
+        y += 8;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+      doc.save("AppointmentLogs.pdf");
+    }
+  </script>
+</body>
+</html>    function fetchData() {
       Papa.parse(csvUrl, {
         download: true,
         header: true,
