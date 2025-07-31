@@ -1,93 +1,120 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>BookingBot – Paid Plan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PIN-Based Activation</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000" />
+  <link rel="apple-touch-icon" href="logo-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     body {
-      background-color: #0e0e0e;
       font-family: Arial, sans-serif;
-      color: white;
-      padding: 30px;
+      background-color: #111;
+      color: #eee;
+      margin: 0;
+      padding: 1rem;
+    }
+    h2 {
+      text-align: center;
+      color: #00e5ff;
+    }
+    .log-card {
+      background: #222;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px #000;
+    }
+    .log-card span {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background-color: #00e5ff;
+      color: #111;
+      border-radius: 6px;
+      font-size: 14px;
       text-align: center;
     }
-    h1 {
-      color: #4dc1ff;
-    }
-    input {
-      padding: 12px;
-      font-size: 16px;
-      width: 80%;
-      max-width: 300px;
-      margin-bottom: 20px;
-    }
-    button {
-      padding: 12px 25px;
-      font-size: 16px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .message {
-      margin-top: 20px;
-      font-size: 18px;
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 14px;
+      color: #777;
     }
   </style>
 </head>
 <body>
-  <h1>Enter Your PIN to Activate Plan</h1>
-  <input type="password" id="pinInput" placeholder="Enter PIN..." />
-  <br />
-  <button onclick="verifyPIN()">Activate</button>
-  <div class="message" id="status"></div>  <script>
+  <h2>📋 Today's Appointments – Paid Plan</h2>
+  <div id="logContainer">Loading logs...</div>
+
+  <footer>
+    BookingBot Paid Plan – WarangalOneStop.in
+  </footer>
+
+  <script>
+    const clinicPin = new URLSearchParams(window.location.search).get("pin") || "2525";
+
     const plans = {
-      "1234": "freeplan.html",
-      "2525": "paidplan.html",
-      "8888": "premiumplan.html"
+      "1234": "clinic1-logs.csv",
+      "2525": "clinic2-logs.csv",
+      "9999": "clinic3-logs.csv"
     };
 
-    function verifyPIN() {
-      const pin = document.getElementById("pinInput").value.trim();
-      const status = document.getElementById("status");
-      if (plans[pin]) {
-        status.textContent = "✅ PIN accepted. Redirecting...";
-        setTimeout(() => {
-          window.location.href = plans[pin];
-        }, 1000);
-      } else {
-        status.textContent = "❌ Invalid PIN. Please try again.";
-        status.style.color = "red";
-      }
+    const file = plans[clinicPin] || "clinic1-logs.csv";
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("en-GB");
     }
-  </script></body>
-</html><script>
-  async function validatePIN() {
-    const enteredPIN = document.getElementById("pinInput").value.trim();
-    const plansURL = "https://warangalonepoint.github.io/clinic-bot-system/plans.json";
 
-    try {
-      const res = await fetch(plansURL);
-      const plans = await res.json();
-
-      const match = plans.find(item => item.pin === enteredPIN);
-
-      if (!match) {
-        alert("❌ Invalid PIN. Please try again.");
-        return;
-      }
-
-      const { clinicID, plan } = match;
-
-      // Save to localStorage
-      localStorage.setItem("clinicID", clinicID);
-      localStorage.setItem("pricingPlan", plan);
-
-      // Redirect to dashboard
-      window.location.href = "dashboard.html";
-    } catch (err) {
-      console.error("Error fetching plans:", err);
-      alert("⚠️ Could not load plan data. Try again.");
+    function sendReminder(name, number, token) {
+      const message = `Reminder: Your appointment (Token No: ${token}) is today. Please be on time.`;
+      const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
     }
-  }
-</script>
+
+    fetch(file)
+      .then(res => res.text())
+      .then(data => {
+        const rows = data.trim().split("\n").slice(1);
+        const today = new Date().toISOString().split("T")[0];
+
+        let html = "";
+        rows.forEach(row => {
+          const [date, time, name, reason, contact, clinic, token, reminder, reminderSent] = row.split(",");
+          if (date === today) {
+            html += `
+              <div class="log-card">
+                <span><strong>Token:</strong> #${token || "N/A"}</span>
+                <span><strong>Name:</strong> ${name}</span>
+                <span><strong>Time:</strong> ${time}</span>
+                <span><strong>Reason:</strong> ${reason}</span>
+                <span><strong>Contact:</strong> ${contact}</span>
+                <span><strong>Reminder Sent:</strong> ${reminderSent || "No"}</span>
+                <button class="btn" onclick="sendReminder('${name}','${contact}','${token}')">Send WhatsApp Reminder</button>
+              </div>
+            `;
+          }
+        });
+
+        document.getElementById("logContainer").innerHTML = html || "No appointments found today.";
+      })
+      .catch(() => {
+        document.getElementById("logContainer").innerText = "Error loading logs.";
+      });
+
+    // PWA: Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("✅ PWA ready"))
+        .catch(e => console.error("❌ PWA failed", e));
+    }
+  </script>
+</body>
+</html>
