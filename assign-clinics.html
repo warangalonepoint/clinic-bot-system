@@ -1,126 +1,146 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Assign Clinic Plans</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assign Clinics Tool</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #121212;
+      background: #0f0f0f;
       color: #fff;
       padding: 20px;
     }
     h1 {
-      text-align: center;
       color: #4dc1ff;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: #1f1f1f;
     }
     th, td {
-      border: 1px solid #333;
-      padding: 10px;
-      text-align: center;
+      padding: 12px;
+      border: 1px solid #444;
+      text-align: left;
     }
     th {
-      background-color: #333;
+      background-color: #222;
     }
-    input {
-      padding: 5px;
-      background-color: #2c2c2c;
-      color: #fff;
+    input, select {
+      padding: 8px;
+      width: 100%;
+      background: #1c1c1c;
+      color: white;
       border: 1px solid #555;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #4dc1ff;
-      color: black;
-      border: none;
-      cursor: pointer;
-    }
-    .delete-btn {
-      background-color: #e74c3c;
+      padding: 10px 20px;
+      background: #28a745;
       color: white;
       border: none;
-      padding: 5px 10px;
       cursor: pointer;
     }
-    .add-btn {
-      background-color: #28a745;
-      margin-top: 10px;
+    .danger {
+      background-color: #dc3545;
     }
   </style>
 </head>
 <body>
-  <h1>Assign Clinic Plans</h1>
-  <table id="clinicTable">
+  <h1>Assign Clinics Tool (Admin Only)</h1>  <table id="clinicTable">
     <thead>
       <tr>
-        <th>Clinic Name</th>
         <th>PIN</th>
+        <th>Clinic Name</th>
         <th>Plan</th>
-        <th>Delete</th>
+        <th>Override Lock</th>
+        <th>Actions</th>
       </tr>
     </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+    <tbody></tbody>
+  </table>  <br>
+  <button onclick="addClinicRow()">➕ Add New Clinic Row</button>
+  <button onclick="saveJSON()">💾 Save plans.json</button>  <script>
+    const plansPath = 'https://warangalonepoint.github.io/clinic-bot-system/plans.json';
+    let plans = {};
 
-  <button class="add-btn" onclick="addRow()">+ Add Clinic</button>
-  <button onclick="savePlans()">💾 Save to plans.json</button>
-
-  <script>
-    let plans = []; // FIXED: make it let, not const
-
-    const tableBody = document.getElementById("tableBody");
-
-    function renderTable() {
-      tableBody.innerHTML = "";
-      plans.forEach((entry, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td><input value="${entry.clinic}" onchange="plans[${index}].clinic = this.value" /></td>
-          <td><input value="${entry.pin}" onchange="plans[${index}].pin = this.value" /></td>
-          <td><input value="${entry.plan}" onchange="plans[${index}].plan = this.value" /></td>
-          <td><button class="delete-btn" onclick="deleteRow(${index})">Delete</button></td>
+    async function loadPlans() {
+      const res = await fetch(plansPath);
+      plans = await res.json();
+      const tbody = document.querySelector("#clinicTable tbody");
+      tbody.innerHTML = '';
+      Object.entries(plans).forEach(([pin, details]) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input value="${pin}" data-original="${pin}" /></td>
+          <td><input value="${details.clinic || ''}" /></td>
+          <td>
+            <select>
+              <option value="free" ${details.plan === 'free' ? 'selected' : ''}>Free</option>
+              <option value="paid" ${details.plan === 'paid' ? 'selected' : ''}>Paid</option>
+              <option value="premium" ${details.plan === 'premium' ? 'selected' : ''}>Premium</option>
+            </select>
+          </td>
+          <td>
+            <select>
+              <option value="true" ${details.overrideLock ? 'selected' : ''}>true</option>
+              <option value="false" ${!details.overrideLock ? 'selected' : ''}>false</option>
+            </select>
+          </td>
+          <td><button class="danger" onclick="deleteClinicRow(this)">🗑️ Delete</button></td>
         `;
-        tableBody.appendChild(row);
+        tbody.appendChild(tr);
       });
     }
 
-    function addRow() {
-      plans.push({ clinic: "", pin: "", plan: "" });
-      renderTable();
+    function addClinicRow() {
+      const tbody = document.querySelector("#clinicTable tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input /></td>
+        <td><input /></td>
+        <td>
+          <select>
+            <option value="free">Free</option>
+            <option value="paid">Paid</option>
+            <option value="premium">Premium</option>
+          </select>
+        </td>
+        <td>
+          <select>
+            <option value="true">true</option>
+            <option value="false">false</option>
+          </select>
+        </td>
+        <td><button class="danger" onclick="deleteClinicRow(this)">🗑️ Delete</button></td>
+      `;
+      tbody.appendChild(tr);
     }
 
-    function deleteRow(index) {
-      plans.splice(index, 1);
-      renderTable();
+    function deleteClinicRow(btn) {
+      const tr = btn.closest("tr");
+      tr.remove();
     }
 
-    function savePlans() {
-      const file = new Blob([JSON.stringify(plans, null, 2)], { type: 'application/json' });
+    function saveJSON() {
+      const rows = document.querySelectorAll("#clinicTable tbody tr");
+      const newPlans = {};
+      for (let row of rows) {
+        const inputs = row.querySelectorAll("input, select");
+        const pin = inputs[0].value.trim();
+        if (!pin) continue;
+        newPlans[pin] = {
+          clinic: inputs[1].value.trim(),
+          plan: inputs[2].value.trim(),
+          overrideLock: inputs[3].value === 'true'
+        };
+      }
+      const blob = new Blob([JSON.stringify(newPlans, null, 2)], { type: 'application/json' });
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(file);
+      a.href = URL.createObjectURL(blob);
       a.download = "plans.json";
       a.click();
     }
 
-    // Fetch existing plans
-    fetch("plans.json")
-      .then(res => res.json())
-      .then(data => {
-        plans = data;
-        renderTable();
-      })
-      .catch(() => {
-        plans = [];
-        renderTable();
-      });
-  </script>
-</body>
+    loadPlans();
+  </script></body>
 </html>
