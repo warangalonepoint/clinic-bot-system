@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Plan Assignment Tool</title>
+  <style>
+    body {
+      background: #0e0e0e;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #00d1ff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #1a1a1a;
+    }
+    input, select {
+      padding: 8px;
+      width: 90%;
+      font-size: 14px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 250px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 Admin Plan Assignment Tool</h1>  <table id="planTable">
+    <thead>
+      <tr>
+        <th>Clinic Name</th>
+        <th>PIN</th>
+        <th>Plan</th>
+        <th>Override Lock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="text" value="Clinic 1"></td>
+        <td><input type="text" value="1234"></td>
+        <td>
+          <select>
+            <option>free</option>
+            <option>paid</option>
+            <option>premium</option>
+          </select>
+        </td>
+        <td><input type="checkbox"></td>
+      </tr>
+      <tr>
+        <td><input type="text" value="Clinic 2"></td>
+        <td><input type="text" value="2525"></td>
+        <td>
+          <select>
+            <option>free</option>
+            <option selected>paid</option>
+            <option>premium</option>
+          </select>
+        </td>
+        <td><input type="checkbox"></td>
+      </tr>
+      <tr>
+        <td><input type="text" value="Clinic 3"></td>
+        <td><input type="text" value="8888"></td>
+        <td>
+          <select>
+            <option>free</option>
+            <option>paid</option>
+            <option selected>premium</option>
+          </select>
+        </td>
+        <td><input type="checkbox"></td>
+      </tr>
+    </tbody>
+  </table><button onclick="generateJSON()">📦 Generate plans.json</button>
+
+  <textarea id="output" placeholder="Generated JSON will appear here..."></textarea>  <script>
+    function generateJSON() {
+      const rows = document.querySelectorAll('#planTable tbody tr');
+      const plans = {};
+      rows.forEach(row => {
+        const name = row.cells[0].querySelector('input').value.trim();
+        const pin = row.cells[1].querySelector('input').value.trim();
+        const plan = row.cells[2].querySelector('select').value;
+        const override = row.cells[3].querySelector('input').checked;
+        if (pin) {
+          plans[pin] = {
+            clinic: name,
+            plan: plan,
+            overrideLock: override
+          };
+        }
+      });
+      document.getElementById('output').value = JSON.stringify(plans, null, 2);
+    }
+  </script></body>
+</html>
