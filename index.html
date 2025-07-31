@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BookingBot Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #00ffcc;
+      font-size: 28px;
+    }
+
+    input[type="password"] {
+      padding: 12px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      width: 220px;
+      text-align: center;
+      margin-top: 15px;
+      background-color: #1c1c1c;
+      color: #fff;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 24px;
+      font-size: 16px;
+      background-color: #00ffcc;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .error {
+      color: #ff5e5e;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: 13px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 Clinic Access Login</h1>
+
+  <input type="password" id="pinInput" placeholder="Enter PIN" />
+  <button onclick="login()">Login</button>
+  <div class="error" id="errorMsg"></div>
+
+  <footer>Powered by WarangalOneStop BookingBot</footer>
+
+  <script>
+    function login() {
+      const pin = document.getElementById("pinInput").value.trim();
+      fetch("plans.json")
+        .then(res => res.json())
+        .then(data => {
+          if (data[pin]) {
+            const plan = data[pin].plan;
+            if (plan === "free") {
+              window.location.href = "freeplan.html?pin=" + pin;
+            } else if (plan === "paid") {
+              window.location.href = "paidplan.html?pin=" + pin;
+            } else if (plan === "premium") {
+              window.location.href = "premiumplan.html?pin=" + pin;
+            } else {
+              showError("Invalid plan assigned.");
+            }
+          } else {
+            showError("Incorrect PIN.");
+          }
+        })
+        .catch(() => showError("Error loading plans."));
+    }
+
+    function showError(msg) {
+      document.getElementById("errorMsg").innerText = msg;
+    }
+  </script>
+</body>
+</html>
