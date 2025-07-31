@@ -3,105 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <title>Clinic PIN Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #111;
+      background-color: #111;
       color: #fff;
+      font-family: sans-serif;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
     }
-
-    .login-box {
-      background: #222;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
-      max-width: 320px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .login-box h2 {
-      margin-bottom: 24px;
-      font-size: 22px;
-      color: #f0ad4e;
-    }
-
-    input[type="password"] {
-      width: 100%;
-      padding: 12px;
+    h1 {
       margin-bottom: 20px;
-      border: none;
-      border-radius: 8px;
-      background: #333;
-      color: #fff;
-      font-size: 16px;
+      color: #4CAF50;
     }
-
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 10px;
+      width: 200px;
+    }
     button {
-      background: #f0ad4e;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      color: #000;
-      font-weight: bold;
+      padding: 10px 20px;
       font-size: 16px;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: white;
       cursor: pointer;
-      width: 100%;
     }
-
     .error {
-      color: red;
-      margin-top: 12px;
-    }
-
-    footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      color: #888;
-      font-size: 12px;
+      margin-top: 10px;
+      color: #ff4444;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Enter Clinic PIN</h2>
-    <input type="password" id="pinInput" placeholder="PIN" />
-    <button onclick="verifyPIN()">Login</button>
-    <div id="error" class="error"></div>
-  </div>
-
-  <footer>Powered by WarangalOneStop BookingBot</footer>
+  <h1>Clinic Login</h1>
+  <input id="pin" type="password" placeholder="Enter your PIN" />
+  <button onclick="login()">Login</button>
+  <div class="error" id="error"></div>
 
   <script>
-    async function verifyPIN() {
-      const pin = document.getElementById("pinInput").value.trim();
-      const error = document.getElementById("error");
+    async function login() {
+      const pin = document.getElementById('pin').value.trim();
+      const errorBox = document.getElementById('error');
+
       if (!pin) {
-        error.textContent = "Please enter a PIN.";
+        errorBox.textContent = 'PIN is required.';
         return;
       }
 
       try {
-        const res = await fetch("plans.json");
+        const res = await fetch('plans.json');
         const plans = await res.json();
 
         if (plans[pin]) {
-          localStorage.setItem("clinicPIN", pin);
-          window.location.href = "clinic-dashboard.html?pin=" + pin;
+          localStorage.setItem('clinic', plans[pin].clinic);
+          localStorage.setItem('plan', plans[pin].plan || 'free');
+          window.location.href = 'clinic-dashboard.html';
         } else {
-          error.textContent = "Invalid PIN. Please try again.";
+          errorBox.textContent = 'Invalid PIN. Please try again.';
         }
       } catch (err) {
-        error.textContent = "Error loading plans. Please try again.";
         console.error(err);
+        errorBox.textContent = 'Error loading plans. Try again.';
       }
     }
   </script>
