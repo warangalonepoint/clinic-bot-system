@@ -2,85 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clinic Admin Dashboard</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="logo.png" type="image/png" />
-
   <style>
     body {
       background-color: #111;
       color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
     }
 
     header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    #clinicLogo {
-      height: 60px;
-      width: auto;
+      background: #222;
+      padding: 15px;
+      border-bottom: 1px solid #444;
     }
 
     h1 {
-      font-size: 22px;
-      margin-top: 30px;
+      color: #00f2ff;
+      margin: 0;
     }
 
-    .info {
-      margin-top: 30px;
+    .panel {
+      padding: 20px;
     }
 
-    .locked {
-      color: red;
+    .btn {
+      background-color: #00c853;
+      border: none;
+      padding: 15px 25px;
+      color: white;
       font-size: 18px;
-      margin-top: 40px;
-      text-align: center;
+      margin: 15px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .btn:hover {
+      background-color: #00a74f;
+    }
+
+    img#clinicLogo {
+      width: 120px;
+      margin-top: 10px;
+    }
+
+    .warning {
+      color: #ff6b6b;
+      margin-top: 10px;
     }
   </style>
 </head>
-
 <body>
+
   <header>
-    <!-- ✅ Match expected logo filename for test -->
     <img id="clinicLogo" src="logo.png" alt="Clinic Logo" />
-    <h1>Dashboard</h1>
+    <h1>Clinic Admin Dashboard</h1>
   </header>
 
-  <div class="info" id="mainContent">
-    <p>✅ Welcome to the Clinic Admin Dashboard. Use this panel to manage operations.</p>
+  <div class="panel" id="mainPanel">
+    <p>Welcome to your admin tools. Choose an action below:</p>
+
+    <button class="btn" onclick="go('bookings.html')">📝 View Bookings</button>
+    <button class="btn" onclick="go('logs.html')">📊 View Logs</button>
+    <button class="btn" onclick="go('clinic-dashboard.html')">⚙️ Doctor Tools</button>
   </div>
 
-  <div class="locked" id="lockedMessage" style="display: none;">
-    ❌ Your 3-day free trial has expired.<br />Please contact the admin to continue using the system.
-  </div>
+  <p class="warning" id="lockMsg"></p>
 
   <script>
-    async function checkTrialStatus() {
+    async function checkAccess() {
       try {
-        const res = await fetch("plans.json");
-        const plans = await res.json();
-        const domain = location.hostname.split(".")[0];
-        const plan = plans[domain] || {};
-        const expiry = new Date(plan.expiry || "1970-01-01");
+        const res = await fetch('plans.json');
+        const data = await res.json();
+        const expiry = new Date(data.expiryDate);
         const today = new Date();
-        const override = plan.overrideLock === true;
+        const isLocked = today > expiry && !data.overrideLock;
 
-        if (today > expiry && !override) {
-          document.getElementById("mainContent").style.display = "none";
-          document.getElementById("lockedMessage").style.display = "block";
+        if (isLocked) {
+          window.location.href = "trial-expired.html";
+        } else {
+          document.getElementById("lockMsg").textContent = "✔️ Trial Active or Manually Unlocked";
         }
-      } catch (err) {
-        console.warn("Trial check skipped or failed.", err);
+      } catch (e) {
+        document.getElementById("lockMsg").textContent = "⚠️ Could not verify plan. Please check plans.json";
       }
     }
 
-    checkTrialStatus();
+    function go(page) {
+      window.location.href = page;
+    }
+
+    checkAccess();
   </script>
+
 </body>
 </html>
