@@ -2,74 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Clinic Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Appointment Logs</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f4f7f9;
-      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
       padding: 20px;
     }
     h1 {
-      text-align: center;
-      color: #1a237e;
+      color: #4CAF50;
+      font-size: 24px;
     }
-    #summary {
-      text-align: center;
-      color: #388e3c;
+    #error {
+      color: red;
       font-weight: bold;
-      margin-bottom: 20px;
-    }
-    .controls {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .controls button,
-    .controls input[type="date"] {
-      margin: 5px;
-      padding: 8px 14px;
-      font-size: 14px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
+      margin-top: 15px;
     }
     th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
+      border: 1px solid #555;
+      padding: 8px;
       text-align: left;
     }
     th {
-      background: #eee;
+      background-color: #333;
     }
-    .sent {
-      color: green;
-      font-weight: bold;
+    tr:nth-child(even) {
+      background-color: #222;
+    }
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Appointment Logs</h1>
-  <div id="summary">Loading...</div>
-
-  <div class="controls">
-    <button onclick="filterToday()">Today</button>
-    <button onclick="filterYesterday()">Yesterday</button>
-    <br>
-    <input type="date" id="startDate">
-    to
-    <input type="date" id="endDate">
-    <button onclick="applyFilter()">Apply</button>
-    <br>
-    <button onclick="exportCSV()">📁 Export CSV</button>
-    <button onclick="exportPDF()">📄 Export PDF</button>
-  </div>
-
-  <table id="logTable">
+  <h1 id="clinicTitle">Loading...</h1>
+  <div id="error" class="hidden">❌ Invalid or missing PIN. Access Denied.</div>
+  <table id="logsTable" class="hidden">
     <thead>
       <tr>
         <th>Date</th>
@@ -80,69 +54,70 @@
         <th>Clinic</th>
         <th>Token</th>
         <th>Reminder</th>
-        <th>Send</th>
+        <th>Reminder Sent</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="tableBody"></tbody>
   </table>
 
   <script>
-    const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
-    let allData = [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const pin = urlParams.get("pin");
 
-    async function fetchData() {
-      try {
-        const res = await fetch(csvUrl);
-        const text = await res.text();
-        const parsed = Papa.parse(text, { header: true });
-        allData = parsed.data.filter(row => row.Date && row.Time); // skip blanks
-        renderTable(allData);
-        updateSummary(allData);
-      } catch (e) {
-        console.error("Error loading CSV:", e);
-      }
+    const plansURL = "plans.json"; // must be in same folder or adjust path
+    const clinicTitle = document.getElementById("clinicTitle");
+    const errorBox = document.getElementById("error");
+    const table = document.getElementById("logsTable");
+    const tableBody = document.getElementById("tableBody");
+
+    if (!pin) {
+      clinicTitle.textContent = "Access Denied";
+      errorBox.classList.remove("hidden");
+    } else {
+      fetch(plansURL)
+        .then(res => res.json())
+        .then(data => {
+          if (!data[pin]) {
+            clinicTitle.textContent = "Invalid PIN";
+            errorBox.classList.remove("hidden");
+            return;
+          }
+
+          const clinicName = data[pin].clinic || "Clinic";
+          const file = data[pin].file || "logs.csv";
+
+          clinicTitle.textContent = `📋 Logs for ${clinicName}`;
+
+          fetch(file)
+            .then(res => res.text())
+            .then(csv => {
+              const rows = csv.trim().split("\n").slice(1); // skip header
+              tableBody.innerHTML = "";
+              for (let row of rows) {
+                const cols = row.split(",");
+                const tr = document.createElement("tr");
+                cols.forEach(col => {
+                  const td = document.createElement("td");
+                  td.textContent = col.trim();
+                  tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+              }
+              table.classList.remove("hidden");
+            })
+            .catch(() => {
+              clinicTitle.textContent = "❌ Log file not found!";
+              errorBox.classList.remove("hidden");
+            });
+        })
+        .catch(() => {
+          clinicTitle.textContent = "❌ Failed to load plans.json!";
+          errorBox.classList.remove("hidden");
+        });
     }
-
-    function renderTable(data) {
-      const tbody = document.querySelector("#logTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.Date}</td>
-          <td>${row.Time}</td>
-          <td>${row.Name}</td>
-          <td>${row.Reason}</td>
-          <td><a href="tel:${row.Contact}">${row.Contact}</a></td>
-          <td>${row.Clinic}</td>
-          <td>${row.Token}</td>
-          <td class="${row["Reminder Sent"] === "Sent" ? "sent" : ""}">${row["Reminder Sent"] || "Not Sent"}</td>
-          <td><button onclick="sendReminder('${row.Name}', '${row.Time}', '${row.Reason}', '${row.Contact}', '${row.Token}', this)">Send Reminder</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function updateSummary(data) {
-      const today = new Date().toISOString().split("T")[0];
-      const todayBookings = data.filter(d => d.Date === today).length;
-      const nextToken = todayBookings + 1;
-      document.getElementById("summary").textContent =
-        `✅ Bookings Today: ${todayBookings} | Next Token: ${nextToken}`;
-    }
-
-    function filterToday() {
-      const today = new Date().toISOString().split("T")[0];
-      const filtered = allData.filter(d => d.Date === today);
-      renderTable(filtered);
-      updateSummary(filtered);
-    }
-
-    function filterYesterday() {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      const yest = d.toISOString().split("T")[0];
-      const filtered = allData.filter(d => d.Date === yest);
+  </script>
+</body>
+</html>      const filtered = allData.filter(d => d.Date === yest);
       renderTable(filtered);
       updateSummary(filtered);
     }
