@@ -3,82 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bookings - Clinic Admin</title>
+  <title>Patient Bookings</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="trial.js"></script>
   <style>
     body {
-      background-color: #000;
+      background: #111;
       color: #fff;
       font-family: Arial, sans-serif;
       padding: 20px;
     }
-    header {
+    h2 {
       text-align: center;
       margin-bottom: 20px;
+      color: #f0ad4e;
     }
-    img {
-      height: 60px;
-      margin-bottom: 10px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
     }
-    h1 {
-      color: #00ffff;
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #333;
     }
-    .booking-log {
-      background: #111;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 0 8px #0ff;
+    th {
+      background-color: #222;
     }
-    .slot {
-      margin: 10px 0;
-      padding: 10px;
-      background: #222;
-      border-left: 5px solid #00e6e6;
-      border-radius: 5px;
+    button {
+      padding: 6px 12px;
+      border: none;
+      background-color: #28a745;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .reminder-btn {
+      background-color: #25D366;
+      margin-left: 8px;
+    }
+    .reminder-btn:hover {
+      background-color: #1da851;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo-bookings.png" alt="Logo" />
-    <h1>📅 Patient Bookings</h1>
-  </header>
+  <h2>Today's Patient Bookings</h2>
+  <table id="bookingTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Time</th>
+        <th>Reason</th>
+        <th>Reminder</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Bookings will load here -->
+    </tbody>
+  </table>
 
-  <div class="booking-log" id="bookingContainer">
-    Loading bookings...
-  </div>
-
-  <script src="trial.js"></script>
   <script>
-    const BOOKINGS_CSV = "Logs.csv"; // Update path if needed
+    const sheetUrl = 'https://warangalonepoint.github.io/clinic-bot-system/Slots.csv';
 
-    async function loadBookings() {
-      try {
-        const res = await fetch(BOOKINGS_CSV);
-        const text = await res.text();
-        const rows = text.trim().split('\n').slice(1); // Skip header
-
-        const container = document.getElementById("bookingContainer");
-        container.innerHTML = "";
+    fetch(sheetUrl)
+      .then(response => response.text())
+      .then(data => {
+        const rows = data.split('\n').slice(1);
+        const tbody = document.querySelector('#bookingTable tbody');
 
         rows.forEach(row => {
-          const cols = row.split(",");
-          const [timestamp, name, reason, slot] = cols;
-          const div = document.createElement("div");
-          div.className = "slot";
-          div.innerHTML = `<strong>${name}</strong> booked <em>${slot}</em><br/><small>${reason} | ${timestamp}</small>`;
-          container.appendChild(div);
+          const [date, time, name, reason, status] = row.split(',');
+
+          if (status?.trim().toLowerCase() === 'booked') {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${name || ''}</td>
+              <td>${time || ''}</td>
+              <td>${reason || ''}</td>
+              <td>
+                <button class="reminder-btn" onclick="sendWhatsAppReminder('${name}', '${time}', '${reason}')">Send Reminder</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          }
         });
+      });
 
-        if (rows.length === 0) {
-          container.innerHTML = "No bookings yet.";
-        }
-      } catch (err) {
-        document.getElementById("bookingContainer").innerText = "Error loading bookings.";
-        console.error(err);
-      }
+    function sendWhatsAppReminder(name, time, reason) {
+      const msg = `Hello ${name},\nThis is a reminder for your appointment today at ${time} for: ${reason}.\nPlease be on time.\n- Warangal OneStop Clinic`;
+      const encodedMsg = encodeURIComponent(msg);
+      const phone = ''; // Leave blank or add default if you want
+      window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
     }
-
-    loadBookings();
   </script>
 </body>
 </html>
