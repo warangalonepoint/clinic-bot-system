@@ -1,27 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- logs.html - Sprint 10: Summary Panel + Date Filters --><!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appointment Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <title>Appointment Logs</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { background-color: #111; color: #fff; padding: 20px; font-family: Arial, sans-serif; }
-    table { color: #fff; }
-    .btn { margin-right: 10px; margin-bottom: 10px; }
-    h2 { color: #f0ad4e; margin-bottom: 20px; }
+    body {
+      background-color: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 { color: #f0ad4e; }
+    .btn-export { margin: 10px 10px 20px 0; }
+    .summary-box { background: #222; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+    .summary-box h5 { margin: 0; color: #f0ad4e; }
+    table.table-dark th, table.table-dark td { vertical-align: middle; }
+    .filter-btns .btn { margin-right: 10px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <h2>Appointment Logs</h2>
+  <h1>Appointment Logs</h1>  <!-- Summary Panel -->  <div class="summary-box">
+    <div class="row text-center">
+      <div class="col"><h5>Total Bookings</h5><div id="totalBookings">-</div></div>
+      <div class="col"><h5>Reminders Sent</h5><div id="remindersSent">-</div></div>
+      <div class="col"><h5>Pending Reminders</h5><div id="remindersPending">-</div></div>
+    </div>
+  </div>  <!-- Filter Buttons -->  <div class="filter-btns mb-3">
+    <button class="btn btn-outline-warning" onclick="filterToday()">Today</button>
+    <button class="btn btn-outline-info" onclick="filterYesterday()">Yesterday</button>
+    <button class="btn btn-outline-light" onclick="resetFilters()">Show All</button>
+  </div>  <!-- Export Buttons --><button class="btn btn-success btn-export" onclick="exportToExcel()">Export to Excel</button> <button class="btn btn-danger btn-export" onclick="exportToPDF()">Export to PDF</button>
 
-  <div class="mb-3">
-    <button class="btn btn-success" onclick="exportToExcel()">Export to Excel</button>
-    <button class="btn btn-danger" onclick="exportToPDF()">Export to PDF</button>
-  </div>
-
-  <div class="table-responsive">
-    <table id="logsTable" class="table table-bordered table-striped">
+  <!-- Logs Table -->  <div class="table-responsive">
+    <table class="table table-dark table-bordered text-center" id="logsTable">
       <thead>
         <tr>
           <th>Date</th>
@@ -34,46 +47,92 @@
       </thead>
       <tbody id="logsBody"></tbody>
     </table>
-  </div>
+  </div>  <script>
+    let allLogs = [];
+    let filteredLogs = [];
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    async function loadLogs() {
+      const response = await fetch('logs.csv');
+      const data = await response.text();
+      const lines = data.trim().split('\n');
+      const rows = lines.slice(1).map(row => row.split(','));
+      allLogs = rows;
+      filteredLogs = rows;
+      renderLogs();
+      updateSummary();
+    }
 
-  <script>
-    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
-
-    fetch(CSV_URL)
-      .then(response => response.text())
-      .then(csv => {
-        const data = Papa.parse(csv, { header: true }).data;
-        const tbody = document.getElementById("logsBody");
-        data.forEach(row => {
-          if (row.Date) {
-            const tr = document.createElement("tr");
-            Object.values(row).forEach(value => {
-              const td = document.createElement("td");
-              td.textContent = value;
-              tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-          }
+    function renderLogs() {
+      const tbody = document.getElementById('logsBody');
+      tbody.innerHTML = '';
+      filteredLogs.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(col => {
+          const td = document.createElement('td');
+          td.textContent = col.trim();
+          tr.appendChild(td);
         });
+        tbody.appendChild(tr);
       });
+    }
+
+    function updateSummary() {
+      const total = filteredLogs.length;
+      const sent = filteredLogs.filter(row => row[5].toLowerCase() === 'yes').length;
+      const pending = total - sent;
+      document.getElementById('totalBookings').textContent = total;
+      document.getElementById('remindersSent').textContent = sent;
+      document.getElementById('remindersPending').textContent = pending;
+    }
+
+    function filterToday() {
+      const today = new Date().toISOString().split('T')[0];
+      filteredLogs = allLogs.filter(row => row[0] === today);
+      renderLogs();
+      updateSummary();
+    }
+
+    function filterYesterday() {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      filteredLogs = allLogs.filter(row => row[0] === yesterday);
+      renderLogs();
+      updateSummary();
+    }
+
+    function resetFilters() {
+      filteredLogs = allLogs;
+      renderLogs();
+      updateSummary();
+    }
 
     function exportToExcel() {
-      const table = document.getElementById("logsTable");
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Logs" });
-      XLSX.writeFile(wb, "AppointmentLogs.xlsx");
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([
+        ['Date','Time','Patient Name','Reason','Status','Reminder Sent'],
+        ...filteredLogs
+      ]);
+      XLSX.utils.book_append_sheet(wb, ws, 'Logs');
+      XLSX.writeFile(wb, 'Appointment_Logs.xlsx');
     }
 
-    function exportToPDF() {
+    async function exportToPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.autoTable({ html: '#logsTable' });
-      doc.save("AppointmentLogs.pdf");
+      let y = 10;
+      doc.setFontSize(12);
+      doc.text('Appointment Logs', 14, y);
+      y += 10;
+      filteredLogs.forEach(row => {
+        doc.text(row.join(' | '), 14, y);
+        y += 8;
+        if (y > 280) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+      doc.save('Appointment_Logs.pdf');
     }
-  </script>
-</body>
+
+    loadLogs();
+  </script></body>
 </html>
