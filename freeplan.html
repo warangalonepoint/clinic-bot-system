@@ -1,75 +1,61 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BookingBot - Free Plan</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="freeplan.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Free Plan - BookingBot</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #111;
-      color: #fff;
+      color: white;
       margin: 0;
-      padding: 0;
-    }
-    header, footer {
-      background-color: #222;
-      padding: 10px 20px;
-      text-align: center;
-    }
-    h1 {
-      color: #4dc1ff;
-      margin: 0;
-    }
-    main {
       padding: 20px;
     }
-    .locked {
-      opacity: 0.4;
-      pointer-events: none;
+    h1 {
+      text-align: center;
+      color: #00bcd4;
     }
-    .upgrade-hint {
-      color: orange;
-      font-size: 0.9em;
-      margin-top: 5px;
+    .features {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+    }
+    .back a {
+      color: #4dc1ff;
+      text-decoration: none;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Clinic Dashboard – Free Plan</h1>
-  </header>
-  <main>
-    <section>
-      <h2>📋 Appointment Logs</h2>
-      <p>View and manage daily bookings.</p>
-      <iframe src="logs.html" width="100%" height="400px"></iframe>
-    </section><section>
-  <h2>🧑‍⚕️ Staff Attendance</h2>
-  <iframe src="staff.html" width="100%" height="300px"></iframe>
-</section>
+  <h1>Free Plan Activated ✅</h1>
 
-<section class="locked">
-  <h2>📤 Export Logs</h2>
-  <button disabled>Export to Excel</button>
-  <div class="upgrade-hint">Upgrade to Paid or Premium to unlock export feature.</div>
-</section>
+  <div class="features">
+    <h2>Included Features</h2>
+    <ul>
+      <li>📋 Public booking page</li>
+      <li>📅 View available slots (via CSV)</li>
+      <li>💬 WhatsApp booking with prefilled messages</li>
+      <li>🧾 Manual appointment confirmation by doctor</li>
+      <li>🔄 Clinic staff updates slot sheet manually</li>
+      <li>📁 Basic logs view (no export)</li>
+    </ul>
+    <p><strong>Note:</strong> This plan is best suited for clinics looking for a simple, no-tech, WhatsApp-first appointment booking solution.</p>
+  </div>
 
-<section class="locked">
-  <h2>📲 Send WhatsApp Reminders</h2>
-  <button disabled>Send Reminder</button>
-  <div class="upgrade-hint">Available in Paid and Premium Plans.</div>
-</section>
-
-<section class="locked">
-  <h2>📊 Daily Summary</h2>
-  <p>Unlock analytics and booking trends with Premium.</p>
-</section>
-
-  </main>
-  <footer>
-    <p>&copy; 2025 BookingBot by WarangalOneStop.in</p>
-  </footer>
+  <div class="back">
+    <a href="test.html">🔙 Back to PIN Activation</a>
+  </div>
 </body>
 </html>
