@@ -71,108 +71,109 @@
   </table>
 
   <script>
-    const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+    <script>
+  const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
 
-    async function fetchCSV() {
-      const res = await fetch(csvUrl);
-      const text = await res.text();
-      return text.trim().split("\n").slice(1).map(row => row.split(","));
+  async function fetchCSV() {
+    const res = await fetch(csvUrl);
+    const text = await res.text();
+    return text.trim().split("\n").slice(1).map(row => row.split(","));
+  }
+
+  function formatDate(d) {
+    return d.toISOString().split('T')[0];
+  }
+
+  function populateDateDropdowns() {
+    const fromSel = document.getElementById("fromDate");
+    const toSel = document.getElementById("toDate");
+    for (let i = 0; i < 60; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const val = formatDate(date);
+      const opt = `<option value="${val}">${val}</option>`;
+      fromSel.innerHTML += opt;
+      toSel.innerHTML += opt;
     }
+    fromSel.selectedIndex = 30;
+    toSel.selectedIndex = 0;
+  }
 
-    function formatDate(d) {
-      return d.toISOString().split('T')[0];
-    }
+  function applyFilter() {
+    const from = document.getElementById("fromDate").value;
+    const to = document.getElementById("toDate").value;
+    loadLogs(from, to);
+  }
 
-    function populateDateDropdowns() {
-      const fromSel = document.getElementById("fromDate");
-      const toSel = document.getElementById("toDate");
-      for (let i = 0; i < 60; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const val = formatDate(date);
-        const opt = `<option value="${val}">${val}</option>`;
-        fromSel.innerHTML += opt;
-        toSel.innerHTML += opt;
+  function filterToday() {
+    const today = formatDate(new Date());
+    document.getElementById("fromDate").value = today;
+    document.getElementById("toDate").value = today;
+    loadLogs(today, today);
+  }
+
+  function filterYesterday() {
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    const yd = formatDate(y);
+    document.getElementById("fromDate").value = yd;
+    document.getElementById("toDate").value = yd;
+    loadLogs(yd, yd);
+  }
+
+  function sendReminder(name, time, reason, contact, token, row) {
+    const msg = `Hello ${name}, this is a reminder for your appointment today at ${time} for ${reason} with Token #${token}. - OneStop Clinic`;
+    const url = `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+
+    row.querySelector(".reminder-status").textContent = "Sent";
+  }
+
+  function exportCSV() {
+    window.open(csvUrl, "_blank");
+  }
+
+  function exportPDF() {
+    window.print();
+  }
+
+  async function loadLogs(startDate, endDate) {
+    const data = await fetchCSV();
+    const tbody = document.querySelector("#logTable tbody");
+    tbody.innerHTML = "";
+
+    const today = formatDate(new Date());
+    let bookingsToday = 0;
+    let nextToken = 1;
+
+    data.forEach(row => {
+      const [date, time, name, reason, contact, clinic, token, reminder] = row;
+      if (date >= startDate && date <= endDate) {
+        if (date === today) bookingsToday++;
+        if (parseInt(token) >= nextToken) nextToken = parseInt(token) + 1;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${date}</td>
+          <td>${time}</td>
+          <td>${name}</td>
+          <td>${reason}</td>
+          <td><a href="tel:${contact}">${contact}</a></td>
+          <td>${clinic}</td>
+          <td>${token}</td>
+          <td class="reminder-status">${reminder}</td>
+          <td><button onclick="sendReminder('${name}', '${time}', '${reason}', '${contact}', '${token}', this.parentElement.parentElement)">Send Reminder</button></td>
+        `;
+        tbody.appendChild(tr);
       }
-      fromSel.selectedIndex = 30;
-      toSel.selectedIndex = 0;
-    }
+    });
 
-    function applyFilter() {
-      const from = document.getElementById("fromDate").value;
-      const to = document.getElementById("toDate").value;
-      loadLogs(from, to);
-    }
+    document.getElementById("summary").textContent = `✅ Bookings Today: ${bookingsToday} | Next Token: ${nextToken}`;
+  }
 
-    function filterToday() {
-      const today = formatDate(new Date());
-      document.getElementById("fromDate").value = today;
-      document.getElementById("toDate").value = today;
-      loadLogs(today, today);
-    }
-
-    function filterYesterday() {
-      const y = new Date();
-      y.setDate(y.getDate() - 1);
-      const yd = formatDate(y);
-      document.getElementById("fromDate").value = yd;
-      document.getElementById("toDate").value = yd;
-      loadLogs(yd, yd);
-    }
-
-    function sendReminder(name, time, reason, contact, token, row) {
-      const msg = `Hello ${name}, this is a reminder for your appointment today at ${time} for ${reason} with Token #${token}. - OneStop Clinic`;
-      const url = `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
-
-      row.querySelector(".reminder-status").textContent = "Sent";
-    }
-
-    function exportCSV() {
-      window.open(csvUrl, "_blank");
-    }
-
-    function exportPDF() {
-      window.print();
-    }
-
-    async function loadLogs(startDate, endDate) {
-      const data = await fetchCSV();
-      const tbody = document.querySelector("#logTable tbody");
-      tbody.innerHTML = "";
-
-      const today = formatDate(new Date());
-      let bookingsToday = 0;
-      let nextToken = 1;
-
-      data.forEach(row => {
-        const [date, time, name, reason, contact, clinic, token, reminder] = row;
-        if (date >= startDate && date <= endDate) {
-          if (date === today) bookingsToday++;
-          if (parseInt(token) >= nextToken) nextToken = parseInt(token) + 1;
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${name}</td>
-            <td>${reason}</td>
-            <td><a href="tel:${contact}">${contact}</a></td>
-            <td>${clinic}</td>
-            <td>${token}</td>
-            <td class="reminder-status">${reminder}</td>
-            <td><button onclick="sendReminder('${name}', '${time}', '${reason}', '${contact}', '${token}', this.parentElement.parentElement)">Send Reminder</button></td>
-          `;
-          tbody.appendChild(tr);
-        }
-      });
-
-      document.getElementById("summary").textContent = `✅ Bookings Today: ${bookingsToday} | Next Token: ${nextToken}`;
-    }
-
-    populateDateDropdowns();
-    filterToday();
-  </script>
+  populateDateDropdowns();
+  filterToday();
+</script>
 </body>
 </html>        `✅ Bookings Today: ${todayCount} | Next Token: ${nextToken}`;
     }
