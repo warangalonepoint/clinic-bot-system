@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="logo.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="logo.png" type="image/png" />
   <style>
     body {
       background-color: #111;
       color: #fff;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
     header {
@@ -20,14 +20,14 @@
       justify-content: space-between;
     }
     #clinicLogo {
-      max-width: 180px;
-      padding: 10px;
+      height: 60px;
+      width: auto;
     }
     h1 {
-      font-size: 24px;
+      font-size: 22px;
     }
     .info {
-      margin-top: 20px;
+      margin-top: 30px;
     }
     .locked {
       color: red;
@@ -39,29 +39,26 @@
 </head>
 <body>
   <header>
-    <img id="clinicLogo" src="logo.png" alt="Clinic Logo">
+    <!-- ✅ Ensure logo is present with the correct ID -->
+    <img id="clinicLogo" src="logo.png" alt="Clinic Logo" />
     <h1>📊 Dashboard</h1>
   </header>
 
   <div class="info" id="mainContent">
-    <!-- Actual dashboard content goes here -->
-    <p>Welcome to your clinic dashboard. Use the menu to manage your system.</p>
+    <p>Welcome to the Clinic Admin Dashboard. Use this panel to manage operations.</p>
   </div>
 
   <div class="locked" id="lockedMessage" style="display: none;">
-    🔒 Your 3-day free trial has expired.<br>
-    Contact the admin to unlock full access.
+    🔒 Your 3-day free trial has expired.<br>Please contact the admin to continue using the system.
   </div>
 
   <script>
     async function checkTrialStatus() {
       try {
-        const response = await fetch('plans.json');
-        const plans = await response.json();
-        const url = window.location.href;
-        const clinicKey = url.split("/")[2].split(".")[0]; // fallback logic
-
-        const plan = plans[clinicKey] || {};
+        const res = await fetch('plans.json');
+        const plans = await res.json();
+        const domain = location.hostname.split('.')[0]; // e.g. warangalonepoint
+        const plan = plans[domain] || {};
         const expiry = new Date(plan.expiry || '1970-01-01');
         const today = new Date();
         const override = plan.overrideLock === true;
@@ -70,8 +67,8 @@
           document.getElementById("mainContent").style.display = "none";
           document.getElementById("lockedMessage").style.display = "block";
         }
-      } catch (e) {
-        console.error("Trial check failed:", e);
+      } catch (err) {
+        console.warn("Trial check skipped or failed.", err);
       }
     }
 
