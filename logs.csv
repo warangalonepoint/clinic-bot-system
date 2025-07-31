@@ -1,51 +1,52 @@
-Date,Time,Name,Reason,Contact,Reminder Sent
-01-07-2025,09:00,Anita Reddy,Fever,9876543210,Sent
-01-07-2025,09:10,Ravi Teja,Back Pain,9876543211,Not Sent
-02-07-2025,09:20,Kiran Kumar,Checkup,9876543212,Sent
-02-07-2025,09:30,Meena Devi,Diabetes,9876543213,Not Sent
-03-07-2025,09:40,Naresh Yadav,Cough,9876543214,Sent
-03-07-2025,09:50,Sunita Rani,Cold,9876543215,Not Sent
-04-07-2025,10:00,Rajesh Das,Fever,9876543216,Sent
-04-07-2025,10:10,Sneha Joshi,Checkup,9876543217,Not Sent
-05-07-2025,10:20,Ajay Varma,Injury,9876543218,Sent
-05-07-2025,10:30,Priya Jain,Fever,9876543219,Not Sent
-06-07-2025,10:40,Satish Rao,Headache,9876543220,Sent
-06-07-2025,10:50,Kavya Nair,Cough,9876543221,Not Sent
-07-07-2025,11:00,Nikhil Sharma,Fever,9876543222,Sent
-07-07-2025,11:10,Rupa Sinha,Allergy,9876543223,Not Sent
-08-07-2025,11:20,Manoj Pillai,Checkup,9876543224,Sent
-08-07-2025,11:30,Nandini Das,Stomach Pain,9876543225,Not Sent
-09-07-2025,11:40,Ramesh Babu,Fever,9876543226,Sent
-09-07-2025,11:50,Deepa Menon,Back Pain,9876543227,Not Sent
-10-07-2025,12:00,Gopal Reddy,Cold,9876543228,Sent
-10-07-2025,12:10,Tina Roy,Injury,9876543229,Not Sent
-11-07-2025,12:20,Vikram Singh,Checkup,9876543230,Sent
-11-07-2025,12:30,Radha Patil,Diabetes,9876543231,Not Sent
-12-07-2025,12:40,Sameer Jain,Stomach Ache,9876543232,Sent
-12-07-2025,12:50,Rekha Shetty,Fever,9876543233,Not Sent
-13-07-2025,13:00,Suresh Gupta,Cold,9876543234,Sent
-13-07-2025,13:10,Shilpa Rao,Cough,9876543235,Not Sent
-14-07-2025,13:20,Arun Menon,Checkup,9876543236,Sent
-14-07-2025,13:30,Preeti Verma,Injury,9876543237,Not Sent
-15-07-2025,13:40,Amitabh Sinha,Back Pain,9876543238,Sent
-15-07-2025,13:50,Lakshmi Iyer,Fever,9876543239,Not Sent
-16-07-2025,14:00,Chandan Babu,Cold,9876543240,Sent
-16-07-2025,14:10,Divya Rani,Stomach Pain,9876543241,Not Sent
-17-07-2025,14:20,Mohan Das,Cough,9876543242,Sent
-17-07-2025,14:30,Bhavya Reddy,Checkup,9876543243,Not Sent
-18-07-2025,14:40,Ganesh Reddy,Fever,9876543244,Sent
-18-07-2025,14:50,Nikita Jain,Cold,9876543245,Not Sent
-19-07-2025,15:00,Sanjay Joshi,Diabetes,9876543246,Sent
-19-07-2025,15:10,Kritika Singh,Injury,9876543247,Not Sent
-20-07-2025,15:20,Vivek Agarwal,Checkup,9876543248,Sent
-20-07-2025,15:30,Nisha Rao,Back Pain,9876543249,Not Sent
-21-07-2025,15:40,Hemant Mehta,Fever,9876543250,Sent
-21-07-2025,15:50,Shweta Patil,Cold,9876543251,Not Sent
-22-07-2025,16:00,Rahul Vyas,Cough,9876543252,Sent
-22-07-2025,16:10,Anjali Nair,Checkup,9876543253,Not Sent
-23-07-2025,16:20,Rajan Iyer,Stomach Ache,9876543254,Sent
-23-07-2025,16:30,Maya Pillai,Fever,9876543255,Not Sent
-24-07-2025,16:40,Devendra Reddy,Back Pain,9876543256,Sent
-24-07-2025,16:50,Pooja Shah,Cold,9876543257,Not Sent
-25-07-2025,17:00,Krishna Rao,Injury,9876543258,Sent
-25-07-2025,17:10,Shruthi Menon,Cough,9876543259,Not Sent
+Date,Time,Patient Name,Reason,Status,Reminder Sent
+31-07-2025,10:00 AM,Aarav Sharma,Fever,Booked,Yes
+31-07-2025,10:10 AM,Diya Mehra,Checkup,Booked,Yes
+31-07-2025,10:20 AM,Vedant Reddy,Injury,Booked,No
+30-07-2025,5:00 PM,Kavya Patel,Consultation,Booked,Yes
+30-07-2025,5:10 PM,Anaya Singh,Flu,Booked,Yes
+30-07-2025,5:20 PM,Ishaan Kumar,Headache,Booked,No
+29-07-2025,6:00 PM,Meera Jain,Back Pain,Booked,Yes
+29-07-2025,6:10 PM,Atharv Das,General Checkup,Booked,No
+29-07-2025,6:20 PM,Sanya Ghosh,Cough,Booked,Yes
+28-07-2025,4:00 PM,Reyansh Verma,Cold,Booked,Yes
+28-07-2025,4:10 PM,Prisha Rao,Follow-up,Booked,No
+28-07-2025,4:20 PM,Ritvik Joshi,Vaccination,Booked,Yes
+27-07-2025,11:00 AM,Navya Nair,Injury,Booked,Yes
+27-07-2025,11:10 AM,Tanvi Bansal,Dental Pain,Booked,No
+27-07-2025,11:20 AM,Ayaan Shetty,Consultation,Booked,Yes
+26-07-2025,3:00 PM,Ira Kapoor,Allergy,Booked,Yes
+26-07-2025,3:10 PM,Arjun Pillai,Chest Pain,Booked,No
+26-07-2025,3:20 PM,Kiara Sen,Flu,Booked,Yes
+25-07-2025,9:00 AM,Dev Bhatt,Checkup,Booked,Yes
+25-07-2025,9:10 AM,Rhea Iyer,Back Pain,Booked,No
+25-07-2025,9:20 AM,Nikhil Sinha,Headache,Booked,Yes
+24-07-2025,6:00 PM,Mira Khanna,Eye Pain,Booked,Yes
+24-07-2025,6:10 PM,Aditya Roy,Throat Infection,Booked,Yes
+24-07-2025,6:20 PM,Avni Jaiswal,Follow-up,Booked,No
+23-07-2025,5:00 PM,Vihaan Gupta,Cold,Booked,Yes
+23-07-2025,5:10 PM,Anika Deshmukh,General Checkup,Booked,Yes
+23-07-2025,5:20 PM,Manan Agarwal,Flu,Booked,No
+22-07-2025,10:00 AM,Saanvi Malhotra,Dental Issue,Booked,Yes
+22-07-2025,10:10 AM,Rudra Goel,Consultation,Booked,Yes
+22-07-2025,10:20 AM,Ishita Chopra,Fever,Booked,No
+21-07-2025,11:00 AM,Tanishq Rathi,Headache,Booked,Yes
+21-07-2025,11:10 AM,Krisha Dubey,Back Pain,Booked,Yes
+21-07-2025,11:20 AM,Om Sharma,Consultation,Booked,No
+20-07-2025,4:00 PM,Jiya Saxena,Flu,Booked,Yes
+20-07-2025,4:10 PM,Aarush Chawla,Fever,Booked,Yes
+20-07-2025,4:20 PM,Myra Pandey,Follow-up,Booked,No
+19-07-2025,3:00 PM,Arnav Mathur,Cold,Booked,Yes
+19-07-2025,3:10 PM,Sharvani Joshi,Dental,Booked,Yes
+19-07-2025,3:20 PM,Yug Sharma,Injury,Booked,No
+18-07-2025,5:00 PM,Advika Reddy,Consultation,Booked,Yes
+18-07-2025,5:10 PM,Neil Bhatia,Flu,Booked,No
+18-07-2025,5:20 PM,Trisha Menon,Eye Pain,Booked,Yes
+17-07-2025,10:00 AM,Shaurya Singh,Allergy,Booked,Yes
+17-07-2025,10:10 AM,Aalia Shah,Cold,Booked,No
+17-07-2025,10:20 AM,Yuvaan Yadav,Fever,Booked,Yes
+16-07-2025,9:00 AM,Amaya Raj,Injury,Booked,Yes
+16-07-2025,9:10 AM,Aryan Das,Back Pain,Booked,Yes
+16-07-2025,9:20 AM,Inaaya Mehta,Consultation,Booked,No
+15-07-2025,2:00 PM,Zayan Khan,Cough,Booked,Yes
+15-07-2025,2:10 PM,Pari Kaur,Checkup,Booked,Yes
+15-07-2025,2:20 PM,Atharva Patil,Flu,Booked,No
