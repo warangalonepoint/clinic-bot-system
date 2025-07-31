@@ -2,147 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BookingBot - Premium Plan</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookingBot – Premium Plan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000">
+  <link rel="apple-touch-icon" href="logo-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     body {
+      background-color: #111;
       font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #fff;
-      padding: 20px;
+      color: #eee;
+      padding: 1rem;
     }
-
-    h1 {
-      font-size: 22px;
-      color: #00e1ff;
-      margin-bottom: 10px;
+    h2 {
+      text-align: center;
+      color: #fcd34d;
+      margin-bottom: 1rem;
     }
-
-    .summary {
-      margin: 20px 0;
-      background: #181818;
-      padding: 15px;
-      border-radius: 8px;
+    .filter {
+      text-align: center;
+      margin-bottom: 1rem;
     }
-
-    .summary span {
+    .log-card {
+      background-color: #1f1f1f;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 5px #000;
+    }
+    .log-card span {
       display: block;
       margin-bottom: 6px;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      font-size: 13px;
-    }
-
-    th, td {
-      border: 1px solid #444;
-      padding: 8px;
-      text-align: center;
-    }
-
-    th {
-      background: #222;
-      color: #0ff;
-    }
-
-    button {
-      background: #28a745;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      margin: 5px 10px 15px 0;
+    .btn {
+      background-color: #fcd34d;
+      color: #000;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-right: 10px;
       cursor: pointer;
     }
-
-    .footer {
-      margin-top: 20px;
+    footer {
+      text-align: center;
       font-size: 12px;
+      margin-top: 2rem;
       color: #aaa;
     }
   </style>
 </head>
 <body>
-  <h1>💎 BookingBot – Premium Plan</h1>
-  <div id="clinicName"></div>
+  <h2>📊 Premium Clinic Dashboard</h2>
 
-  <div>
-    <button onclick="exportCSV()">⬇ Export CSV</button>
-    <button onclick="sendReminders()">📤 Send WhatsApp Reminders</button>
+  <div class="filter">
+    <label for="dateFilter">📅 Select Date:</label>
+    <input type="date" id="dateFilter" />
+    <button class="btn" onclick="loadLogs()">Apply</button>
   </div>
 
-  <div class="summary" id="summaryPanel">
-    <strong>📅 Daily Summary</strong>
-    <span>Total Bookings: —</span>
-    <span>Reminders Sent: —</span>
-    <span>Top 3 Reasons: —</span>
-  </div>
+  <div id="logContainer">Loading logs...</div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Name</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Token</th>
-        <th>Reminder Sent</th>
-      </tr>
-    </thead>
-    <tbody id="logsBody">
-      <tr><td colspan="7">Loading...</td></tr>
-    </tbody>
-  </table>
-
-  <div class="footer">⚙️ WarangalOneStop BookingBot – Premium Clinic Access</div>
+  <footer>
+    BookingBot Premium – Powered by WarangalOneStop.in
+  </footer>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const pin = urlParams.get("pin");
-    let clinic = "";
+    const pin = new URLSearchParams(location.search).get("pin") || "2525";
+    const fileMap = {
+      "1234": "clinic1-logs.csv",
+      "2525": "clinic2-logs.csv",
+      "9999": "clinic3-logs.csv"
+    };
+    const csvFile = fileMap[pin] || "clinic1-logs.csv";
 
-    fetch("plans.json")
-      .then(res => res.json())
-      .then(data => {
-        if (data[pin]) {
-          clinic = data[pin].clinic.toLowerCase().replace(/\s+/g, "-");
-          document.getElementById("clinicName").innerText = "Clinic: " + data[pin].clinic;
-          fetch(`https://warangalonepoint.github.io/clinic-bot-system/${clinic}-logs.csv`)
-            .then(res => res.text())
-            .then(csv => {
-              const rows = csv.trim().split("\n").slice(1);
-              const body = document.getElementById("logsBody");
-              let total = 0;
-              let reminderCount = 0;
-              let reasonMap = {};
-              body.innerHTML = "";
+    function sendReminder(name, number, token) {
+      const message = `Reminder: Token No. ${token} – Your appointment is today. Please arrive on time.`;
+      const waLink = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+      window.open(waLink, '_blank');
+    }
 
-              rows.forEach(row => {
-                const [date, time, name, reason, contact, , token, , reminderSent] = row.split(",");
-                total++;
-                if (reminderSent && reminderSent.toLowerCase().includes("yes")) reminderCount++;
-                reasonMap[reason] = (reasonMap[reason] || 0) + 1;
+    async function loadLogs() {
+      const selectedDate = document.getElementById("dateFilter").value;
+      const res = await fetch(csvFile);
+      const data = await res.text();
 
-                const tr = document.createElement("tr");
-                tr.innerHTML = `<td>${date}</td><td>${time}</td><td>${name}</td><td>${reason}</td><td><a href="tel:${contact}">${contact}</a></td><td>#${token}</td><td>${reminderSent}</td>`;
-                body.appendChild(tr);
-              });
+      const rows = data.trim().split("\n").slice(1);
+      const html = rows
+        .map(r => r.split(","))
+        .filter(([date]) => !selectedDate || date === selectedDate)
+        .map(([date, time, name, reason, contact, clinic, token, reminder, reminderSent]) => `
+          <div class="log-card">
+            <span><strong>Date:</strong> ${date}</span>
+            <span><strong>Token:</strong> #${token}</span>
+            <span><strong>Name:</strong> ${name}</span>
+            <span><strong>Time:</strong> ${time}</span>
+            <span><strong>Reason:</strong> ${reason}</span>
+            <span><strong>Contact:</strong> ${contact}</span>
+            <span><strong>Reminder Sent:</strong> ${reminderSent || "No"}</span>
+            <button class="btn" onclick="sendReminder('${name}','${contact}','${token}')">Send Reminder</button>
+          </div>
+        `).join("");
 
-              const topReasons = Object.entries(reasonMap)
-                .sort((a,b) => b[1] - a[1])
-                .slice(0, 3)
-                .map(e => `${e[0]} (${e[1]})`)
-                .join(", ");
+      document.getElementById("logContainer").innerHTML = html || "No bookings found.";
+    }
 
-              document.getElementById("summaryPanel").innerHTML = `
-                <strong>📅 Daily Summary</strong>
-                <span>Total Bookings: ${total}</span>
-                <span>Reminders Sent: ${reminderCount}</span>
-                <span>Top 3 Reasons: ${topReasons || "—"}</span>
-              `;
+    // Auto-load today's bookings on startup
+    document.addEventListener("DOMContentLoaded", () => {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("dateFilter").value = today;
+      loadLogs();
+    });
+
+    // PWA support
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
+</body>
+</html>              `;
             });
         } else {
           document.getElementById("logsBody").innerHTML = "<tr><td colspan='7'>Invalid PIN</td></tr>";
