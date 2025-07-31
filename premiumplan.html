@@ -2,18 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premium Plan - Clinic System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Premium Plan - BookingBot</title>
+  <link rel="manifest" href="manifest.json" />
+  <script src="service-worker.js"></script>
   <style>
-    body { background: #0e0e0e; color: white; font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-    img { width: 100px; margin-bottom: 20px; }
-    h1 { color: #00ffff; }
+    body {
+      background-color: #101010;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffcc00;
+    }
   </style>
 </head>
 <body>
-  <img src="assets/logos/logo-logs.png" alt="Log" />
-  <h1>🔍 Clinic Admin System - Auto Test</h1>
-  <p>This is the <strong>Premium Plan</strong>. All advanced features unlocked.</p>
+  <h1>Premium Plan Activated</h1>
+  <p>Welcome to the BookingBot - Premium Version</p>
+  <ul>
+    <li>📅 View Bookings</li>
+    <li>📋 Access Full Logs Panel</li>
+    <li>⬇️ Export to Excel + PDF</li>
+    <li>📲 WhatsApp Reminders with “Reminder Sent” Tracking</li>
+    <li>📈 Daily Summary + Top Visit Reasons</li>
+    <li>🔒 PIN-based Plan Locking</li>
+    <li>🧠 Smart Filters + Backup Tools</li>
+  </ul>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
-
