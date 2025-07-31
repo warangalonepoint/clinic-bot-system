@@ -1,17 +1,14 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Logs Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logs Dashboard</title>
   <style>
     body {
-      background-color: #111;
-      color: #fff;
       font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
       padding: 20px;
-    }
-    h1 {
-      color: #4dc1ff;
     }
     table {
       width: 100%;
@@ -19,93 +16,87 @@
       margin-top: 20px;
     }
     th, td {
+      padding: 10px;
       border: 1px solid #444;
-      padding: 8px;
-      text-align: left;
+      text-align: center;
     }
     th {
       background-color: #222;
     }
-    textarea {
-      width: 100%;
-      background-color: #222;
-      color: #fff;
-      border: 1px solid #555;
-      resize: vertical;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #28a745;
+    input[type="text"] {
+      background: #222;
       color: white;
+      border: 1px solid #444;
+      padding: 5px;
+      width: 90%;
+    }
+    .save-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
       border: none;
       cursor: pointer;
+      margin-top: 20px;
+    }
+    .save-button:hover {
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
-  <h1>Clinic Logs with Editable Doctor Notes</h1>
+  <h1>Logs Dashboard</h1>
   <table id="logsTable">
     <thead>
       <tr>
         <th>Date</th>
         <th>Time</th>
-        <th>Name</th>
+        <th>Patient</th>
         <th>Reason</th>
-        <th>Contact</th>
         <th>Reminder Sent</th>
         <th>Doctor Notes</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Data will be loaded dynamically -->
+      <tr>
+        <td>01-08-2025</td>
+        <td>10:00 AM</td>
+        <td>John Doe</td>
+        <td>Checkup</td>
+        <td>Yes</td>
+        <td><input type="text" value="" /></td>
+      </tr>
+      <tr>
+        <td>01-08-2025</td>
+        <td>10:20 AM</td>
+        <td>Jane Smith</td>
+        <td>Fever</td>
+        <td>No</td>
+        <td><input type="text" value="" /></td>
+      </tr>
+      <!-- Add more sample rows as needed -->
     </tbody>
   </table>
-  <button onclick="downloadUpdatedCSV()">Save & Download Logs</button>  <script>
-    const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
-
-    fetch(csvUrl)
-      .then(res => res.text())
-      .then(data => {
-        const rows = data.trim().split('\n');
-        const table = document.querySelector('#logsTable tbody');
-        for (let i = 1; i < rows.length; i++) {
-          const cols = rows[i].split(',');
-          const tr = document.createElement('tr');
-          for (let j = 0; j < cols.length; j++) {
-            const td = document.createElement('td');
-            if (j === 6) {
-              td.innerHTML = `<textarea>${cols[j]}</textarea>`;} else {
-          td.textContent = cols[j];
-        }
-        tr.appendChild(td);
-      }
-      table.appendChild(tr);
+  <button class="save-button" onclick="downloadNotes()">Save Notes as CSV</button>
+  <script>
+    function downloadNotes() {
+      const rows = document.querySelectorAll("#logsTable tbody tr");
+      let csv = "Date,Time,Patient,Reason,Reminder Sent,Doctor Notes\n";
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const date = cells[0].innerText;
+        const time = cells[1].innerText;
+        const patient = cells[2].innerText;
+        const reason = cells[3].innerText;
+        const reminder = cells[4].innerText;
+        const note = cells[5].querySelector("input").value.replace(/,/g, ';');
+        csv += `${date},${time},${patient},${reason},${reminder},${note}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'logs_with_notes.csv';
+      link.click();
     }
-  });
-
-function downloadUpdatedCSV() {
-  const table = document.querySelector('#logsTable tbody');
-  let csvContent = "Date,Time,Name,Reason,Contact,Reminder Sent,Doctor Notes\n";
-  for (const row of table.rows) {
-    const cells = row.cells;
-    let rowData = [];
-    for (let i = 0; i < cells.length; i++) {
-      if (i === 6) {
-        rowData.push(`"${cells[i].querySelector('textarea').value}"`);
-      } else {
-        rowData.push(cells[i].textContent.trim());
-      }
-    }
-    csvContent += rowData.join(',') + "\n";
-  }
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "updated_logs.csv";
-  link.click();
-}
-
   </script>
 </body>
 </html>
