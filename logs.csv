@@ -1,50 +1,50 @@
-Date,Time,Patient Name,Reason,Status,Reminder Sent,Contact
-2025-07-01,09:00,Arjun Reddy,Fever,Completed,Yes,9876543210
-2025-07-01,09:10,Divya Sharma,Checkup,Completed,Yes,9823456712
-2025-07-01,09:20,Vikram Rao,Cold,Completed,Yes,9845098761
-2025-07-01,09:30,Sneha Gupta,Headache,Pending,No,—
-2025-07-01,09:40,Kiran Babu,Injury Follow-up,Completed,Yes,9101234567
-2025-07-01,09:50,Anjali Menon,BP Check,Completed,No,—
-2025-07-01,10:00,Surya Teja,Fever,Pending,No,—
-2025-07-01,10:10,Ritika Nair,Cough,Completed,Yes,9834567890
-2025-07-01,10:20,Manoj Kumar,Follow-up,Completed,Yes,—
-2025-07-01,10:30,Radha Iyer,Migraine,Completed,Yes,9809876543
-2025-07-01,10:40,Vishal Reddy,Cold,Pending,No,—
-2025-07-01,10:50,Pooja Shah,General,Completed,Yes,—
-2025-07-01,11:00,Akhil Verma,BP Check,Completed,Yes,9988776655
-2025-07-01,11:10,Neha Jain,Consultation,Pending,No,—
-2025-07-01,11:20,Sarath Kumar,Cough,Completed,Yes,9321678900
-2025-07-01,11:30,Kavya Rao,Follow-up,Completed,Yes,—
-2025-07-01,11:40,Naveen Das,Migraine,Pending,No,—
-2025-07-01,11:50,Ramya Shetty,Headache,Completed,Yes,9001122334
-2025-07-01,12:00,Rohan Mehta,Fever,Pending,No,—
-2025-07-01,12:10,Deepika Joshi,General,Completed,Yes,—
-2025-07-01,12:20,Aravind Pillai,Checkup,Completed,Yes,9191919191
-2025-07-01,12:30,Isha Kulkarni,Cold,Pending,No,—
-2025-07-01,12:40,Tejaswini Rao,Follow-up,Completed,Yes,—
-2025-07-01,12:50,Amit Desai,BP Check,Completed,Yes,—
-2025-07-01,13:00,Keerthi Reddy,Consultation,Completed,Yes,—
-2025-07-01,13:10,Faizan Khan,Cough,Pending,No,—
-2025-07-01,13:20,Nandini Sinha,Fever,Completed,Yes,—
-2025-07-01,13:30,Abhishek Patel,General,Completed,Yes,—
-2025-07-01,13:40,Sanjana Bhatt,Migraine,Completed,Yes,—
-2025-07-01,13:50,Rajeev Singh,Headache,Pending,No,—
-2025-07-01,14:00,Preeti Malhotra,BP Check,Completed,Yes,—
-2025-07-01,14:10,Harish Naik,Checkup,Completed,Yes,—
-2025-07-01,14:20,Meghana Deshpande,Fever,Pending,No,—
-2025-07-01,14:30,Krishna Iyer,Follow-up,Completed,Yes,—
-2025-07-01,14:40,Tanvi Kapoor,Cold,Completed,Yes,—
-2025-07-01,14:50,Gaurav Rao,Consultation,Completed,Yes,—
-2025-07-01,15:00,Shalini Verma,General,Pending,No,—
-2025-07-01,15:10,Aditya Joshi,Checkup,Completed,Yes,—
-2025-07-01,15:20,Lavanya Sharma,Cough,Completed,Yes,—
-2025-07-01,15:30,Ritesh Reddy,BP Check,Completed,Yes,—
-2025-07-01,15:40,Ankita Das,Follow-up,Completed,Yes,—
-2025-07-01,15:50,Parth Shah,Migraine,Pending,No,—
-2025-07-01,16:00,Saif Ali,Fever,Completed,Yes,—
-2025-07-01,16:10,Juhi Sinha,Consultation,Completed,Yes,—
-2025-07-01,16:20,Raj Kumar,Cold,Completed,Yes,—
-2025-07-01,16:30,Bindu Reddy,Checkup,Completed,Yes,—
-2025-07-01,16:40,Yogesh Meena,Headache,Completed,Yes,—
-2025-07-01,16:50,Meera Kapoor,General,Pending,No,—
-2025-07-01,17:00,Dhanush Rao,BP Check,Completed,Yes,—
+Date,Name,Time,Status,Contact,Reminder Sent
+01-07-2025,Amit Sharma,09:00 AM,Confirmed,9876543210,
+02-07-2025,Ritika Verma,09:10 AM,Confirmed,9876501110,
+03-07-2025,Rahul Singh,09:20 AM,Pending,9876501122,
+04-07-2025,Sneha Reddy,09:30 AM,Confirmed,9876501133,
+05-07-2025,Karan Mehta,09:40 AM,Confirmed,9876501144,
+06-07-2025,Priya Das,09:50 AM,Pending,9876501155,
+07-07-2025,Sai Kumar,10:00 AM,Confirmed,9876501166,
+08-07-2025,Meena Iyer,10:10 AM,Confirmed,9876501177,
+09-07-2025,Nikhil Rao,10:20 AM,Pending,9876501188,
+10-07-2025,Anjali Jain,10:30 AM,Confirmed,9876501199,
+11-07-2025,Ravi Babu,10:40 AM,Confirmed,9876501201,
+12-07-2025,Swathi Rani,10:50 AM,Pending,9876501202,
+13-07-2025,Aditya Nath,11:00 AM,Confirmed,9876501203,
+14-07-2025,Divya Kapoor,11:10 AM,Confirmed,9876501204,
+15-07-2025,Irfan Malik,11:20 AM,Pending,9876501205,
+16-07-2025,Neha Kulkarni,11:30 AM,Confirmed,9876501206,
+17-07-2025,Manoj Yadav,11:40 AM,Confirmed,9876501207,
+18-07-2025,Kavya Shetty,11:50 AM,Pending,9876501208,
+19-07-2025,Rohan Paul,12:00 PM,Confirmed,9876501209,
+20-07-2025,Shalini D,12:10 PM,Confirmed,9876501210,
+21-07-2025,Farhan Syed,12:20 PM,Pending,9876501211,
+22-07-2025,Ayesha Khan,12:30 PM,Confirmed,9876501212,
+23-07-2025,Sid Arora,12:40 PM,Confirmed,9876501213,
+24-07-2025,Harika Rao,12:50 PM,Pending,9876501214,
+25-07-2025,Vishal Raj,01:00 PM,Confirmed,9876501215,
+26-07-2025,Reshma J,01:10 PM,Confirmed,9876501216,
+27-07-2025,Abhay Reddy,01:20 PM,Pending,9876501217,
+28-07-2025,Charan Singh,01:30 PM,Confirmed,9876501218,
+29-07-2025,Nidhi Patel,01:40 PM,Confirmed,9876501219,
+30-07-2025,Arun S,01:50 PM,Pending,9876501220,
+31-07-2025,Sowmya R,02:00 PM,Confirmed,9876501221,
+15-07-2025,Deepak Rao,02:10 PM,Confirmed,9876501222,
+13-07-2025,Malvika Nair,02:20 PM,Pending,9876501223,
+11-07-2025,Kishore V,02:30 PM,Confirmed,9876501224,
+09-07-2025,Yamini S,02:40 PM,Confirmed,9876501225,
+07-07-2025,Tejas M,02:50 PM,Pending,9876501226,
+05-07-2025,Gayathri D,03:00 PM,Confirmed,9876501227,
+03-07-2025,Ajay Sharma,03:10 PM,Confirmed,9876501228,
+01-07-2025,Keerthi P,03:20 PM,Pending,9876501229,
+20-07-2025,Mahesh T,03:30 PM,Confirmed,9876501230,
+18-07-2025,Anuja Jain,03:40 PM,Confirmed,9876501231,
+16-07-2025,Santosh K,03:50 PM,Pending,9876501232,
+14-07-2025,Bindu N,04:00 PM,Confirmed,9876501233,
+12-07-2025,Lokesh R,04:10 PM,Confirmed,9876501234,
+10-07-2025,Arthi G,04:20 PM,Pending,9876501235,
+08-07-2025,Sameer A,04:30 PM,Confirmed,9876501236,
+06-07-2025,Pooja M,04:40 PM,Confirmed,9876501237,
+04-07-2025,Naveen S,04:50 PM,Pending,9876501238,
+02-07-2025,Dhruv P,05:00 PM,Confirmed,9876501239
