@@ -1,18 +1,18 @@
-[
-  {
-    "pin": "1111",
-    "clinic": "clinic1"
+{
+  "1111": {
+    "clinic": "clinic1",
+    "plan": "free"
   },
-  {
-    "pin": "2222",
-    "clinic": "clinic2"
+  "2222": {
+    "clinic": "clinic2",
+    "plan": "paid"
   },
-  {
-    "pin": "3333",
-    "clinic": "clinic3"
+  "3333": {
+    "clinic": "clinic3",
+    "plan": "premium"
   },
-  {
-    "pin": "2525",
-    "clinic": "onestop"
+  "2525": {
+    "clinic": "onestop",
+    "plan": "full"
   }
-]
+}
