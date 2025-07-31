@@ -3,41 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sync Dashboard</title>
+  <title>Sync Panel</title>
   <style>
     body {
       background: #111;
       color: #fff;
       font-family: Arial, sans-serif;
-      text-align: center;
       padding: 20px;
+      margin: 0;
     }
 
     h1 {
       color: #f39c12;
+      text-align: center;
     }
 
-    .panel {
-      background: #222;
-      border-radius: 10px;
-      padding: 20px;
+    .container {
+      max-width: 480px;
       margin: 20px auto;
-      max-width: 500px;
-      box-shadow: 0 0 10px #000;
+      background: #222;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 20px;
     }
 
     input[type="file"] {
+      background: #333;
+      padding: 8px;
       margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      color: #fff;
     }
 
     button {
-      padding: 10px 20px;
       background-color: #00b894;
+      color: #fff;
       border: none;
-      color: white;
+      padding: 12px;
+      margin-top: 15px;
       font-size: 16px;
-      cursor: pointer;
+      width: 100%;
       border-radius: 6px;
+      cursor: pointer;
     }
 
     button:hover {
@@ -46,40 +61,51 @@
 
     #status {
       margin-top: 15px;
+      text-align: center;
       color: #00cec9;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Manual CSV Sync</h1>
+  <h1>📤 Manual Sync Dashboard</h1>
 
-  <div class="panel">
-    <p>🔄 Upload new <strong>logs CSV</strong> for your clinic manually.</p>
-    <input type="file" id="csvFile" accept=".csv" />
-    <br />
-    <button onclick="handleUpload()">Upload Logs</button>
-    <p id="status"></p>
+  <div class="container">
+    <label for="logsFile">Upload Logs CSV (logs.csv)</label>
+    <input type="file" id="logsFile" accept=".csv" />
+
+    <label for="slotsFile">Upload Slots CSV (slots.csv)</label>
+    <input type="file" id="slotsFile" accept=".csv" />
+
+    <button onclick="simulateUpload()">Upload Both Files</button>
+    <p id="status">Waiting for upload...</p>
   </div>
 
   <script>
-    function handleUpload() {
-      const fileInput = document.getElementById("csvFile");
-      const file = fileInput.files[0];
+    function simulateUpload() {
+      const logsFile = document.getElementById("logsFile").files[0];
+      const slotsFile = document.getElementById("slotsFile").files[0];
 
-      if (!file) {
-        document.getElementById("status").textContent = "⚠️ Please choose a file first.";
+      if (!logsFile && !slotsFile) {
+        document.getElementById("status").textContent = "⚠️ Please choose at least one file.";
         return;
       }
 
-      // Simulate upload
-      document.getElementById("status").textContent = "⏳ Uploading...";
-      setTimeout(() => {
-        document.getElementById("status").textContent = "✅ File uploaded successfully (simulated).";
-      }, 1500);
+      document.getElementById("status").textContent = "⏳ Uploading (simulated)...";
 
-      // NOTE: Real upload requires backend (FTP, API, or GitHub CLI)
+      setTimeout(() => {
+        document.getElementById("status").textContent = "✅ Upload complete. (Simulated only)";
+      }, 1500);
     }
+
+    // Placeholder: Real GitHub upload can be implemented via token + API
+    /*
+      Use GitHub API to:
+      1. Authenticate via personal access token
+      2. Fetch repo file path (e.g., logs.csv in clinic-bot-system)
+      3. Update file content using PUT request with base64-encoded file
+      4. Commit with message and push
+    */
   </script>
 </body>
 </html>
