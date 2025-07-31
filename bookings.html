@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appointment Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <title>Appointment Booking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
       background: #111;
@@ -13,171 +11,101 @@
       font-family: Arial, sans-serif;
       padding: 20px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: #222;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #333;
-      text-align: left;
-    }
-    th {
-      background-color: #333;
+    h1 {
+      color: #4dc1ff;
     }
     select, input, button {
       padding: 10px;
-      margin: 10px 5px;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 400px;
     }
-    .highlight {
-      color: #4dc1ff;
-    }
-    .filter-bar {
-      margin-top: 20px;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1 class="highlight">📋 Appointment Logs</h1>
-
-  <div class="filter-bar">
-    <select id="dateFilter">
-      <option value="all">All Dates</option>
-      <option value="today">Today</option>
-      <option value="yesterday">Yesterday</option>
+  <h1>Book an Appointment</h1>
+  <div id="lockedMessage"></div>
+  <div id="bookingForm" class="hidden">
+    <input type="text" id="patientName" placeholder="Patient Name" required>
+    <input type="text" id="visitReason" placeholder="Reason for Visit" required>
+    <select id="slotSelect">
+      <option value="">Loading available slots...</option>
     </select>
-    <input type="date" id="fromDate" />
-    <input type="date" id="toDate" />
-    <button onclick="applyDateFilter()">Apply</button>
-    <button onclick="exportToExcel()">📊 Export Excel</button>
-    <button onclick="exportToPDF()">🧾 Export PDF</button>
+    <button onclick="submitBooking()">Book via WhatsApp</button>
   </div>
 
-  <table id="logsTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Clinic</th>
-        <th>Patient Name</th>
-        <th>Time</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Reminder Sent</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
   <script>
-    let fullData = [];
+    const pin = new URLSearchParams(window.location.search).get('pin') || localStorage.getItem('pin');
+    let bookedSlots = [];
 
-    function loadLogs() {
-      fetch('logs.csv')
-        .then(res => res.text())
+    fetch('plans.json')
+      .then(res => res.json())
+      .then(plans => {
+        if (pin && plans[pin]) {
+          const plan = plans[pin];
+          if (plan.overrideLock || plan.plan !== "locked") {
+            document.getElementById('bookingForm').classList.remove('hidden');
+            localStorage.setItem('pin', pin);
+            loadSlots();
+            loadBookedSlots();
+          } else {
+            document.getElementById('lockedMessage').innerHTML = "🚫 Access denied. Your plan is locked.";
+          }
+        } else {
+          document.getElementById('lockedMessage').innerHTML = "⚠️ Invalid or missing PIN.";
+        }
+      });
+
+    function loadSlots() {
+      fetch('Slots.csv')
+        .then(response => response.text())
         .then(csv => {
-          const lines = csv.trim().split('\n').slice(1);
-          const tbody = document.querySelector('#logsTable tbody');
-          tbody.innerHTML = '';
-          fullData = [];
-
+          const lines = csv.trim().split('\n').slice(1); // Skip header
+          const slotSelect = document.getElementById('slotSelect');
+          slotSelect.innerHTML = "";
           lines.forEach(line => {
-            const [date, clinic, name, time, reason, contact = '', reminder = ''] = line.split(',');
-            fullData.push({ date, clinic, name, time, reason, contact, reminder });
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${date}</td>
-              <td>${clinic}</td>
-              <td>${name}</td>
-              <td>${time}</td>
-              <td>${reason}</td>
-              <td><a href="tel:${contact.trim()}">${contact.trim()}</a></td>
-              <td>${reminder}</td>
-              <td><button onclick="sendReminder('${contact.trim()}', this)">🔔 Send Reminder</button></td>
-            `;
-            tbody.appendChild(tr);
+            const [date, time, status] = line.split(',');
+            const fullSlot = `${date.trim()} ${time.trim()}`;
+            if (status.trim().toLowerCase() === "available" && !bookedSlots.includes(fullSlot)) {
+              const option = document.createElement('option');
+              option.value = fullSlot;
+              option.textContent = fullSlot;
+              slotSelect.appendChild(option);
+            }
           });
         });
     }
 
-    function sendReminder(number, btn) {
-      if (!number) return alert("No contact number.");
-      const msg = encodeURIComponent("⏰ Reminder: You have an appointment booked.");
-      const link = `https://wa.me/${number}?text=${msg}`;
-      window.open(link, '_blank');
-      btn.closest('tr').children[6].textContent = 'Yes';
+    function loadBookedSlots() {
+      fetch('logs.csv')
+        .then(response => response.text())
+        .then(csv => {
+          const rows = csv.trim().split('\n').slice(1);
+          bookedSlots = rows.map(row => {
+            const cols = row.split(',');
+            return `${cols[0].trim()} ${cols[3].trim()}`; // date + time
+          });
+          loadSlots();
+        });
     }
 
-    function applyDateFilter() {
-      const filter = document.getElementById('dateFilter').value;
-      const from = document.getElementById('fromDate').value;
-      const to = document.getElementById('toDate').value;
+    function submitBooking() {
+      const name = document.getElementById('patientName').value.trim();
+      const reason = document.getElementById('visitReason').value.trim();
+      const slot = document.getElementById('slotSelect').value;
 
-      const today = new Date();
-      const yest = new Date(Date.now() - 86400000);
-      const tbody = document.querySelector('#logsTable tbody');
-      tbody.innerHTML = '';
+      if (!name || !reason || !slot) {
+        alert("Please fill all fields.");
+        return;
+      }
 
-      const filtered = fullData.filter(row => {
-        const rowDate = new Date(row.date.split('-').reverse().join('-'));
-        if (filter === 'today') return isSameDate(rowDate, today);
-        if (filter === 'yesterday') return isSameDate(rowDate, yest);
-        if (from && to) {
-          const fromD = new Date(from);
-          const toD = new Date(to);
-          return rowDate >= fromD && rowDate <= toD;
-        }
-        return true;
-      });
-
-      filtered.forEach(({ date, clinic, name, time, reason, contact, reminder }) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${date}</td>
-          <td>${clinic}</td>
-          <td>${name}</td>
-          <td>${time}</td>
-          <td>${reason}</td>
-          <td><a href="tel:${contact.trim()}">${contact.trim()}</a></td>
-          <td>${reminder}</td>
-          <td><button onclick="sendReminder('${contact.trim()}', this)">🔔 Send Reminder</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
+      const msg = `Hi, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nSlot: ${slot}`;
+      const url = `https://wa.me/918686019709?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     }
-
-    function isSameDate(a, b) {
-      return a.getFullYear() === b.getFullYear() &&
-             a.getMonth() === b.getMonth() &&
-             a.getDate() === b.getDate();
-    }
-
-    function exportToExcel() {
-      const ws = XLSX.utils.json_to_sheet(fullData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Logs");
-      XLSX.writeFile(wb, "appointment_logs.xlsx");
-    }
-
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 10;
-      fullData.forEach(({ date, clinic, name, time, reason, contact }) => {
-        doc.text(`${date} | ${clinic} | ${name} | ${time} | ${reason} | ${contact}`, 10, y);
-        y += 10;
-        if (y > 270) {
-          doc.addPage();
-          y = 10;
-        }
-      });
-      doc.save("appointment_logs.pdf");
-    }
-
-    loadLogs();
   </script>
 </body>
 </html>
