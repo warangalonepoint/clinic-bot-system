@@ -1,35 +1,74 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="trial.js" defer></script>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #eef2f3; }
-    header { background-color: #34495e; color: white; padding: 10px 20px; display: flex; align-items: center; }
-    header img { height: 40px; margin-right: 15px; }
-    header h1 { font-size: 20px; margin: 0; }
-    .content { padding: 20px; }
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2em;
+    }
+    .logo {
+      max-width: 200px;
+      margin: 0 auto 20px;
+      display: block;
+    }
   </style>
-  <script>
-    const clinicID = localStorage.getItem("clinicID") || "onesto";
-    const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
-  const logoEl = document.getElementById("clinic-logo");
-  if (logoEl) {
-    logoEl.src = logoPath;
-    logoEl.onerror = () => logoEl.style.display = "none";
-  }
-});
-
-  </script>
 </head>
 <body>
-  <header>
-    <img id="clinic-logo" alt="Clinic Logo">
-    <h1>Clinic Dashboard</h1>
-  </header>
-  <div class="content">
-    <p>Overview and access to staff, appointments, and settings.</p>
-    <!-- Dashboard components will be added here -->
-  </div>
-</body>
+  <img id="clinicLogo" class="logo" src="" alt="Clinic Logo" style="display: none;"/>
+  <h1>Clinic Dashboard</h1>
+  <div class="dashboard-grid">
+    <div class="card">
+      <h2>Appointments</h2>
+      <p>View and manage bookings.</p>
+    </div>
+    <div class="card">
+      <h2>Patient Logs</h2>
+      <p>Access appointment history and notes.</p>
+    </div>
+    <div class="card">
+      <h2>Staff Attendance</h2>
+      <p>Manage and track staff roles and shifts.</p>
+    </div>
+    <div class="card">
+      <h2>Reports</h2>
+      <p>View daily summaries and export data.</p>
+    </div>
+  </div>  <script>
+    // Load logo from plan if available
+    const clinicId = localStorage.getItem('clinicId') || 'onesto';
+    const logo = new Image();
+    logo.onload = () => {
+      document.getElementById('clinicLogo').src = logo.src;
+      document.getElementById('clinicLogo').style.display = 'block';
+    };
+    logo.onerror = () => {
+      document.getElementById('clinicLogo').style.display = 'none';
+    };
+    logo.src = `clinics/${clinicId}/logo-bookings.png`;
+  </script></body>
 </html>
