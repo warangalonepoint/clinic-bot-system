@@ -2,134 +2,139 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Assign Clinics (plans.json Editor)</title>
+  <title>Assign Clinic Plans</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #121212;
+      background-color: #111;
       color: #fff;
       padding: 20px;
     }
-    h2 {
+    h1 {
+      text-align: center;
       color: #4dc1ff;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: #1e1e1e;
     }
     th, td {
-      padding: 12px;
-      border: 1px solid #444;
-      text-align: left;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #333;
+    }
+    th {
+      background-color: #222;
+    }
+    tr:nth-child(even) {
+      background-color: #1a1a1a;
     }
     input, select {
-      padding: 8px;
-      background-color: #2c2c2c;
-      color: white;
-      border: 1px solid #666;
-      width: 100%;
+      padding: 6px;
+      width: 90%;
     }
     button {
-      padding: 10px 20px;
-      margin-top: 20px;
-      background-color: #28a745;
-      border: none;
-      color: white;
+      padding: 8px 12px;
+      margin: 10px 5px;
       cursor: pointer;
+      border: none;
+      background-color: #4dc1ff;
+      color: black;
+      font-weight: bold;
     }
-    .json-output {
-      white-space: pre-wrap;
-      background: #1e1e1e;
-      padding: 10px;
-      margin-top: 20px;
-      border: 1px solid #333;
+    #saveMsg {
+      margin-top: 15px;
+      color: #0f0;
     }
   </style>
 </head>
 <body>
+  <h1>🧪 Assign Clinics to Plans</h1>
+  
+  <table id="clinicTable">
+    <thead>
+      <tr>
+        <th>Clinic Name</th>
+        <th>PIN</th>
+        <th>Plan</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="clinicRows">
+      <!-- Dynamic rows will be inserted here -->
+    </tbody>
+  </table>
 
-<h2>🛠️ Assign Clinics – PIN & Plan Control</h2>
+  <button onclick="addClinicRow()">➕ Add New Clinic</button>
+  <button onclick="savePlans()">💾 Save to plans.json</button>
+  <div id="saveMsg"></div>
 
-<input type="file" id="jsonFile" accept=".json">
-<br/><br/>
+  <script>
+    let clinics = [];
 
-<table id="editorTable">
-  <thead>
-    <tr>
-      <th>Clinic</th>
-      <th>PIN</th>
-      <th>Plan</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+    async function fetchPlans() {
+      try {
+        const response = await fetch('plans.json');
+        clinics = await response.json();
+        populateTable();
+      } catch (error) {
+        console.error("Couldn't fetch plans.json", error);
+        clinics = [];
+      }
+    }
 
-<button onclick="downloadUpdatedJSON()">💾 Download Updated plans.json</button>
+    function populateTable() {
+      const tbody = document.getElementById('clinicRows');
+      tbody.innerHTML = '';
 
-<script>
-let plansData = {};
+      clinics.forEach((clinic, index) => {
+        const row = document.createElement('tr');
 
-document.getElementById("jsonFile").addEventListener("change", function (e) {
-  const reader = new FileReader();
-  reader.onload = function () {
-    plansData = JSON.parse(reader.result);
-    populateTable();
-  };
-  reader.readAsText(e.target.files[0]);
-});
+        row.innerHTML = `
+          <td><input value="${clinic.name}" onchange="updateClinic(${index}, 'name', this.value)" /></td>
+          <td><input value="${clinic.pin}" onchange="updateClinic(${index}, 'pin', this.value)" /></td>
+          <td>
+            <select onchange="updateClinic(${index}, 'plan', this.value)">
+              <option value="free" ${clinic.plan === 'free' ? 'selected' : ''}>Free</option>
+              <option value="paid" ${clinic.plan === 'paid' ? 'selected' : ''}>Paid</option>
+              <option value="premium" ${clinic.plan === 'premium' ? 'selected' : ''}>Premium</option>
+            </select>
+          </td>
+          <td><button onclick="deleteClinic(${index})">🗑️ Delete</button></td>
+        `;
 
-function populateTable() {
-  const tbody = document.querySelector("#editorTable tbody");
-  tbody.innerHTML = "";
+        tbody.appendChild(row);
+      });
+    }
 
-  Object.entries(plansData).forEach(([clinic, { pin, plan }]) => {
-    const row = document.createElement("tr");
+    function updateClinic(index, key, value) {
+      clinics[index][key] = value;
+    }
 
-    row.innerHTML = `
-      <td><input value="${clinic}" data-clinic="${clinic}" onchange="updateClinicKey(this)"></td>
-      <td><input value="${pin}" data-clinic="${clinic}" data-field="pin" onchange="updateField(this)"></td>
-      <td>
-        <select data-clinic="${clinic}" data-field="plan" onchange="updateField(this)">
-          <option value="free" ${plan === "free" ? "selected" : ""}>Free</option>
-          <option value="paid" ${plan === "paid" ? "selected" : ""}>Paid</option>
-          <option value="premium" ${plan === "premium" ? "selected" : ""}>Premium</option>
-        </select>
-      </td>
-    `;
+    function addClinicRow() {
+      clinics.push({ name: "", pin: "", plan: "free" });
+      populateTable();
+    }
 
-    tbody.appendChild(row);
-  });
-}
+    function deleteClinic(index) {
+      clinics.splice(index, 1);
+      populateTable();
+    }
 
-function updateField(element) {
-  const clinic = element.getAttribute("data-clinic");
-  const field = element.getAttribute("data-field");
-  plansData[clinic][field] = element.value.trim();
-}
+    function savePlans() {
+      const blob = new Blob([JSON.stringify(clinics, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "plans.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      document.getElementById('saveMsg').textContent = "✅ plans.json downloaded. Upload to GitHub manually.";
+    }
 
-function updateClinicKey(input) {
-  const oldKey = input.getAttribute("data-clinic");
-  const newKey = input.value.trim();
-
-  if (oldKey !== newKey && newKey) {
-    plansData[newKey] = plansData[oldKey];
-    delete plansData[oldKey];
-    populateTable();
-  }
-}
-
-function downloadUpdatedJSON() {
-  const blob = new Blob([JSON.stringify(plansData, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "plans.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-</script>
+    fetchPlans();
+  </script>
 </body>
 </html>
