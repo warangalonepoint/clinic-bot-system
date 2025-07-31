@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Assign Clinics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: Arial, sans-serif;
       background-color: #111;
-      color: #fff;
+      color: white;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
     h1 {
+      text-align: center;
       color: #4dc1ff;
     }
     table {
@@ -20,129 +21,188 @@
       margin-top: 20px;
     }
     th, td {
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #444;
+      text-align: center;
     }
     th {
       background-color: #222;
     }
-    tr.invalid td {
-      background-color: #660000;
-    }
     input, select {
-      width: 100%;
-      padding: 6px;
-      background: #222;
+      padding: 8px;
+      width: 90%;
+      background-color: #222;
       color: white;
-      border: 1px solid #444;
+      border: 1px solid #555;
     }
     button {
-      padding: 10px 20px;
+      padding: 8px 12px;
+      margin: 5px;
       background-color: #28a745;
-      color: white;
       border: none;
+      color: white;
       cursor: pointer;
-      margin-top: 15px;
     }
-    #errorBox {
-      color: red;
-      margin-top: 10px;
+    .delete-btn {
+      background-color: #dc3545;
+    }
+    .control-panel {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Assign Clinics</h1>
+  <h1>Assign Clinics to Plans</h1>
+
+  <div class="control-panel">
+    <label for="planFilter">Filter by Plan: </label>
+    <select id="planFilter" onchange="filterRows()">
+      <option value="all">All</option>
+      <option value="free">Free</option>
+      <option value="paid">Paid</option>
+      <option value="premium">Premium</option>
+    </select>
+
+    <button onclick="sortRows('pin')">Sort by PIN</button>
+    <button onclick="sortRows('clinic')">Sort by Clinic</button>
+    <button onclick="resetFilters()">Reset</button>
+    <button onclick="addRow()">Add Clinic</button>
+  </div>
+
   <table id="clinicTable">
     <thead>
       <tr>
         <th>PIN</th>
-        <th>Clinic Name</th>
+        <th>Clinic</th>
         <th>Plan</th>
         <th>Override Lock</th>
         <th>Delete</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <tr>
+        <td><input class="pin" value="1234" onchange="checkDuplicatePIN(this)" /></td>
+        <td><input class="clinic" value="Clinic 1" /></td>
+        <td>
+          <select class="plan">
+            <option value="free">Free</option>
+            <option value="paid">Paid</option>
+            <option value="premium">Premium</option>
+          </select>
+        </td>
+        <td>
+          <select class="override">
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        </td>
+        <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+      </tr>
+      <tr>
+        <td><input class="pin" value="2525" onchange="checkDuplicatePIN(this)" /></td>
+        <td><input class="clinic" value="Clinic 2" /></td>
+        <td>
+          <select class="plan">
+            <option value="free">Free</option>
+            <option value="paid" selected>Paid</option>
+            <option value="premium">Premium</option>
+          </select>
+        </td>
+        <td>
+          <select class="override">
+            <option value="true" selected>True</option>
+            <option value="false">False</option>
+          </select>
+        </td>
+        <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+      </tr>
+      <tr>
+        <td><input class="pin" value="9999" onchange="checkDuplicatePIN(this)" /></td>
+        <td><input class="clinic" value="Clinic 3" /></td>
+        <td>
+          <select class="plan">
+            <option value="free">Free</option>
+            <option value="paid">Paid</option>
+            <option value="premium" selected>Premium</option>
+          </select>
+        </td>
+        <td>
+          <select class="override">
+            <option value="true" selected>True</option>
+            <option value="false">False</option>
+          </select>
+        </td>
+        <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+      </tr>
+    </tbody>
   </table>
 
-  <button onclick="addClinicRow()">Add Clinic</button>
-  <button onclick="saveClinics()">Save</button>
-  <pre id="output"></pre>
-  <div id="errorBox"></div>
-
   <script>
-    const allowedPlans = ["free", "paid", "premium"];
-
-    function addClinicRow(pin = "", clinic = "", plan = "free", overrideLock = true) {
-      const table = document.querySelector("#clinicTable tbody");
-      const row = document.createElement("tr");
-
+    function addRow() {
+      const table = document.getElementById("clinicTable").getElementsByTagName('tbody')[0];
+      const row = table.insertRow();
       row.innerHTML = `
-        <td><input type="text" class="pin" value="${pin}"></td>
-        <td><input type="text" class="clinic" value="${clinic}"></td>
-        <td><select class="plan">
-          <option value="free" ${plan === "free" ? "selected" : ""}>free</option>
-          <option value="paid" ${plan === "paid" ? "selected" : ""}>paid</option>
-          <option value="premium" ${plan === "premium" ? "selected" : ""}>premium</option>
-        </select></td>
-        <td><input type="checkbox" class="lock" ${overrideLock ? "checked" : ""}></td>
-        <td><button onclick="deleteRow(this)">🗑</button></td>
+        <td><input class="pin" onchange="checkDuplicatePIN(this)" /></td>
+        <td><input class="clinic" /></td>
+        <td>
+          <select class="plan">
+            <option value="free">Free</option>
+            <option value="paid">Paid</option>
+            <option value="premium">Premium</option>
+          </select>
+        </td>
+        <td>
+          <select class="override">
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        </td>
+        <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
       `;
-
-      table.appendChild(row);
     }
 
-    function deleteRow(btn) {
-      btn.closest("tr").remove();
+    function deleteRow(button) {
+      const row = button.parentNode.parentNode;
+      row.parentNode.removeChild(row);
     }
 
-    function validateRows() {
-      const pins = {};
-      let hasError = false;
-      document.querySelector("#errorBox").textContent = "";
-      document.querySelectorAll("#clinicTable tbody tr").forEach((row, i) => {
-        const pin = row.querySelector(".pin").value.trim();
-        const clinic = row.querySelector(".clinic").value.trim();
-        const plan = row.querySelector(".plan").value.trim();
-        row.classList.remove("invalid");
-
-        if (!pin || !clinic || !plan || !allowedPlans.includes(plan)) {
-          row.classList.add("invalid");
-          hasError = true;
-        } else if (pins[pin]) {
-          row.classList.add("invalid");
-          hasError = true;
-        } else {
-          pins[pin] = true;
-        }
-      });
-
-      if (hasError) {
-        document.querySelector("#errorBox").textContent = "❌ Fix errors before saving. Duplicate or invalid data found.";
+    function checkDuplicatePIN(input) {
+      const pin = input.value.trim();
+      const allPins = Array.from(document.querySelectorAll(".pin")).map(i => i.value.trim());
+      const duplicateCount = allPins.filter(p => p === pin).length;
+      if (duplicateCount > 1) {
+        alert("Duplicate PIN detected. Please use a unique PIN.");
+        input.style.border = "2px solid red";
+      } else {
+        input.style.border = "";
       }
-
-      return !hasError;
     }
 
-    function saveClinics() {
-      if (!validateRows()) return;
-
-      const data = {};
+    function filterRows() {
+      const plan = document.getElementById("planFilter").value;
       document.querySelectorAll("#clinicTable tbody tr").forEach(row => {
-        const pin = row.querySelector(".pin").value.trim();
-        const clinic = row.querySelector(".clinic").value.trim();
-        const plan = row.querySelector(".plan").value.trim();
-        const lock = row.querySelector(".lock").checked;
-        data[pin] = { clinic, plan, overrideLock: lock };
+        const planValue = row.querySelector(".plan").value;
+        row.style.display = (plan === "all" || planValue === plan) ? "" : "none";
+      });
+    }
+
+    function sortRows(by) {
+      const rows = Array.from(document.querySelectorAll("#clinicTable tbody tr"));
+      rows.sort((a, b) => {
+        const valA = a.querySelector(`.${by}`).value.toLowerCase();
+        const valB = b.querySelector(`.${by}`).value.toLowerCase();
+        return valA.localeCompare(valB);
       });
 
-      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      const tbody = document.querySelector("#clinicTable tbody");
+      tbody.innerHTML = "";
+      rows.forEach(row => tbody.appendChild(row));
     }
 
-    // Load default (optional)
-    addClinicRow("1234", "Clinic 1", "free");
-    addClinicRow("2525", "Clinic 2", "paid");
-    addClinicRow("9999", "Clinic 3", "premium");
+    function resetFilters() {
+      document.getElementById("planFilter").value = "all";
+      filterRows();
+    }
   </script>
 </body>
 </html>
