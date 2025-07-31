@@ -1,55 +1,70 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Dashboard</title>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <script src="trial.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const trialInfo = checkTrialStatus();
-      if (!trialInfo.isTrialActive && !trialInfo.overrideLock) {
-        window.location.href = 'trial-expired.html';
-      }
-    });
-  </script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background-color: #f9f9f9;
       margin: 0;
       padding: 0;
-    }header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
-}
-
-header img {
-  height: 40px;
-}
-
-.container {
-  padding: 20px;
-}
-
+    }
+    .header {
+      background-color: #1e90ff;
+      color: white;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header img {
+      height: 40px;
+    }
+    .nav {
+      display: flex;
+      gap: 10px;
+    }
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .container {
+      padding: 20px;
+    }
   </style>
-</head><body>
-  <header>
+</head>
+<body>
+  <div class="header">
     <img id="clinicLogo" src="" alt="Clinic Logo" />
-    <h1>Clinic Dashboard</h1>
-  </header>  <div class="container">
-    <p>Welcome to the Clinic Dashboard. Use the navigation below to access various features:</p>
-    <ul>
-      <li><a href="bookings.html">View Bookings</a></li>
-      <li><a href="logs.html">View Logs</a></li>
-      <li><a href="dashboard.html">Admin Dashboard</a></li>
-    </ul>
-  </div>  <script>
-    const clinicId = new URLSearchParams(window.location.search).get('clinic') || 'onesto';
-    const logoPath = `logos/logo-${clinicId}.png`;
-    document.getElementById('clinicLogo').src = logoPath;
-  </script></body></html>
+    <div class="nav">
+      <a href="bookings.html">Bookings</a>
+      <a href="logs.html">Logs</a>
+      <a href="index.html">Main</a>
+    </div>
+  </div>
+  <div class="container">
+    <h2>Clinic Dashboard</h2>
+    <p>Manage bookings, view logs, and control your clinic features from here.</p>
+    <p>If you're seeing this page, your clinic's dashboard is active.</p>
+  </div>
+  <script>
+    const clinicId = new URLSearchParams(window.location.search).get("id") || "default";fetch(`plans/${clinicId}.json`)
+  .then((res) => res.json())
+  .then((plan) => {
+    if (plan.trialExpired && !plan.overrideLock) {
+      window.location.href = "trial-expired.html";
+    }
+  })
+  .catch((e) => console.warn("Plan check failed", e));
+
+const logoPath = `logos/${clinicId}.png`;
+document.getElementById("clinicLogo").src = logoPath;
+
+  </script>
+</body>
+</html>
