@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paid Booking Plan</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="trial.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h2 {
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    select, input {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 12px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .logo {
+      max-width: 160px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <img class="logo" src="clinics/onesto/logo.png" alt="Clinic Logo">
+  <h2>Paid Plan Booking</h2><label for="booking-date">Select Date</label> <input type="date" id="booking-date" required>
+
+<label for="slot">Available Time Slots</label> <select id="slot" required> <option value="">Loading...</option> </select>
+
+<label for="name">Your Name</label> <input type="text" id="name" placeholder="Enter your name" required>
+
+<label for="reason">Reason for Visit</label> <input type="text" id="reason" placeholder="E.g., Fever, Consultation" required>
+
+<button onclick="confirmBooking()">Book via WhatsApp</button>
+
+  <script>
+    const sheetUrl = 'https://warangalonepoint.github.io/clinic-bot-system/clinics/onesto/slots.csv';
+    const slotDropdown = document.getElementById("slot");
+
+    function loadSlotsForDate(selectedDate) {
+      fetch(sheetUrl)
+        .then(response => response.text())
+        .then(data => {
+          const rows = data.trim().split("\n").slice(1);
+          slotDropdown.innerHTML = "";
+          rows.forEach(row => {
+            const [date, time, status] = row.split(",");
+            if (date === selectedDate && status.trim().toLowerCase() !== "booked") {
+              const option = document.createElement("option");
+              option.value = time;
+              option.textContent = time;
+              slotDropdown.appendChild(option);
+            }
+          });
+          if (slotDropdown.options.length === 0) {
+            slotDropdown.innerHTML = '<option>No available slots</option>';
+          }
+        });
+    }
+
+    document.getElementById("booking-date").addEventListener("change", e => {
+      loadSlotsForDate(e.target.value);
+    });
+
+    function confirmBooking() {
+      const name = document.getElementById("name").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const slot = document.getElementById("slot").value;
+
+      if (!name || !reason || !slot) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const msg = `Hi, I am ${name}. I want to book a slot at ${slot} for ${reason}.`;
+      const whatsappUrl = `https://wa.me/919390664577?text=${encodeURIComponent(msg)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+  </script></body>
+</html>
