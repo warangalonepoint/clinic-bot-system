@@ -1,117 +1,143 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Daily Logs Panel</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
+      font-family: 'Roboto', sans-serif;
+      background: #111;
       color: #fff;
       margin: 0;
       padding: 20px;
     }
     h2 {
-      color: #39f;
+      color: #00e676;
+      text-align: center;
+    }
+    .button-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .excel-btn {
+      background-color: #43a047;
+      color: white;
+    }
+    .pdf-btn {
+      background-color: #e53935;
+      color: white;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      background: #222;
     }
     th, td {
-      padding: 10px;
       border: 1px solid #444;
-      text-align: left;
+      padding: 10px;
+      text-align: center;
     }
     th {
-      background-color: #222;
+      background: #333;
+      color: #00e676;
     }
-    .export-buttons {
-      margin: 10px 0;
-    }
-    button {
-      padding: 10px;
-      margin-right: 10px;
-      cursor: pointer;
+    a {
+      color: #4fc3f7;
+      text-decoration: none;
       font-weight: bold;
-      border: none;
-      border-radius: 5px;
     }
-    .excel-btn {
-      background-color: #28a745;
-      color: white;
+    a:hover {
+      color: #81d4fa;
     }
-    .pdf-btn {
-      background-color: #dc3545;
-      color: white;
+    @media screen and (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
   <h2>📊 Daily Logs Panel</h2>
-  <div class="export-buttons">
+  <div class="button-container">
     <button class="excel-btn" onclick="exportToExcel()">↓ Export to Excel</button>
     <button class="pdf-btn" onclick="exportToPDF()">↓ Export to PDF</button>
   </div>
-  <table id="logsTable">
+  <table>
     <thead>
       <tr>
         <th>Date</th>
         <th>Patient Name</th>
         <th>Time</th>
         <th>Reason</th>
-        <th>Contact</th>
+        <th>Status</th>
         <th>Reminder Sent</th>
+        <th>Contact</th>
+        <th>WhatsApp</th>
       </tr>
     </thead>
-    <tbody id="tableBody"></tbody>
-  </table>  <script>
-    async function fetchCSV() {
-      const response = await fetch("logs.csv");
-      const data = await response.text();
-      const rows = data.trim().split("\n").slice(1); // skip header
+    <tbody id="logsBody"></tbody>
+  </table>
 
-      const tableBody = document.getElementById("tableBody");
-      rows.forEach(row => {
-        const cols = row.split(",");
-        const tr = document.createElement("tr");
-        for (let i = 0; i < 6; i++) {
-          const td = document.createElement("td");
-          td.textContent = cols[i] || "";
-          if (i === 5 && cols[i] === '✔️') td.innerHTML = '✅';
-          tr.appendChild(td);
-        }
-        tableBody.appendChild(tr);
+  <script>
+    fetch("logs.csv")
+      .then((res) => res.text())
+      .then((data) => {
+        const rows = data.trim().split("\n").slice(1);
+        const tableBody = document.getElementById("logsBody");
+        rows.forEach((row) => {
+          const cols = row.split(",");
+          const [date, time, name, reason, status, reminder, contact] = cols;
+          const tr = document.createElement("tr");
+
+          const whatsappLink = (contact && contact.trim() && contact !== "-")
+            ? `<a href="https://wa.me/91${contact.trim()}?text=Hello%20${encodeURIComponent(name)},%20this%20is%20a%20reminder%20for%20your%20clinic%20appointment%20today%20at%20${encodeURIComponent(time)}.%20Please%20confirm%20your%20visit.%20-%20Warangal%20OneStop%20Clinic" target="_blank">🟢 WhatsApp</a>`
+            : "—";
+
+          tr.innerHTML = `
+            <td>${date}</td>
+            <td>${name}</td>
+            <td>${time}</td>
+            <td>${reason}</td>
+            <td>${status}</td>
+            <td>${reminder}</td>
+            <td>${contact || "—"}</td>
+            <td>${whatsappLink}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
       });
-    }
 
     function exportToExcel() {
-      const table = document.getElementById("logsTable");
-      const wb = XLSX.utils.table_to_book(table);
-      XLSX.writeFile(wb, "DailyLogs.xlsx");
+      const table = document.querySelector("table");
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Logs" });
+      XLSX.writeFile(wb, "clinic_logs.xlsx");
     }
 
     function exportToPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.text("Daily Logs Report", 10, 10);
-      const table = document.getElementById("logsTable");
-      let rows = [];
-      for (let i = 0; i < table.rows.length; i++) {
-        const cells = table.rows[i].cells;
-        const row = [];
-        for (let j = 0; j < cells.length; j++) {
-          row.push(cells[j].innerText);
-        }
-        rows.push(row);
-      }
-      doc.autoTable({ head: [rows[0]], body: rows.slice(1) });
-      doc.save("DailyLogs.pdf");
+      doc.text("Clinic Logs", 14, 16);
+      const rows = Array.from(document.querySelectorAll("tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim())
+      );
+      const headers = Array.from(document.querySelectorAll("thead th")).map(th => th.textContent.trim());
+      doc.autoTable({ head: [headers], body: rows, startY: 20 });
+      doc.save("clinic_logs.pdf");
     }
-
-    fetchCSV();
-  </script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script></body>
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+</body>
 </html>
