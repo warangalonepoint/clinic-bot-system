@@ -1,48 +1,45 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bookings</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="logo.png" type="image/png">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #111;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #000;
+      color: #0ff;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header img {
+      height: 40px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    main {
+      padding: 20px;
+    }
+  </style>
 </head>
-<body style="background-color: #111; color: #fff; font-family: Arial, sans-serif;">
-  <img src="logo.png" class="logo" alt="Clinic Logo" style="height: 40px; margin: 10px;" />  <h1 style="text-align: center; color: #0ff;">📅 Book an Appointment</h1>
-  <div style="padding: 20px;">
-    <form id="bookingForm">
-      <label for="name">Your Name:</label><br />
-      <input type="text" id="name" name="name" required><br /><br /><label for="reason">Reason for Visit:</label><br />
-  <input type="text" id="reason" name="reason" required><br /><br />
-
-  <label for="slot">Choose Time Slot:</label><br />
-  <select id="slot" name="slot"></select><br /><br />
-
-  <button type="submit">Book Now</button>
-</form>
-
-  </div>  <script>
-    const slotSelect = document.getElementById('slot');
-    fetch('https://warangalonepoint.github.io/clinic-admin/Slots.csv')
-      .then(response => response.text())
-      .then(csv => {
-        const rows = csv.trim().split('\n').slice(1);
-        rows.forEach(row => {
-          const [time, status] = row.split(',');
-          if (status.trim().toLowerCase() !== 'booked') {
-            const opt = document.createElement('option');
-            opt.value = time;
-            opt.textContent = time;
-            slotSelect.appendChild(opt);
-          }
-        });
-      });
-
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const name = document.getElementById('name').value;
-      const reason = document.getElementById('reason').value;
-      const slot = slotSelect.value;
-      const msg = `Booking Request: Name: ${name}, Reason: ${reason}, Slot: ${slot}`;
-      window.location.href = `https://wa.me/919390664577?text=${encodeURIComponent(msg)}`;
-    });
-  </script></body>
+<body>
+  <header>
+    <img src="logo.png" alt="Clinic Logo" />
+    <h1>Clinic Bookings</h1>
+  </header>
+  <main>
+    <p>This is the booking page. You can load real-time slots from your CSV backend here.</p>
+  </main>
+</body>
 </html>
