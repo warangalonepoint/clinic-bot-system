@@ -1,62 +1,73 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Clinic Dashboard</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
-      background-color: #111;
-      color: white;
-      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
     header {
-      padding: 20px;
-      background-color: #222;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      border-bottom: 1px solid #333;
-    }
-    nav {
+      background: #222;
+      padding: 15px;
       display: flex;
-      justify-content: space-around;
-      padding: 10px;
-      background-color: #1e1e1e;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 8px;
     }
-    nav a {
-      color: #0ff;
-      text-decoration: none;
-      font-weight: bold;
+    h1, h2 {
+      margin: 0;
     }
-    iframe {
-      width: 100%;
-      height: calc(100vh - 120px);
+    .logout {
+      background: #f44336;
+      color: white;
       border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
     }
-    footer {
-      padding: 10px;
-      background-color: #222;
-      text-align: center;
-      font-size: 14px;
-      border-top: 1px solid #333;
+    main {
+      margin-top: 30px;
+    }
+    .info {
+      font-size: 18px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <header>📋 Clinic Dashboard</header>
-  <nav>
-    <a href="#" onclick="loadPage('bookings.html')">Bookings</a>
-    <a href="#" onclick="loadPage('logs.html')">Logs</a>
-    <a href="#" onclick="loadPage('reset-pin.html')">Reset PIN</a>
-  </nav>
-  <iframe id="mainFrame" src="bookings.html"></iframe>
-  <footer>Powered by WarangalOneStop</footer>  <script>
-    function loadPage(page) {
-      document.getElementById('mainFrame').src = page;
+  <header>
+    <h1>Clinic Dashboard</h1>
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+
+  <main>
+    <div class="info">🔐 Logged in as: <b id="clinicName">...</b></div>
+    <div class="info">📦 Plan: <b id="planType">...</b></div>
+
+    <p style="margin-top: 30px;">✅ This dashboard is ready. New panels will load here based on your plan.</p>
+  </main>
+
+  <script>
+    const clinic = localStorage.getItem('clinic');
+    const plan = localStorage.getItem('plan');
+
+    if (!clinic || !plan) {
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('clinicName').textContent = clinic;
+      document.getElementById('planType').textContent = plan.toUpperCase();
     }
-  </script></body>
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
 </html>
