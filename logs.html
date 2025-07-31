@@ -165,42 +165,4 @@
   </script>
 
 </body>
-</html>      fetch(csvUrl).then(res => res.text()).then(text => {
-        const blob = new Blob([text], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "AppointmentLogs.csv";
-        a.click();
-      });
-    }
-
-    function filterDate(type) {
-      let filtered = [];
-      const today = new Date();
-      if (type === 'today') {
-        const d = today.toISOString().split("T")[0];
-        filtered = logData.filter(e => e.Date === d);
-      } else if (type === 'yesterday') {
-        today.setDate(today.getDate() - 1);
-        const d = today.toISOString().split("T")[0];
-        filtered = logData.filter(e => e.Date === d);
-      } else {
-        const sd = document.getElementById('startDate').value;
-        const ed = document.getElementById('endDate').value;
-        filtered = logData.filter(e => e.Date >= sd && e.Date <= ed);
-      }
-      renderTable(filtered);
-    }
-
-    function getPIN() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("pin");
-    }
-
-    const pin = getPIN();
-    if (pin) loadPlansJson(pin);
-    else alert("PIN missing from URL");
-  </script>
-</body>
 </html>
