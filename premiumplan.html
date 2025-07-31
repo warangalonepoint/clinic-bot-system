@@ -4,39 +4,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Premium Plan - BookingBot</title>
-  <link rel="manifest" href="manifest.json" />
-  <script src="service-worker.js"></script>
   <style>
     body {
-      background-color: #101010;
-      color: #fff;
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #f0f0f0;
+      margin: 0;
       padding: 20px;
     }
     h1 {
-      color: #ffcc00;
+      text-align: center;
+      color: #ffc107;
+    }
+    .features {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 14px;
+      margin: 20px auto;
+      max-width: 700px;
+    }
+    h2 {
+      color: #00e676;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    strong {
+      color: #4dc1ff;
+    }
+    .note {
+      font-size: 15px;
+      margin-top: 10px;
+      color: #aaa;
+    }
+    .back {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .back a {
+      color: #29b6f6;
+      font-size: 18px;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h1>Premium Plan Activated</h1>
-  <p>Welcome to the BookingBot - Premium Version</p>
-  <ul>
-    <li>📅 View Bookings</li>
-    <li>📋 Access Full Logs Panel</li>
-    <li>⬇️ Export to Excel + PDF</li>
-    <li>📲 WhatsApp Reminders with “Reminder Sent” Tracking</li>
-    <li>📈 Daily Summary + Top Visit Reasons</li>
-    <li>🔒 PIN-based Plan Locking</li>
-    <li>🧠 Smart Filters + Backup Tools</li>
-  </ul>
+  <h1>Premium Plan Activated 👑</h1>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js');
-      });
-    }
-  </script>
+  <div class="features">
+    <h2>All-Inclusive Features</h2>
+    <ul>
+      <li>✅ Branded Booking Page with Patient Name + Reason Input</li>
+      <li>✅ Real-time Slot Availability (CSV/Google Sheet/Auto)</li>
+      <li>✅ WhatsApp Booking Integration + Confirmation Messages</li>
+      <li>✅ Booking Logs Dashboard with Filter, Export (Excel/PDF)</li>
+      <li>✅ WhatsApp Reminder Buttons & Contact Click-to-Call</li>
+      <li>✅ Reminder Sent Status Tracking</li>
+      <li>✅ Daily Booking Summary Panel (Total, Top Reasons)</li>
+      <li>✅ Admin PIN Panel + Plan Activation</li>
+      <li>✅ Multi-Staff Panel with Shift/Attendance</li>
+      <li>✅ Doctor Dashboard + Internal Notes + Backup</li>
+      <li>✅ Full Offline Support with Add-to-Home-Screen PWA</li>
+      <li>✅ Daily CSV Auto Backup Download Link</li>
+      <li>✅ Logs Editing + PIN Reset Tools</li>
+      <li>✅ Ready for Firebase/Airtable Sync (Future)</li>
+    </ul>
+    <p class="note"><strong>Lifetime Plan:</strong> ₹4,999–₹6,999 one-time fee. Includes all features. No monthly cost.</p>
+  </div>
+
+  <div class="back">
+    <a href="test.html">🔙 Back to PIN Activation</a>
+  </div>
 </body>
 </html>
