@@ -1,25 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bookings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="manifest" href="manifest.json" />
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-      text-align: center;
-    }
-    h1 {
-      color: #6ee7ff;
-    }
-  </style>
+  <title>Bookings</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <h1>📅 Bookings Panel</h1>
-  <p>Manage your patient bookings here.</p>
-</body>
+<body style="background-color: #111; color: #fff; font-family: Arial, sans-serif;">
+  <img src="logo.png" class="logo" alt="Clinic Logo" style="height: 40px; margin: 10px;" />  <h1 style="text-align: center; color: #0ff;">📅 Book an Appointment</h1>
+  <div style="padding: 20px;">
+    <form id="bookingForm">
+      <label for="name">Your Name:</label><br />
+      <input type="text" id="name" name="name" required><br /><br /><label for="reason">Reason for Visit:</label><br />
+  <input type="text" id="reason" name="reason" required><br /><br />
+
+  <label for="slot">Choose Time Slot:</label><br />
+  <select id="slot" name="slot"></select><br /><br />
+
+  <button type="submit">Book Now</button>
+</form>
+
+  </div>  <script>
+    const slotSelect = document.getElementById('slot');
+    fetch('https://warangalonepoint.github.io/clinic-admin/Slots.csv')
+      .then(response => response.text())
+      .then(csv => {
+        const rows = csv.trim().split('\n').slice(1);
+        rows.forEach(row => {
+          const [time, status] = row.split(',');
+          if (status.trim().toLowerCase() !== 'booked') {
+            const opt = document.createElement('option');
+            opt.value = time;
+            opt.textContent = time;
+            slotSelect.appendChild(opt);
+          }
+        });
+      });
+
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const reason = document.getElementById('reason').value;
+      const slot = slotSelect.value;
+      const msg = `Booking Request: Name: ${name}, Reason: ${reason}, Slot: ${slot}`;
+      window.location.href = `https://wa.me/919390664577?text=${encodeURIComponent(msg)}`;
+    });
+  </script></body>
 </html>
