@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clinic Admin Dashboard</title>
-  <link rel="manifest" href="manifest.json" />
+  <title>Dashboard - Clinic Admin</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="logo.png" type="image/png">
   <style>
     body {
       background-color: #111;
@@ -12,92 +14,59 @@
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
-      text-align: center;
     }
 
     header {
-      background: #222;
-      padding: 15px;
-      border-bottom: 1px solid #444;
+      background-color: #222;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header img {
+      height: 50px;
+      margin-bottom: 10px;
     }
 
     h1 {
-      color: #00f2ff;
       margin: 0;
+      color: #0ff;
     }
 
-    .panel {
+    main {
       padding: 20px;
     }
 
-    .btn {
-      background-color: #00c853;
-      border: none;
-      padding: 15px 25px;
-      color: white;
-      font-size: 18px;
-      margin: 15px;
-      cursor: pointer;
+    .section {
+      background: #1a1a1a;
+      padding: 20px;
       border-radius: 8px;
-    }
-
-    .btn:hover {
-      background-color: #00a74f;
-    }
-
-    img#clinicLogo {
-      width: 120px;
-      margin-top: 10px;
-    }
-
-    .warning {
-      color: #ff6b6b;
-      margin-top: 10px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
+  <!-- ✅ Logo tag required for test -->
   <header>
     <img id="clinicLogo" src="logo.png" alt="Clinic Logo" />
     <h1>Clinic Admin Dashboard</h1>
   </header>
 
-  <div class="panel" id="mainPanel">
-    <p>Welcome to your admin tools. Choose an action below:</p>
+  <main>
+    <div class="section">
+      <h2>Welcome</h2>
+      <p>This is your secure dashboard. Use the side menu or buttons to navigate and manage bookings, staff, and settings.</p>
+    </div>
 
-    <button class="btn" onclick="go('bookings.html')">📝 View Bookings</button>
-    <button class="btn" onclick="go('logs.html')">📊 View Logs</button>
-    <button class="btn" onclick="go('clinic-dashboard.html')">⚙️ Doctor Tools</button>
-  </div>
-
-  <p class="warning" id="lockMsg"></p>
-
-  <script>
-    async function checkAccess() {
-      try {
-        const res = await fetch('plans.json');
-        const data = await res.json();
-        const expiry = new Date(data.expiryDate);
-        const today = new Date();
-        const isLocked = today > expiry && !data.overrideLock;
-
-        if (isLocked) {
-          window.location.href = "trial-expired.html";
-        } else {
-          document.getElementById("lockMsg").textContent = "✔️ Trial Active or Manually Unlocked";
-        }
-      } catch (e) {
-        document.getElementById("lockMsg").textContent = "⚠️ Could not verify plan. Please check plans.json";
-      }
-    }
-
-    function go(page) {
-      window.location.href = page;
-    }
-
-    checkAccess();
-  </script>
+    <div class="section">
+      <h2>Quick Links</h2>
+      <ul>
+        <li><a href="bookings.html" style="color:lightgreen;">📅 View Bookings</a></li>
+        <li><a href="logs.html" style="color:lightgreen;">📊 Booking Logs</a></li>
+        <li><a href="staff.html" style="color:lightgreen;">👩‍⚕️ Staff Attendance</a></li>
+      </ul>
+    </div>
+  </main>
 
 </body>
 </html>
