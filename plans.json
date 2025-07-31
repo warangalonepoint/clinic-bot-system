@@ -1,17 +1,22 @@
-[
-  {
-    "clinicID": "clinic01",
-    "pin": "1111",
-    "plan": "Free"
+{
+  "clinic1": {
+    "plan": "free",
+    "expires": "2025-08-04",
+    "overrideLock": false
   },
-  {
-    "clinicID": "clinic02",
-    "pin": "2222",
-    "plan": "Basic"
+  "clinic2": {
+    "plan": "paid",
+    "expires": "2025-08-04",
+    "overrideLock": false
   },
-  {
-    "clinicID": "clinic03",
-    "pin": "3333",
-    "plan": "Pro"
+  "clinic3": {
+    "plan": "premium",
+    "expires": "2025-08-04",
+    "overrideLock": false
+  },
+  "demoClinic": {
+    "plan": "premium",
+    "expires": "2025-08-31",
+    "overrideLock": true
   }
-]
+}
