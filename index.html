@@ -3,72 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clinic Admin System</title>
+  <title>Warangal OneStop BookingBot</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.ico" />
+  <meta name="theme-color" content="#0e0e0e" />
   <style>
     body {
-      background: #000;
-      color: #fff;
+      background-color: #000;
       font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
+      color: white;
       text-align: center;
+      padding: 50px 20px;
     }
-    img {
-      height: 80px;
-      margin-bottom: 10px;
-    }
-    .card {
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 15px;
-    }
-    .success {
-      background: #013220;
-      border: 2px solid #0f0;
-    }
-    .fail {
-      background: #300000;
-      border: 2px solid #f00;
-    }
+
     h1 {
-      color: #00ffc8;
+      font-size: 28px;
+      color: #4dc1ff;
+    }
+
+    p {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    a.button {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 30px;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="logo-bookings.png" alt="Logo" />
-    <h1>🔍 Clinic Admin System - Auto Test</h1>
+  <h1>📍 Warangal OneStop BookingBot</h1>
+  <p>Access your clinic dashboard below.</p>
 
-    <div class="card success">
-      <h2>Index Page</h2>
-      <p>✅ Page loaded and logo found.</p>
-    </div>
+  <a class="button" href="test.html">🔐 Enter PIN to Activate Plan</a>
 
-    <div class="card success">
-      <h2>Dashboard Page</h2>
-      <p>✅ Page loaded and logo found.</p>
-    </div>
-
-    <div class="card fail">
-      <h2>Bookings Page</h2>
-      <p>❌ Page loaded but logo not found.</p>
-    </div>
-
-    <div class="card success">
-      <h2>Logs Page</h2>
-      <p>✅ Page loaded and logo found.</p>
-    </div>
-
-    <div class="card success">
-      <h2>Clinic Dashboard</h2>
-      <p>✅ Page loaded and logo found.</p>
-    </div>
-  </div>
-
-  <script src="trial.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
