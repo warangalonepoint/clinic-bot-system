@@ -1,63 +1,75 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Appointment Logs</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #fff;
+      font-family: sans-serif;
+      background: #f4f7f9;
       margin: 0;
       padding: 20px;
-      color: #000;
     }
     h1 {
       text-align: center;
+      color: #1a237e;
     }
     #summary {
       text-align: center;
+      color: #388e3c;
       font-weight: bold;
-      margin-top: 10px;
-      color: green;
+      margin-bottom: 20px;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .controls button,
+    .controls input[type="date"] {
+      margin: 5px;
+      padding: 8px 14px;
+      font-size: 14px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
+      background: white;
     }
     th, td {
+      border: 1px solid #ccc;
       padding: 10px;
       text-align: left;
     }
-    select, button {
-      padding: 5px 10px;
-      margin: 5px;
+    th {
+      background: #eee;
     }
-    .reminder-status {
+    .sent {
       color: green;
       font-weight: bold;
-    }
-    button {
-      cursor: pointer;
-    }
-    a {
-      color: blue;
     }
   </style>
 </head>
 <body>
   <h1>📋 Appointment Logs</h1>
-  <p id="summary"></p>  <div style="text-align: center;">
+  <div id="summary">Loading...</div>
+
+  <div class="controls">
     <button onclick="filterToday()">Today</button>
-    <button onclick="filterYesterday()">Yesterday</button><br />
-    <select id="fromDate"></select> to <select id="toDate"></select>
-    <button onclick="applyFilter()">Apply</button><br />
+    <button onclick="filterYesterday()">Yesterday</button>
+    <br>
+    <input type="date" id="startDate">
+    to
+    <input type="date" id="endDate">
+    <button onclick="applyFilter()">Apply</button>
+    <br>
     <button onclick="exportCSV()">📁 Export CSV</button>
     <button onclick="exportPDF()">📄 Export PDF</button>
-  </div>  <table id="logTable">
+  </div>
+
+  <table id="logTable">
     <thead>
       <tr>
         <th>Date</th>
@@ -72,77 +84,110 @@
       </tr>
     </thead>
     <tbody></tbody>
-  </table>  <script>
+  </table>
+
+  <script>
     const csvUrl = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+    let allData = [];
 
-    async function fetchCSV() {
-      const res = await fetch(csvUrl);
-      const text = await res.text();
-      return text.trim().split("\n").slice(1).map(row => row.split(","));
-    }
-
-    function formatDate(d) {
-      return d.toISOString().split('T')[0];
-    }
-
-    function populateDateDropdowns() {
-      const fromSel = document.getElementById("fromDate");
-      const toSel = document.getElementById("toDate");
-      for (let i = 0; i < 60; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const val = formatDate(date);
-        const opt = `<option value="${val}">${val}</option>`;
-        fromSel.innerHTML += opt;
-        toSel.innerHTML += opt;
+    async function fetchData() {
+      try {
+        const res = await fetch(csvUrl);
+        const text = await res.text();
+        const parsed = Papa.parse(text, { header: true });
+        allData = parsed.data.filter(row => row.Date && row.Time); // skip blanks
+        renderTable(allData);
+        updateSummary(allData);
+      } catch (e) {
+        console.error("Error loading CSV:", e);
       }
-      fromSel.selectedIndex = 30;
-      toSel.selectedIndex = 0;
     }
 
-    function applyFilter() {
-      const from = document.getElementById("fromDate").value;
-      const to = document.getElementById("toDate").value;
-      loadLogs(from, to);
+    function renderTable(data) {
+      const tbody = document.querySelector("#logTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.Date}</td>
+          <td>${row.Time}</td>
+          <td>${row.Name}</td>
+          <td>${row.Reason}</td>
+          <td><a href="tel:${row.Contact}">${row.Contact}</a></td>
+          <td>${row.Clinic}</td>
+          <td>${row.Token}</td>
+          <td class="${row["Reminder Sent"] === "Sent" ? "sent" : ""}">${row["Reminder Sent"] || "Not Sent"}</td>
+          <td><button onclick="sendReminder('${row.Name}', '${row.Time}', '${row.Reason}', '${row.Contact}', '${row.Token}', this)">Send Reminder</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateSummary(data) {
+      const today = new Date().toISOString().split("T")[0];
+      const todayBookings = data.filter(d => d.Date === today).length;
+      const nextToken = todayBookings + 1;
+      document.getElementById("summary").textContent =
+        `✅ Bookings Today: ${todayBookings} | Next Token: ${nextToken}`;
     }
 
     function filterToday() {
-      const today = formatDate(new Date());
-      document.getElementById("fromDate").value = today;
-      document.getElementById("toDate").value = today;
-      loadLogs(today, today);
+      const today = new Date().toISOString().split("T")[0];
+      const filtered = allData.filter(d => d.Date === today);
+      renderTable(filtered);
+      updateSummary(filtered);
     }
 
     function filterYesterday() {
-      const y = new Date();
-      y.setDate(y.getDate() - 1);
-      const yd = formatDate(y);
-      document.getElementById("fromDate").value = yd;
-      document.getElementById("toDate").value = yd;
-      loadLogs(yd, yd);
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const yest = d.toISOString().split("T")[0];
+      const filtered = allData.filter(d => d.Date === yest);
+      renderTable(filtered);
+      updateSummary(filtered);
     }
 
-    function sendReminder(name, time, reason, contact, token, row) {
-      const msg = `Hello ${name}, this is a reminder for your appointment today at ${time} for ${reason} with Token #${token}. - OneStop Clinic`;
-      const url = `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
-      row.querySelector(".reminder-status").textContent = "Sent";
+    function applyFilter() {
+      const sd = document.getElementById("startDate").value;
+      const ed = document.getElementById("endDate").value;
+      if (!sd || !ed) return alert("Please select valid date range");
+      const filtered = allData.filter(d => d.Date >= sd && d.Date <= ed);
+      renderTable(filtered);
+      updateSummary(filtered);
     }
 
     function exportCSV() {
-      window.open(csvUrl, "_blank");
+      const csv = Papa.unparse(allData);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "AppointmentLogs.csv";
+      a.click();
     }
 
-    function exportPDF() {
-      window.print();
+    async function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const headers = [["Date", "Time", "Name", "Reason", "Contact", "Clinic", "Token", "Reminder"]];
+      const rows = allData.map(d => [d.Date, d.Time, d.Name, d.Reason, d.Contact, d.Clinic, d.Token, d["Reminder Sent"]]);
+      doc.autoTable({ head: headers, body: rows });
+      doc.save("AppointmentLogs.pdf");
     }
 
-    async function loadLogs(startDate, endDate) {
-      const data = await fetchCSV();
-      const tbody = document.querySelector("#logTable tbody");
-      tbody.innerHTML = "";
+    function sendReminder(name, time, reason, contact, token, btn) {
+      const msg = `Hello ${name}, this is a reminder for your appointment today at ${time} for ${reason} with Token #${token}. - OneStop Clinic`;
+      const url = `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+      const td = btn.parentElement.previousElementSibling;
+      td.textContent = "Sent";
+      td.classList.add("sent");
+    }
 
-      const today = formatDate(new Date());
+    fetchData();
+  </script>
+</body>
+</html>      const today = formatDate(new Date());
       let bookingsToday = 0;
       let nextToken = 1;
 
