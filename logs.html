@@ -2,37 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appointment Logs</title>
+  <title>📋 Appointment Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-    th { background-color: #f4f4f4; }
-    button { padding: 5px 10px; background-color: green; color: white; border: none; cursor: pointer; }
-    .export-btns button { margin-right: 10px; }
-    .filters { margin: 10px 0; }
-    .filters input, .filters select, .filters button { margin-right: 5px; padding: 4px; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { font-size: 24px; margin-bottom: 10px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 14px; }
+    th { background-color: #f2f2f2; }
+    .btn { background-color: green; color: white; padding: 6px 12px; border: none; margin-right: 10px; cursor: pointer; }
+    .btn:hover { opacity: 0.9; }
+    select, input[type="date"] { padding: 5px; font-size: 14px; }
   </style>
 </head>
 <body>
-  <h2>📋 Appointment Logs</h2>
+
+  <h1>📋 Appointment Logs</h1>
   <div>
-    ✅ Bookings Today: <span id="bookingsCount">0</span> |
-    Next Token: <span id="nextToken">1</span>
-  </div>
+    ✅ <strong>Bookings Today:</strong> <span id="todayCount">0</span>
+    | <strong>Next Token:</strong> <span id="nextToken">1</span>
+  </div><br>
 
-  <div class="filters">
-    <button onclick="filterDate('today')">Today</button>
-    <button onclick="filterDate('yesterday')">Yesterday</button>
-    <input type="date" id="startDate" />
-    <input type="date" id="endDate" />
-    <button onclick="filterDate('custom')">Apply</button>
-    <button onclick="exportCSV()">📄 Export CSV</button>
-    <button onclick="window.print()">🖨️ Export PDF</button>
-  </div>
+  <button class="btn" onclick="filterByToday()">Today</button>
+  <button class="btn" onclick="filterByYesterday()">Yesterday</button>
+  <input type="date" id="dateFilter" />
+  <button class="btn" onclick="applyCustomDate()">Apply</button>
+  <button class="btn" onclick="exportCSV()">📄 Export CSV</button>
+  <button class="btn" onclick="exportPDF()">🖨 Export PDF</button>
 
-  <table>
+  <table id="logTable">
     <thead>
       <tr>
         <th>Date</th>
@@ -43,44 +41,40 @@
         <th>Clinic</th>
         <th>Token</th>
         <th>Reminder</th>
-        <th>Reminder Sent</th>
       </tr>
     </thead>
-    <tbody id="logTableBody"></tbody>
+    <tbody></tbody>
   </table>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    const csvUrl = 'https://warangalonepoint.github.io/clinic-bot-system/logs.csv';
-    const plansUrl = 'https://warangalonepoint.github.io/clinic-bot-system/plans.json';
-    let logData = [];
+    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
+    let allData = [];
 
-    async function loadPlansJson(pin) {
-      const res = await fetch(plansUrl);
-      const plans = await res.json();
-      const clinicEntry = plans.find(p => p.pin === pin);
-      if (!clinicEntry) return alert("Invalid PIN");
-      loadLogs(clinicEntry.clinic);
-    }
-
-    async function loadLogs(clinicName) {
-      const res = await fetch(csvUrl);
-      const text = await res.text();
-      const rows = text.trim().split('\n').slice(1);
-      logData = rows.map(row => {
-        const [Date, Time, Name, Reason, Contact, Clinic, Token] = row.split(',');
-        return { Date, Time, Name, Reason, Contact, Clinic, Token };
-      }).filter(r => r.Clinic === clinicName);
-      renderTable(logData);
+    async function fetchData() {
+      const res = await fetch(CSV_URL);
+      const csvText = await res.text();
+      const parsed = Papa.parse(csvText.trim(), { header: true });
+      allData = parsed.data;
+      renderTable(allData);
     }
 
     function renderTable(data) {
-      const body = document.getElementById("logTableBody");
-      body.innerHTML = "";
-      let count = 0, maxToken = 0;
+      const tbody = document.querySelector("#logTable tbody");
+      tbody.innerHTML = "";
+
       const today = new Date().toISOString().split("T")[0];
+      let todayCount = 0;
+      let maxToken = 0;
+
       data.forEach(row => {
-        if (row.Date === today) count++;
-        maxToken = Math.max(maxToken, parseInt(row.Token));
+        const rowDate = formatDate(row.Date);
+        if (rowDate === today) todayCount++;
+        if (!isNaN(parseInt(row.Token))) {
+          maxToken = Math.max(maxToken, parseInt(row.Token));
+        }
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${row.Date}</td>
@@ -90,23 +84,70 @@
           <td><a href="tel:${row.Contact}">${row.Contact}</a></td>
           <td>${row.Clinic}</td>
           <td>${row.Token}</td>
-          <td><button onclick="sendReminder('${row.Contact}','${row.Time}','${row.Token}')">Send</button></td>
-          <td>your appointment is at ${row.Time}. Token No: #${row.Token}</td>
+          <td>${row.Reminder}</td>
         `;
-        body.appendChild(tr);
+        tbody.appendChild(tr);
       });
-      document.getElementById("bookingsCount").textContent = count;
+
+      document.getElementById("todayCount").textContent = todayCount;
       document.getElementById("nextToken").textContent = maxToken + 1;
     }
 
-    function sendReminder(contact, time, token) {
-      const msg = `Hello! Your appointment is at ${time}. Token No: #${token}`;
-      const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
-      window.open(link, "_blank");
+    function filterByToday() {
+      const today = formatDisplayDate(new Date());
+      const filtered = allData.filter(row => row.Date === today);
+      renderTable(filtered);
+    }
+
+    function filterByYesterday() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const yesterday = formatDisplayDate(d);
+      const filtered = allData.filter(row => row.Date === yesterday);
+      renderTable(filtered);
+    }
+
+    function applyCustomDate() {
+      const d = document.getElementById("dateFilter").value;
+      const filtered = allData.filter(row => row.Date === d);
+      renderTable(filtered);
     }
 
     function exportCSV() {
-      fetch(csvUrl).then(res => res.text()).then(text => {
+      const csv = Papa.unparse(allData);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "logs-export.csv");
+      link.click();
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const headers = [["Date", "Time", "Name", "Reason", "Contact", "Clinic", "Token", "Reminder"]];
+      const rows = allData.map(r => [
+        r.Date, r.Time, r.Name, r.Reason, r.Contact, r.Clinic, r.Token, r.Reminder
+      ]);
+      doc.autoTable({ head: headers, body: rows });
+      doc.save("logs-export.pdf");
+    }
+
+    function formatDisplayDate(d) {
+      return d.toISOString().split("T")[0];
+    }
+
+    function formatDate(str) {
+      const parts = str.split("-");
+      return `${parts[2]}-${parts[1]}-${parts[0]}` === new Date().toISOString().split("T")[0] ? new Date().toISOString().split("T")[0] : str;
+    }
+
+    fetchData();
+  </script>
+
+</body>
+</html>      fetch(csvUrl).then(res => res.text()).then(text => {
         const blob = new Blob([text], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
