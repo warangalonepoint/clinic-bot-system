@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -55,21 +54,14 @@
   <header>
     <img src="logo-bookings.png" alt="Logo" />
     <h1>📊 Booking Logs</h1>
-  </header>
-
-  <div id="summary">
-    <h2>📅 Daily Summary</h2>
+  </header>  <div id="summary">
+    <h2>🗕️ Daily Summary</h2>
     <p id="summaryContent">Loading summary...</p>
-  </div>
-
-  <div id="logList">
+  </div>  <div id="logList">
     <h2>🧾 All Logs</h2>
     <div id="logsContainer">Loading logs...</div>
     <button onclick="downloadLogs()">⬇ Export Logs</button>
-  </div>
-
-  <script src="trial.js"></script>
-  <script>
+  </div>  <script src="trial.js"></script>  <script>
     const LOGS_CSV = "Logs.csv";
 
     async function loadLogs() {
@@ -109,6 +101,5 @@
     }
 
     loadLogs();
-  </script>
-</body>
+  </script></body>
 </html>
