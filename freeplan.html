@@ -1,76 +1,23 @@
+freeplan.html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Free Plan Booking | BookingBot</title>
-  <link rel="manifest" href="manifest.json" />
-  <script src="trial.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Plan - Clinic System</title>
   <style>
-    body {
-      background-color: #101010;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      text-align: center;
-    }
-    select, button {
-      padding: 10px;
-      margin-top: 20px;
-      width: 80%;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-    }
-    button {
-      background-color: #28a745;
-      color: white;
-      cursor: pointer;
-    }
-    h1 {
-      color: #00d9ff;
-    }
+    body { background: #0e0e0e; color: white; font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    img { width: 100px; margin-bottom: 20px; }
+    h1 { color: #00ffff; }
   </style>
 </head>
 <body>
-  <h1>Book Appointment</h1>
-  <p>Select a time slot:</p>
-  <select id="slotDropdown">
-    <option value="">Loading slots...</option>
-  </select>
-  <br />
-  <button onclick="bookSlot()">Book via WhatsApp</button>
-
-  <script>
-    async function loadSlots() {
-      const res = await fetch('Slots.csv');
-      const text = await res.text();
-      const rows = text.trim().split('\n').slice(1); // remove header
-      const dropdown = document.getElementById('slotDropdown');
-      dropdown.innerHTML = '<option value="">Select Slot</option>';
-      rows.forEach(row => {
-        const [date, time] = row.split(',');
-        const label = `${date.trim()} - ${time.trim()}`;
-        const value = encodeURIComponent(label);
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = label;
-        dropdown.appendChild(option);
-      });
-    }
-
-    function bookSlot() {
-      const dropdown = document.getElementById('slotDropdown');
-      const slot = dropdown.value;
-      if (!slot) {
-        alert('Please select a slot');
-        return;
-      }
-      const url = `https://wa.me/919390664577?text=Hi%2C%20I%20want%20to%20book%20this%20slot%3A%20${slot}`;
-      window.location.href = url;
-    }
-
-    loadSlots();
-  </script>
+  <img src="assets/logos/logo-bookings.png" alt="Log" />
+  <h1>🔍 Clinic Admin System - Auto Test</h1>
+  <p>This is the <strong>Free Plan</strong> version. Basic features only.</p>
 </body>
 </html>
+
+
+
