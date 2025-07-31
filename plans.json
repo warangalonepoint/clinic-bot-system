@@ -1,17 +1,20 @@
-{
-  "1234": {
+[
+  {
     "clinic": "Clinic 1",
-    "plan": "free",
+    "pin": "1234",
+    "plan": "freeplan.html",
     "overrideLock": true
   },
-  "2525": {
+  {
     "clinic": "Clinic 2",
-    "plan": "paid",
+    "pin": "2525",
+    "plan": "paidplan.html",
     "overrideLock": true
   },
-  "9999": {
+  {
     "clinic": "Clinic 3",
-    "plan": "premium",
+    "pin": "9999",
+    "plan": "premiumplan.html",
     "overrideLock": true
   }
-}
+]
