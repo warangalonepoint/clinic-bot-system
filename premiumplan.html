@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BookingBot - Premium Plan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #fff;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 22px;
+      color: #00e1ff;
+      margin-bottom: 10px;
+    }
+
+    .summary {
+      margin: 20px 0;
+      background: #181818;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .summary span {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #222;
+      color: #0ff;
+    }
+
+    button {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      margin: 5px 10px 15px 0;
+      cursor: pointer;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>💎 BookingBot – Premium Plan</h1>
+  <div id="clinicName"></div>
+
+  <div>
+    <button onclick="exportCSV()">⬇ Export CSV</button>
+    <button onclick="sendReminders()">📤 Send WhatsApp Reminders</button>
+  </div>
+
+  <div class="summary" id="summaryPanel">
+    <strong>📅 Daily Summary</strong>
+    <span>Total Bookings: —</span>
+    <span>Reminders Sent: —</span>
+    <span>Top 3 Reasons: —</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Name</th>
+        <th>Reason</th>
+        <th>Contact</th>
+        <th>Token</th>
+        <th>Reminder Sent</th>
+      </tr>
+    </thead>
+    <tbody id="logsBody">
+      <tr><td colspan="7">Loading...</td></tr>
+    </tbody>
+  </table>
+
+  <div class="footer">⚙️ WarangalOneStop BookingBot – Premium Clinic Access</div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pin = urlParams.get("pin");
+    let clinic = "";
+
+    fetch("plans.json")
+      .then(res => res.json())
+      .then(data => {
+        if (data[pin]) {
+          clinic = data[pin].clinic.toLowerCase().replace(/\s+/g, "-");
+          document.getElementById("clinicName").innerText = "Clinic: " + data[pin].clinic;
+          fetch(`https://warangalonepoint.github.io/clinic-bot-system/${clinic}-logs.csv`)
+            .then(res => res.text())
+            .then(csv => {
+              const rows = csv.trim().split("\n").slice(1);
+              const body = document.getElementById("logsBody");
+              let total = 0;
+              let reminderCount = 0;
+              let reasonMap = {};
+              body.innerHTML = "";
+
+              rows.forEach(row => {
+                const [date, time, name, reason, contact, , token, , reminderSent] = row.split(",");
+                total++;
+                if (reminderSent && reminderSent.toLowerCase().includes("yes")) reminderCount++;
+                reasonMap[reason] = (reasonMap[reason] || 0) + 1;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td>${date}</td><td>${time}</td><td>${name}</td><td>${reason}</td><td><a href="tel:${contact}">${contact}</a></td><td>#${token}</td><td>${reminderSent}</td>`;
+                body.appendChild(tr);
+              });
+
+              const topReasons = Object.entries(reasonMap)
+                .sort((a,b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(e => `${e[0]} (${e[1]})`)
+                .join(", ");
+
+              document.getElementById("summaryPanel").innerHTML = `
+                <strong>📅 Daily Summary</strong>
+                <span>Total Bookings: ${total}</span>
+                <span>Reminders Sent: ${reminderCount}</span>
+                <span>Top 3 Reasons: ${topReasons || "—"}</span>
+              `;
+            });
+        } else {
+          document.getElementById("logsBody").innerHTML = "<tr><td colspan='7'>Invalid PIN</td></tr>";
+        }
+      });
+
+    function exportCSV() {
+      window.open(`https://warangalonepoint.github.io/clinic-bot-system/${clinic}-logs.csv`, "_blank");
+    }
+
+    function sendReminders() {
+      alert("✅ Reminders triggered! (Demo only)");
+    }
+  </script>
+</body>
+</html>
