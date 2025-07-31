@@ -1,70 +1,107 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Booking Logs</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #111;
-      color: #fff;
+      background: #111;
+      color: #eee;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
       padding: 20px;
-      font-family: Arial, sans-serif;
     }
-    h2 {
+
+    h1 {
+      color: #4dc1ff;
+      font-size: 24px;
       text-align: center;
-      margin-bottom: 30px;
     }
-    .log-table {
-      margin-top: 30px;
-      overflow-x: auto;
-    }
-    table {
+
+    #logTable {
       width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      overflow-x: auto;
+      font-size: 14px;
     }
-    th, td {
+
+    #logTable th, #logTable td {
+      border: 1px solid #444;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    #logTable th {
+      background: #222;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    #logTable td {
+      background: #1a1a1a;
+    }
+
+    .icon {
+      cursor: pointer;
       text-align: center;
-      padding: 12px;
+      font-size: 18px;
     }
-    th {
-      background-color: #333;
+
+    .icon:hover {
+      color: #4dc1ff;
     }
-    td {
-      background-color: #1c1c1c;
-    }
-    .container-flex {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .chart-container, .summary-container {
-      flex: 1 1 400px;
-    }
-    .chart-container canvas {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 10px;
-    }
-    .btn-primary {
-      background-color: #007bff;
+
+    .export-btn {
+      margin: 10px 10px 0 0;
+      padding: 10px 18px;
       border: none;
+      font-size: 14px;
+      background: #4dc1ff;
+      color: black;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      text-align: center;
+      color: #888;
+    }
+
+    .loader {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 16px;
+    }
+
+    @media (max-width: 600px) {
+      #logTable {
+        font-size: 12px;
+      }
+
+      .export-btn {
+        width: 100%;
+        margin-bottom: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>📊 Booking Logs Dashboard</h2>  <div class="container-flex">
-    <div class="chart-container">
-      <canvas id="dailySummaryChart" height="200"></canvas>
-    </div>
-    <div class="summary-container">
-      <label for="dateFilter">Select Date:</label>
-      <input type="date" id="dateFilter" class="form-control mb-3">
-      <button onclick="exportToExcel()" class="btn btn-success">Export to Excel</button>
-      <button onclick="exportToPDF()" class="btn btn-warning">Export to PDF</button>
-    </div>
-  </div>  <div class="log-table">
-    <table class="table table-dark table-bordered" id="logTable">
+  <h1>📋 Appointment Logs</h1>
+
+  <div style="text-align:center">
+    <button class="export-btn" onclick="exportToExcel()">📊 Export Excel</button>
+    <button class="export-btn" onclick="exportToPDF()">🧾 Export PDF</button>
+  </div>
+
+  <div class="loader" id="loading">Loading logs...</div>
+
+  <div style="overflow-x:auto">
+    <table id="logTable" style="display:none">
       <thead>
         <tr>
           <th>Date</th>
@@ -72,110 +109,51 @@
           <th>Patient Name</th>
           <th>Reason</th>
           <th>Contact</th>
-          <th>Status</th>
-          <th>Reminder Sent</th>
+          <th>Reminder</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="logBody"></tbody>
     </table>
-  </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
-    const csvUrl = 'https://warangalonepoint.github.io/clinic-bot-system/logs.csv';
-    const tableBody = document.querySelector('#logTable tbody');
-    const dateFilter = document.getElementById('dateFilter');
-    let allLogs = [];
+  </div>
 
-    async function fetchLogs() {
-      const res = await fetch(csvUrl);
-      const data = await res.text();
-      const rows = data.trim().split('\n').slice(1);
-      allLogs = rows.map(row => row.split(','));
-      renderTable(allLogs);
-      renderChart(allLogs);
-    }
+  <div class="footer">Powered by WarangalOneStop BookingBot</div>
 
-    function renderTable(logs) {
-      tableBody.innerHTML = '';
-      logs.forEach(log => {
-        const row = document.createElement('tr');
-        log.forEach((cell, index) => {
+  <script>
+    async function loadLogs() {
+      const res = await fetch('https://warangalonepoint.github.io/clinic-bot-system/logs.csv');
+      const csv = await res.text();
+      const lines = csv.trim().split('\n').slice(1);
+      const tbody = document.getElementById('logBody');
+      lines.forEach(row => {
+        const cols = row.split(',');
+        const tr = document.createElement('tr');
+        cols.forEach((col, idx) => {
           const td = document.createElement('td');
-          if (index === 4) {
-            // Contact column - make it clickable on mobile
-            const phone = cell.trim();
-            const a = document.createElement('a');
-            a.href = `tel:${phone}`;
-            a.textContent = phone;
-            a.style.color = 'lightgreen';
-            a.style.textDecoration = 'none';
-            td.appendChild(a);
-          } else {
-            td.textContent = cell;
-          }
-          row.appendChild(td);
+          td.textContent = col.trim();
+          tr.appendChild(td);
         });
-        tableBody.appendChild(row);
-      });
-    }
 
-    function renderChart(logs) {
-      const summary = {};
-      logs.forEach(row => {
-        const date = row[0];
-        summary[date] = (summary[date] || 0) + 1;
-      });
-      const labels = Object.keys(summary);
-      const values = Object.values(summary);
-
-      new Chart(document.getElementById('dailySummaryChart'), {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Bookings per Day',
-            data: values,
-            backgroundColor: '#4dc1ff'
-          }]
+        // Add icons for contact and reminder
+        if (cols.length >= 5) {
+          tr.children[4].innerHTML = `<a href="tel:${cols[4]}" class="icon" title="Call Patient">📞</a>`;
         }
+        tr.children[5].innerHTML = `<span class="icon" title="Send Reminder via WhatsApp">📲</span>`;
+
+        tbody.appendChild(tr);
       });
+      document.getElementById('logTable').style.display = 'table';
+      document.getElementById('loading').style.display = 'none';
     }
 
     function exportToExcel() {
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet([
-        ['Date', 'Time', 'Patient Name', 'Reason', 'Contact', 'Status', 'Reminder Sent'],
-        ...allLogs
-      ]);
-      XLSX.utils.book_append_sheet(wb, ws, 'Logs');
-      XLSX.writeFile(wb, 'booking_logs.xlsx');
+      window.location.href = 'https://warangalonepoint.github.io/clinic-bot-system/logs.csv';
     }
 
-    async function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(12);
-      doc.text('Booking Logs', 20, 20);
-
-      const rows = allLogs.map(r => r.slice(0, 7));
-      let y = 30;
-      rows.forEach(r => {
-        doc.text(r.join(' | '), 10, y);
-        y += 10;
-        if (y > 270) {
-          doc.addPage();
-          y = 20;
-        }
-      });
-
-      doc.save('booking_logs.pdf');
+    function exportToPDF() {
+      alert("PDF export coming soon in next sprint 🚀");
     }
 
-    dateFilter.addEventListener('change', () => {
-      const selected = dateFilter.value;
-      if (!selected) return renderTable(allLogs);
-      const filtered = allLogs.filter(row => row[0] === selected);
-      renderTable(filtered);
-    });
-
-    fetchLogs();
-  </script></body>
+    loadLogs();
+  </script>
+</body>
 </html>
