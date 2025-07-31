@@ -1,35 +1,74 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clinic Admin System</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
-    header { background: #222; color: #fff; padding: 10px; display: flex; align-items: center; }
-    header img { height: 40px; margin-right: 10px; }
-    header h1 { margin: 0; font-size: 20px; }
-    .container { padding: 20px; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
+    img {
+      height: 80px;
+      margin-bottom: 10px;
+    }
+    .card {
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 15px;
+    }
+    .success {
+      background: #013220;
+      border: 2px solid #0f0;
+    }
+    .fail {
+      background: #300000;
+      border: 2px solid #f00;
+    }
+    h1 {
+      color: #00ffc8;
+    }
   </style>
-  <script>
-    const clinicID = localStorage.getItem("clinicID") || "onesto";
-    const logoPath = `clinics/${clinicID}/logo.png`;window.addEventListener("DOMContentLoaded", () => {
-  const logoEl = document.getElementById("clinic-logo");
-  if (logoEl) {
-    logoEl.src = logoPath;
-    logoEl.onerror = () => logoEl.style.display = "none";
-  }
-});
-
-  </script>
 </head>
 <body>
-  <header>
-    <img id="clinic-logo" alt="Clinic Logo" />
-    <h1>Clinic Login</h1>
-  </header>
   <div class="container">
-    <!-- Login content goes here -->
-    <p>Please enter your PIN to access the dashboard.</p>
+    <img src="logo-bookings.png" alt="Logo" />
+    <h1>🔍 Clinic Admin System - Auto Test</h1>
+
+    <div class="card success">
+      <h2>Index Page</h2>
+      <p>✅ Page loaded and logo found.</p>
+    </div>
+
+    <div class="card success">
+      <h2>Dashboard Page</h2>
+      <p>✅ Page loaded and logo found.</p>
+    </div>
+
+    <div class="card fail">
+      <h2>Bookings Page</h2>
+      <p>❌ Page loaded but logo not found.</p>
+    </div>
+
+    <div class="card success">
+      <h2>Logs Page</h2>
+      <p>✅ Page loaded and logo found.</p>
+    </div>
+
+    <div class="card success">
+      <h2>Clinic Dashboard</h2>
+      <p>✅ Page loaded and logo found.</p>
+    </div>
   </div>
+
+  <script src="trial.js"></script>
 </body>
 </html>
