@@ -1,53 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BookingBot Test Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test All Clinic Plans</title>
   <style>
     body {
-      background-color: #0d1117;
-      color: #c9d1d9;
       font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
       padding: 20px;
-      text-align: center;
     }
     h1 {
-      color: #58a6ff;
-      margin-bottom: 20px;
+      color: #4dc1ff;
     }
-    button {
-      padding: 12px 18px;
-      margin: 10px;
-      border: none;
-      background-color: #238636;
-      color: white;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
+    .result {
+      padding: 10px;
+      margin: 10px 0;
+      background: #222;
+      border-left: 5px solid #4dc1ff;
     }
     iframe {
       width: 100%;
-      height: 80vh;
-      border: 2px solid #30363d;
-      border-radius: 8px;
-      margin-top: 20px;
+      height: 200px;
+      border: 1px solid #333;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>BookingBot Test Panel</h1>
-  <button onclick="loadVersion('freeplan.html')">Load Free Plan</button>
-  <button onclick="loadVersion('paidplan.html')">Load Paid Plan</button>
-  <button onclick="loadVersion('premiumplan.html')">Load Premium Plan</button>
-
-  <iframe id="previewFrame" src="about:blank"></iframe>
-
-  <script>
-    function loadVersion(file) {
-      const frame = document.getElementById('previewFrame');
-      frame.src = file + '?v=' + new Date().getTime(); // force reload
-    }
-  </script>
-</body>
+  <h1>🔍 Plan Validation for All Clinics</h1>  <div class="result">
+    <strong>🔒 Clinic 1 (Free Expired):</strong>
+    <iframe src="index.html?clinic=clinic1"></iframe>
+  </div>  <div class="result">
+    <strong>🔒 Clinic 2 (Paid Expired):</strong>
+    <iframe src="index.html?clinic=clinic2"></iframe>
+  </div>  <div class="result">
+    <strong>🔒 Clinic 3 (Premium Expired):</strong>
+    <iframe src="index.html?clinic=clinic3"></iframe>
+  </div>  <div class="result">
+    <strong>✅ Demo Clinic (Unlocked):</strong>
+    <iframe src="index.html?clinic=demoClinic"></iframe>
+  </div></body>
 </html>
