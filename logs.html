@@ -1,52 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Appointment Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: left;
-    }
-    th {
-      background-color: #f4f4f4;
-    }
-    button {
-      padding: 4px 8px;
-      background-color: green;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .export-btns {
-      margin-bottom: 10px;
-    }
-    .export-btns button {
-      margin-right: 10px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    button { padding: 5px 10px; background-color: green; color: white; border: none; cursor: pointer; }
+    .export-btns button { margin-right: 10px; }
+    .filters { margin: 10px 0; }
+    .filters input, .filters select, .filters button { margin-right: 5px; padding: 4px; }
   </style>
 </head>
 <body>
-
-  <h2>Appointment Logs</h2>
+  <h2>📋 Appointment Logs</h2>
   <div>
     ✅ Bookings Today: <span id="bookingsCount">0</span> |
     Next Token: <span id="nextToken">1</span>
   </div>
 
-  <div class="export-btns">
+  <div class="filters">
+    <button onclick="filterDate('today')">Today</button>
+    <button onclick="filterDate('yesterday')">Yesterday</button>
+    <input type="date" id="startDate" />
+    <input type="date" id="endDate" />
+    <button onclick="filterDate('custom')">Apply</button>
     <button onclick="exportCSV()">📄 Export CSV</button>
     <button onclick="window.print()">🖨️ Export PDF</button>
   </div>
@@ -71,42 +52,35 @@
   <script>
     const csvUrl = 'https://warangalonepoint.github.io/clinic-bot-system/logs.csv';
     const plansUrl = 'https://warangalonepoint.github.io/clinic-bot-system/plans.json';
+    let logData = [];
 
     async function loadPlansJson(pin) {
       const res = await fetch(plansUrl);
       const plans = await res.json();
       const clinicEntry = plans.find(p => p.pin === pin);
-      if (!clinicEntry) {
-        alert('Invalid PIN. No matching clinic.');
-        return;
-      }
-      const clinicName = clinicEntry.clinic;
-      loadLogs(clinicName);
+      if (!clinicEntry) return alert("Invalid PIN");
+      loadLogs(clinicEntry.clinic);
     }
 
     async function loadLogs(clinicName) {
       const res = await fetch(csvUrl);
       const text = await res.text();
       const rows = text.trim().split('\n').slice(1);
-      const data = rows.map(row => {
+      logData = rows.map(row => {
         const [Date, Time, Name, Reason, Contact, Clinic, Token] = row.split(',');
         return { Date, Time, Name, Reason, Contact, Clinic, Token };
-      });
-      const filtered = data.filter(r => r.Clinic === clinicName);
-      renderTable(filtered);
+      }).filter(r => r.Clinic === clinicName);
+      renderTable(logData);
     }
 
     function renderTable(data) {
       const body = document.getElementById("logTableBody");
       body.innerHTML = "";
-
+      let count = 0, maxToken = 0;
       const today = new Date().toISOString().split("T")[0];
-      let bookingsToday = 0, maxToken = 0;
-
       data.forEach(row => {
-        if (row.Date === today) bookingsToday++;
-        if (parseInt(row.Token) > maxToken) maxToken = parseInt(row.Token);
-
+        if (row.Date === today) count++;
+        maxToken = Math.max(maxToken, parseInt(row.Token));
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${row.Date}</td>
@@ -121,19 +95,43 @@
         `;
         body.appendChild(tr);
       });
-
-      document.getElementById("bookingsCount").textContent = bookingsToday;
+      document.getElementById("bookingsCount").textContent = count;
       document.getElementById("nextToken").textContent = maxToken + 1;
     }
 
     function sendReminder(contact, time, token) {
       const msg = `Hello! Your appointment is at ${time}. Token No: #${token}`;
-      const url = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
+      const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
+      window.open(link, "_blank");
     }
 
     function exportCSV() {
-      window.open(csvUrl, "_blank");
+      fetch(csvUrl).then(res => res.text()).then(text => {
+        const blob = new Blob([text], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "AppointmentLogs.csv";
+        a.click();
+      });
+    }
+
+    function filterDate(type) {
+      let filtered = [];
+      const today = new Date();
+      if (type === 'today') {
+        const d = today.toISOString().split("T")[0];
+        filtered = logData.filter(e => e.Date === d);
+      } else if (type === 'yesterday') {
+        today.setDate(today.getDate() - 1);
+        const d = today.toISOString().split("T")[0];
+        filtered = logData.filter(e => e.Date === d);
+      } else {
+        const sd = document.getElementById('startDate').value;
+        const ed = document.getElementById('endDate').value;
+        filtered = logData.filter(e => e.Date >= sd && e.Date <= ed);
+      }
+      renderTable(filtered);
     }
 
     function getPIN() {
@@ -142,11 +140,8 @@
     }
 
     const pin = getPIN();
-    if (!pin) {
-      alert("PIN missing from URL");
-    } else {
-      loadPlansJson(pin);
-    }
+    if (pin) loadPlansJson(pin);
+    else alert("PIN missing from URL");
   </script>
 </body>
 </html>
