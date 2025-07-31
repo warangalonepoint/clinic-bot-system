@@ -2,59 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appointment Confirmed</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Confirmed</title>
   <style>
     body {
-      background: #0f0f0f;
-      color: #fff;
+      background-color: #f4f4f4;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px 20px;
+      padding: 40px;
     }
-
-    h2 {
-      font-size: 28px;
-      color: #00ffcc;
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 400px;
+      margin: auto;
     }
-
+    h1 {
+      color: #2e8b57;
+    }
+    .info {
+      font-size: 18px;
+      margin-top: 10px;
+    }
     .token {
-      font-size: 48px;
-      margin: 20px 0;
+      font-size: 20px;
+      color: #d9534f;
       font-weight: bold;
-      color: #ffd700;
-    }
-
-    .msg {
       margin-top: 20px;
-      font-size: 16px;
-      color: #ccc;
     }
-
-    a {
-      display: inline-block;
-      margin-top: 30px;
-      background: #00e1ff;
-      color: #000;
+    .whatsapp-button {
+      margin-top: 25px;
       padding: 12px 24px;
+      font-size: 16px;
+      background-color: #25D366;
+      color: white;
+      border: none;
       border-radius: 8px;
+      cursor: pointer;
       text-decoration: none;
-      font-weight: bold;
+      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <h2>✅ Booking Confirmed!</h2>
-  <div class="token" id="tokenDisplay">Token No: --</div>
-  <div class="msg">Please arrive on time. If the doctor is delayed, patients will be seen in token order.</div>
-  <a id="whatsappLink" target="_blank">📲 Send to WhatsApp</a>
+  <div class="card">
+    <h1>✅ Booking Confirmed!</h1>
+    <div class="info" id="confirmationDetails"></div>
+    <div class="token" id="tokenDisplay"></div>
+    <a id="whatsappButton" class="whatsapp-button" target="_blank">Send Confirmation on WhatsApp</a>
+  </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token") || "--";
-    document.getElementById("tokenDisplay").textContent = `Token No: ${token}`;
-    document.getElementById("whatsappLink").href =
-      `https://wa.me/?text=Your appointment is confirmed. Token No: ${token}. Thank you.`;
+    const name = urlParams.get('name') || 'Patient';
+    const time = urlParams.get('time') || '';
+    const reason = urlParams.get('reason') || '';
+    const contact = urlParams.get('contact') || '';
+    const token = urlParams.get('token') || '';
+
+    document.getElementById('confirmationDetails').innerText = `Hi ${name}, your appointment is booked at ${time} for "${reason}".`;
+    document.getElementById('tokenDisplay').innerText = `Your Token No: ${token}`;
+
+    const message = `Hi, this is ${name}. My appointment is confirmed at ${time} for "${reason}". Token No: ${token}`;
+    const whatsappLink = `https://wa.me/${contact}?text=${encodeURIComponent(message)}`;
+    document.getElementById('whatsappButton').href = whatsappLink;
   </script>
 </body>
 </html>
