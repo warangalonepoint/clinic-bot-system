@@ -1,1 +1,6 @@
 
+Date,Time,Name,Reason,Contact,Clinic,Token,Reminder Sent
+2025-07-31,09:00,Rajesh Kumar,Consultation,+919876543210,clinic1,1,
+2025-07-31,09:10,Anita Reddy,General Checkup,+919812345678,clinic1,2,
+2025-07-31,09:20,Manoj Das,Fever,+918765432198,clinic1,3,
+2025-07-31,09:30,Swetha Rao,Diabetes Follow-up,+919999888877,clinic1,4,
