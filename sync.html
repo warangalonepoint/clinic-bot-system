@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sync Dashboard</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #f39c12;
+    }
+
+    .panel {
+      background: #222;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 500px;
+      box-shadow: 0 0 10px #000;
+    }
+
+    input[type="file"] {
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #00b894;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    button:hover {
+      background-color: #019875;
+    }
+
+    #status {
+      margin-top: 15px;
+      color: #00cec9;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manual CSV Sync</h1>
+
+  <div class="panel">
+    <p>🔄 Upload new <strong>logs CSV</strong> for your clinic manually.</p>
+    <input type="file" id="csvFile" accept=".csv" />
+    <br />
+    <button onclick="handleUpload()">Upload Logs</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    function handleUpload() {
+      const fileInput = document.getElementById("csvFile");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        document.getElementById("status").textContent = "⚠️ Please choose a file first.";
+        return;
+      }
+
+      // Simulate upload
+      document.getElementById("status").textContent = "⏳ Uploading...";
+      setTimeout(() => {
+        document.getElementById("status").textContent = "✅ File uploaded successfully (simulated).";
+      }, 1500);
+
+      // NOTE: Real upload requires backend (FTP, API, or GitHub CLI)
+    }
+  </script>
+</body>
+</html>
