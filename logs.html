@@ -1,88 +1,221 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clinic Logs</title>
+  <meta charset="UTF-8" />
+  <title>Booking Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
       background: #111;
       color: #fff;
-    }
-    header {
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
-      background: #222;
-      text-align: center;
     }
+
     h1 {
-      color: #00bfff;
-      margin: 0;
+      color: #00ffc8;
+      font-size: 24px;
+      margin-bottom: 10px;
     }
-    .summary-box {
-      padding: 20px;
-      background: #1e1e1e;
-      margin: 20px;
-      border-radius: 10px;
-    }
-    .summary-box p {
-      margin: 10px 0;
-    }
+
     table {
-      width: 95%;
-      margin: 20px auto;
+      width: 100%;
       border-collapse: collapse;
-      background: #1a1a1a;
+      margin-top: 20px;
+      font-size: 14px;
     }
+
     th, td {
-      padding: 12px;
-      border: 1px solid #333;
+      border: 1px solid #444;
+      padding: 8px;
       text-align: center;
     }
+
     th {
       background-color: #333;
-      color: #f0ad4e;
     }
-    td {
-      background-color: #222;
+
+    .filter-bar {
+      margin: 10px 0;
     }
-    footer {
-      text-align: center;
-      padding: 10px;
+
+    .filter-bar select,
+    .filter-bar input {
+      padding: 6px;
+      margin-right: 10px;
+    }
+
+    .btn {
+      padding: 6px 14px;
+      background-color: #00ffc8;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .reminder-btn {
+      background-color: #007bff;
+      color: white;
+      padding: 5px 10px;
       font-size: 12px;
-      color: #777;
+      border: none;
+      border-radius: 4px;
+    }
+
+    .reminder-btn:hover {
+      background-color: #0056b3;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 12px;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>📋 Clinic Logs – Daily Summary</h1>
-  </header>  <div class="summary-box">
-    <p><strong>Plan:</strong> paid</p>
-    <p><strong>Clinic:</strong> Clinic 2</p>
-    <p><strong>Date:</strong> 2025-07-31</p>
-    <p><strong>Total Bookings:</strong> 0</p>
-    <p><strong>Reminders Sent:</strong> 0</p>
-    <p><strong>Top Reasons:</strong> N/A</p>
-  </div>  <table>
+  <h1>📑 Booking Logs</h1>
+
+  <div class="filter-bar">
+    <select id="dateFilter">
+      <option value="all">All</option>
+      <option value="today">Today</option>
+      <option value="yesterday">Yesterday</option>
+      <option value="custom">Custom Range</option>
+    </select>
+    <input type="date" id="startDate" style="display:none;">
+    <input type="date" id="endDate" style="display:none;">
+    <button class="btn" onclick="applyFilters()">Apply</button>
+    <button class="btn" onclick="exportCSV()">Export CSV</button>
+  </div>
+
+  <table id="logsTable">
     <thead>
       <tr>
+        <th>Date</th>
         <th>Time</th>
-        <th>Patient</th>
+        <th>Name</th>
         <th>Reason</th>
         <th>Contact</th>
-        <th>Status</th>
         <th>Token</th>
+        <th>Reminder</th>
+        <th>Reminder Sent</th>
+        <th>Action</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td colspan="6">No bookings found for today.</td>
-      </tr>
-    </tbody>
-  </table>  <footer>
-    &copy; 2025 Warangal OneStop BookingBot
-  </footer>
+    <tbody></tbody>
+  </table>
+
+  <footer>🔒 Powered by WarangalOneStop BookingBot</footer>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pin = urlParams.get("pin");
+
+    let clinic = "";
+    let logs = [];
+
+    fetch("plans.json")
+      .then(res => res.json())
+      .then(data => {
+        if (data[pin]) {
+          clinic = data[pin].clinic.toLowerCase().replace(/\s+/g, '-');
+          loadLogs(`https://warangalonepoint.github.io/clinic-bot-system/${clinic}-logs.csv`);
+        }
+      });
+
+    function loadLogs(csvUrl) {
+      fetch(csvUrl)
+        .then(response => response.text())
+        .then(csv => {
+          logs = csv.trim().split("\n").slice(1).map(row => {
+            const [Date, Time, Name, Reason, Contact, Clinic, Token, Reminder, ReminderSent] = row.split(",");
+            return { Date, Time, Name, Reason, Contact, Clinic, Token, Reminder, ReminderSent };
+          });
+          renderTable(logs);
+        });
+    }
+
+    function renderTable(data) {
+      const tbody = document.querySelector("#logsTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(entry => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${entry.Date}</td>
+          <td>${entry.Time}</td>
+          <td>${entry.Name}</td>
+          <td>${entry.Reason}</td>
+          <td><a href="tel:${entry.Contact}">${entry.Contact}</a></td>
+          <td>#${entry.Token}</td>
+          <td>${entry.Reminder}</td>
+          <td>${entry.ReminderSent || "❌"}</td>
+          <td>
+            <button class="reminder-btn" onclick="sendReminder('${entry.Contact}','${entry.Name}','${entry.Time}','${entry.Token}')">Send</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function sendReminder(contact, name, time, token) {
+      const msg = `Reminder: ${name}, your appointment is at ${time}. Token No: #${token}.`;
+      const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
+      window.open(link, "_blank");
+    }
+
+    function applyFilters() {
+      const filter = document.getElementById("dateFilter").value;
+      const now = new Date();
+      let filtered = [];
+
+      if (filter === "today") {
+        const today = now.toLocaleDateString("en-GB");
+        filtered = logs.filter(entry => entry.Date === today);
+      } else if (filter === "yesterday") {
+        const yest = new Date(now);
+        yest.setDate(now.getDate() - 1);
+        const yDate = yest.toLocaleDateString("en-GB");
+        filtered = logs.filter(entry => entry.Date === yDate);
+      } else if (filter === "custom") {
+        const sd = document.getElementById("startDate").value;
+        const ed = document.getElementById("endDate").value;
+        if (sd && ed) {
+          const [start, end] = [new Date(sd), new Date(ed)];
+          filtered = logs.filter(entry => {
+            const logDate = new Date(entry.Date.split("-").reverse().join("-"));
+            return logDate >= start && logDate <= end;
+          });
+        }
+      } else {
+        filtered = logs;
+      }
+
+      renderTable(filtered);
+    }
+
+    document.getElementById("dateFilter").addEventListener("change", e => {
+      const isCustom = e.target.value === "custom";
+      document.getElementById("startDate").style.display = isCustom ? "inline-block" : "none";
+      document.getElementById("endDate").style.display = isCustom ? "inline-block" : "none";
+    });
+
+    function exportCSV() {
+      const rows = [["Date","Time","Name","Reason","Contact","Token","Reminder","Reminder Sent"]];
+      logs.forEach(entry => {
+        rows.push([entry.Date, entry.Time, entry.Name, entry.Reason, entry.Contact, entry.Token, entry.Reminder, entry.ReminderSent || "❌"]);
+      });
+      const csvContent = rows.map(e => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${clinic}-logs.csv`;
+      a.click();
+    }
+  </script>
 </body>
 </html>
