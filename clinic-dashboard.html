@@ -1,70 +1,101 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Dashboard</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
-  <script src="trial.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
+      background-color: #0e0e0e;
+      color: #fff;
       font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #4dc1ff;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1c1c1c;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #333;
+      text-align: left;
+    }
+    th {
+      background-color: #222;
+    }
+    tr:nth-child(even) {
+      background-color: #2b2b2b;
+    }
+    .status {
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+    .done {
+      background-color: #28a745;
+      color: white;
+    }
+    .pending {
+      background-color: #ffc107;
+      color: #000;
     }
     .header {
-      background-color: #1e90ff;
-      color: white;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .header img {
-      height: 40px;
-    }
-    .nav {
-      display: flex;
-      gap: 10px;
-    }
-    .nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .container {
-      padding: 20px;
+      margin-bottom: 10px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <img id="clinicLogo" src="" alt="Clinic Logo" />
-    <div class="nav">
-      <a href="bookings.html">Bookings</a>
-      <a href="logs.html">Logs</a>
-      <a href="index.html">Main</a>
-    </div>
-  </div>
-  <div class="container">
-    <h2>Clinic Dashboard</h2>
-    <p>Manage bookings, view logs, and control your clinic features from here.</p>
-    <p>If you're seeing this page, your clinic's dashboard is active.</p>
-  </div>
+  <h1>📋 Clinic Dashboard – Today's Appointments</h1>
+  <div class="header" id="today"></div>
+  <table id="dashboardTable">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Patient Name</th>
+        <th>Reason</th>
+        <th>Contact</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
   <script>
-    const clinicId = new URLSearchParams(window.location.search).get("id") || "default";fetch(`plans/${clinicId}.json`)
-  .then((res) => res.json())
-  .then((plan) => {
-    if (plan.trialExpired && !plan.overrideLock) {
-      window.location.href = "trial-expired.html";
+    const todayDate = new Date().toISOString().split("T")[0];
+    document.getElementById("today").textContent = "Date: " + todayDate;
+
+    async function loadDashboard() {
+      const res = await fetch("logs.csv");
+      const text = await res.text();
+      const rows = text.trim().split("\n").slice(1);
+
+      const tbody = document.querySelector("#dashboardTable tbody");
+      tbody.innerHTML = "";
+
+      rows.forEach(row => {
+        const [date, name, reason, slot, contact, status] = row.split(",");
+        const rowDate = new Date(date.split("-").reverse().join("-")).toISOString().split("T")[0];
+        if (rowDate === todayDate) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${slot}</td>
+            <td>${name}</td>
+            <td>${reason}</td>
+            <td><a href="tel:${contact}">${contact}</a></td>
+            <td><span class="status ${status === "Done" ? "done" : "pending"}">${status || "Pending"}</span></td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
     }
-  })
-  .catch((e) => console.warn("Plan check failed", e));
 
-const logoPath = `logos/${clinicId}.png`;
-document.getElementById("clinicLogo").src = logoPath;
-
+    loadDashboard();
   </script>
 </body>
 </html>
