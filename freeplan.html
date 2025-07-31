@@ -1,109 +1,76 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WarangalOneStop BookingBot – Free Plan</title>
-  <link rel="manifest" href="manifest.json">
-  <script src="trial.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Free Plan Booking | BookingBot</title>
+  <link rel="manifest" href="manifest.json" />
+  <script src="trial.js"></script>
   <style>
     body {
+      background-color: #101010;
+      color: white;
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #222;
-      margin: 0;
       padding: 20px;
-    }
-    header {
-      background: #111;
-      color: #fff;
-      padding: 15px;
       text-align: center;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      border-radius: 10px;
-    }
-    h2 {
-      color: #333;
-    }
-    select, input[type="text"] {
-      width: 100%;
+    select, button {
       padding: 10px;
-      margin-top: 10px;
-      margin-bottom: 20px;
+      margin-top: 20px;
+      width: 80%;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
     }
     button {
-      padding: 12px;
-      width: 100%;
-      background: #28a745;
+      background-color: #28a745;
       color: white;
-      font-weight: bold;
-      border: none;
       cursor: pointer;
     }
-    button:hover {
-      background: #218838;
-    }
-    footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 14px;
-      color: #777;
+    h1 {
+      color: #00d9ff;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>WarangalOneStop BookingBot</h1>
-    <p><strong>Free Plan</strong> – Simple WhatsApp Booking</p>
-  </header>
-  <div class="container">
-    <h2>Book an Appointment</h2><label for="patientName">Your Name:</label>
-<input type="text" id="patientName" placeholder="Enter your full name" required>
+  <h1>Book Appointment</h1>
+  <p>Select a time slot:</p>
+  <select id="slotDropdown">
+    <option value="">Loading slots...</option>
+  </select>
+  <br />
+  <button onclick="bookSlot()">Book via WhatsApp</button>
 
-<label for="visitReason">Reason for Visit:</label>
-<input type="text" id="visitReason" placeholder="E.g., Consultation, Fever, etc." required>
-
-<label for="timeSlot">Choose Time Slot:</label>
-<select id="timeSlot">
-  <option>Loading slots...</option>
-</select>
-
-<button onclick="redirectToWhatsApp()">Book via WhatsApp</button>
-
-  </div>  <footer>
-    &copy; 2025 WarangalOneStop.in | Free Plan
-  </footer>  <script>
-    // Load available slots from Slots.csv
-    fetch('clinics/onesto/slots.csv')
-      .then(res => res.text())
-      .then(data => {
-        const rows = data.trim().split('\n').slice(1);
-        const dropdown = document.getElementById('timeSlot');
-        dropdown.innerHTML = '';
-        rows.forEach(row => {
-          const [slot, status] = row.split(',');
-          if (status.trim().toLowerCase() !== 'booked') {
-            const option = document.createElement('option');
-            option.value = slot;
-            option.textContent = slot;
-            dropdown.appendChild(option);
-          }
-        });
+  <script>
+    async function loadSlots() {
+      const res = await fetch('Slots.csv');
+      const text = await res.text();
+      const rows = text.trim().split('\n').slice(1); // remove header
+      const dropdown = document.getElementById('slotDropdown');
+      dropdown.innerHTML = '<option value="">Select Slot</option>';
+      rows.forEach(row => {
+        const [date, time] = row.split(',');
+        const label = `${date.trim()} - ${time.trim()}`;
+        const value = encodeURIComponent(label);
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        dropdown.appendChild(option);
       });
-
-    function redirectToWhatsApp() {
-      const name = document.getElementById('patientName').value;
-      const reason = document.getElementById('visitReason').value;
-      const slot = document.getElementById('timeSlot').value;
-      if (!name || !reason || !slot) return alert("Please fill all fields.");
-      const msg = `Hello, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nPreferred Time: ${slot}`;
-      const encoded = encodeURIComponent(msg);
-      window.open(`https://wa.me/919390664577?text=${encoded}`, '_blank');
     }
-  </script></body>
+
+    function bookSlot() {
+      const dropdown = document.getElementById('slotDropdown');
+      const slot = dropdown.value;
+      if (!slot) {
+        alert('Please select a slot');
+        return;
+      }
+      const url = `https://wa.me/919390664577?text=Hi%2C%20I%20want%20to%20book%20this%20slot%3A%20${slot}`;
+      window.location.href = url;
+    }
+
+    loadSlots();
+  </script>
+</body>
 </html>
