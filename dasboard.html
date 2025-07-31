@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#000000" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="icon" href="assets/logos/onestop.png" type="image/png" />
+
   <style>
     body {
       background-color: #111;
@@ -14,21 +15,27 @@
       font-family: Arial, sans-serif;
       padding: 20px;
     }
+
     header {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
+
     #clinicLogo {
       height: 60px;
       width: auto;
     }
+
     h1 {
       font-size: 22px;
+      margin-top: 30px;
     }
+
     .info {
       margin-top: 30px;
     }
+
     .locked {
       color: red;
       font-size: 18px;
@@ -37,29 +44,30 @@
     }
   </style>
 </head>
+
 <body>
   <header>
-    <!-- ✅ Ensure logo is present with the correct ID -->
-    <img id="clinicLogo" src="logo.png" alt="Clinic Logo" />
-    <h1>📊 Dashboard</h1>
+    <!-- ✅ Fixed logo path -->
+    <img id="clinicLogo" src="assets/logos/onestop.png" alt="Clinic Logo" />
+    <h1>Dashboard</h1>
   </header>
 
   <div class="info" id="mainContent">
-    <p>Welcome to the Clinic Admin Dashboard. Use this panel to manage operations.</p>
+    <p>✅ Welcome to the Clinic Admin Dashboard. Use this panel to manage operations.</p>
   </div>
 
   <div class="locked" id="lockedMessage" style="display: none;">
-    🔒 Your 3-day free trial has expired.<br>Please contact the admin to continue using the system.
+    ❌ Your 3-day free trial has expired.<br />Please contact the admin to continue using the system.
   </div>
 
   <script>
     async function checkTrialStatus() {
       try {
-        const res = await fetch('plans.json');
+        const res = await fetch("plans.json");
         const plans = await res.json();
-        const domain = location.hostname.split('.')[0]; // e.g. warangalonepoint
+        const domain = location.hostname.split(".")[0]; // e.g. warangalonepoint
         const plan = plans[domain] || {};
-        const expiry = new Date(plan.expiry || '1970-01-01');
+        const expiry = new Date(plan.expiry || "1970-01-01");
         const today = new Date();
         const override = plan.overrideLock === true;
 
