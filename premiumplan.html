@@ -2,126 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Premium Booking | BookingBot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="manifest" href="manifest.json" />
-  <script src="trial.js"></script>
+  <title>Premium Plan - Clinic System</title>
   <style>
-    body {
-      background-color: #0d1117;
-      color: #c9d1d9;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      color: #58a6ff;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    input, select, textarea, button {
-      display: block;
-      width: 90%;
-      margin: 10px auto;
-      padding: 12px;
-      border-radius: 6px;
-      border: none;
-      font-size: 16px;
-    }
-    textarea {
-      resize: vertical;
-      height: 80px;
-    }
-    button {
-      background-color: #238636;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .hidden {
-      display: none;
-    }
+    body { background: #0e0e0e; color: white; font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    img { width: 100px; margin-bottom: 20px; }
+    h1 { color: #00ffff; }
   </style>
 </head>
 <body>
-  <h1>Premium Appointment Booking</h1>
-  <input type="text" id="patientName" placeholder="Your Full Name" />
-  <input type="text" id="contactNumber" placeholder="Mobile Number" />
-  <input type="text" id="reason" placeholder="Reason for Visit" />
-  <textarea id="notes" placeholder="Any additional notes (optional)"></textarea>
-  <select id="slotDropdown">
-    <option value="">Loading available slots...</option>
-  </select>
-  <button onclick="previewBooking()">Proceed to Confirmation</button>
-
-  <div id="confirmSection" class="hidden">
-    <h2>Confirm Your Booking</h2>
-    <div id="confirmText"></div>
-    <button onclick="confirmBooking()">Book via WhatsApp</button>
-  </div>
-
-  <script>
-    let selectedData = {};
-
-    async function loadSlots() {
-      const slotRes = await fetch('Slots.csv');
-      const slotText = await slotRes.text();
-      const slots = slotText.trim().split('\n').slice(1);
-
-      const logRes = await fetch('logs.csv');
-      const logText = await logRes.text();
-      const booked = logText.trim().split('\n').slice(1).map(row => row.split(',')[1]);
-
-      const dropdown = document.getElementById('slotDropdown');
-      dropdown.innerHTML = '<option value="">Select Slot</option>';
-      slots.forEach(row => {
-        const [date, time] = row.split(',');
-        const label = `${date.trim()} - ${time.trim()}`;
-        if (!booked.includes(time.trim())) {
-          const option = document.createElement('option');
-          option.value = label;
-          option.textContent = label;
-          dropdown.appendChild(option);
-        }
-      });
-    }
-
-    function previewBooking() {
-      const name = document.getElementById('patientName').value.trim();
-      const number = document.getElementById('contactNumber').value.trim();
-      const reason = document.getElementById('reason').value.trim();
-      const notes = document.getElementById('notes').value.trim();
-      const slot = document.getElementById('slotDropdown').value;
-
-      if (!name || !number || !reason || !slot) {
-        alert('Please fill all required fields.');
-        return;
-      }
-
-      selectedData = { name, number, reason, slot, notes };
-
-      const preview = `
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Contact:</strong> ${number}</p>
-        <p><strong>Slot:</strong> ${slot}</p>
-        <p><strong>Reason:</strong> ${reason}</p>
-        <p><strong>Notes:</strong> ${notes || "None"}</p>
-      `;
-
-      document.getElementById('confirmText').innerHTML = preview;
-      document.getElementById('confirmSection').classList.remove('hidden');
-    }
-
-    function confirmBooking() {
-      const msg = `Hi, I am ${selectedData.name}. I would like to book the slot: ${selectedData.slot}.
-Reason: ${selectedData.reason}
-Contact: ${selectedData.number}
-Notes: ${selectedData.notes || "None"}`;
-
-      const url = `https://wa.me/919390664577?text=${encodeURIComponent(msg)}`;
-      window.location.href = url;
-    }
-
-    loadSlots();
-  </script>
+  <img src="assets/logos/logo-logs.png" alt="Log" />
+  <h1>🔍 Clinic Admin System - Auto Test</h1>
+  <p>This is the <strong>Premium Plan</strong>. All advanced features unlocked.</p>
 </body>
 </html>
+
