@@ -2,103 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Appointment Booking</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Patient Bookings</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="trial.js"></script>
   <style>
     body {
       background: #111;
-      color: #fff;
+      color: white;
       font-family: Arial, sans-serif;
       padding: 20px;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #f0ad4e;
+    h1 {
+      color: #4dc1ff;
     }
-    table {
+    select, input, button {
+      padding: 10px;
+      margin: 10px 0;
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+      max-width: 400px;
     }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border: 1px solid #333;
-    }
-    th {
-      background-color: #222;
-    }
-    button {
-      padding: 6px 12px;
-      border: none;
-      background-color: #28a745;
-      color: #fff;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-    .reminder-btn {
-      background-color: #25D366;
-      margin-left: 8px;
-    }
-    .reminder-btn:hover {
-      background-color: #1da851;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h2>Today's Patient Bookings</h2>
-  <table id="bookingTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Time</th>
-        <th>Reason</th>
-        <th>Reminder</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Bookings will load here -->
-    </tbody>
-  </table>
+  <h1>Book an Appointment</h1>
+  <div id="lockedMessage"></div>
+  <div id="bookingForm" class="hidden">
+    <input type="text" id="patientName" placeholder="Patient Name" required>
+    <input type="text" id="visitReason" placeholder="Reason for Visit" required>
+    <select id="slotSelect">
+      <option value="">Loading available slots...</option>
+    </select>
+    <button onclick="submitBooking()">Book via WhatsApp</button>
+  </div>
 
   <script>
-    const sheetUrl = 'https://warangalonepoint.github.io/clinic-bot-system/Slots.csv';
+    const pin = new URLSearchParams(window.location.search).get('pin') || localStorage.getItem('pin');
+    let bookedSlots = [];
 
-    fetch(sheetUrl)
-      .then(response => response.text())
-      .then(data => {
-        const rows = data.split('\n').slice(1);
-        const tbody = document.querySelector('#bookingTable tbody');
-
-        rows.forEach(row => {
-          const [date, time, name, reason, status] = row.split(',');
-
-          if (status?.trim().toLowerCase() === 'booked') {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${name || ''}</td>
-              <td>${time || ''}</td>
-              <td>${reason || ''}</td>
-              <td>
-                <button class="reminder-btn" onclick="sendWhatsAppReminder('${name}', '${time}', '${reason}')">Send Reminder</button>
-              </td>
-            `;
-            tbody.appendChild(tr);
+    fetch('plans.json')
+      .then(res => res.json())
+      .then(plans => {
+        if (pin && plans[pin]) {
+          const plan = plans[pin];
+          if (plan.overrideLock || plan.plan !== "locked") {
+            document.getElementById('bookingForm').classList.remove('hidden');
+            localStorage.setItem('pin', pin);
+            loadSlots();
+            loadBookedSlots();
+          } else {
+            document.getElementById('lockedMessage').innerHTML = "🚫 Access denied. Your plan is locked.";
           }
-        });
+        } else {
+          document.getElementById('lockedMessage').innerHTML = "⚠️ Invalid or missing PIN.";
+        }
       });
 
-    function sendWhatsAppReminder(name, time, reason) {
-      const msg = `Hello ${name},\nThis is a reminder for your appointment today at ${time} for: ${reason}.\nPlease be on time.\n- Warangal OneStop Clinic`;
-      const encodedMsg = encodeURIComponent(msg);
-      const phone = ''; // Leave blank or add default if you want
-      window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+    function loadSlots() {
+      fetch('Slots.csv')
+        .then(response => response.text())
+        .then(csv => {
+          const lines = csv.trim().split('\n').slice(1); // Skip header
+          const slotSelect = document.getElementById('slotSelect');
+          slotSelect.innerHTML = "";
+          lines.forEach(line => {
+            const [date, time, status] = line.split(',');
+            const fullSlot = `${date.trim()} ${time.trim()}`;
+            if (status.trim().toLowerCase() === "available" && !bookedSlots.includes(fullSlot)) {
+              const option = document.createElement('option');
+              option.value = fullSlot;
+              option.textContent = fullSlot;
+              slotSelect.appendChild(option);
+            }
+          });
+        });
+    }
+
+    function loadBookedSlots() {
+      fetch('logs.csv')
+        .then(response => response.text())
+        .then(csv => {
+          const rows = csv.trim().split('\n').slice(1);
+          bookedSlots = rows.map(row => {
+            const cols = row.split(',');
+            return `${cols[0].trim()} ${cols[3].trim()}`; // date + time
+          });
+          loadSlots();
+        });
+    }
+
+    function submitBooking() {
+      const name = document.getElementById('patientName').value.trim();
+      const reason = document.getElementById('visitReason').value.trim();
+      const slot = document.getElementById('slotSelect').value;
+
+      if (!name || !reason || !slot) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const msg = `Hi, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nSlot: ${slot}`;
+      const url = `https://wa.me/918686019709?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     }
   </script>
 </body>
