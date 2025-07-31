@@ -1,85 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Booking Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <title>Book Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background: #111;
-      color: #fff;
       font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
       padding: 20px;
     }
+    #pinSection, #bookingSection {
+      max-width: 400px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
     h2 {
-      color: #4CAF50;
       text-align: center;
+      color: #333;
     }
-    table {
+    input, select, button {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 15px;
-    }
-    th, td {
       padding: 10px;
-      border: 1px solid #444;
-      text-align: left;
+      margin-top: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
     }
-    th {
-      background-color: #222;
-    }
-    .back {
-      background: #4CAF50;
-      border: none;
+    button {
+      background-color: #27ae60;
       color: white;
-      padding: 8px 15px;
-      border-radius: 5px;
       cursor: pointer;
+    }
+    button:hover {
+      background-color: #219150;
+    }
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <button class="back" onclick="goBack()">⬅ Back</button>
-  <h2>📋 Bookings</h2>
-  <div id="logContainer">Loading logs...</div>
 
-  <script>
-    const clinic = localStorage.getItem('clinic');
-    const plan = localStorage.getItem('plan');
+<div id="pinSection">
+  <h2>Enter Clinic PIN</h2>
+  <input type="password" id="pinInput" placeholder="PIN" />
+  <button onclick="verifyPin()">Submit</button>
+</div>
 
-    if (!clinic || !plan) {
-      window.location.href = "index.html";
+<div id="bookingSection" class="hidden">
+  <h2>Book Appointment</h2>
+  <input type="text" id="patientName" placeholder="Your Name" required />
+  <input type="text" id="reason" placeholder="Reason for Visit" required />
+  <select id="slotSelect">
+    <option value="">Select Time Slot</option>
+  </select>
+  <button onclick="bookSlot()">Confirm & WhatsApp</button>
+</div>
+
+<script>
+  const plansUrl = "plans.json";
+  let slotFile = "";
+  let clinicName = "";
+  let contactNumber = "+919390664577"; // Replace with clinic number if dynamic
+
+  async function verifyPin() {
+    const pin = document.getElementById('pinInput').value.trim();
+    const res = await fetch(plansUrl);
+    const plans = await res.json();
+
+    if (plans[pin]) {
+      clinicName = plans[pin].clinic;
+      slotFile = `${clinicName.toLowerCase().replace(/\s+/g, '-')}-slots.csv`;
+      document.getElementById('pinSection').style.display = 'none';
+      document.getElementById('bookingSection').classList.remove('hidden');
+      loadSlots();
+    } else {
+      alert("Invalid PIN. Please try again.");
     }
+  }
 
-    const csvPath = `${clinic}-logs.csv`;
-    const logContainer = document.getElementById("logContainer");
+  async function loadSlots() {
+    try {
+      const res = await fetch(slotFile);
+      const csv = await res.text();
+      const rows = csv.trim().split('\n').slice(1);
 
-    fetch(csvPath)
-      .then(res => {
-        if (!res.ok) throw new Error("File not found");
-        return res.text();
-      })
-      .then(data => {
-        const rows = data.trim().split("\n").map(row => row.split(","));
-        let html = "<table><tr>";
-        rows[0].forEach(col => html += `<th>${col}</th>`);
-        html += "</tr>";
-        rows.slice(1).forEach(row => {
-          html += "<tr>";
-          row.forEach(cell => html += `<td>${cell}</td>`);
-          html += "</tr>";
-        });
-        html += "</table>";
-        logContainer.innerHTML = html;
-      })
-      .catch(err => {
-        logContainer.innerHTML = "<p style='color:red;'>No logs found.</p>";
+      const dropdown = document.getElementById('slotSelect');
+      dropdown.innerHTML = '<option value="">Select Time Slot</option>';
+
+      rows.forEach(row => {
+        const [date, time, status] = row.split(',');
+        if (status.trim().toLowerCase() === "available") {
+          const option = document.createElement('option');
+          option.value = `${date} ${time}`;
+          option.textContent = `${date} - ${time}`;
+          dropdown.appendChild(option);
+        }
       });
 
-    function goBack() {
-      window.location.href = "clinic-dashboard.html";
+    } catch (err) {
+      alert("Error loading slots: " + err.message);
     }
-  </script>
+  }
+
+  function bookSlot() {
+    const name = document.getElementById('patientName').value.trim();
+    const reason = document.getElementById('reason').value.trim();
+    const slot = document.getElementById('slotSelect').value;
+
+    if (!name || !reason || !slot) {
+      alert("Please fill all details and choose a slot.");
+      return;
+    }
+
+    const message = `Hello, I want to book an appointment.\n\nName: ${name}\nReason: ${reason}\nSlot: ${slot}\nClinic: ${clinicName}`;
+    const url = `https://wa.me/${contactNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+    window.location.href = url;
+  }
+</script>
+
 </body>
 </html>
