@@ -3,110 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clinic Logs</title>
+  <title>Appointment Logs</title>
   <style>
-    body {
-      background-color: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h2 {
-      color: #4dc1ff;
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 15px;
-    }
-    th, td {
-      border: 1px solid #444;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #222;
-    }
-    .token {
-      color: #f0ad4e;
-      font-weight: bold;
-    }
+    body { font-family: Arial, sans-serif; background-color: #111; color: #fff; margin: 0; padding: 10px; }
+    h2 { color: #00d9ff; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: center; }
+    th { background-color: #222; color: #00d9ff; }
+    .send-btn { background: #00d9ff; color: #000; padding: 5px 10px; border: none; cursor: pointer; }
+    .send-btn:hover { background: #00b5cc; }
   </style>
 </head>
 <body>
-  <h2>📋 Appointment Logs — <span id="clinicName">Loading...</span></h2>
+  <h2>📋 Appointment Logs — Loading...</h2>
   <table id="logsTable">
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Name</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Token</th>
-        <th>Reminder</th>
-        <th>Reminder Sent</th>
+        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th>
+        <th>Token</th><th>Reminder</th><th>Reminder Sent</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="logBody"></tbody>
   </table>
 
-  <script>
+  <script type="text/javascript">
     const urlParams = new URLSearchParams(window.location.search);
-    const pin = urlParams.get("pin");
+    const pin = urlParams.get('pin');
+    const clinicMap = {
+      "1234": "clinic1",
+      "2525": "clinic2",
+      "9999": "clinic3"
+    };
+    const clinicName = clinicMap[pin] || "clinic1"; // fallback
+    const csvPath = `${clinicName}-logs.csv`;
 
-    if (!pin) {
-      alert("PIN missing from URL.");
-      throw new Error("Missing PIN in URL");
-    }
-
-    fetch("plans.json")
-      .then(res => res.json())
-      .then(plans => {
-        const plan = plans[pin];
-        if (!plan) {
-          alert("Invalid PIN. Clinic not found.");
-          return;
-        }
-
-        const clinic = plan.clinic;
-        document.getElementById("clinicName").textContent = clinic;
-
-        const csvFile = `${clinic.toLowerCase().replace(/\s+/g, '-')}-logs.csv`;
-        fetch(csvFile)
-          .then(response => {
-            if (!response.ok) throw new Error("CSV not found");
-            return response.text();
-          })
-          .then(csvText => {
-            const rows = csvText.trim().split("\n").slice(1); // skip header
-            const tableBody = document.querySelector("#logsTable tbody");
-            tableBody.innerHTML = "";
-
-            rows.forEach(row => {
-              const cols = row.split(",");
-              const tr = document.createElement("tr");
-              cols.forEach((col, index) => {
-                const td = document.createElement("td");
-                td.textContent = col.trim();
-                if (index === 6) td.classList.add("token"); // Token column
-                tr.appendChild(td);
-              });
-              tableBody.appendChild(tr);
-            });
-          })
-          .catch(err => {
-            console.error(err);
-            alert("Error loading logs.");
-          });
+    async function loadLogs() {
+      const res = await fetch(csvPath);
+      const data = await res.text();
+      const rows = data.trim().split("\n").slice(1); // skip header
+      const tbody = document.getElementById("logBody");
+      rows.forEach(line => {
+        const [date, time, name, reason, contact, token, reminder, sent] = line.split(",");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${date}</td><td>${time}</td><td>${name}</td><td>${reason}</td>
+          <td><a href="tel:${contact}" style="color:#00f">${contact}</a></td>
+          <td>${token}</td><td>${reminder}</td><td>${sent}</td>
+        `;
+        tbody.appendChild(tr);
       });
+    }
+    loadLogs();
   </script>
 </body>
-</html>        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
+</html>        tr.innerHTML = `
           <td>${entry.Date}</td>
           <td>${entry.Time}</td>
           <td>${entry.Name}</td>
