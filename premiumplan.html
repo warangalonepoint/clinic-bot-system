@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium Booking Page</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="logos/logo-premium.png">
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      color: #222;
+      text-align: center;
+    }
+    .form-container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    select, input, textarea, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #28a745;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Book Your Appointment</h2>
+  <div class="form-container">
+    <label for="date">Choose Date</label>
+    <select id="date"></select><label for="slot">Choose Slot</label>
+<select id="slot"></select>
+
+<label for="name">Your Name</label>
+<input type="text" id="name" placeholder="Enter your name">
+
+<label for="reason">Reason for Visit</label>
+<textarea id="reason" placeholder="E.g., General Checkup"></textarea>
+
+<button onclick="confirmBooking()">Confirm & Book via WhatsApp</button>
+
+  </div>  <script src="trial.js"></script>  <script>
+    const slotsCSV = "clinics/onesto/Slots.csv";
+    const logsCSV = "clinics/onesto/logs.csv";
+    const today = new Date();
+    const dateSelector = document.getElementById("date");
+    const slotSelector = document.getElementById("slot");
+
+    for (let i = 0; i < 7; i++) {
+      let d = new Date(today);
+      d.setDate(today.getDate() + i);
+      let formatted = d.toISOString().split('T')[0];
+      let opt = document.createElement("option");
+      opt.value = formatted;
+      opt.textContent = formatted;
+      dateSelector.appendChild(opt);
+    }
+
+    dateSelector.addEventListener("change", loadSlots);
+    loadSlots();
+
+    function loadSlots() {
+      fetch(slotsCSV)
+        .then(r => r.text())
+        .then(csv => {
+          const date = dateSelector.value;
+          const lines = csv.split("\n").filter(Boolean);
+          const booked = new Set();
+          fetch(logsCSV)
+            .then(r => r.text())
+            .then(logData => {
+              const logLines = logData.split("\n").filter(Boolean);
+              for (let l of logLines) {
+                const parts = l.split(",");
+                if (parts[1] === date) booked.add(parts[2]);
+              }
+              slotSelector.innerHTML = "";
+              for (let line of lines) {
+                const [slotDate, time] = line.split(",");
+                if (slotDate === date && !booked.has(time)) {
+                  let opt = document.createElement("option");
+                  opt.value = time;
+                  opt.textContent = time;
+                  slotSelector.appendChild(opt);
+                }
+              }
+            });
+        });
+    }
+
+    function confirmBooking() {
+      const name = document.getElementById("name").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const slot = slotSelector.value;
+      const date = dateSelector.value;
+
+      if (!name || !reason || !slot || !date) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      const message = `Appointment Request:%0AName: ${name}%0ADate: ${date}%0ASlot: ${slot}%0AReason: ${reason}`;
+      const url = `https://wa.me/919390664577?text=${message}`;
+      window.open(url, '_blank');
+    }
+  </script></body>
+</html>
