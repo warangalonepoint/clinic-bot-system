@@ -1,51 +1,50 @@
-Date,Time,Patient Name,Reason,Status,Reminder Sent
-2025-07-20,10:00 AM,Aarav Reddy,General Checkup,Booked,Yes
-2025-07-20,10:10 AM,Meera Patel,Flu Symptoms,Booked,Yes
-2025-07-20,10:20 AM,Vikram Joshi,Fever Follow-up,Booked,No
-2025-07-20,10:30 AM,Rekha Sharma,Diabetes Check,Booked,Yes
-2025-07-20,10:40 AM,Naveen Kumar,Blood Test,Booked,Yes
-2025-07-20,10:50 AM,Sneha Rao,Consultation,Booked,No
-2025-07-20,11:00 AM,Karthik Iyer,Chest Pain,Booked,Yes
-2025-07-20,11:10 AM,Priyanka Mehta,Back Pain,Booked,No
-2025-07-20,11:20 AM,Suresh Babu,Injury Follow-up,Booked,Yes
-2025-07-20,11:30 AM,Ragini Das,Migraine,Booked,Yes
-2025-07-20,11:40 AM,Amit Singh,Stomach Ache,Booked,No
-2025-07-20,11:50 AM,Divya Jain,Thyroid,Booked,Yes
-2025-07-20,12:00 PM,Manoj Rao,Cough,Booked,Yes
-2025-07-20,12:10 PM,Isha Kapoor,Eye Infection,Booked,No
-2025-07-20,12:20 PM,Vishal Gupta,Cold,Booked,Yes
-2025-07-20,12:30 PM,Sowmya Reddy,Pregnancy Check,Booked,Yes
-2025-07-20,12:40 PM,Abhinav Jain,Skin Allergy,Booked,No
-2025-07-20,12:50 PM,Ritika Shah,Fever,Booked,Yes
-2025-07-20,01:00 PM,Krishna Murthy,General Checkup,Booked,Yes
-2025-07-20,01:10 PM,Tanya Nair,Consultation,Booked,No
-2025-07-21,10:00 AM,Ayaan Ali,Asthma,Booked,Yes
-2025-07-21,10:10 AM,Lavanya Menon,Throat Pain,Booked,Yes
-2025-07-21,10:20 AM,Vivek Sinha,Back Ache,Booked,No
-2025-07-21,10:30 AM,Ritu Malhotra,Weakness,Booked,Yes
-2025-07-21,10:40 AM,Prakash Verma,High BP,Booked,Yes
-2025-07-21,10:50 AM,Nandita Rao,Injury,Booked,No
-2025-07-21,11:00 AM,Deepak Meena,Knee Pain,Booked,Yes
-2025-07-21,11:10 AM,Preeti Kulkarni,Consultation,Booked,No
-2025-07-21,11:20 AM,Ashwin R,Eye Test,Booked,Yes
-2025-07-21,11:30 AM,Sanjana Kaur,Cold & Cough,Booked,Yes
-2025-07-21,11:40 AM,Farhan Khan,Vaccine,Booked,No
-2025-07-21,11:50 AM,Mohit Desai,Fever,Booked,Yes
-2025-07-21,12:00 PM,Ila Sharma,Diabetes Follow-up,Booked,Yes
-2025-07-21,12:10 PM,Arjun Shetty,Weight Loss,Booked,No
-2025-07-21,12:20 PM,Reema Ghosh,General Checkup,Booked,Yes
-2025-07-21,12:30 PM,Sachin Goel,Migraine,Booked,Yes
-2025-07-21,12:40 PM,Anjali Jadhav,Acidity,Booked,No
-2025-07-21,12:50 PM,Varun Kapoor,General,Booked,Yes
-2025-07-21,01:00 PM,Pallavi Das,Stomach Issue,Booked,Yes
-2025-07-21,01:10 PM,Rahul Chauhan,Thyroid Test,Booked,No
-2025-07-22,10:00 AM,Sunita Naik,Follow-up,Booked,Yes
-2025-07-22,10:10 AM,Gautam Bansal,BP Check,Booked,Yes
-2025-07-22,10:20 AM,Asha Pillai,Cold,Booked,No
-2025-07-22,10:30 AM,Rakesh Rao,Injury,Booked,Yes
-2025-07-22,10:40 AM,Shruti Bansal,Pain in Legs,Booked,Yes
-2025-07-22,10:50 AM,Hitesh Mehra,Consultation,Booked,No
-2025-07-22,11:00 AM,Deepti Singh,Fever,Booked,Yes
-2025-07-22,11:10 AM,Vinay Kumar,Blood Pressure,Booked,Yes
-2025-07-22,11:20 AM,Neha Sethi,Headache,Booked,No
-2025-07-22,11:30 AM,Sameer Rathi,Back Strain,Booked,Yes
+Date,Time,Patient Name,Reason,Status,Reminder Sent,Contact
+2025-07-01,09:00,Arjun Reddy,Fever,Completed,Yes,9876543210
+2025-07-01,09:10,Divya Sharma,Checkup,Completed,Yes,9823456712
+2025-07-01,09:20,Vikram Rao,Cold,Completed,Yes,9845098761
+2025-07-01,09:30,Sneha Gupta,Headache,Pending,No,—
+2025-07-01,09:40,Kiran Babu,Injury Follow-up,Completed,Yes,9101234567
+2025-07-01,09:50,Anjali Menon,BP Check,Completed,No,—
+2025-07-01,10:00,Surya Teja,Fever,Pending,No,—
+2025-07-01,10:10,Ritika Nair,Cough,Completed,Yes,9834567890
+2025-07-01,10:20,Manoj Kumar,Follow-up,Completed,Yes,—
+2025-07-01,10:30,Radha Iyer,Migraine,Completed,Yes,9809876543
+2025-07-01,10:40,Vishal Reddy,Cold,Pending,No,—
+2025-07-01,10:50,Pooja Shah,General,Completed,Yes,—
+2025-07-01,11:00,Akhil Verma,BP Check,Completed,Yes,9988776655
+2025-07-01,11:10,Neha Jain,Consultation,Pending,No,—
+2025-07-01,11:20,Sarath Kumar,Cough,Completed,Yes,9321678900
+2025-07-01,11:30,Kavya Rao,Follow-up,Completed,Yes,—
+2025-07-01,11:40,Naveen Das,Migraine,Pending,No,—
+2025-07-01,11:50,Ramya Shetty,Headache,Completed,Yes,9001122334
+2025-07-01,12:00,Rohan Mehta,Fever,Pending,No,—
+2025-07-01,12:10,Deepika Joshi,General,Completed,Yes,—
+2025-07-01,12:20,Aravind Pillai,Checkup,Completed,Yes,9191919191
+2025-07-01,12:30,Isha Kulkarni,Cold,Pending,No,—
+2025-07-01,12:40,Tejaswini Rao,Follow-up,Completed,Yes,—
+2025-07-01,12:50,Amit Desai,BP Check,Completed,Yes,—
+2025-07-01,13:00,Keerthi Reddy,Consultation,Completed,Yes,—
+2025-07-01,13:10,Faizan Khan,Cough,Pending,No,—
+2025-07-01,13:20,Nandini Sinha,Fever,Completed,Yes,—
+2025-07-01,13:30,Abhishek Patel,General,Completed,Yes,—
+2025-07-01,13:40,Sanjana Bhatt,Migraine,Completed,Yes,—
+2025-07-01,13:50,Rajeev Singh,Headache,Pending,No,—
+2025-07-01,14:00,Preeti Malhotra,BP Check,Completed,Yes,—
+2025-07-01,14:10,Harish Naik,Checkup,Completed,Yes,—
+2025-07-01,14:20,Meghana Deshpande,Fever,Pending,No,—
+2025-07-01,14:30,Krishna Iyer,Follow-up,Completed,Yes,—
+2025-07-01,14:40,Tanvi Kapoor,Cold,Completed,Yes,—
+2025-07-01,14:50,Gaurav Rao,Consultation,Completed,Yes,—
+2025-07-01,15:00,Shalini Verma,General,Pending,No,—
+2025-07-01,15:10,Aditya Joshi,Checkup,Completed,Yes,—
+2025-07-01,15:20,Lavanya Sharma,Cough,Completed,Yes,—
+2025-07-01,15:30,Ritesh Reddy,BP Check,Completed,Yes,—
+2025-07-01,15:40,Ankita Das,Follow-up,Completed,Yes,—
+2025-07-01,15:50,Parth Shah,Migraine,Pending,No,—
+2025-07-01,16:00,Saif Ali,Fever,Completed,Yes,—
+2025-07-01,16:10,Juhi Sinha,Consultation,Completed,Yes,—
+2025-07-01,16:20,Raj Kumar,Cold,Completed,Yes,—
+2025-07-01,16:30,Bindu Reddy,Checkup,Completed,Yes,—
+2025-07-01,16:40,Yogesh Meena,Headache,Completed,Yes,—
+2025-07-01,16:50,Meera Kapoor,General,Pending,No,—
+2025-07-01,17:00,Dhanush Rao,BP Check,Completed,Yes,—
