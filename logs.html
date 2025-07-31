@@ -1,19 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clinic Logs Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic Logs Dashboard</title>
   <style>
     body {
-      background-color: #111;
-      color: #fff;
+      background-color: #0a0a0a;
+      color: white;
       font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0;
+      padding: 0;
     }
-    h1 {
-      color: #00e6e6;
+    header {
+      padding: 20px;
+      background-color: #111;
       text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #4dc1ff;
+    }
+    main {
+      padding: 20px;
     }
     table {
       width: 100%;
@@ -23,79 +30,102 @@
     th, td {
       border: 1px solid #444;
       padding: 10px;
-      text-align: left;
+      text-align: center;
     }
     th {
       background-color: #222;
+      color: #00e0ff;
     }
-    .btn {
-      background-color: #00e6e6;
-      color: #111;
-      padding: 6px 12px;
+    tr:nth-child(even) {
+      background-color: #1a1a1a;
+    }
+    .filter-section {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .filter-section label,
+    .filter-section input,
+    .filter-section button {
+      font-size: 16px;
+      padding: 6px;
+    }
+    .filter-section button {
+      background-color: #28a745;
       border: none;
+      color: white;
       cursor: pointer;
-      border-radius: 6px;
     }
-    .sent {
-      background-color: #4caf50 !important;
-      color: #fff !important;
+    .no-logs {
+      margin-top: 20px;
+      text-align: center;
+      color: #ccc;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <h1>📋 Booking Logs + WhatsApp Reminders</h1>
-  <table id="logsTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Name</th>
-        <th>Time</th>
-        <th>Contact</th>
-        <th>Reminder</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
-    async function loadLogs() {
-      const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/logs.csv");
-      const csv = await res.text();
-      const lines = csv.trim().split("\n").slice(1); // remove header
-      const tbody = document.querySelector("#logsTable tbody");
-      tbody.innerHTML = "";
-
-      lines.forEach((line, idx) => {
-        const [date, name, time, contact, reminderStatus] = line.split(",");
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-          <td>${date}</td>
-          <td>${name}</td>
-          <td>${time}</td>
-          <td>
-            <a href="tel:${contact.trim()}">${contact.trim()}</a>
-          </td>
-          <td>
-            <button class="btn ${reminderStatus === 'Sent' ? 'sent' : ''}" onclick="sendReminder(this, '${contact.trim()}', '${name}', ${idx})">
-              ${reminderStatus === 'Sent' ? 'Sent ✅' : 'Send Reminder'}
-            </button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
+  <header>Clinic Booking Logs</header>
+  <main>
+    <div class="filter-section">
+      <button onclick="filterByDate('today')">Today</button>
+      <button onclick="filterByDate('yesterday')">Yesterday</button>
+      <label for="from">From:</label>
+      <input type="date" id="from" />
+      <label for="to">To:</label>
+      <input type="date" id="to" />
+      <button onclick="applyCustomRange()">Apply</button>
+    </div>
+    <div id="log-table"></div>
+  </main>  <script>
+    async function loadCSV() {
+      const res = await fetch("logs.csv");
+      const data = await res.text();
+      return data.trim().split("\n").map(row => row.split(","));
     }
 
-    function sendReminder(button, contact, name, rowIndex) {
-      const encodedMessage = encodeURIComponent(`Hello ${name}, this is a reminder for your appointment today at our clinic.`);
-      const link = `https://wa.me/91${contact}?text=${encodedMessage}`;
-      window.open(link, '_blank');
-
-      button.textContent = "Sent ✅";
-      button.classList.add("sent");
+    function formatDate(date) {
+      const d = new Date(date);
+      return d.toISOString().split('T')[0];
     }
 
-    window.onload = loadLogs;
-  </script>
-</body>
+    function displayLogs(logs) {
+      const container = document.getElementById("log-table");
+      if (logs.length === 0) {
+        container.innerHTML = '<div class="no-logs">No bookings found for selected dates.</div>';
+        return;
+      }
+      let html = '<table><thead><tr>';
+      logs[0].forEach(h => html += `<th>${h}</th>`);
+      html += '</tr></thead><tbody>';
+      for (let i = 1; i < logs.length; i++) {
+        html += '<tr>' + logs[i].map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+      }
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    async function filterByDate(type) {
+      const allLogs = await loadCSV();
+      const today = new Date();
+      let compareDate = new Date();
+      if (type === 'yesterday') compareDate.setDate(today.getDate() - 1);
+      const filterDate = formatDate(compareDate);
+      const filtered = [allLogs[0], ...allLogs.filter(row => row[0] === filterDate)];
+      displayLogs(filtered);
+    }
+
+    async function applyCustomRange() {
+      const from = document.getElementById("from").value;
+      const to = document.getElementById("to").value;
+      if (!from || !to) return alert("Select both from and to dates");
+      const allLogs = await loadCSV();
+      const filtered = [allLogs[0], ...allLogs.filter(row => row[0] >= from && row[0] <= to)];
+      displayLogs(filtered);
+    }
+
+    loadCSV().then(displayLogs);
+  </script></body>
 </html>
