@@ -1,22 +1,19 @@
 {
-  "1111": {
-    "clinic": "clinic1",
-    "plan": "free",
-    "file": "clinic1-logs.csv"
-  },
-  "2222": {
-    "clinic": "clinic2",
-    "plan": "paid",
-    "file": "clinic2-logs.csv"
-  },
-  "3333": {
-    "clinic": "clinic3",
-    "plan": "premium",
-    "file": "clinic3-logs.csv"
-  },
-  "2525": {
-    "clinic": "onestop",
-    "plan": "full",
-    "file": "onestop-logs.csv"
-  }
+  "clinics": [
+    {
+      "pin": "1111",
+      "plan": "free",
+      "logsFile": "clinic1-logs.csv"
+    },
+    {
+      "pin": "2222",
+      "plan": "paid",
+      "logsFile": "clinic2-logs.csv"
+    },
+    {
+      "pin": "3333",
+      "plan": "premium",
+      "logsFile": "clinic3-logs.csv"
+    }
+  ]
 }
