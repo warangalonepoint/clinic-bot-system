@@ -2,110 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appointment Booking</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background: #111;
-      color: white;
       font-family: Arial, sans-serif;
+      background-color: #0d0d0d;
+      color: #ffffff;
       padding: 20px;
     }
     h1 {
       color: #4dc1ff;
     }
-    select, input, button {
-      padding: 10px;
-      margin: 10px 0;
+    input, select, button {
+      display: block;
       width: 100%;
-      max-width: 400px;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
     }
-    .hidden {
-      display: none;
+    button {
+      background-color: #28a745;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
-  <h1>Book an Appointment</h1>
-  <div id="lockedMessage"></div>
-  <div id="bookingForm" class="hidden">
-    <input type="text" id="patientName" placeholder="Patient Name" required>
-    <input type="text" id="visitReason" placeholder="Reason for Visit" required>
-    <select id="slotSelect">
-      <option value="">Loading available slots...</option>
+  <h1>📅 Book Your Appointment</h1>
+
+  <form id="bookingForm" onsubmit="return confirmBooking()">
+    <input type="text" id="patientName" placeholder="Your Name" required />
+    <input type="text" id="contactNumber" placeholder="WhatsApp Number" required />
+    <input type="text" id="reason" placeholder="Reason for Visit" required />
+
+    <select id="timeSlot" required>
+      <option value="">Select Time Slot</option>
     </select>
-    <button onclick="submitBooking()">Book via WhatsApp</button>
-  </div>
+
+    <button type="submit">Book Appointment</button>
+  </form>
 
   <script>
-    const pin = new URLSearchParams(window.location.search).get('pin') || localStorage.getItem('pin');
-    let bookedSlots = [];
+    async function loadSlots() {
+      const res = await fetch("Slots.csv");
+      const text = await res.text();
+      const lines = text.trim().split("\n").slice(1);
 
-    fetch('plans.json')
-      .then(res => res.json())
-      .then(plans => {
-        if (pin && plans[pin]) {
-          const plan = plans[pin];
-          if (plan.overrideLock || plan.plan !== "locked") {
-            document.getElementById('bookingForm').classList.remove('hidden');
-            localStorage.setItem('pin', pin);
-            loadSlots();
-            loadBookedSlots();
-          } else {
-            document.getElementById('lockedMessage').innerHTML = "🚫 Access denied. Your plan is locked.";
-          }
-        } else {
-          document.getElementById('lockedMessage').innerHTML = "⚠️ Invalid or missing PIN.";
+      const booked = await fetch("logs.csv")
+        .then(r => r.text())
+        .then(d => d.split("\n").map(l => l.split(",")[3].trim()));
+
+      const dropdown = document.getElementById("timeSlot");
+      lines.forEach(line => {
+        const [date, slot] = line.split(",");
+        if (!booked.includes(slot.trim())) {
+          const opt = document.createElement("option");
+          opt.value = `${date},${slot}`;
+          opt.textContent = `${date} – ${slot}`;
+          dropdown.appendChild(opt);
         }
       });
-
-    function loadSlots() {
-      fetch('Slots.csv')
-        .then(response => response.text())
-        .then(csv => {
-          const lines = csv.trim().split('\n').slice(1); // Skip header
-          const slotSelect = document.getElementById('slotSelect');
-          slotSelect.innerHTML = "";
-          lines.forEach(line => {
-            const [date, time, status] = line.split(',');
-            const fullSlot = `${date.trim()} ${time.trim()}`;
-            if (status.trim().toLowerCase() === "available" && !bookedSlots.includes(fullSlot)) {
-              const option = document.createElement('option');
-              option.value = fullSlot;
-              option.textContent = fullSlot;
-              slotSelect.appendChild(option);
-            }
-          });
-        });
     }
 
-    function loadBookedSlots() {
-      fetch('logs.csv')
-        .then(response => response.text())
-        .then(csv => {
-          const rows = csv.trim().split('\n').slice(1);
-          bookedSlots = rows.map(row => {
-            const cols = row.split(',');
-            return `${cols[0].trim()} ${cols[3].trim()}`; // date + time
-          });
-          loadSlots();
-        });
+    function confirmBooking() {
+      const name = document.getElementById("patientName").value;
+      const contact = document.getElementById("contactNumber").value;
+      const reason = document.getElementById("reason").value;
+      const slot = document.getElementById("timeSlot").value;
+
+      if (!slot) return false;
+
+      const [date, time] = slot.split(",");
+      const msg = `Hi, I want to book an appointment.\n\nName: ${name}\nContact: ${contact}\nDate: ${date}\nTime: ${time}\nReason: ${reason}`;
+      const link = `https://wa.me/91${contact}?text=${encodeURIComponent(msg)}`;
+
+      // log to file (optional via backend or email service in future)
+      alert("✅ Slot selected. Redirecting to WhatsApp...");
+      setTimeout(() => {
+        window.location.href = link;
+      }, 1000);
+      return false;
     }
 
-    function submitBooking() {
-      const name = document.getElementById('patientName').value.trim();
-      const reason = document.getElementById('visitReason').value.trim();
-      const slot = document.getElementById('slotSelect').value;
-
-      if (!name || !reason || !slot) {
-        alert("Please fill all fields.");
-        return;
-      }
-
-      const msg = `Hi, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nSlot: ${slot}`;
-      const url = `https://wa.me/918686019709?text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
-    }
+    loadSlots();
   </script>
 </body>
 </html>
