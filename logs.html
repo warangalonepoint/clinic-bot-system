@@ -1,112 +1,145 @@
-<!-- logs.html v47 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Clinic Booking Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    h2 {
-      color: #4caf50;
-      text-align: center;
-    }
-    #logsTable {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    #logsTable th, #logsTable td {
-      border: 1px solid #444;
-      padding: 8px;
-      text-align: center;
-    }
-    #logsTable th {
-      background: #222;
-      color: #0f0;
-    }
-    input, select, button {
-      padding: 6px;
-      margin: 4px;
-    }
-    .top-bar {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+    body { font-family: Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+    th { background-color: #111; color: #0f0; }
+    tr:nth-child(even) { background-color: #111; }
+    .filters { margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .filters button, .filters input { padding: 6px 10px; font-size: 14px; }
+    .hidden { display: none; }
+    .btn { background: #00a651; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .btn:hover { background: #007a3d; }
   </style>
 </head>
 <body>
 
 <h2>📋 Booking Logs</h2>
-<div class="top-bar">
-  <button onclick="filterDate('today')">Today</button>
-  <button onclick="filterDate('yesterday')">Yesterday</button>
-  <input type="date" id="startDate"> to 
-  <input type="date" id="endDate">
-  <button onclick="filterDate('custom')">Apply</button>
+
+<div class="filters">
+  <button class="btn" onclick="filterDate('today')">Today</button>
+  <button class="btn" onclick="filterDate('yesterday')">Yesterday</button>
+  <input type="date" id="startDate" />
+  <input type="date" id="endDate" />
+  <button class="btn" onclick="filterDate('custom')">Apply</button>
+  <button class="btn" onclick="exportCSV()">Export CSV</button>
 </div>
 
-<table id="logsTable">
+<table id="logTable">
   <thead>
     <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Name</th>
-      <th>Reason</th>
-      <th>Contact</th>
-      <th>Token</th>
-      <th>Reminder</th>
+      <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Clinic</th><th>Token</th><th>Reminder</th><th>Reminder Sent</th>
     </tr>
   </thead>
-  <tbody id="logsBody"></tbody>
+  <tbody id="logBody"></tbody>
 </table>
 
 <script>
+const params = new URLSearchParams(window.location.search);
+const pin = params.get("pin");
+
+let clinic = "";
 let logData = [];
-let clinic = '';
 
-function getPIN() {
-  const url = new URL(window.location.href);
-  return url.searchParams.get("pin") || '';
-}
-
-function loadPlansJson(pin) {
-  fetch('plans.json')
+if (!pin) {
+  alert("Missing PIN in URL. Use ?pin=XXXX");
+} else {
+  fetch("plans.json")
     .then(res => res.json())
     .then(plans => {
-      const plan = plans.find(p => p.pin === pin);
-      if (!plan) {
+      const clinicEntry = plans.find(c => c.pin === pin);
+      if (!clinicEntry) {
         alert("Invalid PIN");
         return;
       }
-      clinic = plan.clinic;
-      loadLogs(clinic);
+      clinic = clinicEntry.clinic;
+      loadLogs(`clinic${clinic}-logs.csv`);
     })
-    .catch(() => alert("Error loading plans.json"));
+    .catch(() => alert("Failed to load plans.json"));
 }
 
-function loadLogs(clinic) {
-  fetch(`${clinic}-logs.csv`)
+function loadLogs(file) {
+  fetch(file)
     .then(res => res.text())
     .then(csv => {
-      const rows = csv.trim().split('\n').slice(1);
-      logData = rows.map(r => {
-        const [Date, Time, Name, Reason, Contact, Token, Reminder] = r.split(',');
-        return { Date, Time, Name, Reason, Contact, Token, Reminder };
+      const rows = csv.trim().split("\n");
+      const headers = rows[0].split(",");
+      logData = rows.slice(1).map(row => {
+        const values = row.split(",");
+        const entry = {};
+        headers.forEach((h, i) => entry[h.trim()] = values[i]?.trim());
+        return entry;
       });
       renderTable(logData);
     })
-    .catch(() => alert("Error loading logs"));
+    .catch(() => alert("Failed to load log file"));
 }
 
 function renderTable(data) {
-  const tbody = document.getElementById('logsBody');
-  tbody.innerHTML = '';
+  const body = document.getElementById("logBody");
+  body.innerHTML = "";
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.Date}</td>
+      <td>${row.Time}</td>
+      <td>${row.Name}</td>
+      <td>${row.Reason}</td>
+      <td><a href="tel:${row.Contact}" style="color:#0ff">${row.Contact}</a></td>
+      <td>${row.Clinic}</td>
+      <td>${row.Token}</td>
+      <td><button class="btn" onclick="sendReminder('${row.Contact}','${row.Time}','${row.Token}')">Send</button></td>
+      <td>${row['Reminder Sent'] || ''}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function filterDate(type) {
+  let filtered = logData;
+  const today = new Date();
+  if (type === "today") {
+    const dateStr = today.toISOString().split("T")[0];
+    filtered = logData.filter(e => e.Date === dateStr);
+  } else if (type === "yesterday") {
+    const yest = new Date();
+    yest.setDate(today.getDate() - 1);
+    const dateStr = yest.toISOString().split("T")[0];
+    filtered = logData.filter(e => e.Date === dateStr);
+  } else if (type === "custom") {
+    const sd = document.getElementById("startDate").value;
+    const ed = document.getElementById("endDate").value;
+    filtered = logData.filter(e => e.Date >= sd && e.Date <= ed);
+  }
+  renderTable(filtered);
+}
+
+function sendReminder(contact, time, token) {
+  const msg = `Reminder: Your appointment is at ${time}. Token No: ${token}`;
+  const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
+  window.open(link, "_blank");
+}
+
+function exportCSV() {
+  const headers = ["Date", "Time", "Name", "Reason", "Contact", "Clinic", "Token", "Reminder", "Reminder Sent"];
+  const rows = logData.map(e => headers.map(h => `"${e[h] || ''}"`).join(","));
+  const csv = [headers.join(","), ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `clinic${clinic}-logs.csv`;
+  a.click();
+}
+</script>
+
+</body>
+</html>  tbody.innerHTML = '';
   data.forEach(row => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
