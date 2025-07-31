@@ -1,75 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Logs Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinic Logs</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      margin: 0;
-      padding: 1em;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    #clinicLogo {
-      height: 50px;
-    }
-
-    h1 {
-      color: #f0ad4e;
-    }
-
-    select, button {
-      padding: 8px;
-      margin: 10px 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1em;
-    }
-
-    th, td {
-      border: 1px solid #555;
-      padding: 8px;
-      text-align: left;
-    }
-
-    th {
-      background: #222;
-    }
-
-    .summary {
-      margin-top: 1em;
-      font-weight: bold;
-      color: #0f0;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; color: #333; }
+    h1 { color: #222; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+    th { background-color: #eee; }
+    .highlight { background-color: #dff0d8; }
   </style>
 </head>
 <body>
-  <header>
-    <img id="clinicLogo" src="" alt="Clinic Logo" />
-    <h1>Booking Logs</h1>
-  </header>
-
-  <div id="trialMessage" style="color: red; font-weight: bold; display: none;">Trial expired. Contact admin to activate your plan.</div>
-
-  <label for="logDate">Filter by Date:</label>
-  <select id="logDate">
-    <option value="">-- Select Date --</option>
-  </select>
-
-  <div class="summary" id="dailySummary"></div>
-
+  <h1>Clinic Logs</h1>
   <table id="logsTable">
     <thead>
       <tr>
@@ -77,74 +21,38 @@
         <th>Time</th>
         <th>Patient Name</th>
         <th>Reason</th>
+        <th>Status</th>
+        <th>Reminder Sent</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <!-- Logs will be populated here -->
+    </tbody>
   </table>
-
-  <button onclick="exportLogs()">Export Logs</button>
-
-  <script src="trial.js"></script>
   <script>
-    const CLINIC_ID = "onesto"; // change per clinic if needed
-    const LOGO_URL = `clinics/${CLINIC_ID}/logo-bookings.png`;
-    const LOGS_URL = `clinics/${CLINIC_ID}/logs.csv`;
-
-    document.getElementById("clinicLogo").src = LOGO_URL;
-
-    function fetchLogs() {
-      fetch(LOGS_URL)
-        .then(res => res.text())
-        .then(csv => {
-          const rows = csv.trim().split("\n").slice(1); // Skip header
-          const logs = rows.map(r => {
-            const [date, time, name, reason] = r.split(",");
-            return { date, time, name, reason };
-          });
-
-          const dates = [...new Set(logs.map(l => l.date))];
-          const dropdown = document.getElementById("logDate");
-          dates.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d;
-            opt.textContent = d;
-            dropdown.appendChild(opt);
-          });
-
-          dropdown.addEventListener("change", () => renderLogs(logs, dropdown.value));
-        });
-    }
-
-    function renderLogs(logs, selectedDate) {
-      const tbody = document.querySelector("#logsTable tbody");
-      tbody.innerHTML = "";
-
-      const filtered = logs.filter(l => l.date === selectedDate);
-      document.getElementById("dailySummary").textContent = `Total Bookings: ${filtered.length}`;
-
-      filtered.forEach(log => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${log.date}</td>
-          <td>${log.time}</td>
-          <td>${log.name}</td>
-          <td>${log.reason}</td>
-        `;
-        tbody.appendChild(row);
+    const csvUrl = 'https://yourdomain.github.io/clinic-bot-system/logs.csv';fetch(csvUrl)
+  .then(response => response.text())
+  .then(data => {
+    const rows = data.trim().split('\n').slice(1);
+    const tbody = document.querySelector('#logsTable tbody');
+    rows.forEach(row => {
+      const cols = row.split(',');
+      const tr = document.createElement('tr');
+      cols.forEach((col, idx) => {
+        const td = document.createElement('td');
+        td.textContent = col;
+        tr.appendChild(td);
       });
-    }
-
-    function exportLogs() {
-      window.open(LOGS_URL, "_blank");
-    }
-
-    checkTrialExpiry(CLINIC_ID).then(expired => {
-      if (expired) {
-        document.body.innerHTML = '<h2 style="color:red;text-align:center;">Trial expired. Contact admin to activate your plan.</h2>';
-      } else {
-        fetchLogs();
+      // Append "Reminder Sent" status if not present
+      if (cols.length < 6) {
+        const td = document.createElement('td');
+        td.textContent = 'No';
+        tr.appendChild(td);
       }
+      tbody.appendChild(tr);
     });
+  });
+
   </script>
 </body>
 </html>
