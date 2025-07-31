@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset PIN - Admin Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #4dc1ff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background-color: #222;
+    }
+    input, select {
+      padding: 6px;
+      font-size: 14px;
+      width: 100%;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 14px;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #28a745;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Reset PIN & Assign Plan</h1>  <table>
+    <thead>
+      <tr>
+        <th>Clinic Name</th>
+        <th>Current PIN</th>
+        <th>Assigned Plan</th>
+        <th>New PIN</th>
+        <th>New Plan</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="clinicTable">
+      <!-- Rows will be populated dynamically -->
+    </tbody>
+  </table>  <script>
+    const clinics = [
+      { name: "OneStop Clinic A", pin: "1234", plan: "Free" },
+      { name: "OneStop Clinic B", pin: "2525", plan: "Paid" },
+      { name: "OneStop Clinic C", pin: "8888", plan: "Premium" }
+    ];
+
+    function renderTable() {
+      const tbody = document.getElementById("clinicTable");
+      tbody.innerHTML = "";
+      clinics.forEach((clinic, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${clinic.name}</td>
+          <td>${clinic.pin}</td>
+          <td>${clinic.plan}</td>
+          <td><input id="newPin${index}" placeholder="New PIN"></td>
+          <td>
+            <select id="newPlan${index}">
+              <option value="Free">Free</option>
+              <option value="Paid">Paid</option>
+              <option value="Premium">Premium</option>
+            </select>
+          </td>
+          <td><button onclick="update(${index})">Update</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function update(index) {
+      const newPin = document.getElementById(`newPin${index}`).value.trim();
+      const newPlan = document.getElementById(`newPlan${index}`).value;
+      if (!newPin) {
+        alert("Please enter a new PIN");
+        return;
+      }
+      clinics[index].pin = newPin;
+      clinics[index].plan = newPlan;
+      alert(`✅ ${clinics[index].name} updated to PIN ${newPin} and Plan ${newPlan}`);
+      renderTable();
+    }
+
+    renderTable();
+  </script></body>
+</html>
