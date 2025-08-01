@@ -1,132 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Book Appointment</title>
-  <style>
-    body {
-      background-color: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Book Appointment</title>
+    <style>
+        body {
+            background: #111;
+            color: white;
+            font-family: sans-serif;
+            padding: 20px;
+        }
 
-    h1 {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
 
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      background-color: #222;
-      color: white;
-    }
+        button {
+            background-color: #00c49a;
+            color: white;
+            font-weight: bold;
+        }
 
-    button {
-      background-color: #00c49a;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
+        h1 {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+    <h1>Book Appointment</h1>
 
-  <h1>Book Appointment</h1>
+    <label>Patient Name</label>
+    <input type="text" id="patientName" placeholder="Enter your name" />
 
-  <label>Patient Name</label>
-  <input type="text" id="patientName" placeholder="Enter your name" />
+    <label>Reason for Visit</label>
+    <input type="text" id="reason" placeholder="Enter reason" />
 
-  <label>Reason for Visit</label>
-  <input type="text" id="reason" placeholder="Enter reason" />
+    <label>Select Date</label>
+    <select id="dateDropdown"></select>
 
-  <label>Select Date</label>
-  <select id="dateDropdown">
-    <option value="">Select Date</option>
-  </select>
+    <label>Available Time Slot</label>
+    <select id="slotDropdown"></select>
 
-  <label>Available Time Slot</label>
-  <select id="slotDropdown">
-    <option value="">Select Time Slot</option>
-  </select>
+    <button onclick="confirmBooking()">Confirm & WhatsApp</button>
 
-  <button onclick="confirmBooking()">Confirm & WhatsApp</button>
+    <script>
+        const csvURL = './slots.csv';  // Path to slots.csv file
+        const dateDropdown = document.getElementById('dateDropdown');
+        const slotDropdown = document.getElementById('slotDropdown');
 
-  <script>
-    const csvUrl = "https://raw.githubusercontent.com/warangalonepoint/clinic-bot-system/main/clinic/slots.csv";
-    const dateDropdown = document.getElementById("dateDropdown");
-    const slotDropdown = document.getElementById("slotDropdown");
-    let allSlots = {};
+        let allSlots = {};
 
-    function fetchCSV() {
-      fetch(csvUrl)
-        .then(res => res.text())
-        .then(data => parseCSV(data));
-    }
+        function fetchCSV() {
+            fetch(csvURL)
+                .then(res => res.text())
+                .then(data => parseCSV(data));
+        }
 
-    function parseCSV(data) {
-      const rows = data.trim().split("\n").slice(1); // skip header
-      rows.forEach(row => {
-        const [date, time, status] = row.split(",");
-        if (status.toLowerCase() !== "available") return;
-        if (!allSlots[date]) allSlots[date] = [];
-        allSlots[date].push(time.trim());
-      });
-      populateDates();
-    }
+        function parseCSV(data) {
+            data = data.trim().split("\n").slice(1);  // remove header
+            allSlots = {};
 
-    function populateDates() {
-      Object.keys(allSlots).forEach(date => {
-        const opt = document.createElement("option");
-        opt.value = date;
-        opt.textContent = date;
-        dateDropdown.appendChild(opt);
-      });
-    }
+            data.forEach(row => {
+                const [date, time, status] = row.split(",");
+                if (status.toLowerCase() === "available") {
+                    if (!allSlots[date]) allSlots[date] = [];
+                    allSlots[date].push(time.trim());
+                }
+            });
 
-    dateDropdown.addEventListener("change", () => {
-      const selectedDate = dateDropdown.value;
-      slotDropdown.innerHTML = `<option value="">Select Time Slot</option>`;
-      if (allSlots[selectedDate]) {
-        allSlots[selectedDate].forEach(slot => {
-          const opt = document.createElement("option");
-          opt.value = slot;
-          opt.textContent = slot;
-          slotDropdown.appendChild(opt);
-        });
-      }
-    });
+            populateDates();
+        }
 
-    function confirmBooking() {
-      const name = document.getElementById("patientName").value.trim();
-      const reason = document.getElementById("reason").value.trim();
-      const date = dateDropdown.value;
-      const time = slotDropdown.value;
+        function populateDates() {
+            dateDropdown.innerHTML = '';  // Clear previous options
 
-      if (!name || !reason || !date || !time) {
-        alert("Please fill all fields.");
-        return;
-      }
+            Object.keys(allSlots).forEach(date => {
+                const opt = document.createElement("option");
+                opt.value = date;
+                opt.innerText = date;
+                dateDropdown.appendChild(opt);
+            });
+        }
 
-      const message = `Appointment Request:%0AName: ${name}%0AReason: ${reason}%0ADate: ${date}%0ATime: ${time}`;
-      const whatsappUrl = `https://wa.me/919390664577?text=${message}`;
-      window.open(whatsappUrl, "_blank");
-    }
+        function populateTimeSlots() {
+            const selectedDate = dateDropdown.value;
+            slotDropdown.innerHTML = '';  // Clear previous options
 
-    fetchCSV();
-  </script>
+            if (allSlots[selectedDate]) {
+                allSlots[selectedDate].forEach(time => {
+                    const opt = document.createElement("option");
+                    opt.value = time;
+                    opt.innerText = time;
+                    slotDropdown.appendChild(opt);
+                });
+            }
+        }
 
+        function confirmBooking() {
+            const patientName = document.getElementById('patientName').value;
+            const reason = document.getElementById('reason').value;
+            const selectedDate = dateDropdown.value;
+            const selectedTime = slotDropdown.value;
+
+            if (!patientName || !reason || !selectedDate || !selectedTime) {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            // Fetch logs.csv to get the current count of bookings for the selected date
+            fetch('./logs.csv')
+                .then(res => res.text())
+                .then(data => {
+                    const logEntries = data.trim().split("\n").slice(1);  // Remove header
+                    const dateBookings = logEntries.filter(entry => entry.startsWith(selectedDate));
+                    const tokenNumber = dateBookings.length + 1;
+
+                    // Create log entry to append to logs.csv
+                    const logEntry = `${selectedDate},${selectedTime},${patientName},${reason},Token ${tokenNumber}\n`;
+
+                    // Save the new entry to logs.csv (for real implementation, this would require server-side code)
+                    console.log(logEntry);  // Placeholder to show log entry in console
+
+                    // Redirect to confirmation page with the details
+                    window.location.href = `confirmation.html?patientName=${patientName}&reason=${reason}&date=${selectedDate}&time=${selectedTime}&token=Token ${tokenNumber}`;
+                });
+        }
+
+        // Initialize dropdowns when page loads
+        window.onload = function () {
+            fetchCSV();
+            dateDropdown.addEventListener("change", populateTimeSlots);
+        };
+    </script>
 </body>
 </html>
