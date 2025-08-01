@@ -30,12 +30,6 @@
       color: white;
       font-weight: bold;
     }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
-    }
   </style>
 </head>
 <body>
@@ -48,19 +42,15 @@
   <input type="text" id="reason" placeholder="Enter reason" />
 
   <label>Select Date</label>
-  <select id="dateDropdown">
-    <option value="">Select Date</option>
-  </select>
+  <select id="dateDropdown" onchange="populateSlots()"></select>
 
   <label>Available Time Slot</label>
-  <select id="slotDropdown">
-    <option value="">Available Time Slot</option>
-  </select>
+  <select id="slotDropdown"></select>
 
   <button onclick="confirmBooking()">Confirm & WhatsApp</button>
 
   <script>
-    const csvUrl = "./slots.csv";
+    const csvUrl = "./Slots.csv"; // make sure this file is hosted in same /clinic/ folder
     const dateDropdown = document.getElementById("dateDropdown");
     const slotDropdown = document.getElementById("slotDropdown");
     let allSlots = {};
@@ -72,40 +62,50 @@
     }
 
     function parseCSV(data) {
-      const rows = data.trim().split("\n").slice(1);
+      const rows = data.trim().split("\n").slice(1); // remove header
+      const today = new Date().toISOString().split("T")[0];
       allSlots = {};
 
       rows.forEach(row => {
         const [date, time, status] = row.split(",");
-        if (status.trim().toLowerCase() !== "available") return;
-        if (!allSlots[date]) allSlots[date] = [];
-        allSlots[date].push(time.trim());
+        const trimmedDate = date.trim();
+        const trimmedTime = time.trim();
+        const trimmedStatus = status.trim().toLowerCase();
+
+        if (trimmedStatus !== "available") return;
+        if (trimmedDate < today) return;
+
+        if (!allSlots[trimmedDate]) allSlots[trimmedDate] = [];
+        allSlots[trimmedDate].push(trimmedTime);
       });
 
       populateDates();
     }
 
     function populateDates() {
-      dateDropdown.innerHTML = "<option value=''>Select Date</option>";
+      dateDropdown.innerHTML = "";
       Object.keys(allSlots).forEach(date => {
         const opt = document.createElement("option");
         opt.value = date;
         opt.textContent = date;
         dateDropdown.appendChild(opt);
       });
+
+      populateSlots(); // load slots for first date
     }
 
-    dateDropdown.addEventListener("change", () => {
+    function populateSlots() {
       const selectedDate = dateDropdown.value;
-      slotDropdown.innerHTML = "<option value=''>Available Time Slot</option>";
+      slotDropdown.innerHTML = "";
       if (!allSlots[selectedDate]) return;
-      allSlots[selectedDate].forEach(slot => {
+
+      allSlots[selectedDate].forEach(time => {
         const opt = document.createElement("option");
-        opt.value = slot;
-        opt.textContent = slot;
+        opt.value = time;
+        opt.textContent = time;
         slotDropdown.appendChild(opt);
       });
-    });
+    }
 
     function confirmBooking() {
       const name = document.getElementById("patientName").value.trim();
@@ -114,13 +114,18 @@
       const time = slotDropdown.value;
 
       if (!name || !reason || !date || !time) {
-        alert("Please fill all fields.");
+        alert("Please fill all fields");
         return;
       }
 
-      const msg = `Hi, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${time}`;
-      const url = `https://wa.me/919390664577?text=${encodeURIComponent(msg)}`;
-      window.location.href = url;
+      const message = `Booking Request:
+Name: ${name}
+Reason: ${reason}
+Date: ${date}
+Time: ${time}`;
+
+      const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
+      window.open(whatsappLink, "_blank");
     }
 
     fetchCSV();
