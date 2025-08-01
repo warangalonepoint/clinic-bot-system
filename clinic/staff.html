@@ -1,116 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Staff Attendance</title>
+  <meta charset="UTF-8" />
+  <title>Staff Directory – Onestop Ai Clinic Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body.dark-theme {
-      background-color: #000;
-      color: #0ff;
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --card: #f8f8f8;
+      --highlight: #cceeff;
     }
-    body.light-theme {
-      background-color: #f9f9f9;
-      color: #000;
+    body.dark {
+      --bg: #0d1117;
+      --text: #f0f0f0;
+      --card: #161b22;
+      --highlight: #00ffcc;
     }
-    .dark-theme .btn {
-      background-color: #0ff;
-      color: #000;
-      border: none;
-    }
-    .light-theme .btn {
-      background-color: #007bff;
-      color: #fff;
-    }
-    table {
-      width: 100%;
-      margin-top: 20px;
-    }
-    th, td {
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      margin: 0;
       padding: 10px;
-      text-align: left;
+      transition: background 0.3s ease;
     }
-    .highlight {
-      background-color: #00ff9966 !important;
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .staff-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .staff-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px;
+      width: 220px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease;
+    }
+    .staff-card:hover {
+      transform: scale(1.03);
+      background: var(--highlight);
+    }
+    .staff-card h4 {
+      margin: 6px 0;
+    }
+    .staff-card a {
+      color: var(--text);
+      text-decoration: none;
       font-weight: bold;
     }
-    .theme-toggle, .filter-toggle {
-      margin: 10px;
+    @media (max-width: 600px) {
+      .staff-card {
+        width: 90%;
+      }
+      .toggle-btn {
+        font-size: 12px;
+        top: 5px;
+        right: 5px;
+      }
     }
   </style>
 </head>
-<body class="dark-theme">
-
-  <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center">
-      <h2>👥 Staff Attendance</h2>
-      <div>
-        <button class="btn theme-toggle" onclick="toggleTheme()">🎨 Toggle Theme</button>
-        <button class="btn filter-toggle" onclick="toggleFilter()">🟢 Show Only On Duty</button>
-      </div>
-    </div>
-
-    <table class="table table-bordered mt-3">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Shift</th>
-          <th>Contact</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="staff-table-body">
-        <!-- Staff rows inserted here -->
-      </tbody>
-    </table>
-  </div>
+<body>
+  <button class="toggle-btn" onclick="toggleTheme()">🌓</button>
+  <h2>👨‍⚕️ Clinic Staff Directory</h2>
+  <div class="staff-container" id="staffContainer">Loading...</div>
 
   <script>
-    let filterOn = false;
+    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/staff-attendance.csv";
 
-    function loadStaffData() {
-      fetch('./staff-attendance.csv')
-        .then(response => response.text())
-        .then(data => {
-          const rows = data.trim().split('\n').slice(1); // skip header
-          const tbody = document.getElementById('staff-table-body');
-          tbody.innerHTML = '';
+    fetch(CSV_URL)
+      .then(response => response.text())
+      .then(data => {
+        const rows = data.trim().split("\n").slice(1); // skip header
+        const container = document.getElementById("staffContainer");
+        container.innerHTML = "";
 
-          rows.forEach(row => {
-            const cols = row.split(',');
-            const [name, role, shift, contact, status] = cols;
-            const tr = document.createElement('tr');
+        rows.forEach(row => {
+          const [date, name, role, status, phone] = row.split(",");
+          const card = document.createElement("div");
+          card.className = "staff-card";
 
-            if (status.trim().toLowerCase() === 'on duty') {
-              tr.classList.add('highlight');
-            }
-
-            if (!filterOn || status.trim().toLowerCase() === 'on duty') {
-              [name, role, shift, contact, status].forEach(text => {
-                const td = document.createElement('td');
-                td.textContent = text;
-                tr.appendChild(td);
-              });
-              tbody.appendChild(tr);
-            }
-          });
+          card.innerHTML = `
+            <h4>${name}</h4>
+            <p><strong>Role:</strong> ${role}</p>
+            <p><strong>Status:</strong> ${status}</p>
+            <p><a href="tel:${phone}">📞 ${phone}</a></p>
+          `;
+          container.appendChild(card);
         });
-    }
+      });
 
     function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle('dark-theme');
-      body.classList.toggle('light-theme');
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
-
-    function toggleFilter() {
-      filterOn = !filterOn;
-      loadStaffData();
-    }
-
-    window.onload = loadStaffData;
+    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
   </script>
 </body>
 </html>
