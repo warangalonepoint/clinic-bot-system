@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Management</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      padding: 20px;
+    }
+    .on-duty {
+      color: green;
+      font-weight: bold;
+    }
+    .on-leave {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="mb-4">👥 Clinic Staff Management</h2><!-- Add Staff Form -->
+<div class="card p-3 mb-4">
+  <h5>Add New Staff</h5>
+  <div class="row g-2">
+    <div class="col-md-2"><input type="text" class="form-control" id="empId" placeholder="Employee ID"></div>
+    <div class="col-md-2"><input type="text" class="form-control" id="empName" placeholder="Name"></div>
+    <div class="col-md-2"><input type="text" class="form-control" id="empRole" placeholder="Role"></div>
+    <div class="col-md-2"><input type="text" class="form-control" id="empContact" placeholder="Contact"></div>
+    <div class="col-md-2"><input type="number" class="form-control" id="empAttendance" placeholder="Attendance"></div>
+    <div class="col-md-2"><input type="number" class="form-control" id="empLeaves" placeholder="Leaves"></div>
+    <div class="col-md-2 mt-2">
+      <select class="form-select" id="empToday">
+        <option>On Duty</option>
+        <option>On Leave</option>
+      </select>
+    </div>
+    <div class="col-md-2 mt-2">
+      <button class="btn btn-primary w-100" onclick="addStaff()">➕ Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Staff Table -->
+<table class="table table-bordered" id="staffTable">
+  <thead class="table-dark">
+    <tr>
+      <th>Emp ID</th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Contact</th>
+      <th>Attendance</th>
+      <th>Leaves</th>
+      <th>Today Status</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody id="staffBody">
+    <!-- JS will insert rows here -->
+  </tbody>
+</table>
+
+  </div>  <script>
+    let staffList = [];
+
+    function addStaff() {
+      const id = document.getElementById('empId').value.trim();
+      const name = document.getElementById('empName').value.trim();
+      const role = document.getElementById('empRole').value.trim();
+      const contact = document.getElementById('empContact').value.trim();
+      const att = document.getElementById('empAttendance').value.trim();
+      const leave = document.getElementById('empLeaves').value.trim();
+      const status = document.getElementById('empToday').value.trim();
+
+      if (!id || !name || !role) return alert("Please enter ID, name, and role");
+
+      const row = { id, name, role, contact, att, leave, status };
+      staffList.push(row);
+      renderTable();
+    }
+
+    function deleteStaff(index) {
+      if (confirm("Remove this staff member?")) {
+        staffList.splice(index, 1);
+        renderTable();
+      }
+    }
+
+    function renderTable() {
+      const body = document.getElementById('staffBody');
+      body.innerHTML = '';
+      staffList.forEach((s, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${s.id}</td>
+          <td>${s.name}</td>
+          <td>${s.role}</td>
+          <td><a href="tel:${s.contact}">${s.contact}</a></td>
+          <td>${s.att}</td>
+          <td>${s.leave}</td>
+          <td class="${s.status === 'On Duty' ? 'on-duty' : 'on-leave'}">${s.status}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteStaff(${i})">🗑️</button></td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+  </script></body>
+</html>
