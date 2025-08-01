@@ -2,156 +2,163 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Book Appointment</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Appointment</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      background-color: #111;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
       transition: background 0.3s, color 0.3s;
     }
 
-    .dark-mode {
-      background-color: #111;
-      color: #eee;
-    }
-
     .light-mode {
-      background-color: #f9f9f9;
+      background-color: #f4f4f4;
       color: #111;
     }
 
-    h1 {
+    h2 {
       text-align: center;
-      font-size: 24px;
       margin-bottom: 20px;
-    }
-
-    select, input, button {
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 14px;
-      width: 100%;
-      max-width: 400px;
-      display: block;
-    }
-
-    .toggle-theme {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      border: none;
-      background-color: #444;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .light-mode .toggle-theme {
-      background-color: #ccc;
-      color: #000;
     }
 
     .form-container {
       max-width: 400px;
       margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
+    select, input[type="text"], button {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
     }
 
-    .hidden {
-      display: none;
+    button {
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .theme-toggle {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .theme-toggle button {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .theme-toggle button:hover {
+      background: #666;
     }
   </style>
 </head>
 <body>
-  <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
-
-  <h1>Book Your Appointment</h1>
-
+  <h2>Book Your Appointment</h2>
   <div class="form-container">
-    <label for="dateSelect">Select Date:</label>
-    <select id="dateSelect" onchange="loadSlots()"></select>
+    <select id="dateDropdown" required>
+      <option value="">Select Date</option>
+    </select>
 
-    <label for="slotSelect">Select Time Slot:</label>
-    <select id="slotSelect"></select>
+    <select id="slotDropdown" required>
+      <option value="">Select Time Slot</option>
+    </select>
 
-    <label for="name">Your Name:</label>
-    <input type="text" id="name" placeholder="Enter your name" required>
+    <input type="text" id="patientName" placeholder="Patient Name" required />
+    <input type="text" id="reason" placeholder="Reason for Visit" required />
 
-    <label for="reason">Reason for Visit:</label>
-    <input type="text" id="reason" placeholder="Enter reason" required>
+    <button onclick="bookSlot()">Book on WhatsApp</button>
+  </div>
 
-    <button onclick="bookNow()">Book via WhatsApp</button>
+  <div class="theme-toggle">
+    <button onclick="toggleTheme()">Toggle Theme</button>
   </div>
 
   <script>
-    const body = document.body;
+    const SHEET_URL = 'https://warangalonepoint.github.io/clinic-bot-system/clinic/Slots.csv';
 
-    function applyTheme(theme) {
-      if (theme === 'dark') {
-        body.classList.add('dark-mode');
-        body.classList.remove('light-mode');
-      } else {
-        body.classList.add('light-mode');
-        body.classList.remove('dark-mode');
-      }
+    let allSlots = [];
+
+    function fetchSlots() {
+      fetch(SHEET_URL)
+        .then(res => res.text())
+        .then(data => {
+          const rows = data.trim().split('\n').slice(1);
+          allSlots = rows.map(row => {
+            const [date, time, status] = row.split(',');
+            return { date, time, status };
+          });
+
+          const uniqueDates = [...new Set(allSlots.map(s => s.date))].sort();
+          const dateDropdown = document.getElementById('dateDropdown');
+          uniqueDates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            dateDropdown.appendChild(option);
+          });
+
+          dateDropdown.addEventListener('change', updateSlots);
+        });
     }
 
-    function toggleTheme() {
-      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
-      applyTheme(newTheme);
+    function updateSlots() {
+      const selectedDate = document.getElementById('dateDropdown').value;
+      const slotDropdown = document.getElementById('slotDropdown');
+      slotDropdown.innerHTML = '<option value="">Select Time Slot</option>';
+
+      allSlots
+        .filter(s => s.date === selectedDate && s.status.toLowerCase() === 'available')
+        .forEach(s => {
+          const option = document.createElement('option');
+          option.value = s.time;
+          option.textContent = s.time;
+          slotDropdown.appendChild(option);
+        });
     }
 
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-
-    async function loadSlots() {
-      const response = await fetch('slots.csv');
-      const text = await response.text();
-      const lines = text.trim().split('\n').slice(1);
-
-      const dateSelect = document.getElementById('dateSelect');
-      const slotSelect = document.getElementById('slotSelect');
-      const selectedDate = dateSelect.value;
-
-      const futureDates = [...new Set(lines.map(line => line.split(',')[0]))]
-        .filter(d => new Date(d) >= new Date())
-        .sort();
-
-      dateSelect.innerHTML = futureDates.map(d => `<option value="${d}">${d}</option>`).join('');
-      const currentDate = dateSelect.value;
-
-      slotSelect.innerHTML = lines
-        .filter(line => line.startsWith(currentDate) && line.includes('Available'))
-        .map(line => `<option>${line.split(',')[1]}</option>`)
-        .join('');
-    }
-
-    async function bookNow() {
-      const name = document.getElementById('name').value;
+    function bookSlot() {
+      const date = document.getElementById('dateDropdown').value;
+      const time = document.getElementById('slotDropdown').value;
+      const name = document.getElementById('patientName').value;
       const reason = document.getElementById('reason').value;
-      const slot = document.getElementById('slotSelect').value;
-      const date = document.getElementById('dateSelect').value;
 
-      if (!name || !reason || !slot) {
+      if (!date || !time || !name || !reason) {
         alert("Please fill in all fields.");
         return;
       }
 
-      const message = `Appointment Booking\nName: ${name}\nDate: ${date}\nTime: ${slot}\nReason: ${reason}`;
-      const encoded = encodeURIComponent(message);
-      window.location.href = `https://wa.me/919390664577?text=${encoded}`;
+      const message = `Appointment Request:
+📅 Date: ${date}
+⏰ Time: ${time}
+👤 Name: ${name}
+📝 Reason: ${reason}`;
+      const encodedMsg = encodeURIComponent(message);
+      window.location.href = `https://wa.me/919390664577?text=${encodedMsg}`;
     }
 
-    loadSlots();
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+    }
+
+    fetchSlots();
   </script>
 </body>
 </html>
