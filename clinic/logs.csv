@@ -1,4 +1,21 @@
-Time,Reason,Name,Contact,Date,Token
-17:00,Fever,Chaitanya Krishna,+919876543210,2025-08-01,1
-17:10,Checkup,Ravi Kumar,+918888888888,2025-08-01,2
-17:20,Consultation,Anjali Sharma,+917777777777,2025-08-01,3
+Date,Time,Name,Reason,Contact,Token,Reminder Sent
+2025-08-01,09:00,Chaitanya Krishna,Fever,+919876543210,1,Yes
+2025-08-01,09:10,Ravi Kumar,Checkup,+918888888888,2,Yes
+2025-08-01,09:20,Anjali Sharma,Consultation,+917777777777,3,No
+2025-08-01,09:30,Vikram Rao,Follow-up,+919999999999,4,Yes
+2025-08-01,09:40,Sneha Reddy,Skin Allergy,+918765432100,5,No
+2025-08-01,09:50,Rahul Dev,Back Pain,+917788990011,6,No
+2025-08-01,10:00,Priya Menon,Dental,+919123456789,7,Yes
+2025-08-01,10:10,Suresh Babu,Diabetes,+918612345678,8,No
+2025-08-01,10:20,Aparna Joshi,Cold,+917712345678,9,Yes
+2025-08-01,10:30,Nikhil Jain,Cough,+916789456123,10,No
+2025-08-01,10:40,Meena Patil,Migraine,+917654321098,11,Yes
+2025-08-01,10:50,Arun Verma,Chest Pain,+919234567890,12,Yes
+2025-08-01,11:00,Deepika Rao,Pregnancy,+918823456789,13,No
+2025-08-01,11:10,Karthik Iyer,Blood Test,+917765432123,14,Yes
+2025-08-01,11:20,Geeta Nair,Consultation,+917823456712,15,Yes
+2025-08-01,11:30,Mohan Das,Checkup,+916789123456,16,No
+2025-08-01,11:40,Rekha Sinha,Fever,+918765098765,17,Yes
+2025-08-01,11:50,Siddharth Rao,Joint Pain,+917609876543,18,Yes
+2025-08-01,12:00,Neha Kapoor,Allergy,+919876120987,19,No
+2025-08-01,12:10,Aditya Shetty,Flu,+917890123456,20,No
