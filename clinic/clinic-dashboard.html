@@ -1,132 +1,100 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#007BFF"/>
+  <link rel="manifest" href="manifest.json" />
+  <title>Clinic Dashboard – Onestop Ai Clinic Demo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       margin: 0;
       padding: 0;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
+      transition: 0.3s ease all;
     }
     :root {
-      --bg-color: #fff;
-      --text-color: #000;
-      --card-bg: #f0f0f0;
+      --bg: #ffffff;
+      --text: #000000;
     }
-    body.dark {
-      --bg-color: #121212;
-      --text-color: #fff;
-      --card-bg: #1f1f1f;
+    .dark {
+      --bg: #0d1117;
+      --text: #ffffff;
+    }
+    header {
+      background: #007BFF;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
     }
     .container {
-      padding: 20px;
-    }
-    h1 {
+      padding: 2rem;
       text-align: center;
     }
-    .grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
-    }
-    .card {
-      background-color: var(--card-bg);
-      border-radius: 10px;
-      padding: 20px;
-      flex: 1 1 280px;
-      max-width: 300px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-    .card a {
-      text-decoration: none;
-      color: var(--text-color);
+    .btn {
       display: block;
-      font-weight: bold;
-      margin-top: 10px;
+      margin: 1rem auto;
+      padding: 1rem;
+      width: 90%;
+      max-width: 400px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+      transition: 0.2s ease;
     }
-    .theme-toggle {
-      position: fixed;
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    .toggle-btn {
+      position: absolute;
       top: 10px;
       right: 10px;
-      background: #444;
-      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
       border: none;
-      border-radius: 20px;
-      padding: 8px 16px;
       cursor: pointer;
-      z-index: 1000;
+      background: #222;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+  <button class="toggle-btn" onclick="toggleTheme()">🌓</button>
+  <header>Clinic Dashboard</header>
+
   <div class="container">
-    <h1>Clinic Dashboard</h1>
-    <div class="grid">
-      <div class="card">
-        <i class="fas fa-calendar-plus fa-2x"></i>
-        <a href="bookings.html">Appointment Bookings</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-notes-medical fa-2x"></i>
-        <a href="logs.html">Booking Logs</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-file-export fa-2x"></i>
-        <a href="sync.html">Sync & Export</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-users fa-2x"></i>
-        <a href="staff.html">Staff Details</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-clock fa-2x"></i>
-        <a href="staff-attendance.html">Staff Attendance</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-chart-bar fa-2x"></i>
-        <a href="staff-monthly-summary.html">Monthly Summary</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-umbrella-beach fa-2x"></i>
-        <a href="staff-leave-tracker.html">Leave Tracker</a>
-      </div>
-      <div class="card">
-        <i class="fab fa-whatsapp fa-2x"></i>
-        <a href="whatsapp-attendance.html">WhatsApp Attendance</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-calendar-alt fa-2x"></i>
-        <a href="staff-roster.html">Staff Roster</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-robot fa-2x"></i>
-        <a href="whatsapp-log.html">WhatsApp Log Simulator</a>
-      </div>
-      <div class="card">
-        <i class="fas fa-ticket-alt fa-2x"></i>
-        <a href="token-summary.html">Token Summary</a>
-      </div>
-    </div>
+    <a class="btn" href="bookings.html">📝 Patient Bookings</a>
+    <a class="btn" href="logs.html">📋 Booking Logs</a>
+    <a class="btn" href="staff.html">👥 Staff Panel</a>
+    <a class="btn" href="staff-attendance.html">📅 Staff Attendance</a>
+    <a class="btn" href="staff-attendance-form.html">📲 Mark Attendance (WhatsApp)</a>
+    <a class="btn" href="staff-monthly-summary.html">📈 Monthly Attendance Summary</a>
+    <a class="btn" href="staff-leave-tracker.html">🌴 Leave Tracker</a>
+    <a class="btn" href="staff-roster.html">🗓️ Staff Roster</a>
+    <a class="btn" href="whatsapp-log.html">📨 WhatsApp Log</a>
+    <a class="btn" href="sync.html">🔄 Sync Panel</a>
+    <a class="btn" href="confirmation.html">✅ Booking Confirmation</a>
   </div>
+
   <script>
     function toggleTheme() {
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
-    (function () {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "dark") {
-        document.body.classList.add("dark");
-      }
-    })();
+
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
   </script>
 </body>
 </html>
