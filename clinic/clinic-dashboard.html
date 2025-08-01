@@ -2,143 +2,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Backup & Restore</title>
+  <title>Clinic Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
       transition: background 0.3s, color 0.3s;
     }
-    body.dark {
-      background: #111;
-      color: #0ff;
-    }
     body.light {
-      background: #f9f9f9;
-      color: #111;
+      background-color: #f5f5f5;
+      color: #000;
     }
-    .theme-toggle {
-      margin-bottom: 20px;
-      padding: 10px 16px;
-      cursor: pointer;
+    .dashboard {
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
     }
     h1 {
       text-align: center;
+      color: #0ff;
     }
-    .panel {
-      max-width: 600px;
-      margin: auto;
+    .card {
+      background: #222;
+      border: 1px solid #0ff;
+      border-radius: 12px;
       padding: 20px;
-      border-radius: 10px;
-      border: 2px solid #999;
-      background: rgba(255,255,255,0.05);
-    }
-    .panel.dark {
-      border-color: #0ff;
-    }
-    .panel button, .panel input[type="file"] {
       margin: 10px 0;
-      padding: 10px;
-      width: 100%;
-      font-size: 16px;
-    }
-    .info {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-top: 10px;
-    }
-    .back-link {
-      display: block;
-      margin: 20px auto;
       text-align: center;
-      text-decoration: none;
-      padding: 10px;
-      background: #444;
-      color: white;
-      border-radius: 8px;
-      width: fit-content;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    .back-link:hover {
-      background: #0ff;
-      color: black;
+    .card:hover {
+      background: #333;
+    }
+    .card.light {
+      background: #fff;
+      border: 1px solid #007acc;
+    }
+    .card.light:hover {
+      background: #eaeaea;
+    }
+    .theme-toggle, .logout-btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      background-color: #444;
+      color: #fff;
+    }
+    .theme-toggle:hover, .logout-btn:hover {
+      background-color: #0ff;
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
-  <h1>📦 Backup & Restore Panel</h1>
-  <div class="panel">
-    <h3>⬇️ Download Current Files</h3>
-    <button onclick="downloadCSV('logs.csv')">Download Logs</button>
-    <button onclick="downloadCSV('staff.csv')">Download Staff</button>
-    <button onclick="downloadCSV('staff-attendance.csv')">Download Attendance</button><h3>⬆️ Restore Files</h3>
-<input type="file" id="fileInput" accept=".csv" onchange="handleRestore(event)" />
-<p class="info">Upload a CSV file to restore data.</p>
+  <div class="dashboard">
+    <h1>📋 Clinic Dashboard</h1>
+    <div class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</div>
+    <div class="logout-btn" onclick="logout()">🔓 Logout</div><div class="card" onclick="location.href='bookings.html'">📅 Bookings</div>
+<div class="card" onclick="location.href='logs.html'">📊 Booking Logs</div>
+<div class="card" onclick="location.href='public-booking.html'">🌐 Public Booking Page</div>
+<div class="card" onclick="location.href='staff.html'">👥 Staff Management</div>
+<div class="card" onclick="location.href='staff-attendance.html'">🕒 Attendance Panel</div>
+<div class="card" onclick="location.href='staff-monthly-summary.html'">📆 Monthly Summary</div>
+<div class="card" onclick="location.href='staff-leave-tracker.html'">🏝️ Leave Tracker</div>
+<div class="card" onclick="location.href='staff-roster.html'">📋 Staff Roster</div>
+<div class="card" onclick="location.href='whatsapp-attendance.html'">📲 WhatsApp Panel</div>
+<div class="card" onclick="location.href='reset-pin.html'">🔐 Reset PIN</div>
+<div class="card" onclick="location.href='backup.html'">💾 Backup & Restore</div>
 
-  </div><a href="clinic-dashboard.html" class="back-link">← Back to Dashboard</a>
-
-  <script>
+  </div>  <script>
     function toggleTheme() {
-      const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
-      document.body.className = newTheme;
-      document.querySelector('.panel').className = `panel ${newTheme}`;
-      localStorage.setItem('theme', newTheme);
-    }
-
-    function applyTheme() {
-      const theme = localStorage.getItem('theme') || 'light';
+      const theme = document.body.classList.contains('light') ? 'dark' : 'light';
       document.body.className = theme;
-      document.querySelector('.panel').className = `panel ${theme}`;
+      localStorage.setItem('theme', theme);
     }
-
-    function downloadCSV(filename) {
-      const link = document.createElement('a');
-      link.href = `./${filename}`;
-      link.download = filename;
-      link.click();
+    function applyTheme() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.body.className = theme;
     }
-
-    function handleRestore(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      alert(`📂 File '${file.name}' selected for restore. (Manual sync required)`);
+    function logout() {
+      localStorage.removeItem('pin');
+      alert('You have been logged out.');
+      window.location.href = 'index.html';
     }
-
     applyTheme();
   </script></body>
-</html>      const inputPIN = document.getElementById("pinInput").value;
-      if (inputPIN === correctPIN) {
-        document.getElementById("loginSection").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-        localStorage.setItem("authenticated", "true");
-      } else {
-        alert("Incorrect PIN");
-      }
-    }
-
-    function checkLoginStatus() {
-      if (localStorage.getItem("authenticated") === "true") {
-        document.getElementById("loginSection").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-      }
-    }
-
-    function toggleTheme() {
-      const newTheme = document.body.classList.contains("dark") ? "light" : "dark";
-      document.body.className = newTheme;
-      document.querySelector(".theme-toggle").className = `theme-toggle ${newTheme}`;
-      localStorage.setItem("theme", newTheme);
-    }
-
-    function applySavedTheme() {
-      const savedTheme = localStorage.getItem("theme") || "light";
-      document.body.className = savedTheme;
-      document.querySelector(".theme-toggle").className = `theme-toggle ${savedTheme}`;
-    }
-
-    applySavedTheme();
-    checkLoginStatus();
-  </script>
-</body>
 </html>
