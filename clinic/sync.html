@@ -1,49 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sync Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <title>Data Sync Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background-color: #fafafa;
       font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      padding: 20px;
+      background: #222;
       text-align: center;
-      padding: 50px;
+    }
+    main {
+      padding: 20px;
     }
     .panel {
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 500px;
-      margin: auto;
-    }
-    h1 {
-      color: #333;
-    }
-    p {
-      font-size: 18px;
-      color: #666;
-    }
-    .info-box {
-      background: #f0f0f0;
-      padding: 15px;
+      background: #1a1a1a;
+      padding: 20px;
       border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .panel h2 {
+      margin-top: 0;
+      color: #0ff;
+    }
+    button {
+      background: #0ff;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 20px;
+    }
+    table th, table td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: left;
+    }
+    table th {
+      background: #333;
     }
   </style>
 </head>
 <body>
-  <div class="panel">
-    <h1>🔄 Sync Panel</h1>
-    <p>This utility page was used for syncing data manually from Google Sheets or CSV.</p>
-    <div class="info-box">
-      <p><strong>Current Version:</strong> Using GitHub CSV hosting.</p>
-      <p>No manual sync required anymore.</p>
+  <header>
+    <h1>Data Sync Panel</h1>
+  </header>
+  <main>
+    <div class="panel">
+      <h2>Sync Bookings</h2>
+      <p>Click below to fetch the latest bookings data.</p>
+      <button onclick="loadLogs()">Sync Logs</button>
+      <div id="status"></div>
+      <table id="logsTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Name</th>
+            <th>Reason</th>
+            <th>Contact</th>
+            <th>Token</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be inserted here -->
+        </tbody>
+      </table>
     </div>
-  </div>
-</body>
-</html>  </script>
-</body>
+  </main>  <script>
+    async function loadLogs() {
+      const status = document.getElementById("status");
+      const table = document.getElementById("logsTable").getElementsByTagName("tbody")[0];
+      status.innerText = "Loading...";
+
+      try {
+        const response = await fetch('./logs.csv');
+        const text = await response.text();
+        const lines = text.split('\n').slice(1);
+
+        table.innerHTML = '';
+
+        lines.forEach(line => {
+          const [date, time, name, reason, contact, token] = line.split(',');
+          if (!name || !time) return;
+          const row = table.insertRow();
+          row.innerHTML = `
+            <td>${date}</td>
+            <td>${time}</td>
+            <td>${name}</td>
+            <td>${reason}</td>
+            <td>${contact}</td>
+            <td>${token}</td>
+          `;
+        });
+
+        status.innerText = "Logs successfully synced.";
+      } catch (error) {
+        status.innerText = "Failed to load logs.";
+      }
+    }
+  </script></body>
 </html>
