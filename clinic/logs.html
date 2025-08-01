@@ -1,172 +1,110 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Booking Logs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Logs Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <style>
-    :root {
-      --bg-color: #111;
-      --text-color: #fff;
-      --card-bg: #1e1e1e;
-      --accent-color: #00cfff;
-    }
-    [data-theme="light"] {
-      --bg-color: #fff;
-      --text-color: #000;
-      --card-bg: #f2f2f2;
-      --accent-color: #007bff;
-    }
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: var(--accent-color);
-    }
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      background-color: var(--accent-color);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .card {
-      background-color: var(--card-bg);
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 600px;
-      margin: auto;
-      margin-top: 20px;
-    }
-    canvas {
-      width: 100% !important;
-      height: auto !important;
+    body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; margin: 0; padding: 1rem; }
+    h1 { text-align: center; margin-bottom: 1rem; }
+    .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 1rem; }
+    .filters input, .filters select { padding: 5px; font-size: 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+    th, td { padding: 0.75rem; border: 1px solid #ccc; text-align: left; }
+    th { background-color: #f0f0f0; }
+    .export-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 1rem; }
+    canvas { max-width: 100%; margin-top: 2rem; }
+    @media (max-width: 600px) {
+      table, th, td { font-size: 0.8rem; }
+      .filters { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
-<body>
-  <h1>📋 Clinic Booking Logs</h1>
-  <div class="buttons">
-    <button onclick="filterBy('today')">Today</button>
-    <button onclick="filterBy('yesterday')">Yesterday</button>
-    <button onclick="exportToExcel()">Export to Excel</button>
-    <button onclick="exportToPDF()">Export to PDF</button>
-    <button onclick="downloadCSV()">Download Updated CSV</button>
-    <button onclick="toggleTheme()">Toggle Theme</button>
-  </div>
-  <div class="card">
-    <h3>📊 Daily Summary</h3>
-    <p id="totalBookings">Total Bookings: 0</p>
-    <p id="remindersSent">Reminders Sent: 0</p>
-    <p id="topReasons">Top 3 Reasons:</p>
-    <canvas id="summaryChart"></canvas>
-  </div>
-  <script>
-    document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "dark");
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", current);
-      localStorage.setItem("theme", current);
-    }async function fetchLogs() {
-  const response = await fetch("./logs.csv");
-  const text = await response.text();
-  const rows = text.trim().split("\n").slice(1);
-  return rows.map(row => {
-    const [date, time, name, reason, contact, token, reminder] = row.split(",");
-    return { date, time, name, reason, contact, token, reminder };
+<body><h1>Patient List & Analytics</h1><div class="filters">
+  <input type="text" id="searchName" placeholder="Search Name">
+  <input type="text" id="searchReason" placeholder="Search Reason">
+  <input type="date" id="filterDate">
+</div><div class="export-buttons">
+  <button onclick="exportTableToExcel('patientTable')">Export to Excel</button>
+  <button onclick="exportToPDF()">Export to PDF</button>
+</div><table id="patientTable">
+  <thead>
+    <tr>
+      <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Token</th><th>Reminder Sent</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table><canvas id="bookingChart"></canvas>
+
+<script>
+const data = [
+  { date: '2025-08-01', time: '09:00', name: 'Chaitanya Krishna', reason: 'Fever', contact: '+919876543210', token: 1, reminder: 'Yes' },
+  { date: '2025-08-01', time: '09:10', name: 'Ravi Kumar', reason: 'Checkup', contact: '+918888888888', token: 2, reminder: 'Yes' },
+  { date: '2025-08-01', time: '09:20', name: 'Anjali Sharma', reason: 'Consultation', contact: '+917777777777', token: 3, reminder: 'No' },
+  { date: '2025-08-01', time: '09:30', name: 'Vikram Rao', reason: 'Follow-up', contact: '+919999999999', token: 4, reminder: 'Yes' },
+  { date: '2025-08-01', time: '09:40', name: 'Sneha Reddy', reason: 'Skin Allergy', contact: '+918765432100', token: 5, reminder: 'No' }
+];
+
+function renderTable(filtered = data) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  filtered.forEach(d => {
+    const row = `<tr><td>${d.date}</td><td>${d.time}</td><td>${d.name}</td><td>${d.reason}</td><td>${d.contact}</td><td>${d.token}</td><td>${d.reminder}</td></tr>`;
+    tbody.innerHTML += row;
   });
 }
 
-function formatDate(date) {
-  return date.toISOString().split('T')[0];
+function exportTableToExcel(id) {
+  const table = document.getElementById(id);
+  const wb = XLSX.utils.table_to_book(table);
+  XLSX.writeFile(wb, 'Patient_Logs.xlsx');
 }
 
-function getYesterday(date) {
-  const d = new Date(date);
-  d.setDate(d.getDate() - 1);
-  return formatDate(d);
+function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text('Patient Logs', 10, 10);
+  doc.autoTable({ html: '#patientTable' });
+  doc.save('Patient_Logs.pdf');
 }
 
-async function filterBy(type) {
-  const logs = await fetchLogs();
-  const now = new Date();
-  const todayStr = formatDate(now);
-  const yesterdayStr = getYesterday(now);
-  const filterDate = type === "today" ? todayStr : yesterdayStr;
-  const filtered = logs.filter(l => l.date === filterDate);
-
-  document.getElementById("totalBookings").innerText = `Total Bookings: ${filtered.length}`;
-  document.getElementById("remindersSent").innerText = `Reminders Sent: ${filtered.filter(l => l.reminder.toLowerCase() === 'yes').length}`;
-
-  const reasonMap = {};
-  filtered.forEach(l => {
-    reasonMap[l.reason] = (reasonMap[l.reason] || 0) + 1;
-  });
-  const top3 = Object.entries(reasonMap).sort((a, b) => b[1] - a[1]).slice(0, 3).map(e => e[0]);
-  document.getElementById("topReasons").innerText = `Top 3 Reasons: ${top3.join(", ")}`;
-
-  const hours = {};
-  filtered.forEach(l => {
-    hours[l.time] = (hours[l.time] || 0) + 1;
-  });
-  const ctx = document.getElementById("summaryChart").getContext("2d");
-  if (window.summaryChart) window.summaryChart.destroy();
-  window.summaryChart = new Chart(ctx, {
+function drawChart() {
+  const ctx = document.getElementById('bookingChart').getContext('2d');
+  const countByReason = {};
+  data.forEach(d => countByReason[d.reason] = (countByReason[d.reason] || 0) + 1);
+  new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: Object.keys(hours),
+      labels: Object.keys(countByReason),
       datasets: [{
-        label: 'Bookings per Hour',
-        data: Object.values(hours),
-        backgroundColor: 'deepskyblue'
+        label: 'Visit Reasons',
+        data: Object.values(countByReason),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)'
       }]
     }
   });
 }
 
-function exportToExcel() {
-  fetch("./logs.csv").then(res => res.text()).then(text => {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(text.split("\n").map(row => row.split(",")));
-    XLSX.utils.book_append_sheet(wb, ws, "Logs");
-    XLSX.writeFile(wb, "logs.xlsx");
-  });
+function applyFilters() {
+  const name = document.getElementById('searchName').value.toLowerCase();
+  const reason = document.getElementById('searchReason').value.toLowerCase();
+  const date = document.getElementById('filterDate').value;
+  const filtered = data.filter(d =>
+    (!name || d.name.toLowerCase().includes(name)) &&
+    (!reason || d.reason.toLowerCase().includes(reason)) &&
+    (!date || d.date === date)
+  );
+  renderTable(filtered);
 }
 
-function exportToPDF() {
-  fetch("./logs.csv").then(res => res.text()).then(text => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const rows = text.split("\n").map(row => row.split(","));
-    rows.forEach((row, i) => {
-      doc.text(row.join(" | "), 10, 10 + i * 10);
-    });
-    doc.save("logs.pdf");
-  });
-}
+document.getElementById('searchName').addEventListener('input', applyFilters);
+document.getElementById('searchReason').addEventListener('input', applyFilters);
+document.getElementById('filterDate').addEventListener('change', applyFilters);
 
-function downloadCSV() {
-  window.location.href = "./logs.csv";
-}
-
-  </script>
-</body>
+renderTable();
+drawChart();
+</script></body>
 </html>
