@@ -2,120 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Booking Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      background: #f5f5f5;
       margin: 0;
       padding: 20px;
     }
+
     h1 {
       text-align: center;
+      color: #222;
     }
-    .controls {
+
+    .filters {
       text-align: center;
       margin-bottom: 20px;
     }
-    button, select {
-      margin: 0 5px;
-      padding: 5px 10px;
+
+    .filters button {
+      margin: 5px;
+      padding: 8px 14px;
+      font-size: 16px;
     }
-    .log-entry {
+
+    .log-card {
       background: #fff;
-      padding: 15px;
-      margin-bottom: 10px;
       border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .log-entry strong {
-      display: inline-block;
-      width: 100px;
+
+    .log-card p {
+      margin: 6px 0;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #444;
     }
   </style>
 </head>
 <body>
   <h1>Booking Logs</h1>
-  <div class="controls">
-    <button onclick="filterByDate('today')">Today</button>
-    <button onclick="filterByDate('yesterday')">Yesterday</button>
-    <select id="clinicSelect" onchange="loadLogs()"></select>
+
+  <div class="filters">
+    <button onclick="filterLogs('today')">Today</button>
+    <button onclick="filterLogs('yesterday')">Yesterday</button>
   </div>
-  <div id="logContainer">Loading...</div>
+
+  <div id="log-container"></div>
 
   <script>
-    const logContainer = document.getElementById('logContainer');
-    const clinicSelect = document.getElementById('clinicSelect');
+    const csvURL = './logs.csv';
+    let logs = [];
 
-    const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-
-    let logsData = [];
-    let currentFilterDate = null;
-
-    async function loadLogs() {
-      const clinic = clinicSelect.value || "clinic";
-      const csvUrl = `./${clinic}-logs.csv`;
-      try {
-        const res = await fetch(csvUrl);
-        const text = await res.text();
-        const rows = text.trim().split('\n').slice(1); // Skip header
-        logsData = rows.map(row => {
-          const [Time, Reason, Name, Contact, Date, Token] = row.split(',');
-          return { Time, Reason, Name, Contact, Date, Token };
-        });
-        renderLogs();
-      } catch (err) {
-        logContainer.innerHTML = "Failed to load logs.";
-      }
+    async function fetchCSV() {
+      const res = await fetch(csvURL);
+      const text = await res.text();
+      const rows = text.trim().split('\n').slice(1); // skip header
+      logs = rows.map(row => {
+        const cols = row.split(',');
+        return {
+          time: cols[0],
+          reason: cols[1],
+          name: cols[2],
+          contact: cols[3],
+          date: cols[4],
+          token: cols[5]
+        };
+      });
+      displayLogs(logs);
     }
 
-    function renderLogs() {
-      logContainer.innerHTML = '';
-      let filteredLogs = logsData;
+    function displayLogs(data) {
+      const container = document.getElementById('log-container');
+      container.innerHTML = '';
 
-      if (currentFilterDate) {
-        filteredLogs = logsData.filter(log => log.Date === currentFilterDate);
-      }
-
-      if (filteredLogs.length === 0) {
-        logContainer.innerHTML = "<p>No bookings found.</p>";
-        return;
-      }
-
-      filteredLogs.forEach(log => {
-        const entry = document.createElement('div');
-        entry.className = 'log-entry';
-        entry.innerHTML = `
-          <p><strong>Name:</strong> ${log.Name}</p>
-          <p><strong>Reason:</strong> ${log.Reason}</p>
-          <p><strong>Date:</strong> ${log.Date}</p>
-          <p><strong>Time:</strong> ${log.Time}</p>
-          <p><strong>Contact:</strong> <a href="tel:${log.Contact}">${log.Contact}</a></p>
-          <p><strong>Token No:</strong> ${log.Token}</p>
+      data.forEach(log => {
+        const card = document.createElement('div');
+        card.className = 'log-card';
+        card.innerHTML = `
+          <p><span class="label">Name:</span> ${log.name}</p>
+          <p><span class="label">Reason:</span> ${log.reason}</p>
+          <p><span class="label">Date:</span> ${log.date}</p>
+          <p><span class="label">Time:</span> ${log.time}</p>
+          <p><span class="label">Contact:</span> ${log.contact}</p>
+          <p><span class="label">Token No:</span> ${log.token}</p>
         `;
-        logContainer.appendChild(entry);
+        container.appendChild(card);
       });
     }
 
-    function filterByDate(filter) {
-      currentFilterDate = filter === 'today' ? today : filter === 'yesterday' ? yesterday : null;
-      renderLogs();
+    function filterLogs(day) {
+      const today = new Date();
+      let targetDate;
+
+      if (day === 'today') {
+        targetDate = today.toISOString().split('T')[0];
+      } else if (day === 'yesterday') {
+        const yest = new Date(today);
+        yest.setDate(yest.getDate() - 1);
+        targetDate = yest.toISOString().split('T')[0];
+      }
+
+      const filtered = logs.filter(log => log.date === targetDate);
+      displayLogs(filtered);
     }
 
-    function populateClinics() {
-      const clinics = ["clinic"]; // Add more clinic CSV names if needed
-      clinics.forEach(name => {
-        const opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-        clinicSelect.appendChild(opt);
-      });
-      loadLogs();
-    }
-
-    populateClinics();
+    fetchCSV();
   </script>
 </body>
 </html>
