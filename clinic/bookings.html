@@ -1,1 +1,107 @@
 
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment</title>
+  <link rel="manifest" href="./manifest.json">
+  <script src="./trial.js" defer></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #00b894;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #019875;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Book Appointment</h2>
+    <form id="bookingForm">
+      <label for="name">Patient Name</label>
+      <input type="text" id="name" required><label for="reason">Reason for Visit</label>
+  <input type="text" id="reason" required>
+
+  <label for="slot">Available Time Slot</label>
+  <select id="slot" required>
+    <option value="">Loading...</option>
+  </select>
+
+  <button type="submit">Confirm & WhatsApp</button>
+</form>
+
+  </div>  <script>
+    const slotSelect = document.getElementById('slot');
+    const form = document.getElementById('bookingForm');
+
+    async function loadSlots() {
+      try {
+        const res = await fetch('./Slots.csv');
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',');
+        const statusIndex = headers.indexOf("Status");
+        const timeIndex = headers.indexOf("Time");
+
+        slotSelect.innerHTML = '';
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          if (cols[statusIndex].trim().toLowerCase() !== 'booked') {
+            const option = document.createElement('option');
+            option.value = cols[timeIndex];
+            option.textContent = cols[timeIndex];
+            slotSelect.appendChild(option);
+          }
+        }
+        if (slotSelect.children.length === 0) {
+          slotSelect.innerHTML = '<option value="">No slots available</option>';
+        }
+      } catch (err) {
+        slotSelect.innerHTML = '<option value="">Error loading slots</option>';
+      }
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const reason = document.getElementById('reason').value;
+      const slot = slotSelect.value;
+      if (!slot) return alert('Please select a valid time slot');
+
+      const message = `Hi, I am ${name}. I want to book an appointment for ${reason} at ${slot}.`;
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappLink = `https://wa.me/919390664577?text=${encodedMessage}`;
+      window.location.href = whatsappLink;
+    });
+
+    loadSlots();
+  </script></body>
+</html>
