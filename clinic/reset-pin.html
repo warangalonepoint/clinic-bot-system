@@ -3,93 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <title>Reset Clinic PIN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root {
+      --bg: #111;
+      --text: #fff;
+      --card: #1e1e1e;
+      --accent: #00ff99;
+    }
+    [data-theme="light"] {
+      --bg: #fff;
+      --text: #000;
+      --card: #f0f0f0;
+      --accent: #007bff;
+    }
+
     body {
-      background: #121212;
-      color: #fff;
+      background-color: var(--bg);
+      color: var(--text);
       font-family: Arial, sans-serif;
       padding: 20px;
+    }
+
+    h2 {
       text-align: center;
     }
-    h1 { color: #4dc1ff; }
-    select, input, button {
-      padding: 12px;
-      margin: 10px;
-      font-size: 16px;
-      width: 90%;
-      max-width: 300px;
+
+    .card {
+      background-color: var(--card);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    button {
-      background: #28a745;
-      color: #fff;
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
       border: none;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: var(--accent);
+      color: black;
+      font-weight: bold;
       cursor: pointer;
     }
-    .hidden { display: none; }
-    .msg { margin-top: 20px; }
+
+    .theme-toggle {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
+
+    #status {
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>🔐 Super Admin PIN Reset</h1>
-  <input type="password" id="adminPin" placeholder="Enter Master PIN (e.g., 9999)" />
-  <button onclick="unlock()">Unlock</button>
 
-  <div id="resetSection" class="hidden">
-    <select id="clinicSelect"></select><br/>
-    <input type="text" id="newPIN" placeholder="New PIN" /><br/>
-    <select id="newPlan">
-      <option value="freeplan.html">Free</option>
-      <option value="paidplan.html">Paid</option>
-      <option value="premiumplan.html">Premium</option>
-    </select><br/>
-    <button onclick="resetPIN()">Reset PIN</button>
-    <div class="msg" id="resultMsg"></div>
+  <h2>Reset Clinic PIN</h2>
+  <label class="theme-toggle">
+    <input type="checkbox" id="themeSwitch"> 🌙
+  </label>
+
+  <div class="card">
+    <label>Clinic Name:</label>
+    <input type="text" id="clinicName" placeholder="e.g. clinic1" />
+
+    <label>New PIN:</label>
+    <input type="text" id="newPin" placeholder="e.g. 9999" />
+
+    <button onclick="updatePin()">Update PIN</button>
+    <div id="status"></div>
   </div>
 
   <script>
-    let clinics = [];
-    let MASTER_PIN = "9999";
+    const themeSwitch = document.getElementById('themeSwitch');
+    themeSwitch.addEventListener('change', () => {
+      document.documentElement.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
+    });
 
-    async function unlock() {
-      const pin = document.getElementById("adminPin").value.trim();
-      if (pin === MASTER_PIN) {
-        document.getElementById("resetSection").classList.remove("hidden");
-        loadClinics();
-      } else {
-        alert("❌ Invalid Master PIN");
-      }
-    }
+    async function updatePin() {
+      const clinic = document.getElementById('clinicName').value.trim();
+      const newPin = document.getElementById('newPin').value.trim();
+      const statusDiv = document.getElementById('status');
 
-    async function loadClinics() {
-      const res = await fetch("plans.json");
-      clinics = await res.json();
-      const select = document.getElementById("clinicSelect");
-      select.innerHTML = "";
-      clinics.forEach((c, i) => {
-        const opt = document.createElement("option");
-        opt.value = i;
-        opt.textContent = c.clinic;
-        select.appendChild(opt);
-      });
-    }
-
-    async function resetPIN() {
-      const index = document.getElementById("clinicSelect").value;
-      const newPIN = document.getElementById("newPIN").value.trim();
-      const newPlan = document.getElementById("newPlan").value;
-      if (!newPIN || newPIN.length < 4) {
-        alert("Enter valid new PIN (min 4 digits)");
+      if (!clinic || !newPin) {
+        statusDiv.innerText = "❌ Both fields required.";
         return;
       }
-      clinics[index].pin = newPIN;
-      clinics[index].plan = newPlan;
-      const blob = new Blob([JSON.stringify(clinics, null, 2)], { type: 'application/json' });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "plans.json";
-      link.click();
-      document.getElementById("resultMsg").textContent = "✅ PIN & Plan Updated. Upload updated plans.json to GitHub.";
+
+      try {
+        const res = await fetch('./plans.json');
+        const plans = await res.json();
+
+        if (!plans[clinic]) {
+          statusDiv.innerText = `❌ Clinic "${clinic}" not found.`;
+          return;
+        }
+
+        plans[clinic].pin = newPin;
+
+        const blob = new Blob([JSON.stringify(plans, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'plans.json';
+        a.click();
+
+        statusDiv.innerText = `✅ PIN updated. Upload the new file to GitHub.`;
+
+      } catch (err) {
+        statusDiv.innerText = "⚠️ Failed to update. Try again.";
+      }
     }
   </script>
 </body>
