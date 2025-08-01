@@ -1,6 +1,7 @@
 {
   "clinic001": {
     "pin": "2525",
-    "plan": "premium"
+    "plan": "premium",
+    "logsFile": "clinic1-logs.csv"
   }
 }
