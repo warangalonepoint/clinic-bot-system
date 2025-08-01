@@ -1,75 +1,95 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Confirmation</title>
+  <meta charset="UTF-8" />
+  <title>Booking Confirmed – Onestop Ai Clinic Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --card: #f9f9f9;
+    }
+    body.dark {
+      --bg: #0d1117;
+      --text: #ffffff;
+      --card: #161b22;
+    }
     body {
+      background-color: var(--bg);
+      color: var(--text);
       font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
+      margin: 0;
       padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.3s ease;
+    }
+    h1 {
+      color: var(--text);
       text-align: center;
     }
     .card {
-      background: #222;
-      border-radius: 12px;
-      padding: 30px;
-      max-width: 500px;
-      margin: 40px auto;
-      box-shadow: 0 0 12px rgba(0, 255, 150, 0.4);
+      background: var(--card);
+      border-radius: 10px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
     }
-    h1 {
-      color: #00ffcc;
-    }
-    p {
+    .card p {
       font-size: 18px;
-      line-height: 1.6;
-    }
-    .btn {
-      margin-top: 20px;
-      padding: 12px 24px;
-      background-color: #00ffcc;
-      color: #111;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-      display: inline-block;
+      margin: 10px 0;
     }
     .token {
       font-size: 22px;
-      color: #fffb00;
-      margin-top: 20px;
+      color: #28a745;
       font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <button class="toggle-btn" onclick="toggleTheme()">🌓</button>
+  <h1>Booking Confirmed 🎉</h1>
   <div class="card">
-    <h1>Appointment Confirmed ✅</h1>
-    <p><strong>Name:</strong> <span id="name"></span></p>
-    <p><strong>Reason:</strong> <span id="reason"></span></p>
-    <p><strong>Date:</strong> <span id="date"></span></p>
-    <p><strong>Time Slot:</strong> <span id="slot"></span></p>
-    <div class="token">Your Token No: <span id="token"></span></div>
-    <a id="whatsappLink" class="btn" href="#" target="_blank">Send on WhatsApp</a>
-  </div>  <script>
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get('name');
-    const reason = params.get('reason');
-    const date = params.get('date');
-    const slot = params.get('slot');
-    const token = params.get('token');
-    const contact = params.get('contact');
+    <p><strong>Patient Name:</strong> <span id="name">-</span></p>
+    <p><strong>Date:</strong> <span id="date">-</span></p>
+    <p><strong>Time Slot:</strong> <span id="time">-</span></p>
+    <p><strong>Reason:</strong> <span id="reason">-</span></p>
+    <div class="token">Token No: <span id="token">#</span></div>
+  </div>
 
-    document.getElementById('name').textContent = name;
-    document.getElementById('reason').textContent = reason;
-    document.getElementById('date').textContent = date;
-    document.getElementById('slot').textContent = slot;
-    document.getElementById('token').textContent = token;
+  <script>
+    function getQueryParam(key) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(key) || "-";
+    }
 
-    const msg = `Hello, this is ${name}. I have successfully booked an appointment for ${reason} on ${date} at ${slot}. Token No: ${token}`;
-    const whatsappUrl = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
-    document.getElementById('whatsappLink').href = whatsappUrl;
-  </script></body>
+    document.getElementById("name").innerText = getQueryParam("name");
+    document.getElementById("date").innerText = getQueryParam("date");
+    document.getElementById("time").innerText = getQueryParam("time");
+    document.getElementById("reason").innerText = getQueryParam("reason");
+    document.getElementById("token").innerText = getQueryParam("token") || "Pending";
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+  </script>
+</body>
 </html>
