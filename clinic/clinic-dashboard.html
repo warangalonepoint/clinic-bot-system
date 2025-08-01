@@ -1,148 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clinic Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backup & Restore</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
       font-family: Arial, sans-serif;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body.light {
-      background-color: #f0f0f0;
-      color: #111;
-    }
-
-    body.dark {
-      background-color: #111;
-      color: #00f7ff;
-    }
-
-    .theme-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 8px 14px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-
-    .theme-toggle.light {
-      background-color: #222;
-      color: white;
-    }
-
-    .theme-toggle.dark {
-      background-color: #fff;
-      color: black;
-    }
-
-    .container {
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    h1 {
-      margin-bottom: 40px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background-color: rgba(255, 255, 255, 0.1);
+      margin: 0;
       padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 16px;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
+      transition: background 0.3s, color 0.3s;
     }
-
-    body.light .card {
-      background-color: #fff;
+    body.dark {
+      background: #111;
+      color: #0ff;
+    }
+    body.light {
+      background: #f9f9f9;
       color: #111;
     }
-
-    body.dark .card {
-      background-color: #1a1a1a;
-      color: #00f7ff;
-      border-color: #00f7ff60;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      border-color: #00f7ff;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    #loginSection {
-      text-align: center;
-      padding: 100px 20px;
-    }
-
-    input[type="password"] {
-      padding: 10px;
-      font-size: 16px;
-      width: 200px;
-      border-radius: 6px;
-      border: 1px solid #aaa;
-    }
-
-    button#loginBtn {
-      margin-left: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
+    .theme-toggle {
+      margin-bottom: 20px;
+      padding: 10px 16px;
       cursor: pointer;
-      border-radius: 6px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .panel {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #999;
+      background: rgba(255,255,255,0.05);
+    }
+    .panel.dark {
+      border-color: #0ff;
+    }
+    .panel button, .panel input[type="file"] {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+    .info {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+    .back-link {
+      display: block;
+      margin: 20px auto;
+      text-align: center;
+      text-decoration: none;
+      padding: 10px;
+      background: #444;
+      color: white;
+      border-radius: 8px;
+      width: fit-content;
+    }
+    .back-link:hover {
+      background: #0ff;
+      color: black;
     }
   </style>
 </head>
 <body>
   <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
+  <h1>📦 Backup & Restore Panel</h1>
+  <div class="panel">
+    <h3>⬇️ Download Current Files</h3>
+    <button onclick="downloadCSV('logs.csv')">Download Logs</button>
+    <button onclick="downloadCSV('staff.csv')">Download Staff</button>
+    <button onclick="downloadCSV('staff-attendance.csv')">Download Attendance</button><h3>⬆️ Restore Files</h3>
+<input type="file" id="fileInput" accept=".csv" onchange="handleRestore(event)" />
+<p class="info">Upload a CSV file to restore data.</p>
 
-  <div id="loginSection">
-    <h2>🔒 Enter PIN to Access Dashboard</h2>
-    <input type="password" id="pinInput" placeholder="Enter PIN"/>
-    <button id="loginBtn" onclick="verifyPIN()">Login</button>
-  </div>
-
-  <div class="container hidden" id="dashboard">
-    <h1>🏥 Clinic Admin Dashboard</h1>
-    <div class="grid">
-      <a href="logs.html" class="card">📋 View Logs</a>
-      <a href="bookings.html" class="card">📆 Booking Panel</a>
-      <a href="public-booking.html" class="card">🌐 Public Booking</a>
-      <a href="staff.html" class="card">👥 Staff Directory</a>
-      <a href="staff-attendance.html" class="card">🕒 Staff Attendance</a>
-      <a href="staff-monthly-summary.html" class="card">📈 Monthly Summary</a>
-      <a href="staff-leave-tracker.html" class="card">🏖️ Leave Tracker</a>
-      <a href="staff-roster.html" class="card">🗓️ Duty Roster</a>
-      <a href="whatsapp-attendance.html" class="card">📲 WhatsApp Logs</a>
-      <a href="staff-attendance-form.html" class="card">📝 Attendance Input</a>
-    </div>
-  </div>
+  </div><a href="clinic-dashboard.html" class="back-link">← Back to Dashboard</a>
 
   <script>
-    const correctPIN = "2525"; // Change this to your desired PIN
+    function toggleTheme() {
+      const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+      document.body.className = newTheme;
+      document.querySelector('.panel').className = `panel ${newTheme}`;
+      localStorage.setItem('theme', newTheme);
+    }
 
-    function verifyPIN() {
-      const inputPIN = document.getElementById("pinInput").value;
+    function applyTheme() {
+      const theme = localStorage.getItem('theme') || 'light';
+      document.body.className = theme;
+      document.querySelector('.panel').className = `panel ${theme}`;
+    }
+
+    function downloadCSV(filename) {
+      const link = document.createElement('a');
+      link.href = `./${filename}`;
+      link.download = filename;
+      link.click();
+    }
+
+    function handleRestore(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      alert(`📂 File '${file.name}' selected for restore. (Manual sync required)`);
+    }
+
+    applyTheme();
+  </script></body>
+</html>      const inputPIN = document.getElementById("pinInput").value;
       if (inputPIN === correctPIN) {
         document.getElementById("loginSection").classList.add("hidden");
         document.getElementById("dashboard").classList.remove("hidden");
