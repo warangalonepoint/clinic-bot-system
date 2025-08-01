@@ -2,163 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Appointment</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
       margin: 0;
       padding: 20px;
+      background-color: #f0f0f0;
+      color: #000;
       transition: background 0.3s, color 0.3s;
     }
 
-    .light-mode {
-      background-color: #f4f4f4;
-      color: #111;
+    body.dark {
+      background-color: #111;
+      color: #fff;
     }
 
-    h2 {
+    h1 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
-    .form-container {
-      max-width: 400px;
+    .container {
+      max-width: 500px;
       margin: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      padding: 20px;
     }
 
-    select, input[type="text"], button {
+    body.dark .container {
+      background: #1e1e1e;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    select, input, textarea, button {
       width: 100%;
-      padding: 12px 16px;
-      font-size: 16px;
-      border-radius: 6px;
+      padding: 12px;
+      margin-top: 8px;
       border: 1px solid #ccc;
+      border-radius: 8px;
       box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    body.dark select, 
+    body.dark input,
+    body.dark textarea {
+      background: #2a2a2a;
+      color: #fff;
+      border: 1px solid #444;
     }
 
     button {
       background-color: #28a745;
-      color: white;
+      color: #fff;
+      font-weight: bold;
       cursor: pointer;
+      border: none;
     }
 
     button:hover {
       background-color: #218838;
     }
 
-    .theme-toggle {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .theme-toggle button {
-      background: #444;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
+    #themeToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 6px 10px;
+      font-size: 14px;
       cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .theme-toggle button:hover {
-      background: #666;
     }
   </style>
 </head>
 <body>
-  <h2>Book Your Appointment</h2>
-  <div class="form-container">
-    <select id="dateDropdown" required>
-      <option value="">Select Date</option>
+  <button id="themeToggle">Toggle Theme</button>
+  <div class="container">
+    <h1>Book Your Appointment</h1>
+
+    <label for="date">Select Date</label>
+    <select id="date" onchange="loadTimeSlots()">
+      <option value="">Loading...</option>
     </select>
 
-    <select id="slotDropdown" required>
-      <option value="">Select Time Slot</option>
+    <label for="slot">Select Time Slot</label>
+    <select id="slot">
+      <option value="">Please select a date first</option>
     </select>
 
-    <input type="text" id="patientName" placeholder="Patient Name" required />
-    <input type="text" id="reason" placeholder="Reason for Visit" required />
+    <label for="name">Your Name</label>
+    <input type="text" id="name" placeholder="Enter full name" />
 
-    <button onclick="bookSlot()">Book on WhatsApp</button>
-  </div>
+    <label for="reason">Reason for Visit</label>
+    <textarea id="reason" rows="3" placeholder="Describe your reason..."></textarea>
 
-  <div class="theme-toggle">
-    <button onclick="toggleTheme()">Toggle Theme</button>
+    <button onclick="bookNow()">Book via WhatsApp</button>
   </div>
 
   <script>
-    const SHEET_URL = 'https://warangalonepoint.github.io/clinic-bot-system/clinic/Slots.csv';
+    const SHEET_URL = 'https://raw.githubusercontent.com/warangalonepoint/clinic-bot-system/main/clinic/Slots.csv';
+    let slotsData = [];
 
-    let allSlots = [];
-
-    function fetchSlots() {
-      fetch(SHEET_URL)
-        .then(res => res.text())
-        .then(data => {
-          const rows = data.trim().split('\n').slice(1);
-          allSlots = rows.map(row => {
-            const [date, time, status] = row.split(',');
-            return { date, time, status };
-          });
-
-          const uniqueDates = [...new Set(allSlots.map(s => s.date))].sort();
-          const dateDropdown = document.getElementById('dateDropdown');
-          uniqueDates.forEach(date => {
-            const option = document.createElement('option');
-            option.value = date;
-            option.textContent = date;
-            dateDropdown.appendChild(option);
-          });
-
-          dateDropdown.addEventListener('change', updateSlots);
+    fetch(SHEET_URL)
+      .then(res => res.text())
+      .then(csv => {
+        const lines = csv.trim().split('\n').slice(1); // skip header
+        const today = new Date().toISOString().split('T')[0];
+        const dates = [...new Set(lines.map(line => line.split(',')[0]))]
+                      .filter(date => date >= today)
+                      .sort();
+        slotsData = lines.map(l => {
+          const [date, time, status] = l.split(',');
+          return { date, time, status };
         });
-    }
-
-    function updateSlots() {
-      const selectedDate = document.getElementById('dateDropdown').value;
-      const slotDropdown = document.getElementById('slotDropdown');
-      slotDropdown.innerHTML = '<option value="">Select Time Slot</option>';
-
-      allSlots
-        .filter(s => s.date === selectedDate && s.status.toLowerCase() === 'available')
-        .forEach(s => {
+        const dateSelect = document.getElementById('date');
+        dateSelect.innerHTML = '<option value="">Select Date</option>';
+        dates.forEach(date => {
           const option = document.createElement('option');
-          option.value = s.time;
-          option.textContent = s.time;
-          slotDropdown.appendChild(option);
+          option.value = date;
+          option.textContent = date;
+          dateSelect.appendChild(option);
         });
+      });
+
+    function loadTimeSlots() {
+      const selectedDate = document.getElementById('date').value;
+      const slotSelect = document.getElementById('slot');
+      slotSelect.innerHTML = '<option value="">Select Slot</option>';
+      const filtered = slotsData.filter(s => s.date === selectedDate && s.status.toLowerCase() !== 'booked');
+      filtered.forEach(slot => {
+        const option = document.createElement('option');
+        option.value = slot.time;
+        option.textContent = slot.time;
+        slotSelect.appendChild(option);
+      });
     }
 
-    function bookSlot() {
-      const date = document.getElementById('dateDropdown').value;
-      const time = document.getElementById('slotDropdown').value;
-      const name = document.getElementById('patientName').value;
-      const reason = document.getElementById('reason').value;
-
-      if (!date || !time || !name || !reason) {
-        alert("Please fill in all fields.");
+    function bookNow() {
+      const name = document.getElementById('name').value.trim();
+      const reason = document.getElementById('reason').value.trim();
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('slot').value;
+      if (!name || !reason || !date || !time) {
+        alert("Please fill all fields.");
         return;
       }
-
-      const message = `Appointment Request:
-📅 Date: ${date}
-⏰ Time: ${time}
-👤 Name: ${name}
-📝 Reason: ${reason}`;
-      const encodedMsg = encodeURIComponent(message);
-      window.location.href = `https://wa.me/919390664577?text=${encodedMsg}`;
+      const msg = `Hello, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${time}`;
+      const phone = '919390664577'; // your clinic WhatsApp number
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle('light-mode');
-    }
+    const themeToggle = document.getElementById("themeToggle");
+    const isDark = localStorage.getItem("theme") === "dark";
+    if (isDark) document.body.classList.add("dark");
 
-    fetchSlots();
+    themeToggle.onclick = () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    };
   </script>
 </body>
 </html>
