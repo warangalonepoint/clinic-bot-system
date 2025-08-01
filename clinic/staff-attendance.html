@@ -1,142 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Staff Attendance</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    body.light-theme {
-      background-color: #f8f9fa;
-      color: #000;
-    }
-    body.dark-theme {
-      background-color: #000;
-      color: #0ff;
-    }
-    .dark-theme .btn {
-      background-color: #0ff;
-      color: #000;
-      border: none;
-    }
-    .light-theme .btn {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .theme-toggle {
-      margin-bottom: 10px;
-    }
-    .highlight {
-      background-color: #d4edda !important;
-    }
-    .dark-theme .highlight {
-      background-color: #003f2f !important;
-    }
-    table {
-      width: 100%;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
-    th {
-      background-color: #444;
-      color: #fff;
-    }
-    .light-theme th {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .btn-group {
-      margin-top: 10px;
-    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      transition: background-color 0.3s, color 0.3s;
+    }.dark-mode {
+  background-color: #121212;
+  color: #fff;
+}
+
+h1 {
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #007BFF;
+  color: white;
+}
+
+.dark-mode th {
+  background-color: #1a73e8;
+}
+
+.btn {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.theme-toggle {
+  background-color: #007BFF;
+  color: white;
+}
+
+.filter-toggle {
+  background-color: green;
+  color: white;
+}
+
+.off-duty {
+  background-color: #e0e0e0 !important;
+  opacity: 0.7;
+}
+
   </style>
-</head>
-<body class="light-theme">
-  <div class="container mt-4">
-    <h2><span style="font-size: 1.5em;">👥</span> Staff Attendance</h2>
-    <div class="btn-group">
-      <button class="btn theme-toggle" onclick="toggleTheme()">🎨 Toggle Theme</button>
-      <button class="btn theme-toggle" onclick="toggleOnDuty()">🟢 Show Only On Duty</button>
-    </div>
-
-    <table class="table table-bordered mt-3">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Staff ID</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Shift</th>
-          <th>Contact</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="attendance-log"></tbody>
-    </table>
-  </div>
-
-  <script>
-    let onlyOnDuty = false;
+</head><body>
+  <h1>👥 Staff Attendance</h1>
+  <button class="btn theme-toggle" onclick="toggleTheme()">🎨 Toggle Theme</button>
+  <button class="btn filter-toggle" onclick="toggleFilter()" id="filterBtn">🟢 Show Only On Duty</button>  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Staff ID</th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Shift</th>
+        <th>Contact</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="attendanceBody"></tbody>
+  </table>  <script>
+    const darkModeKey = 'staff-dark-mode';
+    const showOnlyPresentKey = 'show-only-present';
 
     function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle("dark-theme");
-      body.classList.toggle("light-theme");
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem(darkModeKey, document.body.classList.contains("dark-mode"));
     }
 
-    function toggleOnDuty() {
-      onlyOnDuty = !onlyOnDuty;
-      const rows = document.querySelectorAll("#attendance-log tr");
+    function toggleFilter() {
+      const onlyPresent = localStorage.getItem(showOnlyPresentKey) === 'true';
+      localStorage.setItem(showOnlyPresentKey, !onlyPresent);
+      renderTable();
+    }
 
-      rows.forEach(row => {
-        const status = row.children[6]?.textContent?.trim().toLowerCase();
-        if (onlyOnDuty) {
-          if (status !== 'present' && status !== 'on duty') {
-            row.style.display = 'none';
-          } else {
-            row.style.display = '';
-          }
-        } else {
-          row.style.display = '';
-        }
+    async function fetchData() {
+      const response = await fetch("./staff.csv");
+      const data = await response.text();
+      const rows = data.trim().split("\n").slice(1); // skip header
+      return rows.map(row => {
+        const [Date, ID, Name, Role, Shift, Contact, Status] = row.split(",");
+        return { Date, ID, Name, Role, Shift, Contact, Status };
       });
-
-      const button = document.querySelectorAll(".theme-toggle")[1];
-      button.innerHTML = onlyOnDuty ? "👥 Show All Staff" : "🟢 Show Only On Duty";
     }
 
-    function loadAttendanceData() {
-      fetch('./staff-attendance.csv')
-        .then(response => response.text())
-        .then(data => {
-          const rows = data.trim().split('\n');
-          const tbody = document.getElementById("attendance-log");
-          tbody.innerHTML = "";
-
-          rows.forEach((row, index) => {
-            if (index === 0) return; // skip header
-            const cols = row.split(',');
-            const tr = document.createElement('tr');
-
-            cols.forEach((col, colIndex) => {
-              const td = document.createElement('td');
-              td.textContent = col.trim();
-              tr.appendChild(td);
-            });
-
-            const status = cols[6]?.trim().toLowerCase();
-            if (status === 'present' || status === 'on duty') {
-              tr.classList.add('highlight');
-            }
-
-            tbody.appendChild(tr);
-          });
-        });
+    async function renderTable() {
+      const onlyPresent = localStorage.getItem(showOnlyPresentKey) === 'true';
+      document.getElementById("filterBtn").innerText = onlyPresent ? "🟣 Show All Staff" : "🟢 Show Only On Duty";
+      const data = await fetchData();
+      const tbody = document.getElementById("attendanceBody");
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        if (onlyPresent && row.Status.trim().toLowerCase() !== 'present') return;
+        const tr = document.createElement("tr");
+        for (const key in row) {
+          const td = document.createElement("td");
+          td.innerText = row[key];
+          tr.appendChild(td);
+        }
+        if (row.Status.trim().toLowerCase() !== 'present') {
+          tr.classList.add("off-duty");
+        }
+        tbody.appendChild(tr);
+      });
     }
 
-    loadAttendanceData();
-  </script>
-</body>
-</html>
+    // Load settings from local storage
+    if (localStorage.getItem(darkModeKey) === 'true') {
+      document.body.classList.add("dark-mode");
+    }
+
+    renderTable();
+  </script></body></html>
