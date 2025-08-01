@@ -1,348 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Booking Logs – Premium</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./logo.png">
+  <title>Booking Logs</title>
   <style>
     body {
-      background: #000;
-      color: #fff;
+      margin: 0;
       font-family: Arial, sans-serif;
-      padding: 20px;
+      background-color: #111;
+      color: white;
+      transition: background-color 0.3s, color 0.3s;
     }
-    h2 { color: #f8d90f; text-align: center; }
-    #pinEntry {
-      text-align: center;
-      margin: 30px 0;
+    .light-mode {
+      background-color: #fff;
+      color: #111;
     }
-    input, button {
-      font-size: 16px;
-      padding: 8px 10px;
-      margin: 5px;
+    header {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    #logsSection { display: none; }
+    .container {
+      padding: 16px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 16px;
     }
     th, td {
-      border: 1px solid #555;
-      padding: 8px;
-      text-align: left;
+      padding: 10px;
+      border: 1px solid #444;
     }
-    th {
-      background: #111;
-      color: #00ffc8;
+    .light-mode th, .light-mode td {
+      border-color: #ddd;
     }
     .btn {
-      background: green;
-      color: white;
       padding: 8px 14px;
+      background-color: #444;
+      color: white;
       border: none;
-      margin-right: 10px;
       cursor: pointer;
+      border-radius: 6px;
     }
     .btn:hover {
-      background: #00cc88;
+      background-color: #666;
     }
-    #errorMsg {
-      color: red;
-      text-align: center;
-      margin-top: 10px;
+    .light-mode .btn {
+      background-color: #eee;
+      color: #111;
     }
   </style>
 </head>
 <body>
+  <header>
+    <h2>Booking Logs</h2>
+    <button class="btn" onclick="toggleTheme()">Toggle Theme</button>
+  </header>  <div class="container">
+    <p>PIN: <input type="password" id="pin" maxlength="8" /> <button class="btn" onclick="loadLogs()">Load Logs</button></p>
+    <table id="logsTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Reason</th>
+          <th>Contact</th>
+          <th>Time</th>
+          <th>Token</th>
+        </tr>
+      </thead>
+      <tbody id="logData"></tbody>
+    </table>
+  </div>  <script>
+    const toggleTheme = () => {
+      document.body.classList.toggle("light-mode");
+    };
 
-<div id="pinEntry">
-  <h2>🔐 Enter Clinic PIN to View Logs</h2>
-  <input type="text" id="pinInput" placeholder="Enter PIN" />
-  <button onclick="checkPIN()">Submit</button>
-  <p id="errorMsg"></p>
-</div>
+    async function loadLogs() {
+      const pin = document.getElementById("pin").value.trim();
+      if (!pin) return alert("Enter PIN");
 
-<div id="logsSection">
-  <h2>📊 Booking Logs (Paid Plan)</h2>
-  <button class="btn" onclick="exportCSV()">⬇ Export CSV</button>
-  <button class="btn" onclick="sendReminders()">📨 Send Reminders</button>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Token</th><th>Reminder Sent</th>
-      </tr>
-    </thead>
-    <tbody id="logsBody"></tbody>
-  </table>
-</div>
+      try {
+        const file = `./${pin}-logs.csv`;
+        const res = await fetch(file);
+        if (!res.ok) throw new Error("Logs not found");
 
-<script>
-  let clinicID = "";
-
-  async function checkPIN() {
-    const pin = document.getElementById("pinInput").value.trim();
-    document.getElementById("errorMsg").textContent = "";
-
-    try {
-      const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/plans.json");
-      const plans = await res.json();
-
-      let found = false;
-      for (const [id, plan] of Object.entries(plans)) {
-        if (plan.pin === pin) {
-          clinicID = id;
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        document.getElementById("errorMsg").textContent = "❌ Invalid PIN. Try again.";
-        return;
-      }
-
-      document.getElementById("pinEntry").style.display = "none";
-      document.getElementById("logsSection").style.display = "block";
-      loadCSV(`${clinicID}-logs.csv`);
-    } catch (e) {
-      document.getElementById("errorMsg").textContent = "⚠ Error loading plans.json or PIN check failed.";
-    }
-  }
-
-  async function loadCSV(filename) {
-    try {
-      const res = await fetch(`https://warangalonepoint.github.io/clinic-bot-system/${filename}`);
-      const text = await res.text();
-      const lines = text.trim().split("\n").slice(1); // skip header
-      const tbody = document.getElementById("logsBody");
-      tbody.innerHTML = "";
-
-      for (const line of lines) {
-        const [date, time, name, contact, reason, token, reminder] = line.split(",");
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${date}</td>
-          <td>${time}</td>
-          <td>${name}</td>
-          <td>${reason}</td>
-          <td><a href="tel:${contact}" style="color:cyan">${contact}</a></td>
-          <td>${token}</td>
-          <td>${reminder}</td>
-        `;
-        tbody.appendChild(tr);
-      }
-    } catch (e) {
-      document.getElementById("logsBody").innerHTML = "<tr><td colspan='7'>❌ Failed to load logs.</td></tr>";
-    }
-  }
-
-  function exportCSV() {
-    if (clinicID) {
-      const url = `https://warangalonepoint.github.io/clinic-bot-system/${clinicID}-logs.csv`;
-      window.open(url, "_blank");
-    }
-  }
-
-  function sendReminders() {
-    alert("✅ Reminders sent! (Demo mode only)");
-  }
-</script>
-
-</body>
-</html>        const cols = row.split(',');
-        const tr = document.createElement('tr');
-        cols.forEach(col => {
-          const td = document.createElement('td');
-          td.textContent = col.trim();
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-    } catch (err) {
-      alert('Error loading logs: ' + err.message);
-    }
-  }
-
-  function exportCSV() {
-    const table = document.getElementById("logsTable");
-    let csv = [];
-    for (let row of table.rows) {
-      let cols = [];
-      for (let cell of row.cells) {
-        cols.push('"' + cell.innerText + '"');
-      }
-      csv.push(cols.join(","));
-    }
-    const blob = new Blob([csv.join("\n")], { type: "text/csv" });
-    const link = document.createElement("a");
-    link.download = "clinic-logs-export.csv";
-    link.href = URL.createObjectURL(blob);
-    link.click();
-  }
-</script>
-
-</body>
-</html>        [...tr.children].map(td => td.textContent)
-      );
-      doc.autoTable({ head: [['Date','Time','Name','Reason','Contact','Clinic','Token','Reminder','Reminder Sent']], body: rows });
-      doc.save("clinic-logs.pdf");
-    }
-
-    loadCSV(csvPath).then(data => {
-      populateTable(data);
-      updateSummaryAndChart(data);
-    });
-  </script></body>
-</html>      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const headers = [["Date", "Time", "Name", "Reason", "Contact", "Clinic", "Token", "Reminder"]];
-      const rows = allData.map(d => [d.Date, d.Time, d.Name, d.Reason, d.Contact, d.Clinic, d.Token, d["Reminder Sent"]]);
-      doc.autoTable({ head: headers, body: rows });
-      doc.save("AppointmentLogs.pdf");
-    }
-
-    function sendReminder(name, time, reason, contact, token, btn) {
-      const msg = `Hello ${name}, this is a reminder for your appointment today at ${time} for ${reason} with Token #${token}. - OneStop Clinic`;
-      const url = `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
-      const td = btn.parentElement.previousElementSibling;
-      td.textContent = "Sent";
-      td.classList.add("sent");
-    }
-
-    fetchData();
-  </script>
-</body>
-</html>      const today = formatDate(new Date());
-      let bookingsToday = 0;
-      let nextToken = 1;
-
-      data.forEach(row => {
-        const [date, time, name, reason, contact, clinic, token, reminder] = row;
-        if (date >= startDate && date <= endDate) {
-          if (date === today) bookingsToday++;
-          if (parseInt(token) >= nextToken) nextToken = parseInt(token) + 1;
-
+        const csv = await res.text();
+        const rows = csv.trim().split("\n").slice(1); // skip header
+        const tbody = document.getElementById("logData");
+        tbody.innerHTML = "";
+        rows.forEach(row => {
+          const cols = row.split(",");
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${name}</td>
-            <td>${reason}</td>
-            <td><a href="tel:${contact}">${contact}</a></td>
-            <td>${clinic}</td>
-            <td>${token}</td>
-            <td class="reminder-status">${reminder}</td>
-            <td><button onclick="sendReminder('${name}', '${time}', '${reason}', '${contact}', '${token}', this.parentElement.parentElement)">Send Reminder</button></td>
-          `;
+          cols.forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
           tbody.appendChild(tr);
-        }
-      });
-
-      document.getElementById("summary").textContent = `✅ Bookings Today: ${bookingsToday} | Next Token: ${nextToken}`;
+        });
+        document.getElementById("logsTable").style.display = "table";
+      } catch (e) {
+        alert(e.message);
+      }
     }
-
-    populateDateDropdowns();
-    filterToday();
   </script></body>
-</html>    const today = formatDate(new Date());
-    let bookingsToday = 0;
-    let nextToken = 1;
-
-    data.forEach(row => {
-      const [date, time, name, reason, contact, clinic, token, reminder] = row;
-      if (date >= startDate && date <= endDate) {
-        if (date === today) bookingsToday++;
-        if (parseInt(token) >= nextToken) nextToken = parseInt(token) + 1;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${date}</td>
-          <td>${time}</td>
-          <td>${name}</td>
-          <td>${reason}</td>
-          <td><a href="tel:${contact}">${contact}</a></td>
-          <td>${clinic}</td>
-          <td>${token}</td>
-          <td class="reminder-status">${reminder}</td>
-          <td><button onclick="sendReminder('${name}', '${time}', '${reason}', '${contact}', '${token}', this.parentElement.parentElement)">Send Reminder</button></td>
-        `;
-        tbody.appendChild(tr);
-      }
-    });
-
-    document.getElementById("summary").textContent = `✅ Bookings Today: ${bookingsToday} | Next Token: ${nextToken}`;
-  }
-
-  populateDateDropdowns();
-  filterToday();
-</script>
-</body>
-</html>        `✅ Bookings Today: ${todayCount} | Next Token: ${nextToken}`;
-    }
-
-    function renderTable(data) {
-      const tbody = document.querySelector("#logTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.Date}</td>
-          <td>${row.Time}</td>
-          <td>${row.Name}</td>
-          <td>${row.Reason}</td>
-          <td><a href="tel:${row.Contact}">${row.Contact}</a></td>
-          <td>${row.Clinic}</td>
-          <td>${row.Token}</td>
-          <td>${row["Reminder Sent"] || ""}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function exportCSV() {
-      const csv = Papa.unparse(allData);
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", "AppointmentLogs.csv");
-      link.click();
-    }
-
-    function exportPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const headers = [["Date", "Time", "Name", "Reason", "Contact", "Clinic", "Token", "Reminder"]];
-      const rows = allData.map(r => [
-        r.Date, r.Time, r.Name, r.Reason, r.Contact, r.Clinic, r.Token, r["Reminder Sent"] || ""
-      ]);
-      doc.autoTable({ head: headers, body: rows });
-      doc.save("logs-export.pdf");
-    }
-
-    function filterDate(type) {
-      let filtered = [];
-      const today = new Date();
-      if (type === 'today') {
-        const d = today.toISOString().split("T")[0];
-        filtered = allData.filter(e => e.Date === d);
-      } else if (type === 'yesterday') {
-        today.setDate(today.getDate() - 1);
-        const d = today.toISOString().split("T")[0];
-        filtered = allData.filter(e => e.Date === d);
-      } else {
-        const sd = document.getElementById("startDate").value;
-        const ed = document.getElementById("endDate").value;
-        if (!sd || !ed) return alert("Select valid date range");
-        filtered = allData.filter(e => e.Date >= sd && e.Date <= ed);
-      }
-      updateSummary(filtered);
-      renderTable(filtered);
-    }
-
-    fetchData();
-  </script>
-</body>
 </html>
