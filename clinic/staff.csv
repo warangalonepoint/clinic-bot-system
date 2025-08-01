@@ -1,0 +1,8 @@
+Employee ID,Name,Role,Contact,Attendance,Leaves,Today Status
+EMP101,Dr. Rajesh,Doctor,9876543210,25,2,On Duty
+EMP102,Nurse Kavitha,Nurse,9876501234,23,1,On Duty
+EMP103,Anil Kumar,Receptionist,9876009876,24,0,On Leave
+EMP104,Sunita Reddy,Pharmacist,9876123456,26,1,On Duty
+EMP105,Suresh,Nurse,9876098765,22,3,On Duty
+EMP106,Ravi Teja,Security,9876678901,20,4,On Duty
+EMP107,Lakshmi Bai,Admin,9876567890,27,0,On Duty
