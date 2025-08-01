@@ -124,46 +124,12 @@
   let clinicID = "";
   let deferredPrompt;
 
-  // Theme Toggle
+  // Theme toggle
   function toggleTheme() {
     document.body.classList.toggle("light");
   }
 
-  // PWA Install Prompt
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById("installBtn").style.display = "inline-block";
-  });
-
-  document.getElementById("installBtn").addEventListener("click", async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      document.getElementById("installBtn").style.display = "none";
-    }
-  });
-
-  // PIN Verification
-  async function verifyPIN() {
-    const pin = document.getElementById("pinInput").value.trim();
-    const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/plans.json");
-    const plans = await res.json();
-    const match = Object.entries(plans).find(([id, data]) => data.pin === pin);
-
-    if (!match) {
-      document.getElementById("pinError").innerText = "❌ Invalid PIN";
-      return;
-    }
-
-    clinicID = match[0];
-    document.getElementById("pinSection").style.display = "none";
-    document.getElementById("logsSection").style.display = "block";
-    loadLogs(`${clinicID}-logs.csv`);
-  }
-
-  // Auto PIN from URL
+  // Auto-fill PIN from URL
   window.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const autoPIN = params.get("pin");
@@ -173,7 +139,27 @@
     }
   });
 
-  // Load CSV
+  // ✅ Updated verifyPIN with logsFile
+  async function verifyPIN() {
+    const pin = document.getElementById("pinInput").value.trim();
+    const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/plans.json");
+    const plans = await res.json();
+
+    const matchEntry = Object.entries(plans).find(([id, data]) => data.pin === pin);
+    if (!matchEntry) {
+      document.getElementById("pinError").innerText = "❌ Invalid PIN";
+      return;
+    }
+
+    clinicID = matchEntry[0];
+    const clinic = matchEntry[1];
+
+    document.getElementById("pinSection").style.display = "none";
+    document.getElementById("logsSection").style.display = "block";
+
+    loadLogs(clinic.logsFile);
+  }
+
   async function loadLogs(file) {
     const res = await fetch(`https://warangalonepoint.github.io/clinic-bot-system/${file}`);
     const text = await res.text();
@@ -197,7 +183,6 @@
     }
   }
 
-  // Export & Reminders
   function exportCSV() {
     if (!clinicID) return;
     const url = `https://warangalonepoint.github.io/clinic-bot-system/${clinicID}-logs.csv`;
@@ -208,7 +193,7 @@
     alert("✅ WhatsApp Reminders Sent (Demo Only)");
   }
 
-  // Service Worker
+  // Service worker registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
@@ -216,6 +201,22 @@
         .catch(err => console.error("❌ SW Registration Failed", err));
     });
   }
+
+  // PWA install
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById("installBtn").style.display = "inline-block";
+  });
+
+  document.getElementById("installBtn").addEventListener("click", async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById("installBtn").style.display = "none";
+    }
+  });
 </script>
 
 </body>
