@@ -64,7 +64,7 @@
 
     async function loadSlots() {
       try {
-        const res = await fetch('./Slots.csv');
+        const res = await fetch('https://raw.githubusercontent.com/warangalonepoint/clinic-bot-system/main/clinic/slots.csv');
         const text = await res.text();
         const lines = text.trim().split('\n');
         const headers = lines[0].split(',');
