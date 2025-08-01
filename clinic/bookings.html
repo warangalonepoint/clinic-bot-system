@@ -1,142 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Book Appointment</title>
-    <style>
-        body {
-            background: #111;
-            color: white;
-            font-family: sans-serif;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <title>Book Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
 
-        input, select, button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-        }
+    .dark-mode {
+      background-color: #111;
+      color: #eee;
+    }
 
-        button {
-            background-color: #00c49a;
-            color: white;
-            font-weight: bold;
-        }
+    .light-mode {
+      background-color: #f9f9f9;
+      color: #111;
+    }
 
-        h1 {
-            text-align: center;
-        }
-    </style>
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    select, input, button {
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 14px;
+      width: 100%;
+      max-width: 400px;
+      display: block;
+    }
+
+    .toggle-theme {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: none;
+      background-color: #444;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .light-mode .toggle-theme {
+      background-color: #ccc;
+      color: #000;
+    }
+
+    .form-container {
+      max-width: 400px;
+      margin: auto;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>Book Appointment</h1>
+  <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
 
-    <label>Patient Name</label>
-    <input type="text" id="patientName" placeholder="Enter your name" />
+  <h1>Book Your Appointment</h1>
 
-    <label>Reason for Visit</label>
-    <input type="text" id="reason" placeholder="Enter reason" />
+  <div class="form-container">
+    <label for="dateSelect">Select Date:</label>
+    <select id="dateSelect" onchange="loadSlots()"></select>
 
-    <label>Select Date</label>
-    <select id="dateDropdown"></select>
+    <label for="slotSelect">Select Time Slot:</label>
+    <select id="slotSelect"></select>
 
-    <label>Available Time Slot</label>
-    <select id="slotDropdown"></select>
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" placeholder="Enter your name" required>
 
-    <button onclick="confirmBooking()">Confirm & WhatsApp</button>
+    <label for="reason">Reason for Visit:</label>
+    <input type="text" id="reason" placeholder="Enter reason" required>
 
-    <script>
-        const csvURL = './slots.csv';  // Path to slots.csv file
-        const dateDropdown = document.getElementById('dateDropdown');
-        const slotDropdown = document.getElementById('slotDropdown');
+    <button onclick="bookNow()">Book via WhatsApp</button>
+  </div>
 
-        let allSlots = {};
+  <script>
+    const body = document.body;
 
-        function fetchCSV() {
-            fetch(csvURL)
-                .then(res => res.text())
-                .then(data => parseCSV(data));
-        }
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        body.classList.add('dark-mode');
+        body.classList.remove('light-mode');
+      } else {
+        body.classList.add('light-mode');
+        body.classList.remove('dark-mode');
+      }
+    }
 
-        function parseCSV(data) {
-            data = data.trim().split("\n").slice(1);  // remove header
-            allSlots = {};
+    function toggleTheme() {
+      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      applyTheme(newTheme);
+    }
 
-            data.forEach(row => {
-                const [date, time, status] = row.split(",");
-                if (status.toLowerCase() === "available") {
-                    if (!allSlots[date]) allSlots[date] = [];
-                    allSlots[date].push(time.trim());
-                }
-            });
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
 
-            populateDates();
-        }
+    async function loadSlots() {
+      const response = await fetch('slots.csv');
+      const text = await response.text();
+      const lines = text.trim().split('\n').slice(1);
 
-        function populateDates() {
-            dateDropdown.innerHTML = '';  // Clear previous options
+      const dateSelect = document.getElementById('dateSelect');
+      const slotSelect = document.getElementById('slotSelect');
+      const selectedDate = dateSelect.value;
 
-            Object.keys(allSlots).forEach(date => {
-                const opt = document.createElement("option");
-                opt.value = date;
-                opt.innerText = date;
-                dateDropdown.appendChild(opt);
-            });
-        }
+      const futureDates = [...new Set(lines.map(line => line.split(',')[0]))]
+        .filter(d => new Date(d) >= new Date())
+        .sort();
 
-        function populateTimeSlots() {
-            const selectedDate = dateDropdown.value;
-            slotDropdown.innerHTML = '';  // Clear previous options
+      dateSelect.innerHTML = futureDates.map(d => `<option value="${d}">${d}</option>`).join('');
+      const currentDate = dateSelect.value;
 
-            if (allSlots[selectedDate]) {
-                allSlots[selectedDate].forEach(time => {
-                    const opt = document.createElement("option");
-                    opt.value = time;
-                    opt.innerText = time;
-                    slotDropdown.appendChild(opt);
-                });
-            }
-        }
+      slotSelect.innerHTML = lines
+        .filter(line => line.startsWith(currentDate) && line.includes('Available'))
+        .map(line => `<option>${line.split(',')[1]}</option>`)
+        .join('');
+    }
 
-        function confirmBooking() {
-            const patientName = document.getElementById('patientName').value;
-            const reason = document.getElementById('reason').value;
-            const selectedDate = dateDropdown.value;
-            const selectedTime = slotDropdown.value;
+    async function bookNow() {
+      const name = document.getElementById('name').value;
+      const reason = document.getElementById('reason').value;
+      const slot = document.getElementById('slotSelect').value;
+      const date = document.getElementById('dateSelect').value;
 
-            if (!patientName || !reason || !selectedDate || !selectedTime) {
-                alert("Please fill all fields!");
-                return;
-            }
+      if (!name || !reason || !slot) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
-            // Fetch logs.csv to get the current count of bookings for the selected date
-            fetch('./logs.csv')
-                .then(res => res.text())
-                .then(data => {
-                    const logEntries = data.trim().split("\n").slice(1);  // Remove header
-                    const dateBookings = logEntries.filter(entry => entry.startsWith(selectedDate));
-                    const tokenNumber = dateBookings.length + 1;
+      const message = `Appointment Booking\nName: ${name}\nDate: ${date}\nTime: ${slot}\nReason: ${reason}`;
+      const encoded = encodeURIComponent(message);
+      window.location.href = `https://wa.me/919390664577?text=${encoded}`;
+    }
 
-                    // Create log entry to append to logs.csv
-                    const logEntry = `${selectedDate},${selectedTime},${patientName},${reason},Token ${tokenNumber}\n`;
-
-                    // Save the new entry to logs.csv (for real implementation, this would require server-side code)
-                    console.log(logEntry);  // Placeholder to show log entry in console
-
-                    // Redirect to confirmation page with the details
-                    window.location.href = `confirmation.html?patientName=${patientName}&reason=${reason}&date=${selectedDate}&time=${selectedTime}&token=Token ${tokenNumber}`;
-                });
-        }
-
-        // Initialize dropdowns when page loads
-        window.onload = function () {
-            fetchCSV();
-            dateDropdown.addEventListener("change", populateTimeSlots);
-        };
-    </script>
+    loadSlots();
+  </script>
 </body>
 </html>
