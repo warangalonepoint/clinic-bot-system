@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Monthly Summary</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4 bg-light">
+  <div class="container">
+    <h2 class="mb-4">📅 Staff Monthly Attendance Summary</h2><div class="row mb-3">
+  <div class="col-md-6">
+    <input type="month" id="monthPicker" class="form-control" value="2025-08">
+  </div>
+  <div class="col-md-6">
+    <button class="btn btn-primary w-100" onclick="exportSummary()">⬇️ Export Summary CSV</button>
+  </div>
+</div>
+
+<table class="table table-bordered" id="summaryTable">
+  <thead class="table-dark">
+    <tr>
+      <th>Employee ID</th>
+      <th>Name</th>
+      <th>Total Present</th>
+      <th>Total Absent</th>
+      <th>Total Leave</th>
+      <th>Total Days</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+  </div>  <script>
+    let attendanceRaw = [];
+
+    fetch('./staff-attendance.csv')
+      .then(res => res.text())
+      .then(data => {
+        attendanceRaw = data.trim().split('\n').slice(1).map(row => row.split(','));
+        renderSummary();
+      });
+
+    document.getElementById('monthPicker').addEventListener('change', renderSummary);
+
+    function renderSummary() {
+      const month = document.getElementById('monthPicker').value;
+      const summary = {};
+
+      attendanceRaw.forEach(([date, id, name, status]) => {
+        if (!date.startsWith(month)) return;
+        if (!summary[id]) summary[id] = { name, present: 0, absent: 0, leave: 0, total: 0 };
+        if (status.toLowerCase() === 'present') summary[id].present++;
+        else if (status.toLowerCase() === 'absent') summary[id].absent++;
+        else if (status.toLowerCase() === 'leave') summary[id].leave++;
+        summary[id].total++;
+      });
+
+      const tbody = document.querySelector('#summaryTable tbody');
+      tbody.innerHTML = '';
+      for (const id in summary) {
+        const row = summary[id];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${id}</td>
+          <td>${row.name}</td>
+          <td>${row.present}</td>
+          <td>${row.absent}</td>
+          <td>${row.leave}</td>
+          <td>${row.total}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function exportSummary() {
+      const rows = [['Employee ID','Name','Total Present','Total Absent','Total Leave','Total Days']];
+      document.querySelectorAll('#summaryTable tbody tr').forEach(tr => {
+        const cols = Array.from(tr.children).map(td => td.textContent);
+        rows.push(cols);
+      });
+      const csv = rows.map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'monthly-staff-summary.csv';
+      link.click();
+    }
+  </script></body>
+</html>
