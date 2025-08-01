@@ -2,113 +2,93 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clinic PIN Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#007BFF"/>
+  <link rel="manifest" href="manifest.json">
+  <title>Onestop Ai Clinic Demo</title>
   <style>
     body {
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #fff;
       margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease;
     }
-
-    .login-box {
-      background-color: rgba(0, 0, 0, 0.6);
-      padding: 30px 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+    }
+    .dark {
+      --bg: #0d1117;
+      --text: #ffffff;
+    }
+    header {
+      background: #007BFF;
+      color: white;
+      padding: 1rem;
       text-align: center;
-      max-width: 350px;
-      width: 90%;
+      font-size: 1.5rem;
     }
-
-    h1 {
-      margin-bottom: 20px;
-      font-size: 26px;
-      color: #00eaff;
+    .container {
+      padding: 2rem;
+      text-align: center;
     }
-
-    input[type="password"] {
-      width: 100%;
-      padding: 14px;
-      margin: 20px 0;
+    .btn {
+      display: inline-block;
+      margin: 1rem;
+      padding: 1rem 2rem;
+      font-size: 1rem;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #00eaff;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      background-color: #007BFF;
+      color: white;
     }
-
-    button:hover {
-      background-color: #00bcd4;
+    .btn:hover {
+      background-color: #0056b3;
     }
-
-    .error {
-      color: #ff5c5c;
-      margin-top: 10px;
-    }
-
-    .footer-note {
-      margin-top: 30px;
-      font-size: 12px;
-      opacity: 0.6;
+    .toggle-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #222;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h1>Clinic PIN Login</h1>
-    <input type="password" id="pinInput" placeholder="Enter PIN" />
-    <button onclick="login()">Login</button>
-    <div class="error" id="errorMsg"></div>
-    <div class="footer-note">Powered by WarangalOneStop.in</div>
+  <button class="toggle-btn" onclick="toggleTheme()">Toggle Theme</button>
+  <header>Onestop Ai Clinic Demo</header>
+
+  <div class="container">
+    <p>Welcome to your clinic dashboard. Choose a panel below:</p>
+    <a href="clinic-dashboard.html" class="btn">Clinic Dashboard</a>
+    <a href="bookings.html" class="btn">Patient Bookings</a>
+    <a href="logs.html" class="btn">Booking Logs</a>
+    <a href="staff.html" class="btn">Staff Panel</a>
   </div>
 
   <script>
-    const plans = {
-      "1234": { clinic: "Clinic 1", plan: "free" },
-      "2525": { clinic: "Clinic 2", plan: "paid" },
-      "9999": { clinic: "Clinic 3", plan: "premium" }
-    };
+    // Theme Toggle
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
 
-    function login() {
-      const pin = document.getElementById("pinInput").value.trim();
-      const errorMsg = document.getElementById("errorMsg");
+    // Restore Theme
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
 
-      if (!pin) {
-        errorMsg.textContent = "Please enter your PIN.";
-        return;
-      }
-
-      if (plans[pin]) {
-        const plan = plans[pin].plan;
-        if (plan === "free") {
-          window.location.href = `freeplan.html?pin=${pin}`;
-        } else if (plan === "paid") {
-          window.location.href = `paidplan.html?pin=${pin}`;
-        } else if (plan === "premium") {
-          window.location.href = `premiumplan.html?pin=${pin}`;
-        } else {
-          errorMsg.textContent = "Invalid plan assigned.";
-        }
-      } else {
-        errorMsg.textContent = "Invalid PIN. Please try again.";
-      }
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('SW registered:', reg))
+        .catch(err => console.error('SW registration failed:', err));
     }
   </script>
 </body>
