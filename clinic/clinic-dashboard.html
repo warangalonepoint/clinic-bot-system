@@ -1,119 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 30px;
       margin: 0;
-      transition: background 0.3s, color 0.3s;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
     }
-
-    .dark-mode {
-      background-color: #111;
-      color: #eee;
+    :root {
+      --bg-color: #fff;
+      --text-color: #000;
+      --card-bg: #f0f0f0;
     }
-
-    .light-mode {
-      background-color: #f4f4f4;
-      color: #111;
+    body.dark {
+      --bg-color: #121212;
+      --text-color: #fff;
+      --card-bg: #1f1f1f;
     }
-
+    .container {
+      padding: 20px;
+    }
     h1 {
       text-align: center;
-      font-size: 28px;
-      margin-bottom: 30px;
     }
-
     .grid {
-      display: grid;
-      gap: 20px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
     }
-
     .card {
+      background-color: var(--card-bg);
+      border-radius: 10px;
       padding: 20px;
-      background: rgba(0,0,0,0.05);
-      border-radius: 12px;
+      flex: 1 1 280px;
+      max-width: 300px;
       text-align: center;
-      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .card a {
       text-decoration: none;
-      color: inherit;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
+      color: var(--text-color);
+      display: block;
+      font-weight: bold;
+      margin-top: 10px;
     }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .toggle-theme {
+    .theme-toggle {
       position: fixed;
       top: 10px;
       right: 10px;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      border: none;
-      background-color: #444;
+      background: #444;
       color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
       cursor: pointer;
-    }
-
-    .light-mode .card {
-      background: white;
-    }
-
-    .light-mode .toggle-theme {
-      background-color: #ccc;
-      color: #000;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
-  <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
-
-  <h1>Clinic Dashboard</h1>
-
-  <div class="grid">
-    <a class="card" href="bookings.html">📅 Patient Bookings</a>
-    <a class="card" href="logs.html">📖 Booking Logs</a>
-    <a class="card" href="staff.html">👥 Staff Directory</a>
-    <a class="card" href="staff-attendance.html">🕒 Attendance Panel</a>
-    <a class="card" href="staff-attendance-form.html">📝 Mark Attendance</a>
-    <a class="card" href="staff-leave-tracker.html">📆 Leave Tracker</a>
-    <a class="card" href="staff-monthly-summary.html">📊 Staff Summary</a>
-    <a class="card" href="staff-roster.html">📋 Staff Roster</a>
-    <a class="card" href="whatsapp-attendance.html">💬 WhatsApp Log</a>
-    <a class="card" href="export-panel.html">📦 Export Panel</a>
-    <a class="card" href="sync.html">🔄 Sync Slots & Logs</a>
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+  <div class="container">
+    <h1>Clinic Dashboard</h1>
+    <div class="grid">
+      <div class="card">
+        <i class="fas fa-calendar-plus fa-2x"></i>
+        <a href="bookings.html">Appointment Bookings</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-notes-medical fa-2x"></i>
+        <a href="logs.html">Booking Logs</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-file-export fa-2x"></i>
+        <a href="sync.html">Sync & Export</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-users fa-2x"></i>
+        <a href="staff.html">Staff Details</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-clock fa-2x"></i>
+        <a href="staff-attendance.html">Staff Attendance</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-chart-bar fa-2x"></i>
+        <a href="staff-monthly-summary.html">Monthly Summary</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-umbrella-beach fa-2x"></i>
+        <a href="staff-leave-tracker.html">Leave Tracker</a>
+      </div>
+      <div class="card">
+        <i class="fab fa-whatsapp fa-2x"></i>
+        <a href="whatsapp-attendance.html">WhatsApp Attendance</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-calendar-alt fa-2x"></i>
+        <a href="staff-roster.html">Staff Roster</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-robot fa-2x"></i>
+        <a href="whatsapp-log.html">WhatsApp Log Simulator</a>
+      </div>
+      <div class="card">
+        <i class="fas fa-ticket-alt fa-2x"></i>
+        <a href="token-summary.html">Token Summary</a>
+      </div>
+    </div>
   </div>
-
   <script>
-    const body = document.body;
-
-    function applyTheme(theme) {
-      if (theme === 'dark') {
-        body.classList.add('dark-mode');
-        body.classList.remove('light-mode');
-      } else {
-        body.classList.add('light-mode');
-        body.classList.remove('dark-mode');
-      }
-    }
-
     function toggleTheme() {
-      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
-      applyTheme(newTheme);
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
+    (function () {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark");
+      }
+    })();
   </script>
 </body>
 </html>
