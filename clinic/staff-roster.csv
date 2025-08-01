@@ -1,11 +1,4 @@
-Date,Employee ID,Name,Shift
-2025-08-01,EMP001,Dr. Krishna,Morning
-2025-08-01,EMP002,Anita Rao,Evening
-2025-08-01,EMP003,Sai Kumar,On Leave
-2025-08-01,EMP004,Meena Patil,Morning
-2025-08-01,EMP005,Rahul Reddy,Evening
-2025-08-02,EMP001,Dr. Krishna,Evening
-2025-08-02,EMP002,Anita Rao,Morning
-2025-08-02,EMP003,Sai Kumar,Morning
-2025-08-02,EMP004,Meena Patil,On Leave
-2025-08-02,EMP005,Rahul Reddy,Morning
+Employee ID,Name,Role,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday
+ST001,Anita Rao,Nurse,Duty,Duty,Off,Duty,Duty,Off,Off
+ST002,Ravi Kumar,Receptionist,Off,Duty,Duty,Duty,Off,Off,Duty
+ST003,Sneha Reddy,Pharmacist,Duty,Duty,Duty,Off,Off,Duty,Off
