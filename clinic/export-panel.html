@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Export Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 26px;
+      color: #222;
+    }
+    .export-section {
+      margin: 20px 0;
+      text-align: center;
+    }
+    .export-section p {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .export-section a {
+      display: inline-block;
+      padding: 12px 22px;
+      background-color: #007BFF;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .export-section a:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Export Panel</h2><div class="export-section">
+  <p>Download full appointment logs</p>
+  <a href="logs.csv" download>Download logs.csv</a>
+</div>
+
+<div class="export-section">
+  <p>Download available slot schedule</p>
+  <a href="slots.csv" download>Download slots.csv</a>
+</div>
+
+  </div>
+</body>
+</html>
