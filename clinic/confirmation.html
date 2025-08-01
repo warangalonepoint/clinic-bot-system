@@ -1,69 +1,74 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Confirmation</title>
-  <link rel="manifest" href="./manifest.json">
+  <meta charset="UTF-8" />
+  <title>Booking Confirmed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="logo.png" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
+      background-color: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
       text-align: center;
-      padding: 40px;
     }
-    .light-mode {
-      background: #f0f0f0;
-      color: #111;
+    h1 {
+      color: #00ff88;
+      font-size: 32px;
     }
-    .card {
-      background: #222;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 400px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    p {
+      font-size: 18px;
+      margin: 10px 0;
     }
-    .light-mode .card {
-      background: #fff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-bottom: 20px;
+    .token {
+      font-size: 22px;
+      margin-top: 20px;
+      color: #ffd700;
     }
     button {
-      padding: 10px 20px;
-      background: #00ffc8;
+      background-color: #00ff88;
       color: #000;
+      padding: 12px 24px;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
+      margin-top: 30px;
     }
     button:hover {
-      background: #00c6a2;
+      background-color: #00cc70;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>✅ Appointment Confirmed</h2>
-    <p>Your booking has been successfully submitted.</p>
-    <p><strong>Token No:</strong> <span id="token"></span></p>
-    <p><strong>Time Slot:</strong> <span id="slot"></span></p>
-    <button onclick="goBack()">Book Another</button>
-  </div>  <script>
-    function goBack() {
-      window.location.href = "./booking.html";
-    }
+  <h1>✅ Appointment Confirmed</h1>
+  <p>Thank you, <span id="patientName">Patient</span>!</p>
+  <p>Your appointment for <span id="reason">Consultation</span> at <span id="timeSlot">--:--</span> has been booked.</p>
+  <div class="token">🎟️ Token No: <span id="token">#--</span></div>
+  <button onclick="goHome()">Book Another</button>
 
-    function loadData() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token') || 'N/A';
-      const slot = urlParams.get('slot') || 'N/A';
-      document.getElementById('token').textContent = token;
-      document.getElementById('slot').textContent = slot;
-    }
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name') || 'Patient';
+    const reason = urlParams.get('reason') || 'Consultation';
+    const slot = urlParams.get('slot') || '--:--';
+    const token = urlParams.get('token') || '--';
 
-    loadData();
-  </script></body>
+    document.getElementById("patientName").textContent = name;
+    document.getElementById("reason").textContent = reason;
+    document.getElementById("timeSlot").textContent = slot;
+    document.getElementById("token").textContent = token;
+
+    function goHome() {
+      window.location.href = "bookings.html";
+    }
+  </script>
+</body>
 </html>
