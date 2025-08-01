@@ -55,15 +55,15 @@
     let currentFilterDate = null;
 
     async function loadLogs() {
-      const clinic = clinicSelect.value || "default";
+      const clinic = clinicSelect.value || "clinic";
       const csvUrl = `./${clinic}-logs.csv`;
       try {
         const res = await fetch(csvUrl);
         const text = await res.text();
         const rows = text.trim().split('\n').slice(1); // Skip header
         logsData = rows.map(row => {
-          const [Name, Reason, Date, Time, Contact, Token] = row.split(',');
-          return { Name, Reason, Date, Time, Contact, Token };
+          const [Time, Reason, Name, Contact, Date, Token] = row.split(',');
+          return { Time, Reason, Name, Contact, Date, Token };
         });
         renderLogs();
       } catch (err) {
@@ -92,7 +92,7 @@
           <p><strong>Reason:</strong> ${log.Reason}</p>
           <p><strong>Date:</strong> ${log.Date}</p>
           <p><strong>Time:</strong> ${log.Time}</p>
-          <p><strong>Contact:</strong> ${log.Contact}</p>
+          <p><strong>Contact:</strong> <a href="tel:${log.Contact}">${log.Contact}</a></p>
           <p><strong>Token No:</strong> ${log.Token}</p>
         `;
         logContainer.appendChild(entry);
@@ -100,18 +100,12 @@
     }
 
     function filterByDate(filter) {
-      if (filter === 'today') {
-        currentFilterDate = today;
-      } else if (filter === 'yesterday') {
-        currentFilterDate = yesterday;
-      } else {
-        currentFilterDate = null;
-      }
+      currentFilterDate = filter === 'today' ? today : filter === 'yesterday' ? yesterday : null;
       renderLogs();
     }
 
     function populateClinics() {
-      const clinics = ["clinic"]; // Add more if needed
+      const clinics = ["clinic"]; // Add more clinic CSV names if needed
       clinics.forEach(name => {
         const opt = document.createElement("option");
         opt.value = name;
