@@ -2,97 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Booking Confirmation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Confirmed</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #fff;
+      padding: 40px;
+      background-color: #f5f5f5;
+      color: #222;
       text-align: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
       padding: 30px;
-    }
-    .container {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 25px;
-      max-width: 480px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      max-width: 400px;
       margin: auto;
-      box-shadow: 0 0 10px rgba(0,255,255,0.1);
     }
+
     h1 {
-      color: #00ffff;
+      color: green;
+      font-size: 28px;
     }
-    p {
+
+    .info {
+      font-size: 18px;
       margin: 10px 0;
     }
-    .highlight {
-      color: #00ff99;
-      font-weight: bold;
-      font-size: 20px;
-    }
-    button {
+
+    .countdown {
       margin-top: 20px;
-      background-color: #00ffff;
-      color: #000;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
+      font-size: 16px;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Booking Confirmed ✅</h1>
-    <p>Date: <span id="date" class="highlight"></span></p>
-    <p>Time Slot: <span id="slot" class="highlight"></span></p>
-    <p>Patient: <span id="name" class="highlight"></span></p>
-    <p>Reason: <span id="reason" class="highlight"></span></p>
-    <p>Token No: <span id="token" class="highlight"></span></p>
-
-    <button id="whatsappBtn">Send WhatsApp Message</button>
+  <div class="card">
+    <h1>✅ Booking Confirmed</h1>
+    <div class="info" id="nameInfo"></div>
+    <div class="info" id="reasonInfo"></div>
+    <div class="info" id="dateInfo"></div>
+    <div class="info" id="timeInfo"></div>
+    <div class="info" id="tokenInfo"></div>
+    <div class="countdown">Redirecting to WhatsApp in <span id="count">5</span> seconds...</div>
   </div>
 
   <script>
-    // Extract query params
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get("name") || "Not Provided";
-    const reason = params.get("reason") || "N/A";
-    const slot = params.get("slot") || "N/A";
-    const date = params.get("date") || new Date().toISOString().split("T")[0];
-    const contact = params.get("contact") || "Unknown";
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get("name");
+    const reason = urlParams.get("reason");
+    const date = urlParams.get("date");
+    const time = urlParams.get("time");
+    const token = urlParams.get("token");
+    const phone = urlParams.get("phone");
 
-    // Load existing logs and assign token number
-    let tokenNo = 1;
-    const logsURL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv";
-    fetch(logsURL)
-      .then(res => res.text())
-      .then(csv => {
-        const lines = csv.split("\n").filter(line => line.includes(date));
-        tokenNo = lines.length + 1;
+    document.getElementById("nameInfo").innerText = `👤 Name: ${name}`;
+    document.getElementById("reasonInfo").innerText = `📌 Reason: ${reason}`;
+    document.getElementById("dateInfo").innerText = `📅 Date: ${date}`;
+    document.getElementById("timeInfo").innerText = `⏰ Time: ${time}`;
+    document.getElementById("tokenInfo").innerText = `🎫 Token No: ${token}`;
 
-        // Show values
-        document.getElementById("date").textContent = date;
-        document.getElementById("slot").textContent = slot;
-        document.getElementById("name").textContent = name;
-        document.getElementById("reason").textContent = reason;
-        document.getElementById("token").textContent = tokenNo;
+    const msg = `Appointment Confirmation:\nName: ${name}\nDate: ${date}\nTime: ${time}\nReason: ${reason}\nToken No: ${token}`;
+    const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
 
-        // Build booking line
-        const logEntry = `${date},${slot},${name},${reason},${contact},${tokenNo},,\n`;
-
-        // Optional: Save locally until backend sync built
-        localStorage.setItem("latestBooking", logEntry);
-      });
-
-    // WhatsApp button
-    document.getElementById("whatsappBtn").addEventListener("click", () => {
-      const msg = `Hello 👋\nYour booking is confirmed.\n📅 Date: ${date}\n🕒 Time: ${slot}\n🧾 Reason: ${reason}\n🎫 Token No: ${tokenNo}`;
-      const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-      window.location.href = url;
-    });
+    let countdown = 5;
+    const timer = setInterval(() => {
+      countdown--;
+      document.getElementById("count").innerText = countdown;
+      if (countdown === 0) {
+        clearInterval(timer);
+        window.location.href = waLink;
+      }
+    }, 1000);
   </script>
 </body>
 </html>
