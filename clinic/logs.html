@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; margin: 0; padding: 1rem; }
+    body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; margin: 0; padding: 1rem; transition: background 0.3s, color 0.3s; }
     h1 { text-align: center; margin-bottom: 1rem; }
     .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 1rem; }
     .filters input, .filters select { padding: 5px; font-size: 1rem; }
@@ -17,13 +17,20 @@
     th { background-color: #f0f0f0; }
     .export-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 1rem; }
     canvas { max-width: 100%; margin-top: 2rem; }
+    .theme-toggle { text-align: center; margin-bottom: 1rem; }
+    .summary { text-align: center; margin-top: 2rem; font-weight: bold; }
     @media (max-width: 600px) {
       table, th, td { font-size: 0.8rem; }
       .filters { flex-direction: column; align-items: stretch; }
     }
+    .dark-mode { background: #121212; color: #eee; }
+    .dark-mode th { background-color: #333; }
+    .dark-mode td, .dark-mode input { background-color: #222; color: #eee; }
   </style>
 </head>
-<body><h1>Patient List & Analytics</h1><div class="filters">
+<body><h1>Patient List & Analytics</h1><div class="theme-toggle">
+  <button onclick="toggleTheme()">Toggle Dark/Light Theme</button>
+</div><div class="filters">
   <input type="text" id="searchName" placeholder="Search Name">
   <input type="text" id="searchReason" placeholder="Search Reason">
   <input type="date" id="filterDate">
@@ -37,14 +44,14 @@
     </tr>
   </thead>
   <tbody id="tableBody"></tbody>
-</table><canvas id="bookingChart"></canvas>
+</table><div class="summary" id="summaryStats"></div><canvas id="bookingChart"></canvas> <canvas id="repeatChart" style="margin-top: 2rem;"></canvas>
 
 <script>
 const data = [
   { date: '2025-08-01', time: '09:00', name: 'Chaitanya Krishna', reason: 'Fever', contact: '+919876543210', token: 1, reminder: 'Yes' },
   { date: '2025-08-01', time: '09:10', name: 'Ravi Kumar', reason: 'Checkup', contact: '+918888888888', token: 2, reminder: 'Yes' },
   { date: '2025-08-01', time: '09:20', name: 'Anjali Sharma', reason: 'Consultation', contact: '+917777777777', token: 3, reminder: 'No' },
-  { date: '2025-08-01', time: '09:30', name: 'Vikram Rao', reason: 'Follow-up', contact: '+919999999999', token: 4, reminder: 'Yes' },
+  { date: '2025-08-01', time: '09:30', name: 'Ravi Kumar', reason: 'Follow-up', contact: '+918888888888', token: 4, reminder: 'Yes' },
   { date: '2025-08-01', time: '09:40', name: 'Sneha Reddy', reason: 'Skin Allergy', contact: '+918765432100', token: 5, reminder: 'No' }
 ];
 
@@ -55,6 +62,14 @@ function renderTable(filtered = data) {
     const row = `<tr><td>${d.date}</td><td>${d.time}</td><td>${d.name}</td><td>${d.reason}</td><td>${d.contact}</td><td>${d.token}</td><td>${d.reminder}</td></tr>`;
     tbody.innerHTML += row;
   });
+  updateSummary(filtered);
+}
+
+function updateSummary(entries) {
+  const total = entries.length;
+  const uniqueContacts = new Set(entries.map(e => e.contact));
+  const repeat = total - uniqueContacts.size;
+  document.getElementById('summaryStats').innerText = `Total: ${total}, Repeat Patients: ${repeat}`;
 }
 
 function exportTableToExcel(id) {
@@ -71,19 +86,27 @@ function exportToPDF() {
   doc.save('Patient_Logs.pdf');
 }
 
-function drawChart() {
-  const ctx = document.getElementById('bookingChart').getContext('2d');
-  const countByReason = {};
-  data.forEach(d => countByReason[d.reason] = (countByReason[d.reason] || 0) + 1);
-  new Chart(ctx, {
+function drawCharts() {
+  const ctx1 = document.getElementById('bookingChart').getContext('2d');
+  const ctx2 = document.getElementById('repeatChart').getContext('2d');
+  const reasons = {};
+  const times = {};
+  data.forEach(d => {
+    reasons[d.reason] = (reasons[d.reason] || 0) + 1;
+    times[d.time] = (times[d.time] || 0) + 1;
+  });
+  new Chart(ctx1, {
     type: 'bar',
     data: {
-      labels: Object.keys(countByReason),
-      datasets: [{
-        label: 'Visit Reasons',
-        data: Object.values(countByReason),
-        backgroundColor: 'rgba(54, 162, 235, 0.6)'
-      }]
+      labels: Object.keys(reasons),
+      datasets: [{ label: 'Visit Reasons', data: Object.values(reasons), backgroundColor: 'teal' }]
+    }
+  });
+  new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: Object.keys(times),
+      datasets: [{ label: 'Peak Time Slots', data: Object.values(times), backgroundColor: 'orange', fill: false, borderColor: 'orange' }]
     }
   });
 }
@@ -100,11 +123,15 @@ function applyFilters() {
   renderTable(filtered);
 }
 
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+}
+
 document.getElementById('searchName').addEventListener('input', applyFilters);
 document.getElementById('searchReason').addEventListener('input', applyFilters);
 document.getElementById('filterDate').addEventListener('change', applyFilters);
 
 renderTable();
-drawChart();
+drawCharts();
 </script></body>
 </html>
