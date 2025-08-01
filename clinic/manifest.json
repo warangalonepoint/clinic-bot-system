@@ -1,20 +1,22 @@
+/* manifest.json */
 {
-  "name": "Clinic BookingBot",
-  "short_name": "BookingBot",
-  "start_url": "./clinic-dashboard.html",
+  "name": "Onestop Ai Clinic Demo",
+  "short_name": "Clinic Demo",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#00ffc8",
+  "background_color": "#ffffff",
+  "theme_color": "#00897b",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "./logo.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "sizes": "512x512"
     },
     {
       "src": "./logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "sizes": "192x192"
     }
   ]
 }
