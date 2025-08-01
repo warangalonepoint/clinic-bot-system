@@ -1,70 +1,46 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Panel</title>
+  <title>WhatsApp Attendance Log</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding: 20px; background: #f8f9fa; }
+    h2 { margin-bottom: 20px; }
+  </style>
 </head>
-<body class="bg-light p-4">
+<body>
   <div class="container">
-    <h2 class="mb-4">👥 Staff Management</h2>
-    <table class="table table-bordered table-hover" id="staffTable">
+    <h2>📲 WhatsApp Attendance Log</h2>
+    <table class="table table-bordered" id="logTable">
       <thead class="table-dark">
         <tr>
+          <th>Timestamp</th>
           <th>Employee ID</th>
           <th>Name</th>
-          <th>Role</th>
-          <th>Status</th>
+          <th>Action</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Staff rows will be populated here -->
-      </tbody>
+      <tbody id="logBody"></tbody>
     </table>
-  </div>  <script>
-    fetch('./staff.csv')
-      .then(res => res.text())
-      .then(data => {
-        const rows = data.trim().split('\n');
-        const tbody = document.querySelector('#staffTable tbody');
+  </div>
 
-        rows.forEach((line, index) => {
-          const [empId, name, role, status] = line.split(',');
-          if (index === 0 && empId.toLowerCase() === 'employee id') return; // Skip header
+  <script>
+    // Simulated data; in production this would be updated on WhatsApp button click
+    const logs = JSON.parse(localStorage.getItem('waAttendanceLogs') || '[]');
 
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${empId}</td><td>${name}</td><td>${role}</td><td>${status}</td>`;
-          tbody.appendChild(tr);
-        });
-      });
-  </script></body>
-</html>            role: row["Role"],
-            contact: row["Contact"],
-            att: row["Attendance"],
-            leave: row["Leaves"],
-            status: row["Today Status"]
-          }));
-          renderTable();
-        }
-      });
+    const logBody = document.getElementById('logBody');
+    logs.forEach(entry => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${entry.time}</td>
+        <td>${entry.id}</td>
+        <td>${entry.name}</td>
+        <td>${entry.action}</td>
+      `;
+      logBody.appendChild(row);
     });
-
-    // CSV Export
-    function exportToCSV() {
-      const csv = Papa.unparse(staffList.map(s => ({
-        "Employee ID": s.id,
-        "Name": s.name,
-        "Role": s.role,
-        "Contact": s.contact,
-        "Attendance": s.att,
-        "Leaves": s.leave,
-        "Today Status": s.status
-      })));
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "staff-export.csv";
-      link.click();
-    }
-  </script></body>
+  </script>
+</body>
 </html>
