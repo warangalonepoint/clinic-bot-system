@@ -1,78 +1,127 @@
-<!-- logs.html with Date Filters, CSV, Click-to-Call --><!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Booking Logs</title>
   <style>
-    body { font-family: sans-serif; background: #f2f2f2; margin: 20px; }
-    h1 { text-align: center; }
-    .filter-buttons { text-align: center; margin-bottom: 20px; }
-    .filter-buttons button { margin: 0 5px; padding: 8px 16px; }
-    .log-entry { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; }
-    a { color: #007bff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button, select {
+      margin: 0 5px;
+      padding: 5px 10px;
+    }
+    .log-entry {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .log-entry strong {
+      display: inline-block;
+      width: 100px;
+    }
   </style>
 </head>
 <body>
   <h1>Booking Logs</h1>
-  <div class="filter-buttons">
-    <button onclick="filterBy('today')">Today</button>
-    <button onclick="filterBy('yesterday')">Yesterday</button>
-    <input type="date" id="customDate" onchange="filterBy('custom')" />
-  </div>  <div id="logList">Loading...</div>  <script>
-    let logs = [];
+  <div class="controls">
+    <button onclick="filterByDate('today')">Today</button>
+    <button onclick="filterByDate('yesterday')">Yesterday</button>
+    <select id="clinicSelect" onchange="loadLogs()"></select>
+  </div>
+  <div id="logContainer">Loading...</div>
 
-    function formatDate(d) {
-      return d.toISOString().split('T')[0];
+  <script>
+    const logContainer = document.getElementById('logContainer');
+    const clinicSelect = document.getElementById('clinicSelect');
+
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+    let logsData = [];
+    let currentFilterDate = null;
+
+    async function loadLogs() {
+      const clinic = clinicSelect.value || "default";
+      const csvUrl = `./${clinic}-logs.csv`;
+      try {
+        const res = await fetch(csvUrl);
+        const text = await res.text();
+        const rows = text.trim().split('\n').slice(1); // Skip header
+        logsData = rows.map(row => {
+          const [Name, Reason, Date, Time, Contact, Token] = row.split(',');
+          return { Name, Reason, Date, Time, Contact, Token };
+        });
+        renderLogs();
+      } catch (err) {
+        logContainer.innerHTML = "Failed to load logs.";
+      }
     }
 
-    function getYesterday() {
-      const y = new Date();
-      y.setDate(y.getDate() - 1);
-      return formatDate(y);
-    }
+    function renderLogs() {
+      logContainer.innerHTML = '';
+      let filteredLogs = logsData;
 
-    function filterBy(mode) {
-      let selectedDate = '';
-      if (mode === 'today') selectedDate = formatDate(new Date());
-      else if (mode === 'yesterday') selectedDate = getYesterday();
-      else if (mode === 'custom') selectedDate = document.getElementById('customDate').value;
+      if (currentFilterDate) {
+        filteredLogs = logsData.filter(log => log.Date === currentFilterDate);
+      }
 
-      const filtered = logs.filter(log => log.date === selectedDate);
-      displayLogs(filtered);
-    }
-
-    function displayLogs(data) {
-      const logDiv = document.getElementById('logList');
-      logDiv.innerHTML = '';
-      if (data.length === 0) {
-        logDiv.innerHTML = '<p>No bookings found for selected date.</p>';
+      if (filteredLogs.length === 0) {
+        logContainer.innerHTML = "<p>No bookings found.</p>";
         return;
       }
-      data.forEach(log => {
-        logDiv.innerHTML += `<div class='log-entry'>
-          <strong>${log.name}</strong> | Reason: ${log.reason} | Token: ${log.token} | Date: ${log.date}<br>
-          Contact: <a href='tel:${log.contact}'>${log.contact}</a>
-        </div>`;
+
+      filteredLogs.forEach(log => {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `
+          <p><strong>Name:</strong> ${log.Name}</p>
+          <p><strong>Reason:</strong> ${log.Reason}</p>
+          <p><strong>Date:</strong> ${log.Date}</p>
+          <p><strong>Time:</strong> ${log.Time}</p>
+          <p><strong>Contact:</strong> ${log.Contact}</p>
+          <p><strong>Token No:</strong> ${log.Token}</p>
+        `;
+        logContainer.appendChild(entry);
       });
     }
 
-    fetch('./logs.csv')
-      .then(response => response.text())
-      .then(csv => {
-        const rows = csv.trim().split('\n').slice(1); // skip header
-        logs = rows.map(row => {
-          const cols = row.split(',');
-          return {
-            date: cols[0],
-            name: cols[1],
-            reason: cols[2],
-            contact: cols[3],
-            token: cols[4],
-            reminder: cols[5]
-          };
-        });
-        displayLogs(logs);
+    function filterByDate(filter) {
+      if (filter === 'today') {
+        currentFilterDate = today;
+      } else if (filter === 'yesterday') {
+        currentFilterDate = yesterday;
+      } else {
+        currentFilterDate = null;
+      }
+      renderLogs();
+    }
+
+    function populateClinics() {
+      const clinics = ["clinic"]; // Add more if needed
+      clinics.forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        clinicSelect.appendChild(opt);
       });
-  </script></body>
+      loadLogs();
+    }
+
+    populateClinics();
+  </script>
+</body>
 </html>
