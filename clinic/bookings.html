@@ -4,68 +4,58 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Appointment</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
       padding: 20px;
-      background-color: #f4f4f4;
-      transition: background 0.3s, color 0.3s;
+      background-color: #fff;
+      color: #111;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-theme {
+      background-color: #111;
+      color: #fff;
     }
     .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .dark-theme {
-      background-color: #121212;
-      color: #ffffff;
-    }
-    .dark-theme .container {
-      background: #1e1e1e;
-      color: #fff;
+      max-width: 500px;
+      margin: auto;
     }
     h2 {
       text-align: center;
-      margin-bottom: 25px;
     }
     label {
-      font-weight: bold;
       display: block;
       margin-top: 15px;
     }
-    select, input, button {
+    input, select, button {
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      padding: 10px;
+      margin-top: 5px;
       font-size: 16px;
     }
     button {
       background-color: #28a745;
       color: white;
       border: none;
-      font-weight: bold;
       cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
+      margin-top: 20px;
     }
     .theme-toggle {
-      width: 100%;
-      margin-bottom: 20px;
-      background-color: #2e7d32;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: none;
+      border: 1px solid gray;
+      color: inherit;
+      padding: 6px 10px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 Theme</button>
     <h2>Book Your Appointment</h2>
 
     <label for="date">Select Date</label>
@@ -74,14 +64,14 @@
     <label for="time">Select Time Slot</label>
     <select id="time"></select>
 
-    <input type="text" id="name" placeholder="Enter full name">
-    <input type="text" id="reason" placeholder="Reason for Visit">
+    <input type="text" id="name" placeholder="Enter full name" />
+    <input type="text" id="reason" placeholder="Reason for Visit" />
 
     <button onclick="bookAppointment()">Book via WhatsApp</button>
   </div>
 
   <script>
-    const slotsUrl = "./Slots.csv";
+    const slotsUrl = "./slots.csv"; // Local relative path
     let allSlots = [];
 
     function loadSlots() {
@@ -95,9 +85,7 @@
           });
           populateDateDropdown();
         })
-        .catch(error => {
-          console.error("Failed to fetch slots:", error);
-        });
+        .catch(err => console.error("Slot fetch failed:", err));
     }
 
     function populateDateDropdown() {
@@ -105,25 +93,43 @@
       const dateSelect = document.getElementById("date");
       dateSelect.innerHTML = "";
       Array.from(dateSet).sort().forEach(date => {
-        const option = document.createElement("option");
-        option.value = date;
-        option.textContent = date;
-        dateSelect.appendChild(option);
+        const opt = document.createElement("option");
+        opt.value = date;
+        opt.textContent = date;
+        dateSelect.appendChild(opt);
       });
-      filterSlots(); // Load initial slots
+      filterSlots();
     }
 
     function filterSlots() {
       const selectedDate = document.getElementById("date").value;
       const timeSelect = document.getElementById("time");
       timeSelect.innerHTML = "";
+
       allSlots.filter(s => s.date === selectedDate && s.status === "Available")
-        .forEach(slot => {
-          const option = document.createElement("option");
-          option.value = slot.time;
-          option.textContent = slot.time;
-          timeSelect.appendChild(option);
+        .forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s.time;
+          opt.textContent = s.time;
+          timeSelect.appendChild(opt);
         });
+    }
+
+    function bookAppointment() {
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const name = document.getElementById("name").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const phone = "919390664577";
+
+      if (!date || !time || !name || !reason) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      const message = `Hi, I want to book an appointment:\n📅 ${date} at 🕒 ${time}\n👤 ${name}\n📝 ${reason}`;
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
     }
 
     function toggleTheme() {
@@ -136,24 +142,7 @@
       document.body.classList.add("dark-theme");
     }
 
-    function bookAppointment() {
-      const date = document.getElementById("date").value;
-      const time = document.getElementById("time").value;
-      const name = document.getElementById("name").value.trim();
-      const reason = document.getElementById("reason").value.trim();
-      const phone = "919390664577"; // your number here
-
-      if (!name || !reason || !date || !time) {
-        alert("Please fill all details.");
-        return;
-      }
-
-      const message = `Hi, I would like to book an appointment:\n\nName: ${name}\nDate: ${date}\nTime: ${time}\nReason: ${reason}`;
-      const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappURL, "_blank");
-    }
-
-    window.onload = loadSlots;
+    loadSlots();
   </script>
 </body>
 </html>
