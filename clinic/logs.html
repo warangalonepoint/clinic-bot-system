@@ -1,4 +1,4 @@
-<!-- logs.html with Date Filters: Today, Yesterday, Custom --><!DOCTYPE html><html lang="en">
+<!-- logs.html with Date Filters and real CSV integration --><!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,12 +17,8 @@
     <button onclick="filterBy('today')">Today</button>
     <button onclick="filterBy('yesterday')">Yesterday</button>
     <input type="date" id="customDate" onchange="filterBy('custom')" />
-  </div>  <div id="logList"></div>  <script>
-    const logs = [
-      { date: '2025-08-01', name: 'Chaitanya', reason: 'Fever', token: 1 },
-      { date: '2025-07-31', name: 'Anjali', reason: 'Checkup', token: 2 },
-      { date: '2025-07-30', name: 'Rahul', reason: 'Pain', token: 3 },
-    ]; // Replace with parsed CSV in real setup
+  </div>  <div id="logList">Loading...</div>  <script>
+    let logs = [];
 
     function formatDate(d) {
       return d.toISOString().split('T')[0];
@@ -47,7 +43,10 @@
     function displayLogs(data) {
       const logDiv = document.getElementById('logList');
       logDiv.innerHTML = '';
-      if (data.length === 0) logDiv.innerHTML = '<p>No bookings found for selected date.</p>';
+      if (data.length === 0) {
+        logDiv.innerHTML = '<p>No bookings found for selected date.</p>';
+        return;
+      }
       data.forEach(log => {
         logDiv.innerHTML += `<div class='log-entry'>
           <strong>${log.name}</strong> | Reason: ${log.reason} | Token: ${log.token} | Date: ${log.date}
@@ -55,6 +54,22 @@
       });
     }
 
-    displayLogs(logs); // default view
+    fetch('./logs.csv')
+      .then(response => response.text())
+      .then(csv => {
+        const rows = csv.trim().split('\n').slice(1); // skip header
+        logs = rows.map(row => {
+          const cols = row.split(',');
+          return {
+            date: cols[0],
+            name: cols[1],
+            reason: cols[2],
+            contact: cols[3],
+            token: cols[4],
+            reminder: cols[5]
+          };
+        });
+        displayLogs(logs);
+      });
   </script></body>
 </html>
