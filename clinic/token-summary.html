@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Token Summary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #00ffcc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #444;
+      text-align: center;
+    }
+    th {
+      background-color: #222;
+    }
+    #dateFilter {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 Token Summary</h1>
+  <label for="dateFilter">Select Date:</label>
+  <input type="date" id="dateFilter" />  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Total Tokens Issued</th>
+      </tr>
+    </thead>
+    <tbody id="tokenTableBody">
+      <tr><td colspan="2">Loading...</td></tr>
+    </tbody>
+  </table>  <script>
+    const csvUrl = './logs.csv';
+
+    async function fetchCSV() {
+      const res = await fetch(csvUrl);
+      const data = await res.text();
+      const lines = data.trim().split('\n').slice(1);
+
+      const tokenMap = {};
+      lines.forEach(row => {
+        const cols = row.split(',');
+        const date = cols[0].trim(); // assuming date is in col 0
+        if (date) {
+          tokenMap[date] = (tokenMap[date] || 0) + 1;
+        }
+      });
+
+      return tokenMap;
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tokenTableBody');
+      tbody.innerHTML = '';
+      const selected = document.getElementById('dateFilter').value;
+
+      Object.keys(data).sort().forEach(date => {
+        if (!selected || selected === date) {
+          const row = `<tr><td>${date}</td><td>${data[date]}</td></tr>`;
+          tbody.innerHTML += row;
+        }
+      });
+
+      if (!tbody.innerHTML) {
+        tbody.innerHTML = '<tr><td colspan="2">No records found.</td></tr>';
+      }
+    }
+
+    document.getElementById('dateFilter').addEventListener('change', async () => {
+      const tokenData = await fetchCSV();
+      renderTable(tokenData);
+    });
+
+    window.onload = async () => {
+      const tokenData = await fetchCSV();
+      renderTable(tokenData);
+    };
+  </script></body>
+</html>
