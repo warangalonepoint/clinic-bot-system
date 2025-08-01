@@ -1,4 +1,4 @@
-<!-- logs.html with Date Filters and real CSV integration --><!DOCTYPE html><html lang="en">
+<!-- logs.html with Date Filters, CSV, Click-to-Call --><!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +9,8 @@
     .filter-buttons { text-align: center; margin-bottom: 20px; }
     .filter-buttons button { margin: 0 5px; padding: 8px 16px; }
     .log-entry { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; }
+    a { color: #007bff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -49,7 +51,8 @@
       }
       data.forEach(log => {
         logDiv.innerHTML += `<div class='log-entry'>
-          <strong>${log.name}</strong> | Reason: ${log.reason} | Token: ${log.token} | Date: ${log.date}
+          <strong>${log.name}</strong> | Reason: ${log.reason} | Token: ${log.token} | Date: ${log.date}<br>
+          Contact: <a href='tel:${log.contact}'>${log.contact}</a>
         </div>`;
       });
     }
