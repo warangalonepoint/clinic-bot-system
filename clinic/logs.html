@@ -2,109 +2,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./logo.png">
-  <title>Booking Logs</title>
+  <title>Clinic Booking Logs</title>
+  <link rel="manifest" href="./manifest.json" />
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #111;
-      color: white;
-      transition: background-color 0.3s, color 0.3s;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+      margin: 0;
     }
-    .light-mode {
-      background-color: #fff;
+    body.light-mode {
+      background: #f5f5f5;
       color: #111;
     }
     header {
-      padding: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-    .container {
-      padding: 16px;
+      margin-bottom: 20px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 16px;
+      margin-top: 10px;
     }
     th, td {
+      border: 1px solid #555;
       padding: 10px;
-      border: 1px solid #444;
+      text-align: left;
     }
     .light-mode th, .light-mode td {
-      border-color: #ddd;
+      border-color: #ccc;
     }
     .btn {
-      padding: 8px 14px;
-      background-color: #444;
-      color: white;
+      padding: 8px 16px;
+      background: #00ffc8;
       border: none;
+      color: #000;
       cursor: pointer;
-      border-radius: 6px;
+      border-radius: 5px;
     }
     .btn:hover {
-      background-color: #666;
-    }
-    .light-mode .btn {
-      background-color: #eee;
-      color: #111;
+      background: #00ccaa;
     }
   </style>
 </head>
 <body>
   <header>
-    <h2>Booking Logs</h2>
-    <button class="btn" onclick="toggleTheme()">Toggle Theme</button>
-  </header>  <div class="container">
-    <p>PIN: <input type="password" id="pin" maxlength="8" /> <button class="btn" onclick="loadLogs()">Load Logs</button></p>
-    <table id="logsTable" style="display:none">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Reason</th>
-          <th>Contact</th>
-          <th>Time</th>
-          <th>Token</th>
-        </tr>
-      </thead>
-      <tbody id="logData"></tbody>
-    </table>
-  </div>  <script>
-    const toggleTheme = () => {
-      document.body.classList.toggle("light-mode");
-    };
+    <h2>📋 Clinic Booking Logs</h2>
+    <button class="btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </header>  <div>
+    <label>Enter PIN: <input type="text" id="pinInput" /></label>
+    <button class="btn" onclick="loadLogs()">Load Logs</button>
+  </div>  <table id="logsTable" style="display:none">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Reason</th>
+        <th>Contact</th>
+        <th>Time</th>
+        <th>Token</th>
+      </tr>
+    </thead>
+    <tbody id="logBody"></tbody>
+  </table>  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+    }
 
     async function loadLogs() {
-      const pin = document.getElementById("pin").value.trim();
-      if (!pin) return alert("Enter PIN");
+      const pin = document.getElementById('pinInput').value.trim();
+      if (!pin) return alert("Please enter a PIN");
+
+      const file = `./${pin}-logs.csv`;
 
       try {
-        const file = `./${pin}-logs.csv`;
         const res = await fetch(file);
-        if (!res.ok) throw new Error("Logs not found");
+        if (!res.ok) throw new Error("Logs not found.");
 
         const csv = await res.text();
-        const rows = csv.trim().split("\n").slice(1); // skip header
-        const tbody = document.getElementById("logData");
+        const lines = csv.trim().split('\n');
+        const tbody = document.getElementById("logBody");
         tbody.innerHTML = "";
-        rows.forEach(row => {
-          const cols = row.split(",");
+
+        for (let i = 1; i < lines.length; i++) {
+          const [date, name, reason, contact, time, token] = lines[i].split(',');
           const tr = document.createElement("tr");
-          cols.forEach(cell => {
-            const td = document.createElement("td");
-            td.textContent = cell;
-            tr.appendChild(td);
-          });
+          tr.innerHTML = `
+            <td>${date}</td>
+            <td>${name}</td>
+            <td>${reason}</td>
+            <td><a href="tel:${contact}" style="color:cyan">${contact}</a></td>
+            <td>${time}</td>
+            <td>${token}</td>
+          `;
           tbody.appendChild(tr);
-        });
+        }
+
         document.getElementById("logsTable").style.display = "table";
-      } catch (e) {
-        alert(e.message);
+      } catch (err) {
+        alert(err.message);
       }
     }
   </script></body>
