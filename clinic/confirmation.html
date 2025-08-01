@@ -2,73 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Booking Confirmed</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="logo.png" />
+  <title>Appointment Confirmed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+      background: #f1fef1;
       padding: 20px;
+      margin: 0;
+      color: #333;
       text-align: center;
     }
-    h1 {
-      color: #00ff88;
-      font-size: 32px;
+    .card {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    p {
-      font-size: 18px;
-      margin: 10px 0;
+    h2 {
+      color: green;
     }
-    .token {
-      font-size: 22px;
+    .details {
+      text-align: left;
       margin-top: 20px;
-      color: #ffd700;
     }
-    button {
-      background-color: #00ff88;
-      color: #000;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 30px;
-    }
-    button:hover {
-      background-color: #00cc70;
+    .details b {
+      display: inline-block;
+      width: 120px;
     }
   </style>
 </head>
 <body>
-  <h1>✅ Appointment Confirmed</h1>
-  <p>Thank you, <span id="patientName">Patient</span>!</p>
-  <p>Your appointment for <span id="reason">Consultation</span> at <span id="timeSlot">--:--</span> has been booked.</p>
-  <div class="token">🎟️ Token No: <span id="token">#--</span></div>
-  <button onclick="goHome()">Book Another</button>
+  <div class="card">
+    <h2>✅ Appointment Confirmed</h2>
+    <div class="details">
+      <p><b>Patient:</b> <span id="name"></span></p>
+      <p><b>Reason:</b> <span id="reason"></span></p>
+      <p><b>Time:</b> <span id="time"></span></p>
+      <p><b>Token No:</b> <span id="token"></span></p>
+    </div>
+    <p style="margin-top: 20px;">Redirecting to WhatsApp...</p>
+  </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name') || 'Patient';
-    const reason = urlParams.get('reason') || 'Consultation';
-    const slot = urlParams.get('slot') || '--:--';
-    const token = urlParams.get('token') || '--';
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    const reason = params.get("reason");
+    const contact = params.get("contact");
+    const time = params.get("time");
 
-    document.getElementById("patientName").textContent = name;
-    document.getElementById("reason").textContent = reason;
-    document.getElementById("timeSlot").textContent = slot;
+    // Dummy token generation based on timestamp (replace with real logic if needed)
+    const token = Math.floor(Date.now() / 1000) % 100;
+
+    document.getElementById("name").textContent = name || "-";
+    document.getElementById("reason").textContent = reason || "-";
+    document.getElementById("time").textContent = time || "-";
     document.getElementById("token").textContent = token;
 
-    function goHome() {
-      window.location.href = "bookings.html";
-    }
+    const message = `Appointment Confirmed!\n\nName: ${name}\nReason: ${reason}\nTime: ${time}\nToken No: ${token}`;
+    const whatsappURL = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
+
+    setTimeout(() => {
+      window.location.href = whatsappURL;
+    }, 3000);
   </script>
 </body>
 </html>
