@@ -1,190 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Book Appointment</title>
+  <meta charset="UTF-8">
+  <title>Book Your Appointment – Onestop Ai Clinic Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --card: #f9f9f9;
+    }
+    body.dark {
+      --bg: #0d1117;
+      --text: #ffffff;
+      --card: #161b22;
+    }
     body {
+      background-color: var(--bg);
+      color: var(--text);
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #121212;
-      color: #fff;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .light-mode {
-      background-color: #f0f0f0;
-      color: #111;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: rgba(255, 255, 255, 0.05);
+      margin: 0;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #444;
+      transition: all 0.3s ease;
     }
-
-    h2 {
+    h1 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 1rem;
     }
-
+    .input-group {
+      margin-bottom: 1rem;
+    }
     label {
       display: block;
-      margin: 10px 0 5px;
+      margin-bottom: 5px;
+      font-weight: bold;
     }
-
-    select, input {
+    select, input, button {
       width: 100%;
       padding: 10px;
-      border-radius: 6px;
-      border: none;
-      margin-bottom: 15px;
-      background: #fff;
-      color: #000;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #00c853;
-      border: none;
-      color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
       font-size: 16px;
-      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      margin-top: 1rem;
       cursor: pointer;
     }
-
-    .theme-toggle {
-      margin-top: 20px;
-      text-align: center;
+    button:hover {
+      background-color: #0056b3;
     }
-
-    .theme-toggle button {
-      background: #333;
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background: #222;
       color: #fff;
       border: none;
-      padding: 8px 14px;
       border-radius: 6px;
       cursor: pointer;
-    }
-
-    .light-mode .container {
-      background: #fff;
-      box-shadow: 0 0 10px #aaa;
-    }
-
-    .light-mode select,
-    .light-mode input {
-      background: #f9f9f9;
-      color: #000;
-    }
-
-    .light-mode button {
-      background: #007bff;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>📅 Book Your Appointment</h2>
+  <button class="toggle-btn" onclick="toggleTheme()">🌓</button>
+  <h1>Book Your Appointment</h1>
 
-    <label for="dateSelect">Select Date</label>
-    <select id="dateSelect" onchange="updateSlots()">
-      <option value="">-- Select Date --</option>
+  <div class="input-group">
+    <label for="date">Select Date</label>
+    <select id="date" onchange="loadSlots()">
+      <option value="">Loading dates...</option>
     </select>
-
-    <label for="timeSelect">Select Time Slot</label>
-    <select id="timeSelect">
-      <option value="">-- Select Slot --</option>
-    </select>
-
-    <label for="fullName">Your Name</label>
-    <input type="text" id="fullName" placeholder="Enter your full name" />
-
-    <label for="visitReason">Reason for Visit</label>
-    <input type="text" id="visitReason" placeholder="Eg: Fever, Consultation, etc." />
-
-    <button onclick="bookAppointment()">Book via WhatsApp</button>
-
-    <div class="theme-toggle">
-      <button onclick="toggleTheme()">Toggle Theme</button>
-    </div>
   </div>
+
+  <div class="input-group">
+    <label for="slot">Select Time Slot</label>
+    <select id="slot">
+      <option value="">Select a date first</option>
+    </select>
+  </div>
+
+  <div class="input-group">
+    <label for="name">Patient Name</label>
+    <input type="text" id="name" placeholder="Enter your name" />
+  </div>
+
+  <div class="input-group">
+    <label for="reason">Reason for Visit</label>
+    <input type="text" id="reason" placeholder="E.g., Fever, Headache..." />
+  </div>
+
+  <button onclick="bookNow()">Book on WhatsApp</button>
 
   <script>
     const slotsUrl = "https://warangalonepoint.github.io/clinic-bot-system/clinic/slots.csv";
-    const dateSelect = document.getElementById("dateSelect");
-    const timeSelect = document.getElementById("timeSelect");
+    const logsUrl = "https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv";
+
     let allSlots = [];
+    let booked = [];
+
+    async function loadCSV(url) {
+      const res = await fetch(url);
+      const text = await res.text();
+      const rows = text.trim().split("\n").slice(1).map(r => r.split(","));
+      return rows;
+    }
+
+    async function init() {
+      allSlots = await loadCSV(slotsUrl);
+      booked = await loadCSV(logsUrl);
+      const dateSet = [...new Set(allSlots.map(r => r[0]))].filter(d => new Date(d) >= new Date());
+      const dateDropdown = document.getElementById("date");
+      dateDropdown.innerHTML = `<option value="">Select date</option>` + dateSet.map(d => `<option value="${d}">${d}</option>`).join("");
+    }
 
     function loadSlots() {
-      fetch(slotsUrl)
-        .then((response) => response.text())
-        .then((csvText) => {
-          const rows = csvText.split("\n").map(row => row.trim()).filter(Boolean);
-          const headers = rows.shift().split(",");
-          allSlots = rows.map(row => {
-            const cols = row.split(",");
-            const slot = {};
-            headers.forEach((header, i) => {
-              slot[header.trim()] = cols[i] ? cols[i].trim() : "";
-            });
-            return slot;
-          });
-
-          const uniqueDates = [...new Set(allSlots.map(s => s.Date))].filter(d => d);
-          uniqueDates.sort();
-          uniqueDates.forEach(date => {
-            const option = document.createElement("option");
-            option.value = date;
-            option.textContent = date;
-            dateSelect.appendChild(option);
-          });
-        });
+      const selectedDate = document.getElementById("date").value;
+      const bookedSlots = booked.filter(b => b[0] === selectedDate).map(b => b[1]);
+      const filtered = allSlots.filter(s => s[0] === selectedDate && !bookedSlots.includes(s[1]));
+      const slotDropdown = document.getElementById("slot");
+      slotDropdown.innerHTML = `<option value="">${filtered.length ? 'Select slot' : 'No slots available'}</option>` +
+        filtered.map(s => `<option value="${s[1]}">${s[1]}</option>`).join("");
     }
 
-    function updateSlots() {
-      const selectedDate = dateSelect.value;
-      timeSelect.innerHTML = "<option value=''>-- Select Slot --</option>";
-      const slotsForDate = allSlots.filter(slot => slot.Date === selectedDate && slot.Status !== "Booked");
-      slotsForDate.forEach(slot => {
-        const option = document.createElement("option");
-        option.value = slot.Time;
-        option.textContent = slot.Time;
-        timeSelect.appendChild(option);
-      });
-    }
-
-    function bookAppointment() {
-      const date = dateSelect.value;
-      const time = timeSelect.value;
-      const name = document.getElementById("fullName").value.trim();
-      const reason = document.getElementById("visitReason").value.trim();
-
-      if (!date || !time || !name || !reason) {
-        alert("Please fill all fields.");
-        return;
-      }
-
-      const redirectURL = `confirmation.html?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&name=${encodeURIComponent(name)}&reason=${encodeURIComponent(reason)}`;
-      window.location.href = redirectURL;
+    function bookNow() {
+      const date = document.getElementById("date").value;
+      const slot = document.getElementById("slot").value;
+      const name = document.getElementById("name").value;
+      const reason = document.getElementById("reason").value;
+      if (!date || !slot || !name || !reason) return alert("Please fill all fields");
+      const msg = `Booking Request:%0A🧑 Name: ${name}%0A📅 Date: ${date}%0A⏰ Time: ${slot}%0A📌 Reason: ${reason}`;
+      window.location.href = `https://wa.me/919390664577?text=${msg}`;
     }
 
     function toggleTheme() {
-      document.body.classList.toggle("light-mode");
-      localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
 
-    window.onload = function () {
-      loadSlots();
-      if (localStorage.getItem("theme") === "light") {
-        document.body.classList.add("light-mode");
-      }
-    };
+    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+    init();
   </script>
 </body>
 </html>
