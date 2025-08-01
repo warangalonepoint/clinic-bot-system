@@ -2,111 +2,199 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clinic Dashboard</title>
-  <link rel="manifest" href="manifest.json">
+  <title>Clinic Booking Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --accent: #00ffc8;
+      --header: #222;
+    }
+    body.light {
+      --bg: #f5f5f5;
+      --text: #111;
+      --accent: #006666;
+      --header: #ddd;
+    }
+
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
+      transition: all 0.3s ease;
     }
 
-    h1 {
+    h2 {
       text-align: center;
-      color: #f39c12;
+      color: var(--accent);
     }
 
-    .panel {
-      background: #1e1e1e;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 600px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #000;
+    #pinSection {
+      text-align: center;
+      margin-top: 50px;
     }
 
-    .panel h2 {
-      margin-top: 0;
-      color: #00d2ff;
-    }
-
-    .panel p {
-      font-size: 18px;
-    }
-
-    .btn {
-      display: block;
-      margin: 10px auto;
-      padding: 10px 20px;
-      background: #00b894;
-      color: white;
-      text-decoration: none;
-      border: none;
-      border-radius: 6px;
+    input, button {
+      padding: 10px;
       font-size: 16px;
+      margin: 8px;
+    }
+
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
       cursor: pointer;
-      text-align: center;
     }
 
-    .btn:hover {
-      background: #00a383;
-    }
-
-    #installButton {
+    #logsSection {
       display: none;
-      margin-top: 10px;
+      margin-top: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #888;
+    }
+
+    th {
+      background: var(--header);
+      color: var(--text);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    #themeToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    .btn-group {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      th, td {
+        font-size: 14px;
+      }
+      input, button {
+        width: 100%;
+        box-sizing: border-box;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Clinic Dashboard</h1>
 
-  <div class="panel">
-    <h2>Today's Summary</h2>
-    <p><strong>Total Bookings Today:</strong> <span id="todayCount">Loading...</span></p>
-    <p><strong>Next Available Token:</strong> <span id="nextToken">Loading...</span></p>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
+
+<div id="pinSection">
+  <h2>Enter Clinic PIN</h2>
+  <input type="text" id="pinInput" placeholder="Enter PIN" />
+  <button onclick="verifyPIN()">Submit</button>
+  <p id="pinError" style="color: red;"></p>
+</div>
+
+<div id="logsSection">
+  <h2>📋 Clinic Booking Dashboard</h2>
+
+  <div class="btn-group">
+    <button onclick="exportCSV()">⬇ Export CSV</button>
+    <button onclick="sendReminders()">📨 Send WhatsApp Reminders</button>
   </div>
 
-  <div class="panel">
-    <h2>Quick Actions</h2>
-    <a href="logs.html" class="btn">📄 View Booking Logs</a>
-    <a href="bookings.html" class="btn">📆 View Public Booking Page</a>
-    <button id="installButton" class="btn">📲 Install BookingBot App</button>
-  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th><th>Time</th><th>Patient</th><th>Reason</th><th>Contact</th><th>Token</th><th>Reminder Sent</th>
+      </tr>
+    </thead>
+    <tbody id="logsBody"></tbody>
+  </table>
+</div>
 
-  <script>
-    let pin = localStorage.getItem('pin');
-    if (!pin) {
-      window.location.href = "index.html";
+<script>
+  let clinicID = "";
+
+  function toggleTheme() {
+    document.body.classList.toggle("light");
+  }
+
+  async function verifyPIN() {
+    const enteredPIN = document.getElementById("pinInput").value.trim();
+    if (!enteredPIN) return;
+
+    const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/plans.json");
+    const plans = await res.json();
+
+    const match = Object.entries(plans).find(([id, data]) => data.pin === enteredPIN);
+    if (!match) {
+      document.getElementById("pinError").innerText = "❌ Invalid PIN";
+      return;
     }
 
-    let logsUrl = `${pin}-logs.csv`;
+    clinicID = match[0];
+    document.getElementById("pinSection").style.display = "none";
+    document.getElementById("logsSection").style.display = "block";
+    loadLogs(`${clinicID}-logs.csv`);
+  }
 
-    fetch(logsUrl)
-      .then(res => res.text())
-      .then(data => {
-        const rows = data.trim().split('\n').slice(1);
-        const today = new Date().toISOString().split('T')[0];
-        const todayBookings = rows.filter(row => row.startsWith(today));
-        document.getElementById('todayCount').textContent = todayBookings.length;
+  async function loadLogs(file) {
+    const res = await fetch(`https://warangalonepoint.github.io/clinic-bot-system/${file}`);
+    const text = await res.text();
+    const rows = text.trim().split("\n").slice(1);
+    const tbody = document.getElementById("logsBody");
+    tbody.innerHTML = "";
 
-        const tokens = todayBookings.map(row => parseInt(row.split(',')[6] || '0')).filter(n => !isNaN(n));
-        const nextToken = tokens.length > 0 ? Math.max(...tokens) + 1 : 1;
-        document.getElementById('nextToken').textContent = nextToken;
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('todayCount').textContent = 'Error';
-        document.getElementById('nextToken').textContent = 'Error';
-      });
+    for (const row of rows) {
+      const [date, time, name, contact, reason, token, reminder] = row.split(",");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${date}</td>
+        <td>${time}</td>
+        <td>${name}</td>
+        <td>${reason}</td>
+        <td><a href="tel:${contact}">${contact}</a></td>
+        <td>${token}</td>
+        <td>${reminder}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
 
-    // PWA install
-    let deferredPrompt;
-    const installButton = document.getElementById('installButton');
+  function exportCSV() {
+    if (!clinicID) return;
+    const url = `https://warangalonepoint.github.io/clinic-bot-system/${clinicID}-logs.csv`;
+    window.open(url, "_blank");
+  }
 
+  function sendReminders() {
+    alert("✅ WhatsApp Reminders Sent (Demo Only)");
+  }
+</script>
+
+</body>
+</html>
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
