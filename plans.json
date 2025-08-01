@@ -1,19 +1,6 @@
 {
-  "clinics": [
-    {
-      "pin": "1111",
-      "plan": "free",
-      "logsFile": "clinic1-logs.csv"
-    },
-    {
-      "pin": "2222",
-      "plan": "paid",
-      "logsFile": "clinic2-logs.csv"
-    },
-    {
-      "pin": "3333",
-      "plan": "premium",
-      "logsFile": "clinic3-logs.csv"
-    }
-  ]
+  "clinic001": {
+    "pin": "2525",
+    "plan": "premium"
+  }
 }
