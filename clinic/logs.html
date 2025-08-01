@@ -1,232 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Booking Logs</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg-color: #111;
+      --text-color: #fff;
+      --card-bg: #1e1e1e;
+      --accent-color: #00cfff;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 1rem;
+    [data-theme="light"] {
+      --bg-color: #fff;
+      --text-color: #000;
+      --card-bg: #f2f2f2;
+      --accent-color: #007bff;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
     }
     h1 {
       text-align: center;
-      font-size: 1.8rem;
-      color: #00d2ff;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: var(--accent-color);
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
       margin-bottom: 20px;
     }
     button {
-      background-color: #00bcd4;
-      border: none;
       padding: 10px 15px;
-      color: white;
+      border: none;
       border-radius: 5px;
-      margin: 5px;
+      background-color: var(--accent-color);
+      color: white;
+      font-weight: bold;
       cursor: pointer;
     }
-    .summary {
-      background: #222;
-      padding: 15px;
+    .card {
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: auto;
       margin-top: 20px;
-      border-radius: 8px;
-    }
-    .log-entry {
-      background: #1b1b1b;
-      border-radius: 6px;
-      padding: 10px;
-      margin: 10px 0;
-    }
-    .log-entry strong {
-      color: #00eaff;
-    }
-    #chartContainer {
-      margin-top: 10px;
     }
     canvas {
       width: 100% !important;
-      height: 200px !important;
-    }
-    .whatsapp-button {
-      background-color: #25D366;
-      display: inline-block;
-      margin-top: 10px;
+      height: auto !important;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📋 Clinic Booking Logs</h1>
-    <div style="text-align:center">
-      <button onclick="filterLogs('today')">Today</button>
-      <button onclick="filterLogs('yesterday')">Yesterday</button>
-      <button onclick="exportToExcel()">Export to Excel</button>
-      <button onclick="exportToPDF()">Export to PDF</button>
-      <button onclick="downloadCSV()">Download Updated CSV</button>
-    </div>
-
-    <div class="summary" id="summaryBox">
-      <h3>📊 Daily Summary</h3>
-      <p>Total Bookings: <span id="totalBookings">0</span></p>
-      <p>Reminders Sent: <span id="remindersSent">0</span></p>
-      <p>Top 3 Reasons: <span id="topReasons">-</span></p>
-      <div id="chartContainer">
-        <canvas id="bookingChart"></canvas>
-      </div>
-    </div>
-
-    <div id="logsContainer"></div>
+  <h1>📋 Clinic Booking Logs</h1>
+  <div class="buttons">
+    <button onclick="filterBy('today')">Today</button>
+    <button onclick="filterBy('yesterday')">Yesterday</button>
+    <button onclick="exportToExcel()">Export to Excel</button>
+    <button onclick="exportToPDF()">Export to PDF</button>
+    <button onclick="downloadCSV()">Download Updated CSV</button>
+    <button onclick="toggleTheme()">Toggle Theme</button>
   </div>
-
+  <div class="card">
+    <h3>📊 Daily Summary</h3>
+    <p id="totalBookings">Total Bookings: 0</p>
+    <p id="remindersSent">Reminders Sent: 0</p>
+    <p id="topReasons">Top 3 Reasons:</p>
+    <canvas id="summaryChart"></canvas>
+  </div>
   <script>
-    const logsURL = "./logs.csv";
+    document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "dark");
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", current);
+      localStorage.setItem("theme", current);
+    }async function fetchLogs() {
+  const response = await fetch("./logs.csv");
+  const text = await response.text();
+  const rows = text.trim().split("\n").slice(1);
+  return rows.map(row => {
+    const [date, time, name, reason, contact, token, reminder] = row.split(",");
+    return { date, time, name, reason, contact, token, reminder };
+  });
+}
 
-    async function fetchCSVData() {
-      const res = await fetch(logsURL);
-      const text = await res.text();
-      const rows = text.trim().split('\n').slice(1);
-      const data = rows.map(row => {
-        const [name, reason, date, time, contact, token, reminder] = row.split(',');
-        return { name, reason, date, time, contact, token, reminder };
-      });
-      return data;
+function formatDate(date) {
+  return date.toISOString().split('T')[0];
+}
+
+function getYesterday(date) {
+  const d = new Date(date);
+  d.setDate(d.getDate() - 1);
+  return formatDate(d);
+}
+
+async function filterBy(type) {
+  const logs = await fetchLogs();
+  const now = new Date();
+  const todayStr = formatDate(now);
+  const yesterdayStr = getYesterday(now);
+  const filterDate = type === "today" ? todayStr : yesterdayStr;
+  const filtered = logs.filter(l => l.date === filterDate);
+
+  document.getElementById("totalBookings").innerText = `Total Bookings: ${filtered.length}`;
+  document.getElementById("remindersSent").innerText = `Reminders Sent: ${filtered.filter(l => l.reminder.toLowerCase() === 'yes').length}`;
+
+  const reasonMap = {};
+  filtered.forEach(l => {
+    reasonMap[l.reason] = (reasonMap[l.reason] || 0) + 1;
+  });
+  const top3 = Object.entries(reasonMap).sort((a, b) => b[1] - a[1]).slice(0, 3).map(e => e[0]);
+  document.getElementById("topReasons").innerText = `Top 3 Reasons: ${top3.join(", ")}`;
+
+  const hours = {};
+  filtered.forEach(l => {
+    hours[l.time] = (hours[l.time] || 0) + 1;
+  });
+  const ctx = document.getElementById("summaryChart").getContext("2d");
+  if (window.summaryChart) window.summaryChart.destroy();
+  window.summaryChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(hours),
+      datasets: [{
+        label: 'Bookings per Hour',
+        data: Object.values(hours),
+        backgroundColor: 'deepskyblue'
+      }]
     }
+  });
+}
 
-    function getTodayDate() {
-      return new Date().toISOString().split('T')[0];
-    }
+function exportToExcel() {
+  fetch("./logs.csv").then(res => res.text()).then(text => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(text.split("\n").map(row => row.split(",")));
+    XLSX.utils.book_append_sheet(wb, ws, "Logs");
+    XLSX.writeFile(wb, "logs.xlsx");
+  });
+}
 
-    function getYesterdayDate() {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      return d.toISOString().split('T')[0];
-    }
+function exportToPDF() {
+  fetch("./logs.csv").then(res => res.text()).then(text => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const rows = text.split("\n").map(row => row.split(","));
+    rows.forEach((row, i) => {
+      doc.text(row.join(" | "), 10, 10 + i * 10);
+    });
+    doc.save("logs.pdf");
+  });
+}
 
-    async function filterLogs(filter = 'today') {
-      const data = await fetchCSVData();
-      const logsContainer = document.getElementById("logsContainer");
-      const today = getTodayDate();
-      const yesterday = getYesterdayDate();
+function downloadCSV() {
+  window.location.href = "./logs.csv";
+}
 
-      let filtered = data;
-      if (filter === 'today') filtered = data.filter(d => d.date === today);
-      if (filter === 'yesterday') filtered = data.filter(d => d.date === yesterday);
-
-      logsContainer.innerHTML = "";
-      let reasons = {};
-      let perHour = {};
-      let reminderCount = 0;
-
-      filtered.forEach((entry, idx) => {
-        reasons[entry.reason] = (reasons[entry.reason] || 0) + 1;
-        const hour = entry.time.split(":")[0];
-        perHour[hour] = (perHour[hour] || 0) + 1;
-        if (entry.reminder?.toLowerCase().includes("sent")) reminderCount++;
-
-        logsContainer.innerHTML += `
-          <div class="log-entry">
-            <p><strong>Name:</strong> ${entry.name}</p>
-            <p><strong>Reason:</strong> ${entry.reason}</p>
-            <p><strong>Date:</strong> ${entry.date}</p>
-            <p><strong>Time:</strong> ${entry.time}</p>
-            <p><strong>Contact:</strong> ${entry.contact}</p>
-            <p><strong>Token No:</strong> ${entry.token}</p>
-            <p><strong>Reminder Sent:</strong> ${entry.reminder}</p>
-            <button class="whatsapp-button" onclick="sendWhatsApp('${entry.name}', '${entry.reason}', '${entry.date}', '${entry.time}', '${entry.contact}', '${entry.token}')">Send WhatsApp Reminder</button>
-          </div>`;
-      });
-
-      // Summary
-      document.getElementById("totalBookings").innerText = filtered.length;
-      document.getElementById("remindersSent").innerText = reminderCount;
-      const topReasons = Object.entries(reasons).sort((a,b) => b[1] - a[1]).slice(0,3).map(r => r[0]).join(', ');
-      document.getElementById("topReasons").innerText = topReasons;
-
-      const labels = Object.keys(perHour).sort();
-      const counts = labels.map(k => perHour[k]);
-      drawChart(labels, counts);
-    }
-
-    function drawChart(labels, data) {
-      const ctx = document.getElementById('bookingChart').getContext('2d');
-      if (window.bookingChart) window.bookingChart.destroy();
-      window.bookingChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Bookings per Hour',
-            data,
-            backgroundColor: '#00eaff'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { color: '#fff' }
-            },
-            x: {
-              ticks: { color: '#fff' }
-            }
-          },
-          plugins: {
-            legend: { labels: { color: '#fff' } }
-          }
-        }
-      });
-    }
-
-    function sendWhatsApp(name, reason, date, time, contact, token) {
-      const msg = `Reminder: ${name}, your appointment for ${reason} is on ${date} at ${time}. Token No: ${token}.`;
-      const link = `https://wa.me/${contact.replace('+', '')}?text=${encodeURIComponent(msg)}`;
-      window.open(link, '_blank');
-    }
-
-    function exportToExcel() {
-      fetch(logsURL)
-        .then(res => res.text())
-        .then(csv => {
-          const wb = XLSX.utils.book_new();
-          const ws = XLSX.utils.aoa_to_sheet([["Name","Reason","Date","Time","Contact","Token","Reminder Sent"], ...csv.trim().split('\n').slice(1).map(row => row.split(','))]);
-          XLSX.utils.book_append_sheet(wb, ws, "Logs");
-          XLSX.writeFile(wb, "logs.xlsx");
-        });
-    }
-
-    function exportToPDF() {
-      fetch(logsURL)
-        .then(res => res.text())
-        .then(csv => {
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          const rows = csv.trim().split('\n').map(row => row.split(','));
-          doc.autoTable({ head: [rows[0]], body: rows.slice(1) });
-          doc.save('logs.pdf');
-        });
-    }
-
-    function downloadCSV() {
-      const link = document.createElement('a');
-      link.href = logsURL;
-      link.download = 'logs.csv';
-      link.click();
-    }
-
-    // Load today's logs by default
-    filterLogs('today');
   </script>
 </body>
 </html>
