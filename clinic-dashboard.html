@@ -124,6 +124,12 @@
   let clinicID = "";
   let deferredPrompt;
 
+  // Theme Toggle
+  function toggleTheme() {
+    document.body.classList.toggle("light");
+  }
+
+  // PWA Install Prompt
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -139,10 +145,7 @@
     }
   });
 
-  function toggleTheme() {
-    document.body.classList.toggle("light");
-  }
-
+  // PIN Verification
   async function verifyPIN() {
     const pin = document.getElementById("pinInput").value.trim();
     const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/plans.json");
@@ -160,6 +163,17 @@
     loadLogs(`${clinicID}-logs.csv`);
   }
 
+  // Auto PIN from URL
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const autoPIN = params.get("pin");
+    if (autoPIN) {
+      document.getElementById("pinInput").value = autoPIN;
+      verifyPIN();
+    }
+  });
+
+  // Load CSV
   async function loadLogs(file) {
     const res = await fetch(`https://warangalonepoint.github.io/clinic-bot-system/${file}`);
     const text = await res.text();
@@ -183,6 +197,7 @@
     }
   }
 
+  // Export & Reminders
   function exportCSV() {
     if (!clinicID) return;
     const url = `https://warangalonepoint.github.io/clinic-bot-system/${clinicID}-logs.csv`;
@@ -191,6 +206,15 @@
 
   function sendReminders() {
     alert("✅ WhatsApp Reminders Sent (Demo Only)");
+  }
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log("✅ Service Worker Registered"))
+        .catch(err => console.error("❌ SW Registration Failed", err));
+    });
   }
 </script>
 
