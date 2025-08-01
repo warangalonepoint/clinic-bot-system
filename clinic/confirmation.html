@@ -5,73 +5,71 @@
   <title>Booking Confirmation</title>
   <style>
     body {
-      background: #111;
-      color: #fff;
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    .box {
-      background: #222;
+      background-color: #111;
+      color: #fff;
       padding: 20px;
+      text-align: center;
+    }
+    .card {
+      background: #222;
       border-radius: 12px;
-      max-width: 400px;
-      margin: 0 auto;
+      padding: 30px;
+      max-width: 500px;
+      margin: 40px auto;
+      box-shadow: 0 0 12px rgba(0, 255, 150, 0.4);
     }
     h1 {
-      color: #0f0;
+      color: #00ffcc;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #00ffcc;
+      color: #111;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      display: inline-block;
     }
     .token {
-      font-size: 24px;
-      margin-top: 10px;
-      color: #0ff;
+      font-size: 22px;
+      color: #fffb00;
+      margin-top: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>✅ Appointment Confirmed!</h1>
-    <p id="name"></p>
-    <p id="date"></p>
-    <p id="time"></p>
-    <p id="reason"></p>
-    <p class="token" id="token"></p>
+  <div class="card">
+    <h1>Appointment Confirmed ✅</h1>
+    <p><strong>Name:</strong> <span id="name"></span></p>
+    <p><strong>Reason:</strong> <span id="reason"></span></p>
+    <p><strong>Date:</strong> <span id="date"></span></p>
+    <p><strong>Time Slot:</strong> <span id="slot"></span></p>
+    <div class="token">Your Token No: <span id="token"></span></div>
+    <a id="whatsappLink" class="btn" href="#" target="_blank">Send on WhatsApp</a>
   </div>  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get("name") || "-";
-    const date = urlParams.get("date") || "-";
-    const time = urlParams.get("time") || "-";
-    const reason = urlParams.get("reason") || "-";
-    const contact = urlParams.get("contact") || "-";
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name');
+    const reason = params.get('reason');
+    const date = params.get('date');
+    const slot = params.get('slot');
+    const token = params.get('token');
+    const contact = params.get('contact');
 
-    document.getElementById("name").textContent = `👤 Name: ${name}`;
-    document.getElementById("date").textContent = `📅 Date: ${date}`;
-    document.getElementById("time").textContent = `⏰ Time: ${time}`;
-    document.getElementById("reason").textContent = `📄 Reason: ${reason}`;
+    document.getElementById('name').textContent = name;
+    document.getElementById('reason').textContent = reason;
+    document.getElementById('date').textContent = date;
+    document.getElementById('slot').textContent = slot;
+    document.getElementById('token').textContent = token;
 
-    const logsURL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv";
-
-    async function assignTokenAndSave() {
-      let token = 1;
-      try {
-        const res = await fetch(logsURL);
-        const text = await res.text();
-        const lines = text.trim().split("\n");
-        const todayCount = lines.filter(line => line.startsWith(date + ",")).length;
-        token = todayCount + 1;
-      } catch (e) {
-        console.warn("Token fetch error", e);
-      }
-
-      document.getElementById("token").textContent = `🎫 Token No: ${token}`;
-
-      // Save to logs.csv (via backend/API/manual setup)
-      const newRow = `${date},${time},${name},${reason},${contact},${token},No`;
-      console.log("📥 Save row:", newRow);
-
-      // Optional: Post to endpoint or instruct manual append
-    }
-
-    assignTokenAndSave();
+    const msg = `Hello, this is ${name}. I have successfully booked an appointment for ${reason} on ${date} at ${slot}. Token No: ${token}`;
+    const whatsappUrl = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
+    document.getElementById('whatsappLink').href = whatsappUrl;
   </script></body>
 </html>
