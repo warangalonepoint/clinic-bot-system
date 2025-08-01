@@ -2,69 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appointment Confirmed</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Appointment Confirmation</title>
+  <link rel="manifest" href="manifest.json" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f1fef1;
-      padding: 20px;
+      background-color: #f7f7f7;
       margin: 0;
-      color: #333;
+      padding: 30px;
       text-align: center;
     }
+
     .card {
-      max-width: 400px;
-      margin: auto;
-      background: white;
+      background-color: #fff;
       padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      max-width: 400px;
+      margin: 0 auto;
     }
+
     h2 {
-      color: green;
+      color: #28a745;
+      margin-bottom: 20px;
     }
-    .details {
+
+    .info {
       text-align: left;
-      margin-top: 20px;
-    }
-    .details b {
-      display: inline-block;
-      width: 120px;
+      font-size: 18px;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>✅ Appointment Confirmed</h2>
-    <div class="details">
-      <p><b>Patient:</b> <span id="name"></span></p>
-      <p><b>Reason:</b> <span id="reason"></span></p>
-      <p><b>Time:</b> <span id="time"></span></p>
-      <p><b>Token No:</b> <span id="token"></span></p>
+    <h2>Appointment Confirmed!</h2>
+    <div class="info">
+      <p><strong>Name:</strong> <span id="name"></span></p>
+      <p><strong>Reason:</strong> <span id="reason"></span></p>
+      <p><strong>Date:</strong> <span id="date"></span></p>
+      <p><strong>Time:</strong> <span id="time"></span></p>
+      <p><strong>Token No:</strong> <span id="token"></span></p>
     </div>
-    <p style="margin-top: 20px;">Redirecting to WhatsApp...</p>
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get("name");
-    const reason = params.get("reason");
-    const contact = params.get("contact");
-    const time = params.get("time");
+    function getParam(key) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(key) || '';
+    }
 
-    // Dummy token generation based on timestamp (replace with real logic if needed)
-    const token = Math.floor(Date.now() / 1000) % 100;
+    const name = decodeURIComponent(getParam('name') || '');
+    const reason = decodeURIComponent(getParam('reason') || '');
+    const contact = decodeURIComponent(getParam('contact') || '');
+    const time = decodeURIComponent(getParam('time') || '');
+    const token = decodeURIComponent(getParam('token') || '');
+    let date = getParam('date');
 
-    document.getElementById("name").textContent = name || "-";
-    document.getElementById("reason").textContent = reason || "-";
-    document.getElementById("time").textContent = time || "-";
-    document.getElementById("token").textContent = token;
+    if (!date) {
+      const today = new Date();
+      date = today.toISOString().split('T')[0]; // YYYY-MM-DD
+    }
 
-    const message = `Appointment Confirmed!\n\nName: ${name}\nReason: ${reason}\nTime: ${time}\nToken No: ${token}`;
-    const whatsappURL = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
+    document.getElementById('name').textContent = name;
+    document.getElementById('reason').textContent = reason;
+    document.getElementById('date').textContent = date;
+    document.getElementById('time').textContent = time;
+    document.getElementById('token').textContent = token;
+
+    const message = `Appointment Confirmed!\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${time}\nToken No: ${token}`;
 
     setTimeout(() => {
+      const whatsappURL = `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
       window.location.href = whatsappURL;
     }, 3000);
   </script>
