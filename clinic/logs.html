@@ -45,6 +45,17 @@
     .label {
       font-weight: bold;
     }
+
+    .whatsapp-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #25D366;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -74,39 +85,41 @@
             reminder: cols[6] || 'No'
           };
         });
-        displayLogs('today');
+        displayLogs(filterByDate('today'));
       });
 
     function formatDate(date) {
       return date.toISOString().split('T')[0];
     }
 
-    function filterLogs(dayType) {
+    function filterByDate(dayType) {
       const now = new Date();
-      let targetDate;
-      if (dayType === 'today') targetDate = formatDate(now);
-      else if (dayType === 'yesterday') {
-        now.setDate(now.getDate() - 1);
-        targetDate = formatDate(now);
-      }
+      if (dayType === 'yesterday') now.setDate(now.getDate() - 1);
+      const target = formatDate(now);
+      return logs.filter(log => log.date === target);
+    }
 
-      const filtered = logs.filter(log => log.date === targetDate);
+    function filterLogs(dayType) {
+      const filtered = filterByDate(dayType);
       displayLogs(filtered);
     }
 
-    function displayLogs(filteredLogs) {
-      if (!Array.isArray(filteredLogs)) return;
-
+    function displayLogs(data) {
       const container = document.getElementById('logsContainer');
       container.innerHTML = '';
-      if (filteredLogs.length === 0) {
+
+      if (data.length === 0) {
         container.innerHTML = '<p style="text-align:center;">No bookings found.</p>';
         return;
       }
 
-      filteredLogs.forEach(log => {
+      data.forEach(log => {
         const card = document.createElement('div');
         card.className = 'log-card';
+
+        const message = `Hello ${log.name}, this is a reminder for your appointment today at ${log.time} (Token No: ${log.token}). - Warangal OneStop Clinic`;
+        const whatsappURL = `https://wa.me/${log.contact.replace('+', '')}?text=${encodeURIComponent(message)}`;
+
         card.innerHTML = `
           <p><span class="label">Name:</span> ${log.name}</p>
           <p><span class="label">Reason:</span> ${log.reason}</p>
@@ -115,6 +128,9 @@
           <p><span class="label">Contact:</span> ${log.contact}</p>
           <p><span class="label">Token No:</span> ${log.token}</p>
           <p><span class="label">Reminder Sent:</span> ${log.reminder}</p>
+          <a href="${whatsappURL}" target="_blank">
+            <button class="whatsapp-btn">Send WhatsApp Reminder</button>
+          </a>
         `;
         container.appendChild(card);
       });
