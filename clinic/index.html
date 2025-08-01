@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -58,19 +57,30 @@
       background: #222;
       color: #fff;
     }
+    #installBtn {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <button class="toggle-btn" onclick="toggleTheme()">Toggle Theme</button>
-  <header>Onestop Ai Clinic Demo</header>
-
-  <div class="container">
+  <header>Onestop Ai Clinic Demo</header>  <div class="container">
     <p>Welcome to your clinic dashboard. Choose a panel below:</p>
     <a href="clinic-dashboard.html" class="btn">Clinic Dashboard</a>
     <a href="bookings.html" class="btn">Patient Bookings</a>
     <a href="logs.html" class="btn">Booking Logs</a>
     <a href="staff.html" class="btn">Staff Panel</a>
-  </div>
+  </div><button id="installBtn">📲 Install App</button>
 
   <script>
     // Theme Toggle
@@ -78,18 +88,30 @@
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
-
-    // Restore Theme
     if (localStorage.getItem("theme") === "dark") {
       document.body.classList.add("dark");
     }
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('SW registered:', reg))
-        .catch(err => console.error('SW registration failed:', err));
+      navigator.serviceWorker.register('service-worker.js').then(() => console.log("SW registered"));
     }
-  </script>
-</body>
+
+    // Install Prompt Handler
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('installBtn');
+      installBtn.style.display = 'block';
+
+      installBtn.addEventListener('click', async () => {
+        installBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to install: ${outcome}`);
+        deferredPrompt = null;
+      });
+    });
+  </script></body>
 </html>
