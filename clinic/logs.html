@@ -1,215 +1,200 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Booking Logs</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
-      background-color: #121212;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #111;
       color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0;
+      padding: 0;
     }
     h2 {
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 24px;
+      color: #00d9ff;
+      margin-top: 1rem;
     }
-    .button-row {
+    .filters, .summary, .log-entry {
+      margin: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    .filters {
       text-align: center;
-      margin-bottom: 20px;
     }
-    button {
+    .filters button {
       background-color: #00bcd4;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .summary-box {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    .booking-card {
-      background: #1f1f1f;
-      margin-bottom: 15px;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-    .label {
-      font-weight: bold;
-      color: #00ffff;
-    }
-    .whatsapp-button {
-      background-color: #25d366;
       color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      margin: 0.25rem;
+      border-radius: 6px;
       cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
+    }
+    .log-entry {
+      background-color: #222;
+      margin-bottom: 1rem;
+    }
+    .log-entry strong {
+      color: #00bcd4;
+    }
+    .log-entry button {
+      background-color: #2ecc71;
+      border: none;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .summary {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+    }
+    .summary h3 {
+      color: #00d9ff;
+    }
+    canvas {
+      max-width: 100%;
     }
   </style>
 </head>
 <body>
   <h2>📋 Clinic Booking Logs</h2>
-  <div class="button-row">
+  <div class="filters">
     <button onclick="filterLogs('today')">Today</button>
     <button onclick="filterLogs('yesterday')">Yesterday</button>
     <button onclick="exportToExcel()">Export to Excel</button>
     <button onclick="exportToPDF()">Export to PDF</button>
+    <button onclick="downloadUpdatedCSV()">Download Updated CSV</button>
   </div>
+  <div class="summary" id="dailySummary"></div>
+  <div id="logContainer"></div>  <script>
+    const LOGS_CSV = './logs.csv';
+    let logs = [];
 
-  <div class="summary-box" id="summaryBox">
-    <h3 style="color: #00ffff;">📊 Daily Summary</h3>
-    <p id="summaryStats"></p>
-    <canvas id="summaryChart" width="400" height="200"></canvas>
-  </div>
+    async function loadLogs() {
+      const response = await fetch(LOGS_CSV);
+      const data = await response.text();
+      const lines = data.trim().split('\n');
+      const headers = lines[0].split(',');
 
-  <div id="logContainer"></div>
+      logs = lines.slice(1).map(line => {
+        const values = line.split(',');
+        return headers.reduce((obj, header, index) => {
+          obj[header.trim()] = values[index] ? values[index].trim() : '';
+          return obj;
+        }, {});
+      });
 
-  <script>
-    let allLogs = [];
-
-    function fetchLogs() {
-      fetch('./logs.csv')
-        .then(response => response.text())
-        .then(data => {
-          const rows = data.trim().split('\n');
-          const headers = rows.shift().split(',');
-          allLogs = rows.map(row => {
-            const cols = row.split(',');
-            return {
-              date: cols[0],
-              time: cols[1],
-              name: cols[2],
-              reason: cols[3],
-              contact: cols[4],
-              token: cols[5],
-              reminderSent: cols[6] || "No"
-            };
-          });
-          filterLogs('today');
-        });
+      renderLogs('today');
     }
 
-    function filterLogs(filterType) {
+    function filterLogs(filter) {
       const today = new Date();
-      let targetDate = new Date(today);
-      if (filterType === 'yesterday') targetDate.setDate(today.getDate() - 1);
-
-      const dateStr = targetDate.toISOString().split('T')[0];
-      const filtered = allLogs.filter(log => log.date === dateStr);
-      renderLogs(filtered);
-      renderSummary(filtered);
+      let dateStr = today.toISOString().split('T')[0];
+      if (filter === 'yesterday') {
+        today.setDate(today.getDate() - 1);
+        dateStr = today.toISOString().split('T')[0];
+      }
+      renderLogs(dateStr);
     }
 
-    function renderLogs(logs) {
+    function renderLogs(dateStr) {
       const container = document.getElementById('logContainer');
       container.innerHTML = '';
-      logs.forEach(log => {
-        const card = document.createElement('div');
-        card.className = 'booking-card';
-        card.innerHTML = `
-          <p><span class="label">Name:</span> ${log.name}</p>
-          <p><span class="label">Reason:</span> ${log.reason}</p>
-          <p><span class="label">Date:</span> ${log.date}</p>
-          <p><span class="label">Time:</span> ${log.time}</p>
-          <p><span class="label">Contact:</span> ${log.contact}</p>
-          <p><span class="label">Token No:</span> ${log.token}</p>
-          <p><span class="label">Reminder Sent:</span> ${log.reminderSent}</p>
-          <button class="whatsapp-button" onclick="sendReminder('${log.contact}', '${log.name}', '${log.time}', this)">Send WhatsApp Reminder</button>
+      let countPerHour = {};
+      let reasons = {};
+
+      const filtered = logs.filter(log => log.Date === dateStr);
+      filtered.forEach((log, index) => {
+        countPerHour[log.Time] = (countPerHour[log.Time] || 0) + 1;
+        reasons[log.Reason] = (reasons[log.Reason] || 0) + 1;
+
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `
+          <p><strong>Name:</strong> ${log.Name}</p>
+          <p><strong>Reason:</strong> ${log.Reason}</p>
+          <p><strong>Date:</strong> ${log.Date}</p>
+          <p><strong>Time:</strong> ${log.Time}</p>
+          <p><strong>Contact:</strong> ${log.Contact}</p>
+          <p><strong>Token No:</strong> ${log.Token}</p>
+          <p><strong>Reminder Sent:</strong> ${log.Reminder || 'No'}</p>
+          <button onclick="sendReminder(${index})">Send WhatsApp Reminder</button>
         `;
-        container.appendChild(card);
+        container.appendChild(entry);
       });
-    }
 
-    function sendReminder(contact, name, time, buttonEl) {
-      const msg = `Reminder: ${name}, your clinic appointment is at ${time}. Please arrive 5 mins early.`;
-      const url = `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
-      buttonEl.previousElementSibling.innerHTML = `<span class="label">Reminder Sent:</span> Yes`;
-      buttonEl.disabled = true;
-    }
-
-    function exportToExcel() {
-      const ws = XLSX.utils.json_to_sheet(allLogs);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Logs");
-      XLSX.writeFile(wb, "Clinic_Logs.xlsx");
-    }
-
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(12);
-      let y = 10;
-      allLogs.forEach(log => {
-        doc.text(`Name: ${log.name}, Time: ${log.time}, Token: ${log.token}`, 10, y);
-        y += 10;
-      });
-      doc.save("Clinic_Logs.pdf");
-    }
-
-    function renderSummary(logs) {
-      const summary = {
-        total: logs.length,
-        reminders: logs.filter(l => l.reminderSent.trim().toLowerCase() === 'yes').length,
-        reasons: {}
-      };
-      logs.forEach(l => {
-        summary.reasons[l.reason] = (summary.reasons[l.reason] || 0) + 1;
-      });
-      const topReasons = Object.entries(summary.reasons)
+      const topReasons = Object.entries(reasons)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 3)
         .map(([reason]) => reason)
         .join(', ');
 
-      document.getElementById('summaryStats').innerHTML = `
-        Total Bookings: ${summary.total}<br>
-        Reminders Sent: ${summary.reminders}<br>
-        Top 3 Reasons: ${topReasons || 'N/A'}
+      document.getElementById('dailySummary').innerHTML = `
+        <h3>📊 Daily Summary</h3>
+        <p>Total Bookings: ${filtered.length}</p>
+        <p>Reminders Sent: ${filtered.filter(l => l.Reminder === 'Yes').length}</p>
+        <p>Top 3 Reasons: ${topReasons}</p>
+        <canvas id="summaryChart"></canvas>
       `;
 
-      const hours = logs.map(l => l.time.split(':')[0]);
-      const hourCounts = {};
-      hours.forEach(h => hourCounts[h] = (hourCounts[h] || 0) + 1);
-
-      const chart = document.getElementById('summaryChart');
-      new Chart(chart, {
+      const ctx = document.getElementById('summaryChart').getContext('2d');
+      new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: Object.keys(hourCounts),
+          labels: Object.keys(countPerHour),
           datasets: [{
             label: 'Bookings per Hour',
-            data: Object.values(hourCounts),
-            backgroundColor: '#00bcd4'
+            data: Object.values(countPerHour),
+            backgroundColor: '#00d9ff'
           }]
         },
-        options: {
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
       });
     }
 
-    fetchLogs();
-  </script>
-</body>
+    function sendReminder(index) {
+      const log = logs[index];
+      const msg = `Hi ${log.Name}, this is a reminder for your ${log.Reason} appointment today at ${log.Time}. Token No: ${log.Token}`;
+      const url = `https://wa.me/${log.Contact.replace('+', '')}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+      logs[index].Reminder = 'Yes';
+      filterLogs('today');
+    }
+
+    function exportToExcel() {
+      const ws = XLSX.utils.json_to_sheet(logs);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Logs');
+      XLSX.writeFile(wb, 'logs_export.xlsx');
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      logs.forEach((log, i) => {
+        doc.text(`Name: ${log.Name} | Time: ${log.Time} | Token: ${log.Token}`, 10, 10 + i * 10);
+      });
+      doc.save('logs_export.pdf');
+    }
+
+    function downloadUpdatedCSV() {
+      const headers = Object.keys(logs[0]);
+      const csv = [headers.join(',')].concat(logs.map(l => headers.map(h => l[h]).join(','))).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'logs_updated.csv';
+      a.click();
+    }
+
+    window.onload = loadLogs;
+  </script></body>
 </html>
