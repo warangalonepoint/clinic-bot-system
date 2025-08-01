@@ -2,95 +2,143 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Book Appointment – WarangalOneStop</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background: #111;
       font-family: Arial, sans-serif;
-      color: white;
+      background: #f8f9fa;
+      margin: 0;
       padding: 20px;
-      text-align: center;
     }
+
     h2 {
-      color: #00e1ff;
+      text-align: center;
+      color: #333;
     }
-    select, input, button {
-      font-size: 16px;
-      margin: 10px 0;
-      padding: 10px;
-      width: 90%;
-      max-width: 300px;
-      border-radius: 6px;
-      border: none;
+
+    form {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    button {
-      background: #00c2ff;
-      color: black;
+
+    label {
       font-weight: bold;
-      cursor: pointer;
+      display: block;
+      margin-top: 15px;
     }
-    .hidden {
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    #confirmation {
       display: none;
+      text-align: center;
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h2>Book Your Appointment</h2>
+  <form id="bookingForm">
+    <label for="name">Patient Name</label>
+    <input type="text" id="name" required>
 
-  <input type="text" id="name" placeholder="Your Name" />
-  <input type="text" id="reason" placeholder="Reason for Visit" />
-  <select id="slotDropdown"></select>
-  <br />
-  <button onclick="bookSlot()">Book Now</button>
+    <label for="reason">Visit Reason</label>
+    <input type="text" id="reason" required>
+
+    <label for="contact">Mobile Number</label>
+    <input type="tel" id="contact" required pattern="^(\+91)?[0-9]{10}$" placeholder="+91XXXXXXXXXX">
+
+    <label for="time">Available Slots</label>
+    <select id="time" required></select>
+
+    <button type="submit">Confirm and Send to WhatsApp</button>
+  </form>
+
+  <div id="confirmation">
+    ✅ Appointment Confirmed!  
+    Redirecting to WhatsApp...
+  </div>
 
   <script>
-    const slotsCSV = "https://warangalonepoint.github.io/clinic-bot-system/Slots.csv";
-    const logsCSV = "https://warangalonepoint.github.io/clinic-bot-system/logs.csv";
-    const selectedClinic = "Clinic 1"; // Change this dynamically if needed
+    const slotsCSV = "https://warangalonepoint.github.io/clinic-bot-system/clinic/slots.csv";
+    const logsCSV = "https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv";
 
     async function fetchCSV(url) {
       const res = await fetch(url);
-      return await res.text();
+      return res.text();
+    }
+
+    function parseCSV(data) {
+      return data.trim().split("\n").slice(1).map(row => row.split(",")[1]); // Time only
     }
 
     async function loadSlots() {
-      const slotsText = await fetchCSV(slotsCSV);
-      const logsText = await fetchCSV(logsCSV);
+      const [slotsData, logsData] = await Promise.all([fetchCSV(slotsCSV), fetchCSV(logsCSV)]);
+      const availableTimes = new Set(parseCSV(slotsData));
+      const bookedTimes = new Set(parseCSV(logsData));
 
-      const today = new Date().toLocaleDateString("en-GB").split("/").join("-");
-      const logs = logsText.trim().split("\n").slice(1).map(row => row.split(","));
-      const bookedTimes = logs.filter(row => row[0] === today && row[5] === selectedClinic).map(row => row[1]);
-
-      const slots = slotsText.trim().split("\n").slice(1).map(row => row.split(",")[0]);
-      const available = slots.filter(time => !bookedTimes.includes(time));
-
-      const dropdown = document.getElementById("slotDropdown");
+      const dropdown = document.getElementById("time");
       dropdown.innerHTML = "";
-      available.forEach(time => {
-        const opt = document.createElement("option");
-        opt.value = time;
-        opt.textContent = time;
-        dropdown.appendChild(opt);
+
+      [...availableTimes].forEach(slot => {
+        if (!bookedTimes.has(slot)) {
+          const option = document.createElement("option");
+          option.value = slot;
+          option.textContent = slot;
+          dropdown.appendChild(option);
+        }
       });
+
+      if (dropdown.options.length === 0) {
+        const option = document.createElement("option");
+        option.textContent = "No slots available";
+        option.disabled = true;
+        dropdown.appendChild(option);
+      }
     }
 
-    async function bookSlot() {
+    document.getElementById("bookingForm").addEventListener("submit", function(e) {
+      e.preventDefault();
       const name = document.getElementById("name").value.trim();
       const reason = document.getElementById("reason").value.trim();
-      const time = document.getElementById("slotDropdown").value;
-      if (!name || !reason || !time) return alert("Fill all fields");
+      const contact = document.getElementById("contact").value.trim();
+      const time = document.getElementById("time").value;
 
-      const logsText = await fetchCSV(logsCSV);
-      const today = new Date().toLocaleDateString("en-GB").split("/").join("-");
-      const logs = logsText.trim().split("\n").slice(1).map(row => row.split(","));
-      const todaysBookings = logs.filter(row => row[0] === today && row[5] === selectedClinic);
-      const token = todaysBookings.length + 1;
+      if (!name || !reason || !contact || !time) return;
 
-      // Simulate saving logic
-      const logURL = `confirmation.html?token=${token}`;
-      window.location.href = logURL;
-    }
+      const message = `Hello, I would like to book an appointment.\n\nName: ${name}\nReason: ${reason}\nContact: ${contact}\nPreferred Time: ${time}`;
+      document.getElementById("confirmation").style.display = "block";
+
+      setTimeout(() => {
+        window.location.href = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
+      }, 2000);
+    });
 
     loadSlots();
   </script>
