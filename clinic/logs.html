@@ -40,7 +40,7 @@
 </div><table id="patientTable">
   <thead>
     <tr>
-      <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Token</th><th>Reminder Sent</th>
+      <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Token</th><th>Reminder Sent</th><th>Send Reminder</th>
     </tr>
   </thead>
   <tbody id="tableBody"></tbody>
@@ -52,11 +52,28 @@ let fullData = [];
 function renderTable(filtered = fullData) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  filtered.forEach(d => {
-    const row = `<tr><td>${d.Date}</td><td>${d.Time}</td><td>${d.Name}</td><td>${d.Reason}</td><td>${d.Contact}</td><td>${d.Token}</td><td>${d['Reminder Sent']}</td></tr>`;
-    tbody.innerHTML += row;
+  filtered.forEach((d, i) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${d.Date}</td>
+      <td>${d.Time}</td>
+      <td>${d.Name}</td>
+      <td>${d.Reason}</td>
+      <td><a href="tel:${d.Contact}">${d.Contact}</a></td>
+      <td>${d.Token}</td>
+      <td id="reminder-${i}">${d['Reminder Sent'] || ''}</td>
+      <td><button onclick="sendReminder('${d.Name}', '${d.Date}', '${d.Time}', '${d.Token}', '${d.Contact}', ${i})">📲 Send</button></td>
+    `;
+    tbody.appendChild(row);
   });
   updateSummary(filtered);
+}
+
+function sendReminder(name, date, time, token, contact, index) {
+  const message = `Hello ${name}, this is a reminder for your appointment on ${date} at ${time}.\nToken No: ${token}`;
+  const link = `https://wa.me/91${contact}?text=${encodeURIComponent(message)}`;
+  window.open(link, '_blank');
+  document.getElementById(`reminder-${index}`).innerText = '✅';
 }
 
 function updateSummary(entries) {
