@@ -3,156 +3,178 @@
 <head>
   <meta charset="UTF-8" />
   <title>Book Appointment</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: 0.3s ease;
-      padding: 20px;
+      background-color: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+      margin: 0;
+      padding: 0;
     }
-    :root {
-      --bg: #fff;
-      --text: #000;
-      --card: #f0f0f0;
-      --button: #25D366;
+
+    .dark-theme {
+      background-color: #121212;
+      color: #f0f0f0;
     }
-    .dark {
-      --bg: #121212;
-      --text: #fff;
-      --card: #1e1e1e;
-    }
+
     .container {
-      max-width: 500px;
-      margin: auto;
-      background: var(--card);
+      max-width: 400px;
+      margin: 40px auto;
       padding: 20px;
-      border-radius: 12px;
+      background: #f5f5f5;
+      border-radius: 16px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
-    h1 {
-      text-align: center;
+
+    .dark-theme .container {
+      background: #1e1e1e;
+      box-shadow: 0 0 15px rgba(255,255,255,0.05);
     }
-    select, input, textarea {
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    select, input {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 5px;
       border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
       font-size: 16px;
     }
+
+    .dark-theme select,
+    .dark-theme input {
+      background: #2c2c2c;
+      color: #f0f0f0;
+      border: 1px solid #555;
+    }
+
     button {
       width: 100%;
-      background: var(--button);
-      color: white;
-      font-size: 18px;
-      padding: 12px;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 16px;
+      background-color: #28a745;
       border: none;
-      border-radius: 8px;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
     }
-    .theme-btn {
-      background: #2e7d32;
+
+    .theme-toggle {
+      background-color: #2d7d2d;
       margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
+
   <div class="container">
-    <button class="theme-btn" onclick="toggleTheme()">Toggle Theme</button>
-    <h1>Book Your Appointment</h1>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
 
-    <label><b>Select Date</b></label>
-    <select id="dateDropdown" onchange="updateSlots()">
-      <option>Select Date</option>
-    </select>
+    <h2>Book Your Appointment</h2>
 
-    <label><b>Select Time Slot</b></label>
-    <select id="slotDropdown">
-      <option>Please select a date first</option>
-    </select>
+    <label for="date">Select Date</label>
+    <select id="date" onchange="filterSlots()"></select>
 
-    <input type="text" id="name" placeholder="Enter full name" />
-    <textarea id="reason" placeholder="Reason for Visit"></textarea>
-    <button onclick="bookSlot()">Book via WhatsApp</button>
+    <label for="time">Select Time Slot</label>
+    <select id="time"></select>
+
+    <input type="text" id="name" placeholder="Enter full name">
+    <input type="text" id="reason" placeholder="Reason for Visit">
+
+    <button onclick="bookAppointment()">Book via WhatsApp</button>
   </div>
 
   <script>
-    let csvData = [];
+    const slotsUrl = "./clinic/Slots.csv"; // path to your slots.csv
 
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-      localStorage.setItem("theme", document.body.classList.contains('dark') ? 'dark' : 'light');
-    }
+    let allSlots = [];
 
-    function loadTheme() {
-      const saved = localStorage.getItem("theme");
-      if (saved === 'dark') document.body.classList.add('dark');
-    }
-
-    async function fetchSlots() {
-      try {
-        const res = await fetch('./slots.csv');
-        const text = await res.text();
-        const lines = text.trim().split('\n').slice(1);
-        csvData = lines.map(row => {
-          const [date, time, status] = row.split(',');
-          return { date, time, status };
+    function loadSlots() {
+      fetch(slotsUrl)
+        .then(res => res.text())
+        .then(data => {
+          const lines = data.trim().split("\n").slice(1);
+          allSlots = lines.map(line => {
+            const [date, time, status] = line.split(",");
+            return { date, time, status };
+          });
+          populateDateDropdown();
         });
-
-        const futureDates = [...new Set(csvData
-          .filter(entry => entry.status === 'Available' && new Date(entry.date) >= new Date())
-          .map(entry => entry.date))];
-
-        const dateDropdown = document.getElementById('dateDropdown');
-        dateDropdown.innerHTML = '<option>Select Date</option>';
-        futureDates.forEach(date => {
-          const option = document.createElement('option');
-          option.value = date;
-          option.textContent = date;
-          dateDropdown.appendChild(option);
-        });
-      } catch (e) {
-        alert("Error loading slots.csv");
-      }
     }
 
-    function updateSlots() {
-      const selectedDate = document.getElementById('dateDropdown').value;
-      const slotDropdown = document.getElementById('slotDropdown');
-      const availableSlots = csvData.filter(entry =>
-        entry.date === selectedDate && entry.status === 'Available'
-      );
-      slotDropdown.innerHTML = '';
-      availableSlots.forEach(slot => {
-        const option = document.createElement('option');
+    function populateDateDropdown() {
+      const dateSet = new Set(allSlots.filter(s => s.status === "Available").map(s => s.date));
+      const dateSelect = document.getElementById("date");
+      dateSelect.innerHTML = "";
+      Array.from(dateSet).sort().forEach(date => {
+        const option = document.createElement("option");
+        option.value = date;
+        option.textContent = date;
+        dateSelect.appendChild(option);
+      });
+      filterSlots(); // Load time slots for first date
+    }
+
+    function filterSlots() {
+      const selectedDate = document.getElementById("date").value;
+      const timeSelect = document.getElementById("time");
+      timeSelect.innerHTML = "";
+      allSlots.filter(s => s.date === selectedDate && s.status === "Available").forEach(slot => {
+        const option = document.createElement("option");
         option.value = slot.time;
         option.textContent = slot.time;
-        slotDropdown.appendChild(option);
+        timeSelect.appendChild(option);
       });
-      if (availableSlots.length === 0) {
-        const option = document.createElement('option');
-        option.textContent = "No slots available";
-        slotDropdown.appendChild(option);
-      }
     }
 
-    function bookSlot() {
-      const date = document.getElementById('dateDropdown').value;
-      const time = document.getElementById('slotDropdown').value;
-      const name = document.getElementById('name').value.trim();
-      const reason = document.getElementById('reason').value.trim();
-      if (!date || !time || !name) {
+    function toggleTheme() {
+      document.body.classList.toggle("dark-theme");
+      localStorage.setItem("theme", document.body.classList.contains("dark-theme") ? "dark" : "light");
+    }
+
+    // Load preferred theme
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-theme");
+    }
+
+    function bookAppointment() {
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const name = document.getElementById("name").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const phone = "919390664577";
+
+      if (!name || !reason || !date || !time) {
         alert("Please fill all details.");
         return;
       }
-      const msg = `Appointment Request:%0A🗓️ Date: ${date}%0A⏰ Time: ${time}%0A👤 Name: ${name}%0A📝 Reason: ${reason}`;
-      const url = `https://wa.me/919390664577?text=${msg}`;
-      window.open(url, '_blank');
+
+      fetch("./clinic/logs.csv")
+        .then(response => response.text())
+        .then(csv => {
+          const bookings = csv.split("\n").filter(line => line.includes(date));
+          const token = bookings.length;
+          const url = `confirmation.html?name=${encodeURIComponent(name)}&reason=${encodeURIComponent(reason)}&date=${date}&time=${time}&token=${token + 1}&phone=${phone}`;
+          window.location.href = url;
+        });
     }
 
-    loadTheme();
-    fetchSlots();
+    loadSlots();
   </script>
+
 </body>
 </html>
