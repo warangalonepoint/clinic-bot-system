@@ -4,14 +4,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Patient Logs Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; margin: 0; padding: 1rem; transition: background 0.3s, color 0.3s; }
     h1 { text-align: center; margin-bottom: 1rem; }
     .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 1rem; }
-    .filters input, .filters select { padding: 5px; font-size: 1rem; }
+    .filters input { padding: 5px; font-size: 1rem; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
     th, td { padding: 0.75rem; border: 1px solid #ccc; text-align: left; }
     th { background-color: #f0f0f0; }
@@ -47,19 +47,13 @@
 </table><div class="summary" id="summaryStats"></div><canvas id="bookingChart"></canvas> <canvas id="repeatChart" style="margin-top: 2rem;"></canvas>
 
 <script>
-const data = [
-  { date: '2025-08-01', time: '09:00', name: 'Chaitanya Krishna', reason: 'Fever', contact: '+919876543210', token: 1, reminder: 'Yes' },
-  { date: '2025-08-01', time: '09:10', name: 'Ravi Kumar', reason: 'Checkup', contact: '+918888888888', token: 2, reminder: 'Yes' },
-  { date: '2025-08-01', time: '09:20', name: 'Anjali Sharma', reason: 'Consultation', contact: '+917777777777', token: 3, reminder: 'No' },
-  { date: '2025-08-01', time: '09:30', name: 'Ravi Kumar', reason: 'Follow-up', contact: '+918888888888', token: 4, reminder: 'Yes' },
-  { date: '2025-08-01', time: '09:40', name: 'Sneha Reddy', reason: 'Skin Allergy', contact: '+918765432100', token: 5, reminder: 'No' }
-];
+let fullData = [];
 
-function renderTable(filtered = data) {
+function renderTable(filtered = fullData) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   filtered.forEach(d => {
-    const row = `<tr><td>${d.date}</td><td>${d.time}</td><td>${d.name}</td><td>${d.reason}</td><td>${d.contact}</td><td>${d.token}</td><td>${d.reminder}</td></tr>`;
+    const row = `<tr><td>${d.Date}</td><td>${d.Time}</td><td>${d.Name}</td><td>${d.Reason}</td><td>${d.Contact}</td><td>${d.Token}</td><td>${d['Reminder Sent']}</td></tr>`;
     tbody.innerHTML += row;
   });
   updateSummary(filtered);
@@ -67,7 +61,7 @@ function renderTable(filtered = data) {
 
 function updateSummary(entries) {
   const total = entries.length;
-  const uniqueContacts = new Set(entries.map(e => e.contact));
+  const uniqueContacts = new Set(entries.map(e => e.Contact));
   const repeat = total - uniqueContacts.size;
   document.getElementById('summaryStats').innerText = `Total: ${total}, Repeat Patients: ${repeat}`;
 }
@@ -86,14 +80,14 @@ function exportToPDF() {
   doc.save('Patient_Logs.pdf');
 }
 
-function drawCharts() {
+function drawCharts(data) {
   const ctx1 = document.getElementById('bookingChart').getContext('2d');
   const ctx2 = document.getElementById('repeatChart').getContext('2d');
   const reasons = {};
   const times = {};
   data.forEach(d => {
-    reasons[d.reason] = (reasons[d.reason] || 0) + 1;
-    times[d.time] = (times[d.time] || 0) + 1;
+    reasons[d.Reason] = (reasons[d.Reason] || 0) + 1;
+    times[d.Time] = (times[d.Time] || 0) + 1;
   });
   new Chart(ctx1, {
     type: 'bar',
@@ -115,10 +109,10 @@ function applyFilters() {
   const name = document.getElementById('searchName').value.toLowerCase();
   const reason = document.getElementById('searchReason').value.toLowerCase();
   const date = document.getElementById('filterDate').value;
-  const filtered = data.filter(d =>
-    (!name || d.name.toLowerCase().includes(name)) &&
-    (!reason || d.reason.toLowerCase().includes(reason)) &&
-    (!date || d.date === date)
+  const filtered = fullData.filter(d =>
+    (!name || d.Name.toLowerCase().includes(name)) &&
+    (!reason || d.Reason.toLowerCase().includes(reason)) &&
+    (!date || d.Date === date)
   );
   renderTable(filtered);
 }
@@ -131,7 +125,14 @@ document.getElementById('searchName').addEventListener('input', applyFilters);
 document.getElementById('searchReason').addEventListener('input', applyFilters);
 document.getElementById('filterDate').addEventListener('change', applyFilters);
 
-renderTable();
-drawCharts();
+Papa.parse("logs.csv", {
+  download: true,
+  header: true,
+  complete: function(results) {
+    fullData = results.data.filter(r => r.Date && r.Time);
+    renderTable();
+    drawCharts(fullData);
+  }
+});
 </script></body>
 </html>
