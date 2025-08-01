@@ -2,147 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clinic Logs</title>
+  <title>Booking Logs – Premium</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
+      background: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
-      padding: 10px;
-      background: #f9f9f9;
+      padding: 20px;
     }
-    h2 { text-align: center; }
+    h2 { color: #f8d90f; text-align: center; }
+    #pinEntry {
+      text-align: center;
+      margin: 30px 0;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 8px 10px;
+      margin: 5px;
+    }
+    #logsSection { display: none; }
     table {
-      border-collapse: collapse;
       width: 100%;
+      border-collapse: collapse;
       margin-top: 20px;
     }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
     th, td {
+      border: 1px solid #555;
       padding: 8px;
       text-align: left;
     }
-    #pinSection {
-      text-align: center;
-      margin-top: 50px;
+    th {
+      background: #111;
+      color: #00ffc8;
     }
-    #logsSection {
-      display: none;
-    }
-    .click-call {
-      color: blue;
-      text-decoration: underline;
+    .btn {
+      background: green;
+      color: white;
+      padding: 8px 14px;
+      border: none;
+      margin-right: 10px;
       cursor: pointer;
+    }
+    .btn:hover {
+      background: #00cc88;
+    }
+    #errorMsg {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-<div id="pinSection">
-  <h2>Enter Your Clinic PIN</h2>
+<div id="pinEntry">
+  <h2>🔐 Enter Clinic PIN to View Logs</h2>
   <input type="text" id="pinInput" placeholder="Enter PIN" />
-  <button onclick="verifyPIN()">Submit</button>
-  <p id="pinError" style="color: red;"></p>
+  <button onclick="checkPIN()">Submit</button>
+  <p id="errorMsg"></p>
 </div>
 
 <div id="logsSection">
-  <h2>Booking Logs</h2>
-  <table id="logsTable">
+  <h2>📊 Booking Logs (Paid Plan)</h2>
+  <button class="btn" onclick="exportCSV()">⬇ Export CSV</button>
+  <button class="btn" onclick="sendReminders()">📨 Send Reminders</button>
+  <table>
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Patient</th>
-        <th>Contact</th>
-        <th>Reason</th>
-        <th>Token</th>
-        <th>Reminder Sent</th>
+        <th>Date</th><th>Time</th><th>Name</th><th>Reason</th><th>Contact</th><th>Token</th><th>Reminder Sent</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="logsBody"></tbody>
   </table>
 </div>
 
 <script>
-  let plans = {};
-  async function fetchPlans() {
+  let clinicID = "";
+
+  async function checkPIN() {
+    const pin = document.getElementById("pinInput").value.trim();
+    document.getElementById("errorMsg").textContent = "";
+
     try {
-      const res = await fetch('plans.json');
-      plans = await res.json();
+      const res = await fetch("https://warangalonepoint.github.io/clinic-bot-system/plans.json");
+      const plans = await res.json();
+
+      let found = false;
+      for (const [id, plan] of Object.entries(plans)) {
+        if (plan.pin === pin) {
+          clinicID = id;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        document.getElementById("errorMsg").textContent = "❌ Invalid PIN. Try again.";
+        return;
+      }
+
+      document.getElementById("pinEntry").style.display = "none";
+      document.getElementById("logsSection").style.display = "block";
+      loadCSV(`${clinicID}-logs.csv`);
     } catch (e) {
-      document.getElementById("pinError").innerText = "Error loading plans.json";
+      document.getElementById("errorMsg").textContent = "⚠ Error loading plans.json or PIN check failed.";
     }
   }
 
-  async function verifyPIN() {
-    const enteredPIN = document.getElementById("pinInput").value.trim();
-    if (!enteredPIN) return;
-
-    await fetchPlans();
-
-    const clinic = Object.values(plans).find(p => p.pin === enteredPIN);
-    if (!clinic) {
-      document.getElementById("pinError").innerText = "Invalid PIN. Try again.";
-      return;
-    }
-
-    const logURL = `${clinic.id}-logs.csv`;  // Ensure this format is followed
-
-    loadLogs(logURL);
-    document.getElementById("pinSection").style.display = "none";
-    document.getElementById("logsSection").style.display = "block";
-  }
-
-  async function loadLogs(csvURL) {
+  async function loadCSV(filename) {
     try {
-      const res = await fetch(csvURL);
+      const res = await fetch(`https://warangalonepoint.github.io/clinic-bot-system/${filename}`);
       const text = await res.text();
-      const rows = text.trim().split("\n").slice(1); // skip header
-      const tbody = document.querySelector("#logsTable tbody");
+      const lines = text.trim().split("\n").slice(1); // skip header
+      const tbody = document.getElementById("logsBody");
       tbody.innerHTML = "";
 
-      for (let row of rows) {
-        const [date, time, name, phone, reason, token, reminder] = row.split(",");
+      for (const line of lines) {
+        const [date, time, name, contact, reason, token, reminder] = line.split(",");
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${date}</td>
           <td>${time}</td>
           <td>${name}</td>
-          <td><a class="click-call" href="tel:${phone}">${phone}</a></td>
           <td>${reason}</td>
+          <td><a href="tel:${contact}" style="color:cyan">${contact}</a></td>
           <td>${token}</td>
           <td>${reminder}</td>
         `;
         tbody.appendChild(tr);
       }
     } catch (e) {
-      alert("Failed to load logs: " + csvURL);
+      document.getElementById("logsBody").innerHTML = "<tr><td colspan='7'>❌ Failed to load logs.</td></tr>";
     }
+  }
+
+  function exportCSV() {
+    if (clinicID) {
+      const url = `https://warangalonepoint.github.io/clinic-bot-system/${clinicID}-logs.csv`;
+      window.open(url, "_blank");
+    }
+  }
+
+  function sendReminders() {
+    alert("✅ Reminders sent! (Demo mode only)");
   }
 </script>
 
 </body>
-</html>      clinicFile = `${clinicName.toLowerCase().replace(/\s+/g, '-')}-logs.csv`;
-      document.getElementById('pinSection').style.display = 'none';
-      document.getElementById('logsSection').classList.remove('hidden');
-      loadLogs();
-    } else {
-      alert('Invalid PIN. Please try again.');
-    }
-  }
-
-  async function loadLogs() {
-    try {
-      const response = await fetch(clinicFile);
-      const text = await response.text();
-      const rows = text.trim().split('\n').slice(1); // skip header
-
-      const tbody = document.getElementById('logBody');
-      tbody.innerHTML = '';
-
-      rows.forEach(row => {
-        const cols = row.split(',');
+</html>        const cols = row.split(',');
         const tr = document.createElement('tr');
         cols.forEach(col => {
           const td = document.createElement('td');
