@@ -162,7 +162,15 @@
         alert("Please fill all details.");
         return;
       }
-
+fetch("./slots.csv")
+  .then(response => response.text())
+  .then(csvText => {
+    const data = Papa.parse(csvText, { header: true }).data;
+    populateDateDropdown(data);
+  })
+  .catch(error => {
+    console.error("Failed to fetch slots:", error);
+  });
       fetch("./clinic/logs.csv")
         .then(response => response.text())
         .then(csv => {
