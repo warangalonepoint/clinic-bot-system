@@ -1,110 +1,149 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Booking Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Booking Logs</title>
-  <link rel="manifest" href="./manifest.json" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="logo.png" />
   <style>
+    :root {
+      --bg: #111;
+      --text: #fff;
+      --card: #222;
+      --accent: #00ff88;
+    }
+    [data-theme="light"] {
+      --bg: #fff;
+      --text: #000;
+      --card: #f1f1f1;
+      --accent: #007bff;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      padding: 20px;
       margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
     }
-    body.light-mode {
-      background: #f5f5f5;
-      color: #111;
-    }
+
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--card);
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+
+    .theme-toggle {
+      position: absolute;
+      top: 12px;
+      right: 20px;
+    }
+
+    .logs-container {
+      padding: 20px;
+    }
+
+    .log-card {
+      background-color: var(--card);
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .log-card p {
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    button {
       margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #555;
-      padding: 10px;
-      text-align: left;
-    }
-    .light-mode th, .light-mode td {
-      border-color: #ccc;
-    }
-    .btn {
       padding: 8px 16px;
-      background: #00ffc8;
-      border: none;
+      background: var(--accent);
       color: #000;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
-      border-radius: 5px;
+      font-size: 14px;
     }
-    .btn:hover {
-      background: #00ccaa;
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    .summary {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 10px;
+      margin: 20px;
+      font-size: 15px;
     }
   </style>
 </head>
 <body>
+
   <header>
-    <h2>📋 Clinic Booking Logs</h2>
-    <button class="btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
-  </header>  <div>
-    <label>Enter PIN: <input type="text" id="pinInput" /></label>
-    <button class="btn" onclick="loadLogs()">Load Logs</button>
-  </div>  <table id="logsTable" style="display:none">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Name</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Time</th>
-        <th>Token</th>
-      </tr>
-    </thead>
-    <tbody id="logBody"></tbody>
-  </table>  <script>
-    function toggleTheme() {
-      document.body.classList.toggle('light-mode');
-    }
+    Booking Logs
+    <label class="theme-toggle">
+      <input type="checkbox" id="themeSwitch"> 🌙
+    </label>
+  </header>
+
+  <div class="logs-container" id="logs"></div>
+
+  <div class="summary" id="summary"></div>
+
+  <script>
+    // Theme toggle
+    const themeSwitch = document.getElementById('themeSwitch');
+    themeSwitch.addEventListener('change', () => {
+      document.documentElement.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
+    });
 
     async function loadLogs() {
-      const pin = document.getElementById('pinInput').value.trim();
-      if (!pin) return alert("Please enter a PIN");
-
-      const file = `./${pin}-logs.csv`;
-
       try {
-        const res = await fetch(file);
-        if (!res.ok) throw new Error("Logs not found.");
+        const res = await fetch('logs.csv');
+        const data = await res.text();
+        const rows = data.trim().split('\n').slice(1); // skip header
+        const container = document.getElementById("logs");
+        const summary = document.getElementById("summary");
+        let total = 0;
 
-        const csv = await res.text();
-        const lines = csv.trim().split('\n');
-        const tbody = document.getElementById("logBody");
-        tbody.innerHTML = "";
+        rows.forEach(row => {
+          const [date, name, reason, slot, token, contact, reminder] = row.split(',');
 
-        for (let i = 1; i < lines.length; i++) {
-          const [date, name, reason, contact, time, token] = lines[i].split(',');
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${date}</td>
-            <td>${name}</td>
-            <td>${reason}</td>
-            <td><a href="tel:${contact}" style="color:cyan">${contact}</a></td>
-            <td>${time}</td>
-            <td>${token}</td>
+          const div = document.createElement("div");
+          div.className = "log-card";
+          div.innerHTML = `
+            <p><strong>Patient:</strong> ${name}</p>
+            <p><strong>Reason:</strong> ${reason}</p>
+            <p><strong>Slot:</strong> ${slot}</p>
+            <p><strong>Token:</strong> ${token}</p>
+            <p><strong>Contact:</strong> <a href="tel:${contact}">${contact}</a></p>
+            <p><strong>Reminder Sent:</strong> ${reminder}</p>
+            <button onclick="sendReminder('${contact}', '${name}', '${slot}', '${token}')">Send WhatsApp Reminder</button>
           `;
-          tbody.appendChild(tr);
-        }
+          container.appendChild(div);
+          total++;
+        });
 
-        document.getElementById("logsTable").style.display = "table";
+        summary.innerHTML = `Total Bookings: <strong>${total}</strong>`;
+
       } catch (err) {
-        alert(err.message);
+        document.getElementById("logs").innerText = "⚠️ Error loading logs.";
       }
     }
-  </script></body>
+
+    function sendReminder(phone, name, slot, token) {
+      const msg = `Hello ${name}, this is a reminder for your appointment at ${slot} (Token No: ${token}).`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    loadLogs();
+  </script>
+
+</body>
 </html>
