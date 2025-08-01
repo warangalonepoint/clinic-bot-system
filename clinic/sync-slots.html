@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Backup Slots</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      text-align: center;
+    }
+    h1 {
+      color: #222;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+    .btn-download {
+      background-color: #2e7d32;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-download:hover {
+      background-color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Backup Slots</h1>
+    <p>This panel allows you to download the current available slot schedule.</p>
+    <a class="btn-download" href="https://warangalonepoint.github.io/clinic-bot-system/clinic/slots.csv" download>
+      ⬇️ Download slots.csv Backup
+    </a>
+    <p style="margin-top:20px; font-size:14px; color:#555;">
+      Note: This file reflects the current slot data and auto-updates when you push changes to GitHub.
+    </p>
+  </div>
+</body>
+</html>
