@@ -1,107 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- logs.html with Date Filters: Today, Yesterday, Custom --><!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Booking Logs</title>
-  <link rel="manifest" href="manifest.json">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      color: #111;
-      padding: 20px;
-      margin: 0;
-    }
-    .dark body {
-      background: #111;
-      color: #f9f9f9;
-    }
-    h1 {
-      text-align: center;
-    }
-    .log-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .dark .log-card {
-      background: #1e1e1e;
-      color: #f1f1f1;
-    }
-    .log-card b {
-      display: inline-block;
-      width: 130px;
-    }
-    .reminder-btn {
-      margin-top: 10px;
-      padding: 6px 12px;
-      font-size: 14px;
-    }
-    #themeToggle {
-      float: right;
-      margin-right: 10px;
-    }
+    body { font-family: sans-serif; background: #f2f2f2; margin: 20px; }
+    h1 { text-align: center; }
+    .filter-buttons { text-align: center; margin-bottom: 20px; }
+    .filter-buttons button { margin: 0 5px; padding: 8px 16px; }
+    .log-entry { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; }
   </style>
 </head>
 <body>
-  <label><input type="checkbox" id="themeToggle"> Dark Mode</label>
   <h1>Booking Logs</h1>
-  <div id="logs"></div>
+  <div class="filter-buttons">
+    <button onclick="filterBy('today')">Today</button>
+    <button onclick="filterBy('yesterday')">Yesterday</button>
+    <input type="date" id="customDate" onchange="filterBy('custom')" />
+  </div>  <div id="logList"></div>  <script>
+    const logs = [
+      { date: '2025-08-01', name: 'Chaitanya', reason: 'Fever', token: 1 },
+      { date: '2025-07-31', name: 'Anjali', reason: 'Checkup', token: 2 },
+      { date: '2025-07-30', name: 'Rahul', reason: 'Pain', token: 3 },
+    ]; // Replace with parsed CSV in real setup
 
-  <script>
-    const plansURL = "./logs.csv";
-    const isDark = localStorage.getItem("darkMode") === "true";
-
-    const applyTheme = (dark) => {
-      document.body.classList.toggle("dark", dark);
-      document.getElementById("themeToggle").checked = dark;
-    };
-
-    document.getElementById("themeToggle").addEventListener("change", function() {
-      localStorage.setItem("darkMode", this.checked);
-      applyTheme(this.checked);
-    });
-
-    applyTheme(isDark);
-
-    fetch(plansURL)
-      .then((res) => res.text())
-      .then((csv) => {
-        const lines = csv.trim().split("\n");
-        const headers = lines[0].split(",");
-        const logs = lines.slice(1).map(line => {
-          const parts = line.split(",");
-          const obj = {};
-          headers.forEach((h, i) => obj[h.trim()] = parts[i]?.trim());
-          return obj;
-        });
-
-        const logsDiv = document.getElementById("logs");
-        logs.reverse().forEach((log) => {
-          const div = document.createElement("div");
-          div.className = "log-card";
-          div.innerHTML = `
-            <b>Date:</b> ${log.Date || "-"}<br>
-            <b>Time:</b> ${log.Time || "-"}<br>
-            <b>Patient Name:</b> ${log.Name || "-"}<br>
-            <b>Visit Reason:</b> ${log.Reason || "-"}<br>
-            <b>Contact Number:</b> ${log.Contact || "-"}<br>
-            <b>Token No.:</b> ${log.Token || "-"}<br>
-            <b>Reminder Sent:</b> ${log.Reminder || "No"}<br>
-            <button class="reminder-btn" onclick="sendReminder('${log.Contact}', '${log.Name}', '${log.Time}', '${log.Token}')">Send WhatsApp Reminder</button>
-          `;
-          logsDiv.appendChild(div);
-        });
-      });
-
-    function sendReminder(contact, name, time, token) {
-      const text = `Reminder: You have an appointment at ${time}.\nName: ${name}\nToken No: ${token}`;
-      const url = `https://wa.me/${contact.replace('+', '')}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+    function formatDate(d) {
+      return d.toISOString().split('T')[0];
     }
-  </script>
-</body>
+
+    function getYesterday() {
+      const y = new Date();
+      y.setDate(y.getDate() - 1);
+      return formatDate(y);
+    }
+
+    function filterBy(mode) {
+      let selectedDate = '';
+      if (mode === 'today') selectedDate = formatDate(new Date());
+      else if (mode === 'yesterday') selectedDate = getYesterday();
+      else if (mode === 'custom') selectedDate = document.getElementById('customDate').value;
+
+      const filtered = logs.filter(log => log.date === selectedDate);
+      displayLogs(filtered);
+    }
+
+    function displayLogs(data) {
+      const logDiv = document.getElementById('logList');
+      logDiv.innerHTML = '';
+      if (data.length === 0) logDiv.innerHTML = '<p>No bookings found for selected date.</p>';
+      data.forEach(log => {
+        logDiv.innerHTML += `<div class='log-entry'>
+          <strong>${log.name}</strong> | Reason: ${log.reason} | Token: ${log.token} | Date: ${log.date}
+        </div>`;
+      });
+    }
+
+    displayLogs(logs); // default view
+  </script></body>
 </html>
