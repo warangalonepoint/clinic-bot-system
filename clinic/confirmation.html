@@ -1,127 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Confirm Appointment</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation</title>
   <style>
     body {
+      background: #111;
+      color: #fff;
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #121212;
-      color: #fff;
-      transition: background-color 0.3s, color 0.3s;
+      text-align: center;
+      padding: 40px;
     }
-
-    .light-mode {
-      background-color: #f5f5f5;
-      color: #111;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: rgba(255, 255, 255, 0.05);
+    .box {
+      background: #222;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #444;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: 0 auto;
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
+    h1 {
+      color: #0f0;
     }
-
-    .details {
-      font-size: 18px;
-      margin-bottom: 25px;
-      line-height: 1.5;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #00c853;
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .theme-toggle {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .theme-toggle button {
-      padding: 8px 14px;
-      background: #333;
-      border: none;
-      color: #fff;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .light-mode .container {
-      background: #fff;
-      box-shadow: 0 0 10px #aaa;
-    }
-
-    .light-mode button {
-      background: #007bff;
+    .token {
+      font-size: 24px;
+      margin-top: 10px;
+      color: #0ff;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>✅ Confirm Your Booking</h2>
-    <div class="details" id="bookingDetails">Loading...</div>
-    <button id="confirmBtn">Confirm via WhatsApp</button>
+  <div class="box">
+    <h1>✅ Appointment Confirmed!</h1>
+    <p id="name"></p>
+    <p id="date"></p>
+    <p id="time"></p>
+    <p id="reason"></p>
+    <p class="token" id="token"></p>
+  </div>  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get("name") || "-";
+    const date = urlParams.get("date") || "-";
+    const time = urlParams.get("time") || "-";
+    const reason = urlParams.get("reason") || "-";
+    const contact = urlParams.get("contact") || "-";
 
-    <div class="theme-toggle">
-      <button onclick="toggleTheme()">Toggle Theme</button>
-    </div>
-  </div>
+    document.getElementById("name").textContent = `👤 Name: ${name}`;
+    document.getElementById("date").textContent = `📅 Date: ${date}`;
+    document.getElementById("time").textContent = `⏰ Time: ${time}`;
+    document.getElementById("reason").textContent = `📄 Reason: ${reason}`;
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const date = params.get("date");
-    const time = params.get("time");
-    const name = params.get("name");
-    const reason = params.get("reason");
+    const logsURL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv";
 
-    const detailsDiv = document.getElementById("bookingDetails");
-    const confirmBtn = document.getElementById("confirmBtn");
-
-    if (date && time && name && reason) {
-      detailsDiv.innerHTML = `
-        <strong>Name:</strong> ${name}<br/>
-        <strong>Date:</strong> ${date}<br/>
-        <strong>Time:</strong> ${time}<br/>
-        <strong>Reason:</strong> ${reason}
-      `;
-
-      const message = `Hello, I would like to book an appointment:\n\nName: ${name}\nDate: ${date}\nTime: ${time}\nReason: ${reason}`;
-      const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
-      confirmBtn.onclick = () => {
-        window.location.href = whatsappLink;
-      };
-    } else {
-      detailsDiv.innerHTML = "Missing booking info. Please go back and fill the form.";
-      confirmBtn.style.display = "none";
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle("light-mode");
-      localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
-    }
-
-    window.onload = function () {
-      if (localStorage.getItem("theme") === "light") {
-        document.body.classList.add("light-mode");
+    async function assignTokenAndSave() {
+      let token = 1;
+      try {
+        const res = await fetch(logsURL);
+        const text = await res.text();
+        const lines = text.trim().split("\n");
+        const todayCount = lines.filter(line => line.startsWith(date + ",")).length;
+        token = todayCount + 1;
+      } catch (e) {
+        console.warn("Token fetch error", e);
       }
-    };
-  </script>
-</body>
+
+      document.getElementById("token").textContent = `🎫 Token No: ${token}`;
+
+      // Save to logs.csv (via backend/API/manual setup)
+      const newRow = `${date},${time},${name},${reason},${contact},${token},No`;
+      console.log("📥 Save row:", newRow);
+
+      // Optional: Post to endpoint or instruct manual append
+    }
+
+    assignTokenAndSave();
+  </script></body>
 </html>
