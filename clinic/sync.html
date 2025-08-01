@@ -1,116 +1,54 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Data Sync Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sync & Backup - Clinic Logs</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    header {
+      background-color: #f9f9f9;
+      color: #333;
       padding: 20px;
-      background: #222;
+    }
+    h1 {
       text-align: center;
     }
-    main {
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
       padding: 20px;
-    }
-    .panel {
-      background: #1a1a1a;
-      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
-      margin-bottom: 20px;
     }
-    .panel h2 {
-      margin-top: 0;
-      color: #0ff;
-    }
-    button {
-      background: #0ff;
-      color: #000;
-      border: none;
+    .btn {
+      display: inline-block;
       padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+      background-color: #28a745;
+      border: none;
       border-radius: 5px;
-      cursor: pointer;
+      text-decoration: none;
+      margin: 20px 0;
+    }
+    .btn:hover {
+      background-color: #218838;
+    }
+    .info {
+      font-size: 14px;
       margin-top: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    table th, table td {
-      border: 1px solid #444;
-      padding: 8px;
-      text-align: left;
-    }
-    table th {
-      background: #333;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Data Sync Panel</h1>
-  </header>
-  <main>
-    <div class="panel">
-      <h2>Sync Bookings</h2>
-      <p>Click below to fetch the latest bookings data.</p>
-      <button onclick="loadLogs()">Sync Logs</button>
-      <div id="status"></div>
-      <table id="logsTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Name</th>
-            <th>Reason</th>
-            <th>Contact</th>
-            <th>Token</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Rows will be inserted here -->
-        </tbody>
-      </table>
-    </div>
-  </main>  <script>
-    async function loadLogs() {
-      const status = document.getElementById("status");
-      const table = document.getElementById("logsTable").getElementsByTagName("tbody")[0];
-      status.innerText = "Loading...";
-
-      try {
-        const response = await fetch('./logs.csv');
-        const text = await response.text();
-        const lines = text.split('\n').slice(1);
-
-        table.innerHTML = '';
-
-        lines.forEach(line => {
-          const [date, time, name, reason, contact, token] = line.split(',');
-          if (!name || !time) return;
-          const row = table.insertRow();
-          row.innerHTML = `
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${name}</td>
-            <td>${reason}</td>
-            <td>${contact}</td>
-            <td>${token}</td>
-          `;
-        });
-
-        status.innerText = "Logs successfully synced.";
-      } catch (error) {
-        status.innerText = "Failed to load logs.";
-      }
-    }
-  </script></body>
+  <div class="container">
+    <h1>Backup Logs</h1>
+    <p>This panel provides a downloadable backup of all booking logs.</p>
+    <a href="https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv" download class="btn">⬇️ Download logs.csv Backup</a>
+    <p class="info">Note: This file contains the full log data and is auto-updated when you push new logs to GitHub.</p>
+  </div>
+</body>
 </html>
