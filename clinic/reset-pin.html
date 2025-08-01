@@ -66,25 +66,3 @@
     }
   </script></body>
 </html>
-        if (!plans[clinic]) {
-          statusDiv.innerText = `❌ Clinic "${clinic}" not found.`;
-          return;
-        }
-
-        plans[clinic].pin = newPin;
-
-        const blob = new Blob([JSON.stringify(plans, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'plans.json';
-        a.click();
-
-        statusDiv.innerText = `✅ PIN updated. Upload the new file to GitHub.`;
-
-      } catch (err) {
-        statusDiv.innerText = "⚠️ Failed to update. Try again.";
-      }
-    }
-  </script>
-</body>
-</html>
