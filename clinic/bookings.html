@@ -1,107 +1,98 @@
-
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Appointment</title>
-  <link rel="manifest" href="./manifest.json">
-  <script src="./trial.js" defer></script>
   <style>
     body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background-color: #121212;
+      background-color: #111;
       color: white;
+      font-family: sans-serif;
+      padding: 20px;
     }
-    .container {
-      max-width: 400px;
-      margin: auto;
-    }
-    h2 {
+    h1 {
       text-align: center;
-    }
-    label {
-      display: block;
-      margin-top: 20px;
     }
     input, select, button {
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 5px;
       border: none;
-      border-radius: 6px;
+      font-size: 16px;
     }
     button {
-      background-color: #00b894;
+      background-color: #00c49a;
       color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #019875;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Book Appointment</h2>
-    <form id="bookingForm">
-      <label for="name">Patient Name</label>
-      <input type="text" id="name" required><label for="reason">Reason for Visit</label>
-  <input type="text" id="reason" required>
+  <h1>Book Appointment</h1>
+  <label>Patient Name</label>
+  <input type="text" id="patientName" placeholder="Enter your name" />
 
-  <label for="slot">Available Time Slot</label>
-  <select id="slot" required>
-    <option value="">Loading...</option>
-  </select>
+  <label>Reason for Visit</label>
+  <input type="text" id="reason" placeholder="Enter reason" />
 
-  <button type="submit">Confirm & WhatsApp</button>
-</form>
+  <label>Select Date</label>
+  <select id="dateDropdown"></select>
 
-  </div>  <script>
-    const slotSelect = document.getElementById('slot');
-    const form = document.getElementById('bookingForm');
+  <label>Available Time Slot</label>
+  <select id="slotDropdown"></select>
 
-    async function loadSlots() {
-      try {
-        const res = await fetch('https://raw.githubusercontent.com/warangalonepoint/clinic-bot-system/main/clinic/slots.csv');
-        const text = await res.text();
-        const lines = text.trim().split('\n');
-        const headers = lines[0].split(',');
-        const statusIndex = headers.indexOf("Status");
-        const timeIndex = headers.indexOf("Time");
+  <button onclick="confirmBooking()">Confirm & WhatsApp</button>
 
-        slotSelect.innerHTML = '';
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',');
-          if (cols[statusIndex].trim().toLowerCase() !== 'booked') {
-            const option = document.createElement('option');
-            option.value = cols[timeIndex];
-            option.textContent = cols[timeIndex];
-            slotSelect.appendChild(option);
-          }
-        }
-        if (slotSelect.children.length === 0) {
-          slotSelect.innerHTML = '<option value="">No slots available</option>';
-        }
-      } catch (err) {
-        slotSelect.innerHTML = '<option value="">Error loading slots</option>';
-      }
+  <script>
+    const slotData = {
+      "2025-08-01": ["17:00", "17:10", "17:20"],
+      "2025-08-02": ["17:00", "18:00"],
+      "2025-08-03": ["16:00", "16:30", "17:30"]
+    };
+
+    const dateDropdown = document.getElementById("dateDropdown");
+    const slotDropdown = document.getElementById("slotDropdown");
+
+    function loadDates() {
+      Object.keys(slotData).forEach(date => {
+        const opt = document.createElement("option");
+        opt.value = date;
+        opt.textContent = date;
+        dateDropdown.appendChild(opt);
+      });
     }
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value;
-      const reason = document.getElementById('reason').value;
-      const slot = slotSelect.value;
-      if (!slot) return alert('Please select a valid time slot');
+    function loadSlots(date) {
+      slotDropdown.innerHTML = "";
+      slotData[date].forEach(slot => {
+        const opt = document.createElement("option");
+        opt.value = slot;
+        opt.textContent = slot;
+        slotDropdown.appendChild(opt);
+      });
+    }
 
-      const message = `Hi, I am ${name}. I want to book an appointment for ${reason} at ${slot}.`;
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappLink = `https://wa.me/919390664577?text=${encodedMessage}`;
-      window.location.href = whatsappLink;
+    dateDropdown.addEventListener("change", () => {
+      loadSlots(dateDropdown.value);
     });
 
-    loadSlots();
-  </script></body>
+    function confirmBooking() {
+      const name = document.getElementById("patientName").value;
+      const reason = document.getElementById("reason").value;
+      const date = dateDropdown.value;
+      const slot = slotDropdown.value;
+
+      const message = `Appointment Request:\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${slot}`;
+      const phone = "919390664577"; // your number
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    }
+
+    // Init
+    loadDates();
+    loadSlots(Object.keys(slotData)[0]);
+  </script>
+</body>
 </html>
