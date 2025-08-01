@@ -3,28 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Booking Confirmed</title>
+  <title>Confirm Booking</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 40px;
-      background-color: #f5f5f5;
-      color: #222;
+      background-color: #111;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
       text-align: center;
     }
 
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 30px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      max-width: 400px;
-      margin: auto;
+    h2 {
+      color: #00ffcc;
+      margin-bottom: 20px;
     }
 
-    h1 {
-      color: green;
-      font-size: 28px;
+    .card {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px #00ffcc55;
     }
 
     .info {
@@ -32,51 +32,64 @@
       margin: 10px 0;
     }
 
-    .countdown {
-      margin-top: 20px;
+    .btn {
+      padding: 12px 24px;
       font-size: 16px;
-      color: #888;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .confirm {
+      background-color: #00c853;
+      color: white;
+    }
+
+    .back {
+      background-color: #555;
+      color: white;
+    }
+
+    @media (prefers-color-scheme: light) {
+      body { background: #f9f9f9; color: #111; }
+      .card { background: #fff; box-shadow: 0 0 10px #ccc; }
+      .confirm { background: #00c853; }
+      .back { background: #999; }
     }
   </style>
 </head>
 <body>
+  <h2>📝 Confirm Your Appointment</h2>
   <div class="card">
-    <h1>✅ Booking Confirmed</h1>
-    <div class="info" id="nameInfo"></div>
-    <div class="info" id="reasonInfo"></div>
-    <div class="info" id="dateInfo"></div>
-    <div class="info" id="timeInfo"></div>
-    <div class="info" id="tokenInfo"></div>
-    <div class="countdown">Redirecting to WhatsApp in <span id="count">5</span> seconds...</div>
+    <div class="info"><strong>Date:</strong> <span id="date"></span></div>
+    <div class="info"><strong>Time:</strong> <span id="time"></span></div>
+    <div class="info"><strong>Name:</strong> <span id="name"></span></div>
+    <div class="info"><strong>Reason:</strong> <span id="reason"></span></div>
   </div>
+  <button class="btn confirm" onclick="confirmBooking()">✅ Confirm & Book</button>
+  <button class="btn back" onclick="goBack()">⬅️ Back</button>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get("name");
-    const reason = urlParams.get("reason");
-    const date = urlParams.get("date");
-    const time = urlParams.get("time");
-    const token = urlParams.get("token");
-    const phone = urlParams.get("phone");
+    const date = urlParams.get('date') || '';
+    const time = urlParams.get('time') || '';
+    const name = urlParams.get('name') || '';
+    const reason = urlParams.get('reason') || '';
 
-    document.getElementById("nameInfo").innerText = `👤 Name: ${name}`;
-    document.getElementById("reasonInfo").innerText = `📌 Reason: ${reason}`;
-    document.getElementById("dateInfo").innerText = `📅 Date: ${date}`;
-    document.getElementById("timeInfo").innerText = `⏰ Time: ${time}`;
-    document.getElementById("tokenInfo").innerText = `🎫 Token No: ${token}`;
+    document.getElementById("date").textContent = date;
+    document.getElementById("time").textContent = time;
+    document.getElementById("name").textContent = name;
+    document.getElementById("reason").textContent = reason;
 
-    const msg = `Appointment Confirmation:\nName: ${name}\nDate: ${date}\nTime: ${time}\nReason: ${reason}\nToken No: ${token}`;
-    const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    function confirmBooking() {
+      const encodedMsg = encodeURIComponent(`Hi, I'd like to book an appointment:\n📅 ${date}\n⏰ ${time}\n👤 ${name}\n📝 ${reason}`);
+      window.location.href = `https://wa.me/919390664577?text=${encodedMsg}`;
+    }
 
-    let countdown = 5;
-    const timer = setInterval(() => {
-      countdown--;
-      document.getElementById("count").innerText = countdown;
-      if (countdown === 0) {
-        clearInterval(timer);
-        window.location.href = waLink;
-      }
-    }, 1000);
+    function goBack() {
+      window.history.back();
+    }
   </script>
 </body>
 </html>
