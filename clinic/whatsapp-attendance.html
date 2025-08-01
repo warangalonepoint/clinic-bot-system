@@ -102,28 +102,40 @@
 
   <script>
     const tableBody = document.getElementById('tableBody');
-    const sheetURL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/whatsapp-log.csv";
+    const csvURL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/whatsapp-log.csv";
 
-    fetch(sheetURL)
+    function parseCSV(csv) {
+      const lines = csv.trim().split('\n');
+      const headers = lines[0].split(',');
+      return lines.slice(1).map(line => {
+        const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        const obj = {};
+        headers.forEach((header, i) => {
+          obj[header.trim()] = values[i]?.replace(/^"|"$/g, '').trim();
+        });
+        return obj;
+      });
+    }
+
+    fetch(csvURL)
       .then(res => res.text())
       .then(csv => {
-        const rows = csv.trim().split('\n').slice(1); // Skip header
+        const data = parseCSV(csv);
         tableBody.innerHTML = "";
-        rows.forEach(row => {
-          const cols = row.split(',');
+        data.forEach(row => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td data-label="Timestamp">${cols[0]}</td>
-            <td data-label="Staff ID">${cols[1]}</td>
-            <td data-label="Name">${cols[2]}</td>
-            <td data-label="Shift">${cols[3]}</td>
-            <td data-label="Status">${cols[4]}</td>
+            <td data-label="Timestamp">${row['Timestamp'] || ''}</td>
+            <td data-label="Staff ID">${row['Staff ID'] || ''}</td>
+            <td data-label="Name">${row['Name'] || ''}</td>
+            <td data-label="Shift">${row['Shift'] || ''}</td>
+            <td data-label="Status">${row['Status'] || ''}</td>
           `;
           tableBody.appendChild(tr);
         });
       })
       .catch(err => {
-        tableBody.innerHTML = `<tr><td colspan="5">Failed to load data</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5">Error loading log</td></tr>`;
       });
 
     function toggleTheme() {
@@ -131,4 +143,4 @@
     }
   </script>
 </body>
-</html>
+</html>      
