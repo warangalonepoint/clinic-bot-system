@@ -1,0 +1,94 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backup & Restore</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: #111;
+      color: #0ff;
+    }
+    body.light {
+      background: #f9f9f9;
+      color: #111;
+    }
+    .theme-toggle {
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    h1 {
+      text-align: center;
+    }
+    .panel {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #999;
+      background: rgba(255,255,255,0.05);
+    }
+    .panel.dark {
+      border-color: #0ff;
+    }
+    .panel button, .panel input[type="file"] {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+    .info {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
+  <h1>📦 Backup & Restore Panel</h1>
+  <div class="panel">
+    <h3>⬇️ Download Current Files</h3>
+    <button onclick="downloadCSV('logs.csv')">Download Logs</button>
+    <button onclick="downloadCSV('staff.csv')">Download Staff</button>
+    <button onclick="downloadCSV('staff-attendance.csv')">Download Attendance</button><h3>⬆️ Restore Files</h3>
+<input type="file" id="fileInput" accept=".csv" onchange="handleRestore(event)" />
+<p class="info">Upload a CSV file to restore data.</p>
+
+  </div>  <script>
+    function toggleTheme() {
+      const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+      document.body.className = newTheme;
+      document.querySelector('.panel').className = `panel ${newTheme}`;
+      localStorage.setItem('theme', newTheme);
+    }
+
+    function applyTheme() {
+      const theme = localStorage.getItem('theme') || 'light';
+      document.body.className = theme;
+      document.querySelector('.panel').className = `panel ${theme}`;
+    }
+
+    function downloadCSV(filename) {
+      const link = document.createElement('a');
+      link.href = `./${filename}`;
+      link.download = filename;
+      link.click();
+    }
+
+    function handleRestore(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      alert(`📂 File '${file.name}' selected for restore. (Manual sync required)`);
+      // Manual restore: user must replace CSV via GitHub or local storage.
+    }
+
+    applyTheme();
+  </script></body>
+</html>
