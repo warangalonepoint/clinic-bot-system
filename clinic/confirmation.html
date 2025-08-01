@@ -1,73 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Booking Confirmed</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation</title>
+  <link rel="manifest" href="./manifest.json">
   <style>
     body {
-      background-color: #f4f4f4;
       font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
       text-align: center;
       padding: 40px;
     }
+    .light-mode {
+      background: #f0f0f0;
+      color: #111;
+    }
     .card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: #222;
       padding: 30px;
+      border-radius: 10px;
       max-width: 400px;
       margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
-    h1 {
-      color: #2e8b57;
+    .light-mode .card {
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .info {
-      font-size: 18px;
-      margin-top: 10px;
+    h2 {
+      margin-bottom: 20px;
     }
-    .token {
-      font-size: 20px;
-      color: #d9534f;
-      font-weight: bold;
-      margin-top: 20px;
-    }
-    .whatsapp-button {
-      margin-top: 25px;
-      padding: 12px 24px;
-      font-size: 16px;
-      background-color: #25D366;
-      color: white;
+    button {
+      padding: 10px 20px;
+      background: #00ffc8;
+      color: #000;
       border: none;
-      border-radius: 8px;
+      border-radius: 5px;
       cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
+    }
+    button:hover {
+      background: #00c6a2;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>✅ Booking Confirmed!</h1>
-    <div class="info" id="confirmationDetails"></div>
-    <div class="token" id="tokenDisplay"></div>
-    <a id="whatsappButton" class="whatsapp-button" target="_blank">Send Confirmation on WhatsApp</a>
-  </div>
+    <h2>✅ Appointment Confirmed</h2>
+    <p>Your booking has been successfully submitted.</p>
+    <p><strong>Token No:</strong> <span id="token"></span></p>
+    <p><strong>Time Slot:</strong> <span id="slot"></span></p>
+    <button onclick="goBack()">Book Another</button>
+  </div>  <script>
+    function goBack() {
+      window.location.href = "./booking.html";
+    }
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name') || 'Patient';
-    const time = urlParams.get('time') || '';
-    const reason = urlParams.get('reason') || '';
-    const contact = urlParams.get('contact') || '';
-    const token = urlParams.get('token') || '';
+    function loadData() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token') || 'N/A';
+      const slot = urlParams.get('slot') || 'N/A';
+      document.getElementById('token').textContent = token;
+      document.getElementById('slot').textContent = slot;
+    }
 
-    document.getElementById('confirmationDetails').innerText = `Hi ${name}, your appointment is booked at ${time} for "${reason}".`;
-    document.getElementById('tokenDisplay').innerText = `Your Token No: ${token}`;
-
-    const message = `Hi, this is ${name}. My appointment is confirmed at ${time} for "${reason}". Token No: ${token}`;
-    const whatsappLink = `https://wa.me/${contact}?text=${encodeURIComponent(message)}`;
-    document.getElementById('whatsappButton').href = whatsappLink;
-  </script>
-</body>
+    loadData();
+  </script></body>
 </html>
