@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Booking Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background-color: #f6f6f6;
       margin: 0;
       padding: 20px;
     }
 
     h1 {
       text-align: center;
-      color: #222;
+      margin-bottom: 10px;
     }
 
     .filters {
@@ -23,66 +23,88 @@
     }
 
     .filters button {
-      margin: 5px;
-      padding: 8px 14px;
-      font-size: 16px;
+      margin: 0 5px;
+      padding: 8px 16px;
+      font-size: 14px;
     }
 
     .log-card {
-      background: #fff;
+      background: white;
       border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 10px auto;
+      padding: 16px;
+      max-width: 600px;
     }
 
     .log-card p {
-      margin: 6px 0;
+      margin: 4px 0;
+      font-size: 14px;
     }
 
     .label {
       font-weight: bold;
-      color: #444;
     }
   </style>
 </head>
 <body>
   <h1>Booking Logs</h1>
-
   <div class="filters">
     <button onclick="filterLogs('today')">Today</button>
     <button onclick="filterLogs('yesterday')">Yesterday</button>
   </div>
-
-  <div id="log-container"></div>
+  <div id="logsContainer"></div>
 
   <script>
-    const csvURL = './logs.csv';
     let logs = [];
 
-    async function fetchCSV() {
-      const res = await fetch(csvURL);
-      const text = await res.text();
-      const rows = text.trim().split('\n').slice(1); // skip header
-      logs = rows.map(row => {
-        const cols = row.split(',');
-        return {
-          time: cols[0],
-          reason: cols[1],
-          name: cols[2],
-          contact: cols[3],
-          date: cols[4],
-          token: cols[5]
-        };
+    fetch('./logs.csv')
+      .then(response => response.text())
+      .then(csv => {
+        const lines = csv.trim().split('\n').slice(1);
+        logs = lines.map(row => {
+          const cols = row.split(',');
+          return {
+            date: cols[0],
+            time: cols[1],
+            name: cols[2],
+            reason: cols[3],
+            contact: cols[4],
+            token: cols[5],
+            reminder: cols[6] || 'No'
+          };
+        });
+        displayLogs('today');
       });
-      displayLogs(logs);
+
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
     }
 
-    function displayLogs(data) {
-      const container = document.getElementById('log-container');
-      container.innerHTML = '';
+    function filterLogs(dayType) {
+      const now = new Date();
+      let targetDate;
+      if (dayType === 'today') targetDate = formatDate(now);
+      else if (dayType === 'yesterday') {
+        now.setDate(now.getDate() - 1);
+        targetDate = formatDate(now);
+      }
 
-      data.forEach(log => {
+      const filtered = logs.filter(log => log.date === targetDate);
+      displayLogs(filtered);
+    }
+
+    function displayLogs(filteredLogs) {
+      if (!Array.isArray(filteredLogs)) return;
+
+      const container = document.getElementById('logsContainer');
+      container.innerHTML = '';
+      if (filteredLogs.length === 0) {
+        container.innerHTML = '<p style="text-align:center;">No bookings found.</p>';
+        return;
+      }
+
+      filteredLogs.forEach(log => {
         const card = document.createElement('div');
         card.className = 'log-card';
         card.innerHTML = `
@@ -92,28 +114,11 @@
           <p><span class="label">Time:</span> ${log.time}</p>
           <p><span class="label">Contact:</span> ${log.contact}</p>
           <p><span class="label">Token No:</span> ${log.token}</p>
+          <p><span class="label">Reminder Sent:</span> ${log.reminder}</p>
         `;
         container.appendChild(card);
       });
     }
-
-    function filterLogs(day) {
-      const today = new Date();
-      let targetDate;
-
-      if (day === 'today') {
-        targetDate = today.toISOString().split('T')[0];
-      } else if (day === 'yesterday') {
-        const yest = new Date(today);
-        yest.setDate(yest.getDate() - 1);
-        targetDate = yest.toISOString().split('T')[0];
-      }
-
-      const filtered = logs.filter(log => log.date === targetDate);
-      displayLogs(filtered);
-    }
-
-    fetchCSV();
   </script>
 </body>
 </html>
