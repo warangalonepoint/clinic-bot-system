@@ -1,65 +1,114 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Export Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
       margin: 0;
-      padding: 0;
-      color: #333;
+      padding: 40px 20px;
+      transition: background-color 0.3s, color 0.3s;
     }
-    .container {
-      max-width: 600px;
-      margin: 60px auto;
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    .dark-mode {
+      background-color: #111;
+      color: #eee;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 26px;
+
+    .light-mode {
+      background-color: #f9f9f9;
       color: #222;
     }
-    .export-section {
-      margin: 20px 0;
+
+    .panel {
+      max-width: 600px;
+      margin: auto;
+      background-color: rgba(0,0,0,0.05);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .panel h1 {
+      text-align: center;
+      font-size: 26px;
+    }
+
+    .download-button {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      margin-top: 20px;
+      border: none;
+      font-size: 16px;
+      color: white;
+      background-color: #28a745;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .note {
+      margin-top: 20px;
+      font-size: 14px;
       text-align: center;
     }
-    .export-section p {
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    .export-section a {
-      display: inline-block;
-      padding: 12px 22px;
-      background-color: #007BFF;
+
+    .toggle-theme {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: none;
+      background-color: #444;
       color: #fff;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-      transition: background 0.3s ease;
+      cursor: pointer;
     }
-    .export-section a:hover {
-      background-color: #0056b3;
+
+    .light-mode .toggle-theme {
+      background-color: #ccc;
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Export Panel</h2><div class="export-section">
-  <p>Download full appointment logs</p>
-  <a href="logs.csv" download>Download logs.csv</a>
-</div>
+  <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
 
-<div class="export-section">
-  <p>Download available slot schedule</p>
-  <a href="slots.csv" download>Download slots.csv</a>
-</div>
+  <div class="panel">
+    <h1>Export Panel</h1>
 
+    <a href="./logs.csv" class="download-button" download>⬇️ Download logs.csv Backup</a>
+    <a href="./slots.csv" class="download-button" download>⬇️ Download slots.csv Backup</a>
+
+    <p class="note">
+      Note: These files reflect the most recent booking and slot data and are auto-updated when changes are pushed to GitHub.
+    </p>
   </div>
+
+  <script>
+    const body = document.body;
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        body.classList.add('dark-mode');
+        body.classList.remove('light-mode');
+      } else {
+        body.classList.add('light-mode');
+        body.classList.remove('dark-mode');
+      }
+    }
+
+    function toggleTheme() {
+      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      applyTheme(newTheme);
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+  </script>
 </body>
 </html>
