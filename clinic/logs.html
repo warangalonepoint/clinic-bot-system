@@ -1,149 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Booking Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="logo.png" />
+  <link rel="manifest" href="./manifest.json">
+  <script src="./pwa.js"></script>
   <style>
-    :root {
-      --bg: #111;
-      --text: #fff;
-      --card: #222;
-      --accent: #00ff88;
-    }
-    [data-theme="light"] {
-      --bg: #fff;
-      --text: #000;
-      --card: #f1f1f1;
-      --accent: #007bff;
-    }
-
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
     }
-
-    header {
-      padding: 16px;
-      background: var(--card);
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 1rem;
+    }
+    h1 {
       text-align: center;
-      font-size: 20px;
-      font-weight: bold;
     }
-
-    .theme-toggle {
-      position: absolute;
-      top: 12px;
-      right: 20px;
-    }
-
-    .logs-container {
-      padding: 20px;
-    }
-
     .log-card {
-      background-color: var(--card);
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      background: #fff;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
     .log-card p {
-      margin: 6px 0;
-      font-size: 14px;
+      margin: 0.25rem 0;
     }
-
-    button {
-      margin-top: 10px;
-      padding: 8px 16px;
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
+    .log-card strong {
+      display: inline-block;
+      width: 130px;
     }
-
-    button:hover {
-      opacity: 0.8;
+    .dark-mode {
+      background-color: #121212;
+      color: #fff;
     }
-
-    .summary {
-      background: var(--card);
-      padding: 16px;
-      border-radius: 10px;
-      margin: 20px;
-      font-size: 15px;
+    .dark-mode .log-card {
+      background-color: #1e1e1e;
+      color: #fff;
+    }
+    .toggle-mode {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 100;
     }
   </style>
 </head>
 <body>
+<div class="toggle-mode">
+  <label><input type="checkbox" id="modeToggle"> Dark Mode</label>
+</div>
+<div class="container">
+  <h1>Booking Logs</h1>
+  <div id="logs"></div>
+</div><script>
+  document.getElementById('modeToggle').addEventListener('change', function () {
+    document.body.classList.toggle('dark-mode');
+  });
 
-  <header>
-    Booking Logs
-    <label class="theme-toggle">
-      <input type="checkbox" id="themeSwitch"> 🌙
-    </label>
-  </header>
-
-  <div class="logs-container" id="logs"></div>
-
-  <div class="summary" id="summary"></div>
-
-  <script>
-    // Theme toggle
-    const themeSwitch = document.getElementById('themeSwitch');
-    themeSwitch.addEventListener('change', () => {
-      document.documentElement.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
+  async function loadLogs() {
+    const response = await fetch('./logs.csv');
+    const text = await response.text();
+    const rows = text.trim().split('\n');
+    const header = rows.shift().split(',');
+    const logs = rows.map(row => {
+      const values = row.split(',');
+      const entry = {};
+      header.forEach((key, i) => {
+        entry[key.trim()] = values[i]?.trim();
+      });
+      return entry;
     });
 
-    async function loadLogs() {
-      try {
-        const res = await fetch('logs.csv');
-        const data = await res.text();
-        const rows = data.trim().split('\n').slice(1); // skip header
-        const container = document.getElementById("logs");
-        const summary = document.getElementById("summary");
-        let total = 0;
+    const logsContainer = document.getElementById('logs');
+    logs.forEach(log => {
+      const card = document.createElement('div');
+      card.className = 'log-card';
+      card.innerHTML = `
+        <p><strong>Time:</strong> ${log.Time}</p>
+        <p><strong>Patient Name:</strong> ${log.Name}</p>
+        <p><strong>Visit Reason:</strong> ${log.Reason}</p>
+        <p><strong>Contact Number:</strong> ${log.Contact}</p>
+        <p><strong>Token No.:</strong> ${log.Token}</p>
+        <p><strong>Reminder Sent:</strong> ${log["Reminder Sent"] || 'No'}</p>
+        <button onclick="sendReminder('${log.Contact}', '${log.Name}', '${log.Time}', '${log.Token}')">Send WhatsApp Reminder</button>
+      `;
+      logsContainer.appendChild(card);
+    });
+  }
 
-        rows.forEach(row => {
-          const [date, name, reason, slot, token, contact, reminder] = row.split(',');
+  function sendReminder(contact, name, time, token) {
+    const msg = `Hello ${name}, this is a reminder for your appointment at ${time}. Your token number is ${token}.`;
+    const url = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  }
 
-          const div = document.createElement("div");
-          div.className = "log-card";
-          div.innerHTML = `
-            <p><strong>Patient:</strong> ${name}</p>
-            <p><strong>Reason:</strong> ${reason}</p>
-            <p><strong>Slot:</strong> ${slot}</p>
-            <p><strong>Token:</strong> ${token}</p>
-            <p><strong>Contact:</strong> <a href="tel:${contact}">${contact}</a></p>
-            <p><strong>Reminder Sent:</strong> ${reminder}</p>
-            <button onclick="sendReminder('${contact}', '${name}', '${slot}', '${token}')">Send WhatsApp Reminder</button>
-          `;
-          container.appendChild(div);
-          total++;
-        });
-
-        summary.innerHTML = `Total Bookings: <strong>${total}</strong>`;
-
-      } catch (err) {
-        document.getElementById("logs").innerText = "⚠️ Error loading logs.";
-      }
-    }
-
-    function sendReminder(phone, name, slot, token) {
-      const msg = `Hello ${name}, this is a reminder for your appointment at ${slot} (Token No: ${token}).`;
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    loadLogs();
-  </script>
-
-</body>
-</html>
+  loadLogs();
+</script></body>
+</html>    
