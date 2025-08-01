@@ -171,14 +171,6 @@ fetch("./slots.csv")
   .catch(error => {
     console.error("Failed to fetch slots:", error);
   });
-      fetch("./clinic/logs.csv")
-        .then(response => response.text())
-        .then(csv => {
-          const bookings = csv.split("\n").filter(line => line.includes(date));
-          const token = bookings.length;
-          const url = `confirmation.html?name=${encodeURIComponent(name)}&reason=${encodeURIComponent(reason)}&date=${date}&time=${time}&token=${token + 1}&phone=${phone}`;
-          window.location.href = url;
-        });
     }
 
     loadSlots();
