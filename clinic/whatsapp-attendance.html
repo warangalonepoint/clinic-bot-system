@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📲 WhatsApp Attendance Log</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #111;
+      margin: 0;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dark {
+      background-color: #121212;
+      color: #f1f1f1;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .theme-toggle {
+      display: block;
+      margin: 0 auto 15px auto;
+      padding: 10px 20px;
+      background: #006eff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f1f1;
+    }
+
+    .dark th {
+      background-color: #1e1e1e;
+    }
+
+    .dark td {
+      border-color: #333;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      th {
+        display: none;
+      }
+      td {
+        border: none;
+        border-bottom: 1px solid #444;
+        padding: 8px;
+      }
+      td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>📲 WhatsApp Attendance Log</h1>
+  <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Staff ID</th>
+        <th>Name</th>
+        <th>Shift</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="5">Loading data...</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const tableBody = document.getElementById('tableBody');
+    const sheetURL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/whatsapp-log.csv";
+
+    fetch(sheetURL)
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.trim().split('\n').slice(1); // Skip header
+        tableBody.innerHTML = "";
+        rows.forEach(row => {
+          const cols = row.split(',');
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td data-label="Timestamp">${cols[0]}</td>
+            <td data-label="Staff ID">${cols[1]}</td>
+            <td data-label="Name">${cols[2]}</td>
+            <td data-label="Shift">${cols[3]}</td>
+            <td data-label="Status">${cols[4]}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        tableBody.innerHTML = `<tr><td colspan="5">Failed to load data</td></tr>`;
+      });
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+  </script>
+</body>
+</html>
