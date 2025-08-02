@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,74 +10,84 @@
     <header class="header">
         <img src="assets/logo.png" alt="Clinic Logo" class="logo">
         <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-    </header><section class="hero-banner">
-    <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
-</section>
+    </header>
 
-<section class="logs-section">
-    <h2>Booking Logs</h2>
-    <div class="form-group">
-        <button onclick="exportTableToCSV('BookingLogs.csv')" class="book-btn">Export as CSV</button>
-        <button onclick="window.print()" class="book-btn">Export as PDF (Print)</button>
-    </div>
-    <table class="logs-table" id="logsTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Patient Name</th>
-                <th>Reason</th>
-                <th>Contact</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>2025-08-01</td>
-                <td>09:00</td>
-                <td>Chaitanya Krishna</td>
-                <td>Fever</td>
-                <td>+919876543210</td>
-            </tr>
-            <tr>
-                <td>2025-08-01</td>
-                <td>09:10</td>
-                <td>Ravi Kumar</td>
-                <td>Checkup</td>
-                <td>+918888888888</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
+    <section class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
+    </section>
 
-<footer>
-    <button class="toggle-theme">Toggle Theme</button>
-    <p>Powered by Onestop AI</p>
-</footer>
+    <section class="logs-section">
+        <h2>Booking Logs</h2>
+        <div class="form-group">
+            <button onclick="exportTableToCSV('BookingLogs.csv')" class="book-btn">Export as CSV</button>
+            <button onclick="window.print()" class="book-btn">Export as PDF (Print)</button>
+        </div>
+        <table class="logs-table" id="logsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient Name</th>
+                    <th>Reason</th>
+                    <th>Contact</th>
+                    <th>Reminder</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2025-08-01</td>
+                    <td>09:00</td>
+                    <td>Chaitanya Krishna</td>
+                    <td>Fever</td>
+                    <td>+919876543210</td>
+                    <td><button onclick="sendReminder('Chaitanya Krishna', '09:00', 'Fever', '919876543210')" class="book-btn">Send</button></td>
+                </tr>
+                <tr>
+                    <td>2025-08-01</td>
+                    <td>09:10</td>
+                    <td>Ravi Kumar</td>
+                    <td>Checkup</td>
+                    <td>+918888888888</td>
+                    <td><button onclick="sendReminder('Ravi Kumar', '09:10', 'Checkup', '918888888888')" class="book-btn">Send</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 
-<script>
-    document.querySelector('.toggle-theme').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-    });
+    <footer>
+        <button class="toggle-theme">Toggle Theme</button>
+        <p>Powered by Onestop AI</p>
+    </footer>
 
-    function exportTableToCSV(filename) {
-        const csv = [];
-        const rows = document.querySelectorAll("table tr");
+    <script>
+        document.querySelector('.toggle-theme').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
 
-        for (let row of rows) {
-            const cols = row.querySelectorAll("td, th");
-            const rowData = Array.from(cols).map(col => col.innerText).join(",");
-            csv.push(rowData);
+        function exportTableToCSV(filename) {
+            const csv = [];
+            const rows = document.querySelectorAll("table tr");
+
+            for (let row of rows) {
+                const cols = row.querySelectorAll("td, th");
+                const rowData = Array.from(cols).map(col => col.innerText).join(",");
+                csv.push(rowData);
+            }
+
+            const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            const downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
         }
 
-        const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-        const downloadLink = document.createElement("a");
-        downloadLink.download = filename;
-        downloadLink.href = window.URL.createObjectURL(csvFile);
-        downloadLink.style.display = "none";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-    }
-</script>
-
+        function sendReminder(name, time, reason, contact) {
+            const msg = `Reminder: Appointment Confirmed.\nName: ${name}\nTime: ${time}\nReason: ${reason}`;
+            const encodedMsg = encodeURIComponent(msg);
+            window.open(`https://wa.me/${contact}?text=${encodedMsg}`, '_blank');
+        }
+    </script>
 </body>
 </html>
