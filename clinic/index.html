@@ -1,44 +1,46 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OneStop AI Clinic - Home</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onestop AI Clinic Demo</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <header>
-    <img src="assets/logo.png" alt="Clinic Logo" height="50">
-    <h1>OneStop AI Clinic</h1>
-  </header>  <section class="hero">
-    <h2>Book Appointments Instantly via WhatsApp</h2>
-    <a href="bookings.html" class="cta-button">Book Now</a>
-  </section>  <section class="services">
-    <h3>Our AI Services</h3>
-    <div class="service-grid">
-      <div class="service-card">
-        <h4>Chatbot Development</h4>
-        <p>Custom bots to automate your business conversations.</p>
-      </div>
-      <div class="service-card">
-        <h4>Appointment Bots</h4>
-        <p>WhatsApp-based booking systems for clinics & businesses.</p>
-      </div>
-      <div class="service-card">
-        <h4>Website Creation</h4>
-        <p>Fully responsive business websites tailored for you.</p>
-      </div>
-      <div class="service-card">
-        <h4>Mobile App Development</h4>
-        <p>Simple, powerful apps with AI integration.</p>
-      </div>
-    </div>
-  </section>  <footer>
-    <p>Powered by OneStop AI | Contact: +91 9390664577</p>
-  </footer>  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script></body>
+    <header>
+        <img src="clinic/logo.png" alt="Clinic Logo" class="logo">
+        <h1>Onestop AI Clinic Demo</h1>
+        <button id="themeToggle">Toggle Theme</button>
+    </header>
+
+    <main>
+        <div class="hero-banner">
+            <img src="assets/clinic-hero-banner.png" alt="Hero Banner">
+        </div>
+
+        <p>Welcome to your clinic dashboard. Choose a panel below:</p>
+        <a href="clinic-dashboard.html" class="btn">Clinic Dashboard</a>
+        <a href="bookings.html" class="btn">Patient Bookings</a>
+        <a href="logs.html" class="btn">Booking Logs</a>
+        <a href="staff-panel.html" class="btn">Staff Panel</a>
+    </main>
+
+    <footer>
+        <p>Powered by Onestop AI</p>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        });
+
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') document.body.classList.add('dark-theme');
+        };
+    </script>
+</body>
 </html>
