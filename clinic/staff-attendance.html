@@ -5,6 +5,16 @@
     <title>Staff Attendance - Onestop AI Clinic</title>
     <link rel="stylesheet" href="assets/styles.css">
     <style>
+        .theme-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: inherit;
+        }
         body.dark-mode {
             background-color: #121212;
             color: #ffffff;
@@ -31,6 +41,7 @@
     <header class="header">
         <img src="assets/logo.png" alt="Clinic Logo" class="logo">
         <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
+        <button id="themeToggleBtn" class="theme-icon">🌓</button>
     </header><section class="hero-banner">
     <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
 </section>
@@ -78,7 +89,6 @@
 </section>
 
 <footer>
-    <button id="themeToggleBtn" class="book-btn">Toggle Theme</button>
     <p>Powered by Onestop AI</p>
 </footer>
 
