@@ -1,18 +1,41 @@
-body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; }
-
-h1, h2 { text-align: center; }
-
-.booking-form, .logs-table, .sync-panel { max-width: 600px; margin: 2rem auto; padding: 1rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); animation: fadeSlideUp 0.6s ease forwards; }
-
-input, select, textarea, button { width: 100%; padding: 10px; margin: 0.5rem 0; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
-
-button { background: linear-gradient(135deg, #007bff, #0056b3); color: #fff; border: none; cursor: pointer; font-weight: bold; transition: transform 0.2s; }
-
-button:hover { transform: translateY(-2px); }
-
-footer { text-align: center; padding: 1rem; font-size: 0.9rem; color: #666; }
-
-/* Animations */ @keyframes fadeSlideUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
-
-/* Dark Theme Support */ .dark-theme { background: #121212; color: #e0e0e0; } .dark-theme input, .dark-theme select, .dark-theme textarea { background: #1e1e1e; color: #fff; border: 1px solid #333; } .dark-theme .booking-form, .dark-theme .logs-table, .dark-theme .sync-panel { background: #1e1e1e; box-shadow: 0 4px 8px rgba(0,0,0,0.6); }
-
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.header {
+    background: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+button {
+    margin-top: 10px;
+}
+.logs-container {
+    padding: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+.dark-theme {
+    background: #222;
+    color: white;
+}
+.floating-whatsapp {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #25D366;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 50%;
+    font-size: 24px;
+    text-decoration: none;
+}
