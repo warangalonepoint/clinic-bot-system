@@ -1,17 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onestop AI Clinic Demo</title>
-    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="header">
         <img src="assets/logo.png" alt="Clinic Logo" class="logo">
         <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-    </header>
-
+    </header><main>
     <section class="hero-banner">
         <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
     </section>
@@ -26,18 +24,19 @@
         <a href="sync-panel.html" class="nav-button">🔄 Sync Panel</a>
         <a href="confirmation.html" class="nav-button">✅ Confirmations</a>
     </section>
+</main>
 
-    <footer>
-        <button class="toggle-theme">Toggle Theme</button>
-        <p>Powered by Onestop AI</p>
-    </footer>
+<footer>
+    <button class="toggle-theme">Toggle Theme</button>
+    <p>Powered by Onestop AI</p>
+</footer>
 
-    <script>
-        // Theme Toggle Functionality
-        const toggleButton = document.querySelector('.toggle-theme');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-        });
-    </script>
+<script>
+    const toggleButton = document.querySelector('.toggle-theme');
+    toggleButton.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+</script>
+
 </body>
 </html>
