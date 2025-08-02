@@ -2,22 +2,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment</title>
-    <link rel="stylesheet" href="assets/styles.css">
+    <title>Onestop AI Clinic Demo</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="header">
-        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
+        <img src="logo.png" alt="Clinic Logo" class="logo">
         <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-    </header><section class="hero-banner">
-    <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
-</section>
-
-<section class="form-section">
+    </header><section class="form-section">
     <h2>Book Your Appointment</h2>
     <div class="form-group">
-        <select><option>Select Date</option></select>
-        <select><option>Select Time Slot</option></select>
+        <select id="date-select">
+            <option>Select Date</option>
+            <option>2025-08-05</option>
+            <option>2025-08-06</option>
+        </select>
+        <select id="time-slot">
+            <option>Select Time Slot</option>
+            <option>10:00 AM</option>
+            <option>10:10 AM</option>
+            <option>10:20 AM</option>
+        </select>
         <input type="text" placeholder="Patient Name">
         <input type="text" placeholder="Reason for Visit">
         <a href="#" class="book-btn">Book on WhatsApp</a>
