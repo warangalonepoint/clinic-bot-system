@@ -8,47 +8,59 @@
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-    <header>
-        <img src="clinic/logo.png" alt="Clinic Logo" class="logo">
-        <h1>Onestop AI Clinic Demo</h1>
-        <button id="themeToggle">Toggle Theme</button>
-    </header>
 
-    <main>
-        <div class="hero-banner">
-            <img src="assets/dashboard-hero.png" alt="Dashboard Hero Banner">
-        </div>
+    <!-- Logo -->
+    <div class="logo-section">
+        <img src="logo.png" alt="Clinic Logo" class="logo">
+    </div>
 
-        <div class="container">
-            <a href="bookings.html" class="btn">📝 Patient Bookings</a>
-            <a href="logs.html" class="btn">📋 Booking Logs</a>
-            <a href="staff-panel.html" class="btn">👥 Staff Panel</a>
-            <a href="staff-attendance.html" class="btn">📅 Staff Attendance</a>
-            <a href="staff-whatsapp-attendance.html" class="btn">📲 Mark Attendance (WhatsApp)</a>
-            <a href="staff-monthly-summary.html" class="btn">📈 Monthly Attendance Summary</a>
-            <a href="staff-leave-tracker.html" class="btn">🏝️ Leave Tracker</a>
-            <a href="staff-roster.html" class="btn">🗓️ Staff Roster</a>
-            <a href="whatsapp-log.html" class="btn">📨 WhatsApp Log</a>
-            <a href="sync.html" class="btn">🔄 Sync Panel</a>
-            <a href="confirmation.html" class="btn">✅ Booking Confirmation</a>
-        </div>
-    </main>
+    <!-- Clinic Name -->
+    <h1>Onestop AI Clinic Demo</h1>
+
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle">Toggle Theme</button>
+
+    <!-- Hero Banner Image -->
+    <div class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Dashboard Hero Banner" class="hero-img">
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="container">
+        <a href="index.html" class="btn">🏠 Home</a>
+        <a href="bookings.html" class="btn">📝 Patient Bookings</a>
+        <a href="logs.html" class="btn">📋 Booking Logs</a>
+        <a href="staff-panel.html" class="btn">👥 Staff Panel</a>
+        <a href="staff-attendance.html" class="btn">🗓️ Staff Attendance</a>
+        <a href="staff-whatsapp-attendance.html" class="btn">📲 Mark Attendance (WhatsApp)</a>
+        <a href="staff-monthly-summary.html" class="btn">📈 Monthly Attendance Summary</a>
+        <a href="staff-leave-tracker.html" class="btn">🏝️ Leave Tracker</a>
+        <a href="staff-roster.html" class="btn">🗓️ Staff Roster</a>
+        <a href="whatsapp-log.html" class="btn">📩 WhatsApp Log</a>
+        <a href="sync.html" class="btn">🔄 Sync Panel</a>
+        <a href="confirmation.html" class="btn">✅ Booking Confirmation</a>
+    </div>
 
     <footer>
         <p>Powered by Onestop AI</p>
     </footer>
 
     <script>
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => {
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
             localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
         });
 
+        // Load preferred theme
         window.onload = () => {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') document.body.classList.add('dark-theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
         };
     </script>
+
 </body>
 </html>
