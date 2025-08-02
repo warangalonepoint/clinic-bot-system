@@ -1,144 +1,90 @@
-body {
-    font-family: 'Arial', sans-serif;
+/* Universal Reset */
+body, h1, h2, h3, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
     margin: 0;
     padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    box-sizing: border-box;
 }
 
-:root {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --card-bg: #000000;
-    --button-bg: #00C851;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #000;
+    text-align: center;
 }
 
-.dark-mode {
-    --bg-color: #121212;
-    --text-color: #ffffff;
-    --card-bg: #1e1e1e;
-    --button-bg: #007e33;
+/* Dark Mode */
+body.dark-mode {
+    background-color: #121212;
+    color: #f5f5f5;
 }
 
-/* Header Branding */
+/* Header */
 header {
     background-color: #000;
-    color: white;
-    text-align: center;
+    color: #fff;
     padding: 10px;
-    font-size: 20px;
+    font-size: 18px;
+    text-align: center;
 }
 
 /* Banner Image */
 .banner {
     width: 100%;
+    height: auto;
     display: block;
-    object-fit: cover;
+    margin-bottom: 20px;
 }
 
-/* Main Content Wrapper */
-.main-content {
-    padding: 20px;
-    text-align: center;
-}
-
-/* Grid Buttons */
+/* Button Grid */
 .button-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    justify-items: center;
-    margin-top: 20px;
+    width: 80%;
+    margin: 0 auto 30px auto;
 }
 
+/* Button Cards */
 .button-card {
-    background-color: var(--card-bg);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 12px;
-    text-align: center;
-    width: 140px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    background-color: #000;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
     transition: transform 0.2s;
 }
 
 .button-card:hover {
-    transform: scale(1.05);
-}
-
-/* Forms Section */
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-input, select {
-    padding: 10px;
-    width: 90%;
-    max-width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-/* WhatsApp Button */
-.whatsapp-button {
-    background-color: var(--button-bg);
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    width: 90%;
-    max-width: 300px;
-}
-
-.whatsapp-button:hover {
-    opacity: 0.9;
-}
-
-/* Logs Table */
-.logs-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-.logs-table th, .logs-table td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ccc;
-}
-
-.logs-table th {
-    background-color: var(--card-bg);
-    color: white;
+    transform: translateY(-2px);
 }
 
 /* Footer */
 footer {
     background-color: #000;
-    color: white;
-    text-align: center;
+    color: #fff;
     padding: 15px;
-    margin-top: 30px;
     position: relative;
     bottom: 0;
     width: 100%;
 }
 
-/* Toggle Theme Button */
 .theme-toggle {
-    margin-top: 10px;
-    padding: 8px 16px;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border: none;
     border-radius: 8px;
-    font-size: 14px;
-    background-color: white;
-    color: black;
     cursor: pointer;
+}
+
+/* Dark Mode Styling */
+body.dark-mode .button-card {
+    background-color: #1f1f1f;
+}
+
+body.dark-mode footer {
+    background-color: #1f1f1f;
 }
