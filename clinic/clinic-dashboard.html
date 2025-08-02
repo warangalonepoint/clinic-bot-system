@@ -1,123 +1,88 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#007BFF"/>
-  <link rel="manifest" href="manifest.json">
-  <title>Clinic Dashboard – Onestop Ai Clinic Demo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onestop AI Clinic Dashboard V2</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
       margin: 0;
       padding: 0;
-      transition: 0.3s ease all;
-    }
-    :root {
-      --bg: #ffffff;
-      --text: #000000;
-    }
-    .dark {
-      --bg: #0d1117;
-      --text: #ffffff;
+      background-color: #fff;
+      color: #333;
     }
     header {
-      background: #007BFF;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      font-size: 1.5rem;
-    }
-    .container {
-      padding: 2rem;
-      text-align: center;
-    }
-    .btn {
-      display: block;
-      margin: 1rem auto;
-      padding: 1rem;
-      width: 90%;
-      max-width: 400px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
       background-color: #007BFF;
       color: white;
-      transition: 0.2s ease;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
     }
-    .btn:hover {
-      background-color: #0056b3;
+    .container {
+      padding: 20px;
     }
-    .toggle-btn {
+    .section-title {
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .button {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 12px;
+      text-align: center;
+      background-color: #007BFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .theme-toggle {
       position: absolute;
       top: 10px;
       right: 10px;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      border: none;
+      background-color: #333;
+      color: white;
+      padding: 8px;
+      border-radius: 5px;
       cursor: pointer;
-      background: #222;
-      color: #fff;
     }
-    #installBtn {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      background: #007BFF;
-      color: #fff;
-      border: none;
-      cursor: pointer;
+    .dark-theme {
+      background-color: #121212;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <button class="toggle-btn" onclick="toggleTheme()">🌓</button>
-  <header>Clinic Dashboard</header>
-  <div class="container">
-    <a class="btn" href="bookings.html">📝 Patient Bookings</a>
-    <a class="btn" href="logs.html">📋 Booking Logs</a>
-    <a class="btn" href="staff.html">👥 Staff Panel</a>
-    <a class="btn" href="staff-attendance.html">📅 Staff Attendance</a>
-    <a class="btn" href="staff-attendance-form.html">📲 Mark Attendance (WhatsApp)</a>
-    <a class="btn" href="staff-monthly-summary.html">📈 Monthly Attendance Summary</a>
-    <a class="btn" href="staff-leave-tracker.html">🌴 Leave Tracker</a>
-    <a class="btn" href="staff-roster.html">🗓️ Staff Roster</a>
-    <a class="btn" href="whatsapp-log.html">📨 WhatsApp Log</a>
-    <a class="btn" href="sync.html">🔄 Sync Panel</a>
-    <a class="btn" href="confirmation.html">✅ Booking Confirmation</a>
+  <header>
+    Onestop AI Clinic Dashboard
+    <span class="theme-toggle" onclick="toggleTheme()">Toggle Theme</span>
+  </header>
+  <div class="container"><div class="section-title">Patient Management</div>
+<a href="bookings.html" class="button">📝 Patient Bookings</a>
+<a href="confirmation.html" class="button">✅ Booking Confirmation</a>
+
+<div class="section-title">Staff Management</div>
+<a href="staff-panel.html" class="button">👥 Staff Panel</a>
+<a href="staff-attendance-form.html" class="button">📅 Staff Attendance</a>
+<a href="mark-attendance.html" class="button">📝 Mark Attendance (WhatsApp)</a>
+<a href="roster-summary.html" class="button">📊 Monthly Attendance Summary</a>
+<a href="leave-tracker.html" class="button">🌴 Leave Tracker</a>
+<a href="staff-roster.html" class="button">📅 Staff Roster</a>
+
+<div class="section-title">Logs & Sync</div>
+<a href="logs.html" class="button">📜 Booking Logs</a>
+<a href="whatsapp-log.html" class="button">📩 WhatsApp Log</a>
+<a href="sync.html" class="button">🔄 Sync Panel</a>
+
   </div>
-  <button id="installBtn">📲 Install App</button>
   <script>
     function toggleTheme() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+      document.body.classList.toggle('dark-theme');
     }
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const installBtn = document.getElementById('installBtn');
-      installBtn.style.display = 'block';
-      installBtn.addEventListener('click', async () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`Install outcome: ${outcome}`);
-        deferredPrompt = null;
-      });
-    });
   </script>
 </body>
 </html>
