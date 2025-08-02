@@ -2,41 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onestop AI Clinic Demo</title>
-    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="header">
-        <img src="logo.png" alt="Clinic Logo" class="logo">
-        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
+
+    <header>
+        <span>🏛️ Onestop AI Clinic Demo</span>
     </header>
 
-    <section class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
-    </section>
+    <img src="doctor-banner.png" alt="Doctor Banner" class="banner">
 
-    <section class="nav-grid">
-        <a href="index.html" class="nav-button">🏠 Home</a>
-        <a href="bookings.html" class="nav-button">📋 Bookings</a>
-        <a href="logs.html" class="nav-button">📄 Logs</a>
-        <a href="staff-panel.html" class="nav-button">👥 Staff</a>
-        <a href="staff-attendance.html" class="nav-button">🗓️ Attendance</a>
-        <a href="whatsapp-log.html" class="nav-button">📲 WhatsApp</a>
-        <a href="sync-panel.html" class="nav-button">🔄 Sync Panel</a>
-        <a href="confirmation.html" class="nav-button">✅ Confirmations</a>
-    </section>
+    <div class="main-content">
+        <div class="button-grid">
+            <a href="index.html" class="button-card">🏠 Home</a>
+            <a href="bookings.html" class="button-card">📋 Bookings</a>
+            <a href="logs.html" class="button-card">📄 Logs</a>
+            <a href="staff.html" class="button-card">👥 Staff</a>
+            <a href="attendance.html" class="button-card">🗓️ Attendance</a>
+            <a href="https://wa.me/your-number" class="button-card">💬 WhatsApp</a>
+            <a href="sync.html" class="button-card">🔄 Sync Panel</a>
+            <a href="confirmations.html" class="button-card">✅ Confirmations</a>
+        </div>
+    </div>
 
     <footer>
-        <button id="toggleTheme" class="toggle-theme">Toggle Theme</button>
+        <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
         <p>Powered by Onestop AI</p>
     </footer>
 
     <script>
-        const toggleButton = document.getElementById('toggleTheme');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-        });
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+        }
     </script>
+
 </body>
 </html>
