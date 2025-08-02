@@ -19,16 +19,17 @@
     <section class="logs-section">
         <h2>Booking Logs</h2>
 
-        <div class="form-group">
-            <button onclick="exportTableToCSV('BookingLogs.csv')" class="book-btn">Export as CSV</button>
-            <button onclick="window.print()" class="book-btn">Export as PDF (Print)</button>
-        </div>
-
-        <!-- Daily Summary Panel -->
+        <!-- Daily Summary -->
         <div class="daily-summary">
             <p>Total Bookings: <span id="totalBookings">0</span></p>
             <p>Reminders Sent: <span id="remindersSent">0</span></p>
             <p>Next Token: <span id="nextToken">1</span></p>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="form-group">
+            <button onclick="exportTableToCSV('BookingLogs.csv')" class="book-btn">Export as CSV</button>
+            <button onclick="window.print()" class="book-btn">Export as PDF (Print)</button>
         </div>
 
         <table class="logs-table" id="logsTable">
@@ -78,23 +79,23 @@
 
         function exportTableToCSV(filename) {
             const csv = [];
-            const rows = document.querySelectorAll("table tr");
+            const rows = document.querySelectorAll(\"table tr\");
             for (let row of rows) {
-                const cols = row.querySelectorAll("td, th");
-                const rowData = Array.from(cols).map(col => col.innerText).join(",");
+                const cols = row.querySelectorAll(\"td, th\");
+                const rowData = Array.from(cols).map(col => col.innerText).join(\",\");
                 csv.push(rowData);
             }
-            const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-            const downloadLink = document.createElement("a");
+            const csvFile = new Blob([csv.join(\"\\n\")], { type: \"text/csv\" });
+            const downloadLink = document.createElement(\"a\");
             downloadLink.download = filename;
             downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
+            downloadLink.style.display = \"none\";
             document.body.appendChild(downloadLink);
             downloadLink.click();
         }
 
         function sendReminder(name, time, reason, contact) {
-            const msg = `Reminder: Appointment Confirmed.\nName: ${name}\nTime: ${time}\nReason: ${reason}`;
+            const msg = `Reminder: Appointment Confirmed.\\nName: ${name}\\nTime: ${time}\\nReason: ${reason}`;
             const encodedMsg = encodeURIComponent(msg);
             window.open(`https://wa.me/${contact}?text=${encodedMsg}`, '_blank');
             updateRemindersCount();
