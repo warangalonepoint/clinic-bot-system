@@ -13,22 +13,49 @@
     </header>
 
     <section class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
     </section>
 
-    <section class="form-section">
+    <section class="logs-section">
         <h2>Staff Daily Attendance</h2>
+
+        <!-- Search & Export -->
         <div class="form-group">
-            <input type="text" placeholder="Staff Name">
-            <input type="text" placeholder="Today's Role">
-            <select>
-                <option>Select Shift</option>
-                <option>Morning (9 AM - 1 PM)</option>
-                <option>Afternoon (1 PM - 5 PM)</option>
-                <option>Evening (5 PM - 8 PM)</option>
-            </select>
-            <a href="https://wa.me/919876543210" class="book-btn">Mark Attendance via WhatsApp</a>
+            <input type="text" id="searchStaff" placeholder="Search by Staff Name" onkeyup="filterStaffLogs()">
+            <button onclick="exportTableToCSV('StaffAttendance.csv')" class="book-btn">Export CSV</button>
+            <button onclick="window.print()" class="book-btn">Export PDF</button>
         </div>
+
+        <table class="logs-table" id="staffLogsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Staff Name</th>
+                    <th>Role</th>
+                    <th>Shift</th>
+                    <th>Contact</th>
+                    <th>Mark Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2025-08-01</td>
+                    <td>Chaitanya Krishna</td>
+                    <td>Receptionist</td>
+                    <td>Morning</td>
+                    <td>+919876543210</td>
+                    <td><button onclick="markPresent('Chaitanya Krishna', '919876543210')" class="book-btn">Mark</button></td>
+                </tr>
+                <tr>
+                    <td>2025-08-01</td>
+                    <td>Ravi Kumar</td>
+                    <td>Assistant</td>
+                    <td>Afternoon</td>
+                    <td>+918888888888</td>
+                    <td><button onclick="markPresent('Ravi Kumar', '918888888888')" class="book-btn">Mark</button></td>
+                </tr>
+            </tbody>
+        </table>
     </section>
 
     <footer>
@@ -40,6 +67,38 @@
         document.querySelector('.toggle-theme').addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
         });
+
+        function exportTableToCSV(filename) {
+            const csv = [];
+            const rows = document.querySelectorAll("table tr");
+            for (let row of rows) {
+                const cols = row.querySelectorAll("td, th");
+                const rowData = Array.from(cols).map(col => col.innerText).join(",");
+                csv.push(rowData);
+            }
+            const csvFile = new Blob([csv.join("\\n")], { type: "text/csv" });
+            const downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        }
+
+        function markPresent(name, contact) {
+            const msg = `Attendance Marked: ${name} Present.`;
+            const encodedMsg = encodeURIComponent(msg);
+            window.open(`https://wa.me/${contact}?text=${encodedMsg}`, '_blank');
+        }
+
+        function filterStaffLogs() {
+            const input = document.getElementById('searchStaff').value.toLowerCase();
+            const rows = document.querySelectorAll('#staffLogsTable tbody tr');
+            rows.forEach(row => {
+                const name = row.cells[1].innerText.toLowerCase();
+                row.style.display = name.includes(input) ? '' : 'none';
+            });
+        }
     </script>
 </body>
 </html>
