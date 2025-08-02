@@ -1,52 +1,58 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onestop AI Clinic Dashboard</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="assets/styles.css">
-    <style>
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-        .header { background: #000; color: #fff; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .header img { height: 35px; }
-        .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; }
-        .btn { background: #000; color: #fff; border: none; padding: 15px; border-radius: 10px; font-size: 16px; text-align: center; text-decoration: none; }
-        .btn:hover { background: #333; }
-        .footer { background: #000; color: #fff; padding: 10px; text-align: center; position: fixed; bottom: 0; width: 100%; }
-    </style>
 </head>
 <body>
+
+    <!-- Header with Logo and Clinic Name -->
     <div class="header">
-        <img src="assets/clinic-logo.png" alt="Clinic Logo">
-        <span style="font-weight:700; font-size:20px;">Onestop AI Clinic Demo</span>
-    </div><div class="button-grid">
-    <a href="index.html" class="btn">🏠 Home</a>
-    <a href="bookings.html" class="btn">📝 Bookings</a>
-    <a href="logs.html" class="btn">📋 Logs</a>
-    <a href="staff-panel.html" class="btn">👥 Staff</a>
-    <a href="staff-attendance.html" class="btn">📅 Attendance</a>
-    <a href="whatsapp-log.html" class="btn">📲 WhatsApp</a>
-    <a href="sync.html" class="btn">🔄 Sync Panel</a>
-    <a href="confirmation.html" class="btn">✅ Confirmations</a>
-</div>
+        <img src="assets/clinic-logo.png" alt="Clinic Logo" class="logo">
+        <h1>Onestop AI Clinic Demo</h1>
+    </div>
 
-<div class="footer">
-    <button id="themeToggle" style="padding:10px 20px; background:#fff; color:#000; border:none; border-radius:5px;">Toggle Theme</button>
-    <p style="margin-top:10px;">Powered by Onestop AI</p>
-</div>
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Dashboard Banner" class="hero-img">
+    </div>
 
-<script>
-    const toggleBtn = document.getElementById('themeToggle');
-    toggleBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-theme');
-        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    });
-    window.onload = () => {
-        if(localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
-    }
-</script>
+    <!-- Dashboard Tabs -->
+    <div class="dashboard-container">
+        <a href="index.html" class="dashboard-btn">🏠 Home</a>
+        <a href="bookings.html" class="dashboard-btn">📋 Bookings</a>
+        <a href="logs.html" class="dashboard-btn">📄 Logs</a>
+        <a href="staff-panel.html" class="dashboard-btn">👥 Staff</a>
+        <a href="staff-attendance.html" class="dashboard-btn">🗓️ Attendance</a>
+        <a href="whatsapp-log.html" class="dashboard-btn">📱 WhatsApp</a>
+        <a href="sync.html" class="dashboard-btn">🔄 Sync Panel</a>
+        <a href="confirmation.html" class="dashboard-btn">✅ Confirmations</a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <button id="themeToggle">Toggle Theme</button>
+        <p>Powered by Onestop AI</p>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        });
+
+        // Load Preferred Theme
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+        };
+    </script>
 
 </body>
 </html>
