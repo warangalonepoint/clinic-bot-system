@@ -23,7 +23,28 @@
       <tbody id="logsBody">
       </tbody>
     </table>
-  </section>  <script>
+  </section><a href="https://wa.me/918686019709?text=Hi, I need assistance" class="whatsapp-float" target="_blank">💬</a>
+
+  <style>
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25D366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 28px;
+      z-index: 1000;
+    }
+  </style>  <script>
     const logsUrl = "logs.csv";
 
     fetch(logsUrl)
