@@ -1,127 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Booking Logs – Onestop Ai Clinic Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --bg: #ffffff;
-      --text: #000000;
-      --card: #f2f2f2;
-    }
-    body.dark {
-      --bg: #0d1117;
-      --text: #f0f0f0;
-      --card: #161b22;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 10px;
-      transition: background 0.3s ease;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    .toggle-btn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 6px 12px;
-      background: #222;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-      background: var(--card);
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #28a745;
-      color: white;
-    }
-    tr:hover {
-      background: #ddd;
-    }
-    @media (max-width: 600px) {
-      table {
-        font-size: 12px;
-      }
-      .toggle-btn {
-        top: 5px;
-        right: 5px;
-        font-size: 12px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Logs - OneStop AI Clinic</title>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <button class="toggle-btn" onclick="toggleTheme()">🌓</button>
-  <h2>📋 Booking Logs</h2>
-  <table id="logTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Name</th>
-        <th>Reason</th>
-        <th>Contact</th>
-        <th>Token</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <header>
+    <h1>Booking Logs</h1>
+  </header>  <section class="logs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Name</th>
+          <th>Reason</th>
+          <th>Token</th>
+          <th>Reminder Sent</th>
+        </tr>
+      </thead>
+      <tbody id="logsBody">
+      </tbody>
+    </table>
+  </section>  <script>
+    const logsUrl = "logs.csv";
 
-  <script>
-    const CSV_URL = "https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv";
-
-    fetch(CSV_URL)
-      .then(response => response.text())
+    fetch(logsUrl)
+      .then(res => res.text())
       .then(data => {
-        const rows = data.trim().split("\n").slice(1); // skip header
-        const tableBody = document.querySelector("#logTable tbody");
+        const lines = data.trim().split('\n').slice(1);
+        const logs = lines.map(line => {
+          const [date, time, name, reason, token, reminder] = line.split(',');
+          return { date, time, name, reason, token, reminder };
+        });
 
-        rows.forEach(row => {
-          const cols = row.split(",");
-          const tr = document.createElement("tr");
-
-          cols.forEach((col, i) => {
-            const td = document.createElement("td");
-            if (i === 4) {
-              const a = document.createElement("a");
-              a.href = `tel:${col}`;
-              a.innerText = col;
-              a.style.color = "inherit";
-              a.style.textDecoration = "none";
-              td.appendChild(a);
-            } else {
-              td.innerText = col;
-            }
-            tr.appendChild(td);
-          });
-
-          tableBody.appendChild(tr);
+        const tbody = document.getElementById('logsBody');
+        logs.forEach(log => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${log.date}</td>
+            <td>${log.time}</td>
+            <td>${log.name}</td>
+            <td>${log.reason}</td>
+            <td>${log.token}</td>
+            <td>${log.reminder}</td>
+          `;
+          tbody.appendChild(row);
         });
       });
-
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-    }
-    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
-  </script>
-</body>
+  </script></body>
 </html>
