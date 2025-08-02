@@ -1,59 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onestop AI Clinic Demo</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="assets/styles.css">
 </head>
-<body>
+<body><div class="header">
+    <img src="assets/logo.png" alt="Clinic Logo" class="logo-img">
+    Onestop AI Clinic Demo
+</div>
 
-    <!-- Header with Logo and Clinic Name -->
-    <div style="display: flex; align-items: center; padding: 10px; background-color: black; color: white;">
-        <img src="./assets/logo.png" alt="Clinic Logo" style="height: 40px; margin-right: 10px;">
-        <h1 style="font-family: 'Arial Black', sans-serif; font-size: 1.2rem;">Onestop AI Clinic Demo</h1>
-    </div>
+<img src="assets/clinic-hero-banner.png" alt="Clinic Banner" class="hero-banner">
 
-    <!-- Hero Banner -->
-    <div style="width: 100%; overflow: hidden;">
-        <img src="./assets/clinic-hero-banner.png" alt="Clinic Hero Banner" style="width: 100%; height: auto;">
-    </div>
+<div class="nav-grid">
+    <a href="index.html" class="nav-btn">🏠 Home</a>
+    <a href="bookings.html" class="nav-btn">📋 Bookings</a>
+    <a href="logs.html" class="nav-btn">📄 Logs</a>
+    <a href="staff-panel.html" class="nav-btn">👥 Staff</a>
+    <a href="staff-attendance.html" class="nav-btn">🗓️ Attendance</a>
+    <a href="whatsapp-log.html" class="nav-btn">📲 WhatsApp</a>
+    <a href="sync.html" class="nav-btn">🔄 Sync Panel</a>
+    <a href="confirmation.html" class="nav-btn">✅ Confirmations</a>
+</div>
 
-    <!-- Navigation Buttons -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px;">
-        <a href="index.html" class="nav-btn">🏠 Home</a>
-        <a href="bookings.html" class="nav-btn">📋 Bookings</a>
-        <a href="logs.html" class="nav-btn">📄 Logs</a>
-        <a href="staff-panel.html" class="nav-btn">👥 Staff</a>
-        <a href="staff-attendance.html" class="nav-btn">📅 Attendance</a>
-        <a href="whatsapp-log.html" class="nav-btn">📲 WhatsApp</a>
-        <a href="sync.html" class="nav-btn">🔄 Sync Panel</a>
-        <a href="confirmation.html" class="nav-btn">✅ Confirmations</a>
-    </div>
+<footer>
+    <button id="themeToggle">Toggle Theme</button>
+    <p>Powered by Onestop AI</p>
+</footer>
 
-    <!-- Footer -->
-    <footer style="position: fixed; bottom: 0; width: 100%; background-color: black; color: white; text-align: center; padding: 10px;">
-        <button id="themeToggle" style="padding: 8px 16px; margin-bottom: 5px;">Toggle Theme</button>
-        <p>Powered by Onestop AI</p>
-    </footer>
-
-    <script>
-        // Theme Toggle Logic
-        const toggleButton = document.getElementById('themeToggle');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-        });
-
-        // Load saved theme
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
-        };
-    </script>
+<script>
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+    });
+</script>
 
 </body>
-</html>
+</html>/* --- assets/styles.css --- */ body { margin: 0; font-family: Arial, sans-serif; background-color: #fff; color: #000; }
+
+.dark-theme { background-color: #121212; color: #fff; }
+
+.header { display: flex; align-items: center; justify-content: center; background-color: black; color: white; padding: 10px; font-weight: bold; font-size: 20px; }
+
+.logo-img { height: 40px; margin-right: 10px; }
+
+.hero-banner { width: 100%; height: auto; display: block; }
+
+.nav-grid { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
+
+.nav-btn { display: flex; align-items: center; justify-content: center; background-color: black; color: white; padding: 12px 20px; margin: 10px; border-radius: 10px; text-decoration: none; font-size: 16px; width: 140px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: background-color 0.3s; }
+
+.nav-btn:hover { background-color: #333; }
+
+footer { background-color: black; color: white; text-align: center; padding: 10px; }
+
+#themeToggle { padding: 8px 16px; margin-bottom: 10px; background-color: #333; color: white; border: none; border-radius: 6px; cursor: pointer; }
+
+#themeToggle:hover { background-color: #555; }
+
+.dark-theme .nav-btn { background-color: #222; }
+
+.dark-theme .nav-btn:hover { background-color: #444; }
+
+.dark-theme footer { background-color: #000; }
+
