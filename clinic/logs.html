@@ -15,7 +15,11 @@
 
 <section class="logs-section">
     <h2>Booking Logs</h2>
-    <table class="logs-table">
+    <div class="form-group">
+        <button onclick="exportTableToCSV('BookingLogs.csv')" class="book-btn">Export as CSV</button>
+        <button onclick="window.print()" class="book-btn">Export as PDF (Print)</button>
+    </div>
+    <table class="logs-table" id="logsTable">
         <thead>
             <tr>
                 <th>Date</th>
@@ -40,7 +44,6 @@
                 <td>Checkup</td>
                 <td>+918888888888</td>
             </tr>
-            <!-- Add more rows as needed -->
         </tbody>
     </table>
 </section>
@@ -54,6 +57,25 @@
     document.querySelector('.toggle-theme').addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
     });
+
+    function exportTableToCSV(filename) {
+        const csv = [];
+        const rows = document.querySelectorAll("table tr");
+
+        for (let row of rows) {
+            const cols = row.querySelectorAll("td, th");
+            const rowData = Array.from(cols).map(col => col.innerText).join(",");
+            csv.push(rowData);
+        }
+
+        const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+        const downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
 </script>
 
 </body>
