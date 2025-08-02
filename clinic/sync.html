@@ -1,23 +1,56 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sync Panel - OneStop AI Clinic</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Panel - Onestop AI Clinic</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <header>
-    <h1>Sync Panel</h1>
-  </header>  <section class="sync-panel">
-    <button onclick="downloadCSV('slots.csv')">Download Slots CSV</button>
-    <button onclick="downloadCSV('logs.csv')">Download Logs CSV</button>
-    <button onclick="downloadCSV('staff.csv')">Download Staff CSV</button>
-  </section>  <script>
-    function downloadCSV(file) {
-      const link = document.createElement('a');
-      link.href = file;
-      link.download = file;
-      link.click();
-    }
-  </script></body>
+    <div class="header">
+        <h1>Sync Data Panel</h1>
+        <button id="themeToggle">Toggle Theme</button>
+    </div>
+
+    <div class="container">
+        <p>Use this panel to sync and backup clinic data.</p>
+        <div class="card">
+            <h3>🔄 Sync Slots</h3>
+            <a href="slots.csv" download><button>Download Slots Backup</button></a>
+        </div>
+        <div class="card">
+            <h3>📋 Sync Logs</h3>
+            <a href="logs.csv" download><button>Download Booking Logs</button></a>
+        </div>
+        <div class="card">
+            <h3>🧑‍⚕️ Sync Staff Data</h3>
+            <a href="staff.csv" download><button>Download Staff Backup</button></a>
+        </div>
+        <div class="card">
+            <h3>🌴 Sync Leave Tracker</h3>
+            <a href="staff-leave-tracker.csv" download><button>Download Leave Tracker</button></a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Powered by Onestop AI</p>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        });
+
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+        };
+    </script>
+</body>
 </html>
