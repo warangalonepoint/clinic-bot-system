@@ -3,18 +3,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Appointment Confirmation</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Appointment Confirmed</h1>
+  <header>
+    <h1>Booking Confirmed</h1>
+  </header>  <section class="confirmation-details">
     <p><strong>Date:</strong> <span id="confirmDate"></span></p>
     <p><strong>Time:</strong> <span id="confirmTime"></span></p>
     <p><strong>Name:</strong> <span id="confirmName"></span></p>
     <p><strong>Reason:</strong> <span id="confirmReason"></span></p>
     <p><strong>Token No:</strong> <span id="confirmToken"></span></p>
-    <a href="bookings.html" class="btn">Book Another Appointment</a>
-  </div>  <script>
+    <a href="bookings.html" class="button">Book Another Appointment</a>
+  </section>  <script>
     const urlParams = new URLSearchParams(window.location.search);
     const date = urlParams.get('date');
     const time = urlParams.get('time');
