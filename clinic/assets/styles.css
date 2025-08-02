@@ -69,3 +69,21 @@ button {
     color: white;
     cursor: pointer;
 }
+.nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 1rem;
+}
+.nav-btn:hover {
+    background-color: #333;
+}
+body.dark-theme {
+    background-color: #111;
+    color: white;
+}
