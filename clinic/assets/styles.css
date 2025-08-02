@@ -1,93 +1,44 @@
-/* Reset & Base Styles */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #fff;
-    color: #000;
-}
+/* Base Reset */ body { margin: 0; font-family: 'Arial', sans-serif; background-color: #fff; color: #000; }
 
-/* Header Section */
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #000;
-    padding: 10px;
-}
+/* Header */ .header { display: flex; align-items: center; justify-content: center; background-color: #000; padding: 10px; gap: 10px; }
 
-.logo {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    vertical-align: middle;
-}
+.logo { width: 40px; height: auto; }
 
-h1 {
-    color: #fff;
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
-}
+.clinic-name { color: #fff; font-size: 22px; font-weight: bold; }
 
-/* Hero Banner Image */
-.hero-banner {
-    width: 100%;
-    max-width: 600px;
-    display: block;
-    margin: 0 auto;
-}
+/* Hero Banner */ .hero-banner img { width: 100%; height: auto; }
 
-/* Button Grid */
-.nav-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    padding: 20px;
-    max-width: 500px;
-    margin: 0 auto;
-}
+/* Navigation Grid Buttons */ .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
 
-/* Buttons Style */
-.nav-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #000;
-    color: #fff;
-    padding: 15px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-size: 18px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    height: 60px;
-}
+.nav-button { display: flex; align-items: center; justify-content: center; background-color: #000; color: #fff; padding: 15px; border-radius: 12px; text-decoration: none; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
-.nav-button:hover {
-    background-color: #222;
-}
+.nav-button:hover { background-color: #222; }
 
-/* Footer Section */
-footer {
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-}
+/* Form Section */ .form-section { text-align: center; padding: 20px; }
 
-/* Toggle Theme Button */
-.toggle-theme {
-    background-color: #fff;
-    color: #000;
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 10px;
-}
+.form-group { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 20px; }
 
-/* General Images */
-img {
-    max-width: 100%;
-    height: auto;
-}
+.form-group select, .form-group input { width: 80%; max-width: 300px; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+
+.book-btn { display: inline-block; background-color: #25D366; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+
+.book-btn:hover { background-color: #128C7E; }
+
+/* Footer */ footer { background-color: #000; color: #fff; text-align: center; padding: 20px; margin-top: 20px; }
+
+/* Toggle Theme Button */ .toggle-theme { background-color: #fff; color: #000; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; margin-bottom: 10px; }
+
+/* Dark Mode */ body.dark-mode { background-color: #121212; color: #fff; }
+
+body.dark-mode .header, body.dark-mode footer { background-color: #1f1f1f; }
+
+body.dark-mode .nav-button { background-color: #333; }
+
+body.dark-mode .nav-button:hover { background-color: #555; }
+
+body.dark-mode .form-group select, body.dark-mode .form-group input { background-color: #333; color: #fff; border: 1px solid #555; }
+
+body.dark-mode .toggle-theme { background-color: #333; color: #fff; }
+
+/* General Image Responsive */ img { max-width: 100%; height: auto; }
+
