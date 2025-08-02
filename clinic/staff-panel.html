@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Panel - OneStop AI Clinic</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Staff Panel</h1>
+  </header>  <section class="staff-section">
+    <table>
+      <thead>
+        <tr>
+          <th>Employee ID</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Contact</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="staffBody">
+      </tbody>
+    </table>
+  </section>  <script>
+    const staffUrl = "staff.csv";
+
+    fetch(staffUrl)
+      .then(res => res.text())
+      .then(data => {
+        const lines = data.trim().split('\n').slice(1);
+        const staffList = lines.map(line => {
+          const [id, name, role, contact, status] = line.split(',');
+          return { id, name, role, contact, status };
+        });
+
+        const tbody = document.getElementById('staffBody');
+        staffList.forEach(staff => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${staff.id}</td>
+            <td>${staff.name}</td>
+            <td>${staff.role}</td>
+            <td><a href="tel:${staff.contact}">${staff.contact}</a></td>
+            <td>${staff.status}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  </script></body>
+</html>
