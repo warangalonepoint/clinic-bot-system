@@ -1,49 +1,69 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leave Tracker - OneStop AI Clinic</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Tracker - Onestop AI Clinic</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <header>
-    <h1>Leave Tracker</h1>
-  </header>  <section class="leave-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Employee ID</th>
-          <th>Name</th>
-          <th>Leave Date</th>
-          <th>Reason</th>
-        </tr>
-      </thead>
-      <tbody id="leaveBody">
-      </tbody>
-    </table>
-  </section>  <script>
-    const leaveUrl = "staff-leave.csv";
+    <div class="header">
+        <h1>Leave Tracker</h1>
+        <button id="themeToggle">Toggle Theme</button>
+    </div>
 
-    fetch(leaveUrl)
-      .then(res => res.text())
-      .then(data => {
-        const lines = data.trim().split('\n').slice(1);
-        const leaves = lines.map(line => {
-          const [id, name, date, reason] = line.split(',');
-          return { id, name, date, reason };
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Leave Date</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody id="leaveTableBody">
+                <!-- Leave entries will load here -->
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>Powered by Onestop AI</p>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
         });
 
-        const tbody = document.getElementById('leaveBody');
-        leaves.forEach(leave => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${leave.id}</td>
-            <td>${leave.name}</td>
-            <td>${leave.date}</td>
-            <td>${leave.reason}</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-  </script></body>
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+
+            fetch('staff-leave-tracker.csv')
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.trim().split('\n').slice(1);
+                    const tableBody = document.getElementById('leaveTableBody');
+                    rows.forEach(row => {
+                        const cols = row.split(',');
+                        const tr = document.createElement('tr');
+                        cols.forEach(col => {
+                            const td = document.createElement('td');
+                            td.textContent = col.trim();
+                            tr.appendChild(td);
+                        });
+                        tableBody.appendChild(tr);
+                    });
+                });
+        };
+    </script>
+</body>
 </html>
