@@ -1,5 +1,5 @@
-/* Reset & Basics */
-body, h1, h2, h3, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+/* RESET */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -7,30 +7,19 @@ body, h1, h2, h3, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #fff;
+    background: #fff;
     color: #000;
     text-align: center;
 }
 
-/* Dark Mode */
-body.dark-mode {
-    background-color: #121212;
-    color: #f5f5f5;
-}
-
-/* Header */
-header {
-    background-color: #000;
-    color: #fff;
-    padding: 10px 20px;
+/* HEADER */
+.header {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.logo-title {
-    display: flex;
-    align-items: center;
+    padding: 10px;
+    background: #000;
+    color: #fff;
     gap: 10px;
 }
 
@@ -39,62 +28,70 @@ header {
     height: 30px;
 }
 
-/* Banner */
+.title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* BANNER IMAGE */
 .banner {
     width: 100%;
     height: auto;
-    display: block;
-    max-height: 220px;
+    max-height: 200px;
     object-fit: cover;
+    display: block;
 }
 
-/* Button Grid */
+/* BUTTON GRID */
 .button-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    width: 80%;
-    margin: 20px auto;
+    padding: 20px;
+    width: 90%;
+    margin: auto;
 }
 
-/* Buttons */
 .button-card {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 15px;
-    background-color: #000;
+    background: #000;
     color: #fff;
     text-decoration: none;
+    padding: 15px;
     border-radius: 10px;
+    font-size: 1rem;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-    transition: transform 0.2s;
+    transition: 0.2s;
 }
 
 .button-card:hover {
-    transform: translateY(-2px);
+    transform: scale(1.03);
 }
 
-/* Footer */
+/* FOOTER */
 footer {
-    background-color: #000;
-    color: #fff;
-    padding: 20px;
     margin-top: 30px;
+    padding: 20px;
+    background: #000;
+    color: #fff;
 }
 
-.theme-toggle {
+footer button {
     padding: 10px 20px;
-    border: none;
     border-radius: 8px;
+    border: none;
     cursor: pointer;
 }
 
-/* Dark Mode Styling */
+/* DARK MODE */
+body.dark-mode {
+    background: #121212;
+    color: #f5f5f5;
+}
+
 body.dark-mode .button-card {
-    background-color: #1f1f1f;
+    background: #1f1f1f;
 }
 
 body.dark-mode footer {
-    background-color: #1f1f1f;
+    background: #1f1f1f;
 }
