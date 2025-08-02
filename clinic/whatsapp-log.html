@@ -1,92 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>📲 WhatsApp Attendance Log</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: var(--bg);
-      color: var(--text);
-    }
-    h1 {
-      font-size: 24px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      border: 1px solid #999;
-      padding: 10px;
-      text-align: left;
-    }
-    tr.present {
-      background-color: #d4edda;
-    }
-    tr.absent {
-      background-color: #f8d7da;
-    }
-    .theme-btn {
-      margin: 10px 0;
-      padding: 10px 15px;
-      font-weight: bold;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 8px;
-    }
-
-    /* Themes */
-    :root {
-      --bg: #ffffff;
-      --text: #000000;
-    }
-    .dark-mode {
-      --bg: #111111;
-      --text: #ffffff;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Logs - OneStop AI Clinic</title>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <h1>📲 WhatsApp Attendance Log</h1>
-  <button class="theme-btn" onclick="toggleTheme()">🌐 Toggle Theme</button>
-  <div id="log"></div>
+  <header>
+    <h1>WhatsApp Logs</h1>
+  </header>  <section class="whatsapp-log-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Patient Name</th>
+          <th>Message Sent</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody id="whatsappBody">
+      </tbody>
+    </table>
+  </section>  <script>
+    const whatsappLogUrl = "whatsapp-log.csv";
 
-  <script>
-    // Load CSV
-    fetch("whatsapp-log.csv")
-      .then((res) => res.text())
-      .then((data) => {
-        const rows = data.trim().split("\n").map(r => r.split(","));
-        const headers = rows[0];
-        const body = rows.slice(1);
-
-        let html = "<table><thead><tr>";
-        headers.forEach(h => html += `<th>${h}</th>`);
-        html += "</tr></thead><tbody>";
-        body.forEach(row => {
-          const status = row[4].trim().toLowerCase();
-          const rowClass = status === "present" ? "present" : "absent";
-          html += `<tr class="${rowClass}">`;
-          row.forEach(cell => html += `<td>${cell}</td>`);
-          html += "</tr>";
+    fetch(whatsappLogUrl)
+      .then(res => res.text())
+      .then(data => {
+        const lines = data.trim().split('\n').slice(1);
+        const logs = lines.map(line => {
+          const [date, time, name, message, response] = line.split(',');
+          return { date, time, name, message, response };
         });
-        html += "</tbody></table>";
-        document.getElementById("log").innerHTML = html;
-      })
-      .catch(() => {
-        document.getElementById("log").innerHTML = "<p>Error loading log</p>";
-      });
 
-    // Toggle theme
-    function toggleTheme() {
-      document.body.classList.toggle("dark-mode");
-    }
-  </script>
-</body>
+        const tbody = document.getElementById('whatsappBody');
+        logs.forEach(log => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${log.date}</td>
+            <td>${log.time}</td>
+            <td>${log.name}</td>
+            <td>${log.message}</td>
+            <td>${log.response}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  </script></body>
 </html>
