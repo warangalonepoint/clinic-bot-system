@@ -3,118 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Your Appointment</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Bookings - Onestop AI Clinic</title>
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-    <!-- Header Section -->
     <header class="header">
-        <img src="clinic/logo.png" alt="Clinic Logo" class="logo">
-        <h1>Onestop AI Clinic Demo</h1>
-        <button id="themeToggle">Toggle Theme</button>
+        <img src="logo.png" alt="Clinic Logo" class="logo">
+        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
     </header>
 
-    <!-- Hero Banner -->
-    <div class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner" class="hero-img">
-    </div>
+    <section class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
+    </section>
 
-    <!-- Booking Form Section -->
     <section class="booking-form">
-        <h2>📅 Book Your Appointment</h2>
-        <label for="date">Select Date</label>
-        <select id="date">
-            <option>Select date</option>
+        <select class="input-field">
+            <option>Select Date</option>
+            <option>Today</option>
+            <option>Tomorrow</option>
         </select>
 
-        <label for="time">Select Time Slot</label>
-        <select id="time">
-            <option>Select a date first</option>
+        <select class="input-field">
+            <option>Select Time Slot</option>
+            <option>10:00 AM</option>
+            <option>10:30 AM</option>
+            <option>11:00 AM</option>
         </select>
 
-        <label for="name">Patient Name</label>
-        <input type="text" id="name" placeholder="Enter your name">
+        <input type="text" class="input-field" placeholder="Patient Name">
+        <input type="text" class="input-field" placeholder="Reason for Visit">
 
-        <label for="reason">Reason for Visit</label>
-        <input type="text" id="reason" placeholder="E.g., Fever, Headache...">
-
-        <button id="bookButton">Book on WhatsApp</button>
+        <a href="#" class="button">Book on WhatsApp</a>
     </section>
 
     <footer>
+        <button id="toggleTheme" class="toggle-theme">Toggle Theme</button>
         <p>Powered by Onestop AI</p>
     </footer>
 
-    <script>
-        // Theme Toggle Logic
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-        });
-
-        // Load stored theme on page load
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
-        };
-
-        // Populate Dates from slots.csv
-        let slotsData = [];
-        fetch('slots.csv')
-            .then(response => response.text())
-            .then(data => {
-                const lines = data.split('\n').slice(1);
-                const dates = [...new Set(lines.map(line => line.split(',')[0]))];
-                const dateSelect = document.getElementById('date');
-                dates.forEach(date => {
-                    if(date.trim() !== '') {
-                        const option = document.createElement('option');
-                        option.value = date;
-                        option.textContent = date;
-                        dateSelect.appendChild(option);
-                    }
-                });
-                slotsData = lines.map(line => {
-                    const [date, time, status] = line.split(',');
-                    return {date, time, status};
-                });
-            });
-
-        // Load Time Slots on Date Change
-        document.getElementById('date').addEventListener('change', function() {
-            const selectedDate = this.value;
-            const timeSelect = document.getElementById('time');
-            timeSelect.innerHTML = '<option>Select Time Slot</option>';
-            slotsData.forEach(slot => {
-                if (slot.date === selectedDate && slot.status.trim() === 'Available') {
-                    const option = document.createElement('option');
-                    option.value = slot.time;
-                    option.textContent = slot.time;
-                    timeSelect.appendChild(option);
-                }
-            });
-        });
-
-        // WhatsApp Booking Link Generation
-        document.getElementById('bookButton').addEventListener('click', () => {
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-            const name = document.getElementById('name').value.trim();
-            const reason = document.getElementById('reason').value.trim();
-
-            if (!date || !time || !name || !reason) {
-                alert('Please fill all fields.');
-                return;
-            }
-
-            const message = `Hello, I want to book an appointment on ${date} at ${time}.\nPatient Name: ${name}\nReason: ${reason}`;
-            const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
-            window.open(whatsappLink, '_blank');
-        });
-    </script>
+    <script src="assets/theme-toggle.js"></script>
 </body>
 </html>
