@@ -2,89 +2,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OneStop AI Clinic Dashboard V2</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #fff;
-      color: #333;
-    }
-    header {
-      background-color: #007BFF;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 20px;
-    }
-    .container {
-      padding: 20px;
-    }
-    .section-title {
-      font-size: 18px;
-      margin-top: 30px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    .button {
-      display: block;
-      width: 100%;
-      max-width: 300px;
-      margin: 10px auto;
-      padding: 12px;
-      text-align: center;
-      background-color: #007BFF;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    .theme-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #333;
-      color: white;
-      padding: 8px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .dark-theme {
-      background-color: #121212;
-      color: white;
-    }
-  </style>
+  <title>OneStop AI Clinic Dashboard</title>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
   <header>
-    Onestop AI Clinic Dashboard
-    <span class="theme-toggle" onclick="toggleTheme()">Toggle Theme</span>
-  </header>
-  <div class="container"><div class="section-title">Patient Dashboard</div>
-<a href="bookings.html" class="button">📝 Patient Bookings</a>
-<a href="logs.html" class="button">📜 Booking Logs</a>
-<a href="confirmation.html" class="button">✅ Booking Confirmation</a>
-
-<div class="section-title">Staff Dashboard</div>
-<a href="staff-panel.html" class="button">👥 Staff Panel</a>
-<a href="staff-attendance-form.html" class="button">📅 Staff Attendance</a>
-<a href="mark-attendance.html" class="button">📝 Mark Attendance (WhatsApp)</a>
-<a href="roster-summary.html" class="button">📊 Monthly Attendance Summary</a>
-<a href="leave-tracker.html" class="button">🌴 Leave Tracker</a>
-<a href="staff-roster.html" class="button">📅 Staff Roster</a>
-
-<div class="section-title">Communication Panel</div>
-<a href="whatsapp-log.html" class="button">📩 WhatsApp Log</a>
-
-<div class="section-title">Admin Utilities</div>
-<a href="sync.html" class="button">🔄 Sync Panel</a>
-
-  </div>
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle('dark-theme');
-    }
-  </script>
-</body>
+    <h1>Clinic Admin Dashboard</h1>
+  </header>  <section class="dashboard-section">
+    <h2>Patient Dashboard</h2>
+    <a href="bookings.html" class="button">📝 Bookings</a>
+    <a href="logs.html" class="button">📜 Booking Logs</a>
+    <a href="confirmation.html" class="button">✅ Confirmation Page</a>
+  </section>  <section class="dashboard-section">
+    <h2>Staff Dashboard</h2>
+    <a href="staff-panel.html" class="button">👥 Staff Panel</a>
+    <a href="staff-attendance-form.html" class="button">📅 Mark Attendance</a>
+    <a href="roster-summary.html" class="button">📊 Monthly Summary</a>
+    <a href="leave-tracker.html" class="button">🌴 Leave Tracker</a>
+    <a href="staff-roster.html" class="button">🗓️ Roster Schedule</a>
+  </section>  <section class="dashboard-section">
+    <h2>Communication Panel</h2>
+    <a href="whatsapp-log.html" class="button">📩 WhatsApp Logs</a>
+  </section>  <section class="dashboard-section">
+    <h2>Admin Utilities</h2>
+    <a href="sync.html" class="button">🔄 Sync Panel</a>
+  </section></body>
 </html>
