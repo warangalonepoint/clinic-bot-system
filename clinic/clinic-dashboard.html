@@ -1,30 +1,102 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OneStop AI Clinic Dashboard</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Dashboard - Onestop AI</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f9f9f9;
+            color: #333;
+        }
+        .header {
+            background: #0a74da;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+            position: relative;
+        }
+        .theme-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            background: #333;
+            color: #fff;
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .hero-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .container {
+            padding: 1rem;
+        }
+        .panel-btn {
+            display: block;
+            width: 100%;
+            background: #007bff;
+            color: #fff;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .panel-btn:hover {
+            background: #0056b3;
+        }
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Clinic Admin Dashboard</h1>
-  </header>  <section class="dashboard-section">
-    <h2>Patient Dashboard</h2>
-    <a href="bookings.html" class="button">📝 Bookings</a>
-    <a href="logs.html" class="button">📜 Booking Logs</a>
-    <a href="confirmation.html" class="button">✅ Confirmation Page</a>
-  </section>  <section class="dashboard-section">
-    <h2>Staff Dashboard</h2>
-    <a href="staff-panel.html" class="button">👥 Staff Panel</a>
-    <a href="staff-attendance-form.html" class="button">📅 Mark Attendance</a>
-    <a href="roster-summary.html" class="button">📊 Monthly Summary</a>
-    <a href="leave-tracker.html" class="button">🌴 Leave Tracker</a>
-    <a href="staff-roster.html" class="button">🗓️ Roster Schedule</a>
-  </section>  <section class="dashboard-section">
-    <h2>Communication Panel</h2>
-    <a href="whatsapp-log.html" class="button">📩 WhatsApp Logs</a>
-  </section>  <section class="dashboard-section">
-    <h2>Admin Utilities</h2>
-    <a href="sync.html" class="button">🔄 Sync Panel</a>
-  </section></body>
+    <div class="header">
+        Clinic Dashboard
+        <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
+    </div><img src="./dashboard-hero.png" alt="Dashboard Hero" class="hero-image">
+
+<div class="container">
+    <a href="./bookings.html" class="panel-btn">📅 Patient Bookings</a>
+    <a href="./logs.html" class="panel-btn">📊 Booking Logs</a>
+    <a href="./staff-panel.html" class="panel-btn">👥 Staff Panel</a>
+    <a href="./staff-attendance.html" class="panel-btn">🗓️ Staff Attendance</a>
+    <a href="./staff-whatsapp-attendance.html" class="panel-btn">📲 WhatsApp Attendance</a>
+    <a href="./staff-monthly-summary.html" class="panel-btn">📈 Monthly Summary</a>
+    <a href="./staff-leave-tracker.html" class="panel-btn">🌴 Leave Tracker</a>
+    <a href="./staff-roster.html" class="panel-btn">📅 Staff Roster</a>
+    <a href="./sync.html" class="panel-btn">🔄 Sync Panel</a>
+</div>
+
+<footer>
+    Powered by Onestop AI
+</footer>
+
+<script>
+    function toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    }
+    window.onload = function() {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+    }
+</script>
+
+</body>
 </html>
