@@ -1,28 +1,2 @@
-// service-worker.js
-const CACHE_NAME = 'clinic-cache-v1';
-const urlsToCache = [
-  './',
-  './index.html',
-  './clinic-dashboard.html',
-  './bookings.html',
-  './logs.html',
-  './staff.html',
-  './logo.png',
-  './manifest.json'
-];
+{ "name": "Onestop AI Clinic Demo", "short_name": "ClinicDemo", "start_url": "./index.html", "display": "standalone", "background_color": "#ffffff", "theme_color": "#0a74da", "icons": [ { "src": "assets/logo.png", "sizes": "192x192", "type": "image/png" }, { "src": "assets/logo.png", "sizes": "512x512", "type": "image/png" } ] }
 
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(urlsToCache);
-    })
-  );
-});
-
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
-    })
-  );
-});
