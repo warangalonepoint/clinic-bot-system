@@ -1,89 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Book Your Appointment – Onestop Ai Clinic Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onestop AI Clinic Dashboard V2</title>
   <style>
-    /* (Styling same as before for simplicity) */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+    }
+    .container {
+      padding: 20px;
+    }
+    .section-title {
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .button {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 12px;
+      text-align: center;
+      background-color: #007BFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: white;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .dark-theme {
+      background-color: #121212;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <h1>Book Your Appointment</h1>
+  <header>
+    Onestop AI Clinic Dashboard
+    <span class="theme-toggle" onclick="toggleTheme()">Toggle Theme</span>
+  </header>
+  <div class="container"><div class="section-title">Patient Management</div>
+<a href="bookings.html" class="button">📝 Patient Bookings</a>
+<a href="confirmation.html" class="button">✅ Booking Confirmation</a>
 
-  <div>
-    <label>Date</label>
-    <select id="date"></select>
+<div class="section-title">Staff Management</div>
+<a href="staff-panel.html" class="button">👥 Staff Panel</a>
+<a href="staff-attendance-form.html" class="button">📅 Staff Attendance</a>
+<a href="mark-attendance.html" class="button">📝 Mark Attendance (WhatsApp)</a>
+<a href="roster-summary.html" class="button">📊 Monthly Attendance Summary</a>
+<a href="leave-tracker.html" class="button">🌴 Leave Tracker</a>
+<a href="staff-roster.html" class="button">📅 Staff Roster</a>
+
+<div class="section-title">Logs & Sync</div>
+<a href="logs.html" class="button">📜 Booking Logs</a>
+<a href="whatsapp-log.html" class="button">📩 WhatsApp Log</a>
+<a href="sync.html" class="button">🔄 Sync Panel</a>
+
   </div>
-
-  <div>
-    <label>Time Slot</label>
-    <select id="slot">
-      <option>Select a date first</option>
-    </select>
-  </div>
-
-  <div>
-    <label>Name</label>
-    <input type="text" id="name" placeholder="Your Name">
-  </div>
-
-  <div>
-    <label>Reason for Visit</label>
-    <input type="text" id="reason" placeholder="E.g., Fever, Consultation...">
-  </div>
-
-  <button onclick="bookNow()">Book on WhatsApp</button>
-
   <script>
-    const slotsUrl = "https://warangalonepoint.github.io/clinic-bot-system/clinic/slots.csv";
-    const logsUrl = "https://warangalonepoint.github.io/clinic-bot-system/clinic/logs.csv";
-
-    let allSlots = [];
-    let booked = [];
-
-    async function loadCSV(url) {
-      const res = await fetch(url);
-      const text = await res.text();
-      const rows = text.trim().split("\\n").slice(1).map(r => r.split(","));
-      return rows;
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
     }
-
-    async function init() {
-      allSlots = await loadCSV(slotsUrl);
-      booked = await loadCSV(logsUrl);
-      const dateSet = [...new Set(allSlots.map(r => r[0]))].filter(d => new Date(d) >= new Date());
-      const dateDropdown = document.getElementById("date");
-      dateDropdown.innerHTML = `<option>Select date</option>` + dateSet.map(d => `<option value="${d}">${d}</option>`).join("");
-    }
-
-    function loadSlots() {
-      const selectedDate = document.getElementById("date").value;
-      const bookedSlots = booked.filter(b => b[0] === selectedDate).map(b => b[1]);
-      const filtered = allSlots.filter(s => s[0] === selectedDate && !bookedSlots.includes(s[1]));
-      const slotDropdown = document.getElementById("slot");
-      slotDropdown.innerHTML = `<option>${filtered.length ? 'Select slot' : 'No slots available'}</option>` +
-        filtered.map(s => `<option value="${s[1]}">${s[1]}</option>`).join("");
-    }
-
-    document.getElementById("date").addEventListener("change", loadSlots);
-
-    function bookNow() {
-      const date = document.getElementById("date").value;
-      const slot = document.getElementById("slot").value;
-      const name = document.getElementById("name").value;
-      const reason = document.getElementById("reason").value;
-
-      if (!date || !slot || !name || !reason) {
-        alert("Please fill all fields");
-        return;
-      }
-
-      const msg = `Booking Request:%0A🧑 Name: ${name}%0A📅 Date: ${date}%0A⏰ Time: ${slot}%0A📌 Reason: ${reason}`;
-      window.location.href = `https://wa.me/919390664577?text=${msg}`;
-    }
-
-    init();
   </script>
 </body>
 </html>
