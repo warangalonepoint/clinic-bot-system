@@ -91,41 +91,4 @@
 </script>
 
 </body>
-</html>        function updateSummary() {
-            const totalRows = document.querySelectorAll('#logsTable tbody tr').length;
-            document.getElementById('totalBookings').innerText = totalRows;
-            document.getElementById('nextToken').innerText = totalRows + 1;
-        }
-
-        let remindersSent = 0;
-        function updateRemindersCount() {
-            remindersSent++;
-            document.getElementById('remindersSent').innerText = remindersSent;
-        }
-
-        function filterLogs() {
-            const nameInput = document.getElementById('searchName').value.toLowerCase();
-            const dateInput = document.getElementById('filterDate').value;
-            const rows = document.querySelectorAll('#logsTable tbody tr');
-
-            rows.forEach(row => {
-                const name = row.cells[3].innerText.toLowerCase();
-                const date = row.cells[1].innerText;
-
-                const matchesName = name.includes(nameInput);
-                const matchesDate = dateInput === '' || date === dateInput;
-
-                row.style.display = (matchesName && matchesDate) ? '' : 'none';
-            });
-        }
-
-        function resetFilters() {
-            document.getElementById('searchName').value = '';
-            document.getElementById('filterDate').value = '';
-            filterLogs();
-        }
-
-        window.onload = updateSummary;
-    </script>
-</body>
 </html>
