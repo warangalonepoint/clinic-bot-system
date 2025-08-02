@@ -1,44 +1,67 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onestop AI Clinic Demo</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Book Appointment - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
     <header class="header">
-        <img src="logo.png" alt="Clinic Logo" class="logo">
+        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
         <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-    </header><section class="form-section">
-    <h2>Book Your Appointment</h2>
-    <div class="form-group">
-        <select id="date-select">
-            <option>Select Date</option>
-            <option>2025-08-05</option>
-            <option>2025-08-06</option>
-        </select>
-        <select id="time-slot">
-            <option>Select Time Slot</option>
-            <option>10:00 AM</option>
-            <option>10:10 AM</option>
-            <option>10:20 AM</option>
-        </select>
-        <input type="text" placeholder="Patient Name">
-        <input type="text" placeholder="Reason for Visit">
-        <a href="#" class="book-btn">Book on WhatsApp</a>
-    </div>
-</section>
+    </header>
 
-<footer>
-    <button class="toggle-theme">Toggle Theme</button>
-    <p>Powered by Onestop AI</p>
-</footer>
+    <section class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
+    </section>
 
-<script>
-    document.querySelector('.toggle-theme').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-    });
-</script>
+    <section class="form-section">
+        <h2>Book Your Appointment</h2>
+        <div class="form-group">
+            <select id="date">
+                <option>Select Date</option>
+                <option>2025-08-02</option>
+                <option>2025-08-03</option>
+            </select>
+            <select id="time">
+                <option>Select Time Slot</option>
+                <option>10:00 AM</option>
+                <option>10:10 AM</option>
+            </select>
+            <input type="text" id="name" placeholder="Patient Name">
+            <input type="text" id="reason" placeholder="Reason for Visit">
+            <a href="#" id="whatsapp-link" class="book-btn">Book on WhatsApp</a>
+        </div>
+    </section>
 
+    <footer>
+        <button class="toggle-theme">Toggle Theme</button>
+        <p>Powered by Onestop AI</p>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        document.querySelector('.toggle-theme').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // WhatsApp Dynamic Link
+        document.getElementById('whatsapp-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const reason = document.getElementById('reason').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            if (name && reason && date !== "Select Date" && time !== "Select Time Slot") {
+                const message = `Hello Doctor, I want to book an appointment.\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${time}`;
+                const encodedMsg = encodeURIComponent(message);
+                window.open(`https://wa.me/919876543210?text=${encodedMsg}`, '_blank');
+            } else {
+                alert("Please fill all fields!");
+            }
+        });
+    </script>
 </body>
 </html>
