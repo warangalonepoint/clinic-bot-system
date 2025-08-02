@@ -1,84 +1,49 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinic Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f3f3f3;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark {
-      background-color: #121212;
-      color: #f0f0f0;
-    }
-    h1 {
-      text-align: center;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-      margin-top: 30px;
-    }
-    .card {
-      padding: 20px;
-      border-radius: 10px;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-      transition: background 0.3s;
-    }
-    .dark .card {
-      background: #1f1f1f;
-      color: #fff;
-    }
-    .card a {
-      text-decoration: none;
-      color: inherit;
-    }
-    .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #444;
-      color: #fff;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Roster Summary - OneStop AI Clinic</title>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
-  <h1>🏥 Clinic Dashboard</h1>
-  <div class="grid">
-    <div class="card"><a href="bookings.html">📅 Patient Bookings</a></div>
-    <div class="card"><a href="logs.html">📈 Booking Logs</a></div>
-    <div class="card"><a href="public-booking.html">🌐 Public Booking Page</a></div>
-    <div class="card"><a href="staff.html">👩‍⚕️ Staff List</a></div>
-    <div class="card"><a href="staff-attendance.html">📋 Attendance Sheet</a></div>
-    <div class="card"><a href="staff-attendance-form.html">📝 Mark Attendance</a></div>
-    <div class="card"><a href="staff-monthly-summary.html">📊 Attendance Summary</a></div>
-    <div class="card"><a href="staff-leave-tracker.html">🏖️ Leave Tracker</a></div>
-    <div class="card"><a href="staff-roster.html">🗓️ Duty Roster</a></div>
-    <div class="card"><a href="whatsapp-attendance.html">📲 WhatsApp Attendance</a></div>
-    <div class="card"><a href="reset-pin.html">🔑 Reset PIN</a></div>
-  </div>
-  <script>
-    function toggleTheme() {
-      const body = document.body;
-      const isDark = body.classList.toggle("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    }
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
-  </script>
-</body>
+  <header>
+    <h1>Monthly Attendance Summary</h1>
+  </header>  <section class="summary-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Employee ID</th>
+          <th>Name</th>
+          <th>Days Present</th>
+          <th>Leaves Taken</th>
+        </tr>
+      </thead>
+      <tbody id="summaryBody">
+      </tbody>
+    </table>
+  </section>  <script>
+    const summaryUrl = "staff-attendance.csv";
+
+    fetch(summaryUrl)
+      .then(res => res.text())
+      .then(data => {
+        const lines = data.trim().split('\n').slice(1);
+        const summary = lines.map(line => {
+          const [id, name, present, leaves] = line.split(',');
+          return { id, name, present, leaves };
+        });
+
+        const tbody = document.getElementById('summaryBody');
+        summary.forEach(emp => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${emp.id}</td>
+            <td>${emp.name}</td>
+            <td>${emp.present}</td>
+            <td>${emp.leaves}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  </script></body>
 </html>
