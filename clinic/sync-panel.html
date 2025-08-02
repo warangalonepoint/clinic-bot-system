@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Panel - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <header class="header">
+        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
+        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
+    </header>
+
+    <section class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Banner">
+    </section>
+
+    <section class="form-section">
+        <h2>Sync & Backup Panel</h2>
+        <div class="form-group">
+            <a href="clinic/Slots.csv" class="book-btn" download>📥 Download Slots Backup</a>
+            <a href="clinic/Logs.csv" class="book-btn" download>📥 Download Logs Backup</a>
+            <a href="https://wa.me/919876543210" class="book-btn">🔄 Sync with Admin</a>
+        </div>
+    </section>
+
+    <footer>
+        <button class="toggle-theme">Toggle Theme</button>
+        <p>Powered by Onestop AI</p>
+    </footer>
+
+    <script>
+        document.querySelector('.toggle-theme').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+</html>
