@@ -8,52 +8,46 @@
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-    <header class="header">
-        <img src="logo.png" alt="Clinic Logo" class="logo">
-        <h1>Onestop AI Clinic</h1>
+    <header>
+        <img src="clinic/logo.png" alt="Clinic Logo" class="logo">
+        <h1>Onestop AI Clinic Demo</h1>
         <button id="themeToggle">Toggle Theme</button>
     </header>
 
-    <div class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Dashboard Hero" class="hero-img">
-    </div>
+    <main>
+        <div class="hero-banner">
+            <img src="assets/dashboard-hero.png" alt="Dashboard Hero Banner">
+        </div>
 
-    <div class="container">
-        <p>Welcome to your clinic dashboard. Select a panel below:</p>
-
-        <div class="card">
-            <a href="clinic-dashboard.html">🏥 Clinic Dashboard</a>
+        <div class="container">
+            <a href="bookings.html" class="btn">📝 Patient Bookings</a>
+            <a href="logs.html" class="btn">📋 Booking Logs</a>
+            <a href="staff-panel.html" class="btn">👥 Staff Panel</a>
+            <a href="staff-attendance.html" class="btn">📅 Staff Attendance</a>
+            <a href="staff-whatsapp-attendance.html" class="btn">📲 Mark Attendance (WhatsApp)</a>
+            <a href="staff-monthly-summary.html" class="btn">📈 Monthly Attendance Summary</a>
+            <a href="staff-leave-tracker.html" class="btn">🏝️ Leave Tracker</a>
+            <a href="staff-roster.html" class="btn">🗓️ Staff Roster</a>
+            <a href="whatsapp-log.html" class="btn">📨 WhatsApp Log</a>
+            <a href="sync.html" class="btn">🔄 Sync Panel</a>
+            <a href="confirmation.html" class="btn">✅ Booking Confirmation</a>
         </div>
-        <div class="card">
-            <a href="bookings.html">🗓️ Patient Bookings</a>
-        </div>
-        <div class="card">
-            <a href="logs.html">📊 Booking Logs</a>
-        </div>
-        <div class="card">
-            <a href="staff-panel.html">👥 Staff Panel</a>
-        </div>
-        <div class="card">
-            <a href="sync.html">🔄 Sync Panel</a>
-        </div>
-    </div>
+    </main>
 
     <footer>
         <p>Powered by Onestop AI</p>
     </footer>
 
     <script>
-        const toggleButton = document.getElementById('themeToggle');
-        toggleButton.addEventListener('click', () => {
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
             localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
         });
 
         window.onload = () => {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
+            if (savedTheme === 'dark') document.body.classList.add('dark-theme');
         };
     </script>
 </body>
