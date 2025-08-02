@@ -2,87 +2,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Onestop AI Clinic Dashboard V2</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #fff;
-      color: #333;
-    }
-    header {
-      background-color: #007BFF;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 20px;
-    }
-    .container {
-      padding: 20px;
-    }
-    .section-title {
-      font-size: 18px;
-      margin-top: 30px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    .button {
-      display: block;
-      width: 100%;
-      max-width: 300px;
-      margin: 10px auto;
-      padding: 12px;
-      text-align: center;
-      background-color: #007BFF;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    .theme-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #333;
-      color: white;
-      padding: 8px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .dark-theme {
-      background-color: #121212;
-      color: white;
-    }
-  </style>
+  <title>Book Your Appointment</title>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
   <header>
-    Onestop AI Clinic Dashboard
-    <span class="theme-toggle" onclick="toggleTheme()">Toggle Theme</span>
-  </header>
-  <div class="container"><div class="section-title">Patient Management</div>
-<a href="bookings.html" class="button">📝 Patient Bookings</a>
-<a href="confirmation.html" class="button">✅ Booking Confirmation</a>
+    <h1>OneStop AI Clinic</h1>
+  </header>  <section class="booking-form">
+    <h2>Book Your Appointment</h2>
+    <label for="date">Select Date</label>
+    <select id="date" onchange="filterSlots()"></select><label for="slot">Select Time Slot</label>
+<select id="slot"></select>
 
-<div class="section-title">Staff Management</div>
-<a href="staff-panel.html" class="button">👥 Staff Panel</a>
-<a href="staff-attendance-form.html" class="button">📅 Staff Attendance</a>
-<a href="mark-attendance.html" class="button">📝 Mark Attendance (WhatsApp)</a>
-<a href="roster-summary.html" class="button">📊 Monthly Attendance Summary</a>
-<a href="leave-tracker.html" class="button">🌴 Leave Tracker</a>
-<a href="staff-roster.html" class="button">📅 Staff Roster</a>
+<label for="name">Full Name</label>
+<input type="text" id="name" placeholder="Enter your name">
 
-<div class="section-title">Logs & Sync</div>
-<a href="logs.html" class="button">📜 Booking Logs</a>
-<a href="whatsapp-log.html" class="button">📩 WhatsApp Log</a>
-<a href="sync.html" class="button">🔄 Sync Panel</a>
+<label for="reason">Reason for Visit</label>
+<textarea id="reason" placeholder="E.g., Consultation, Fever"></textarea>
 
-  </div>
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle('dark-theme');
+<button onclick="bookNow()">Book via WhatsApp</button>
+
+  </section>  <script>
+    const slotsUrl = "slots.csv";
+    let allSlots = [];
+
+    function loadSlots() {
+      fetch(slotsUrl)
+        .then(res => res.text())
+        .then(data => {
+          const lines = data.trim().split('\n').slice(1);
+          allSlots = lines.map(line => {
+            const [date, time, status] = line.split(',');
+            return { date, time, status };
+          });
+          populateDates();
+        });
     }
-  </script>
-</body>
+
+    function populateDates() {
+      const dateSelect = document.getElementById('date');
+      const uniqueDates = [...new Set(allSlots.filter(s => s.status === 'Available').map(s => s.date))];
+      dateSelect.innerHTML = '<option value="">Select Date</option>' + uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
+      filterSlots();
+    }
+
+    function filterSlots() {
+      const selectedDate = document.getElementById('date').value;
+      const slotSelect = document.getElementById('slot');
+      const filteredSlots = allSlots.filter(s => s.date === selectedDate && s.status === 'Available');
+      slotSelect.innerHTML = '<option value="">Select Slot</option>' + filteredSlots.map(s => `<option value="${s.time}">${s.time}</option>`).join('');
+    }
+
+    function bookNow() {
+      const date = document.getElementById('date').value;
+      const slot = document.getElementById('slot').value;
+      const name = document.getElementById('name').value.trim();
+      const reason = document.getElementById('reason').value.trim();
+
+      if (!date || !slot || !name || !reason) {
+        alert("Please fill all details.");
+        return;
+      }
+
+      const message = `Booking Request:\nName: ${name}\nDate: ${date}\nTime: ${slot}\nReason: ${reason}`;
+      window.open(`https://wa.me/918686019709?text=${encodeURIComponent(message)}`);
+    }
+
+    loadSlots();
+  </script></body>
 </html>
