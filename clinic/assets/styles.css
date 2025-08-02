@@ -1,113 +1,32 @@
-/* Reset Styles */
-body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #fff;
-    color: #000;
-}
+/* Reset Styles */ body { margin: 0; font-family: 'Arial', sans-serif; background-color: #fff; color: #000; min-height: 100vh; display: flex; flex-direction: column; }
 
-/* Header */
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #000;
-    padding: 10px;
-}
+/* Header */ .header { display: flex; align-items: center; justify-content: center; background-color: #000; padding: 10px; gap: 10px; }
 
-.logo {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-}
+.logo { width: 40px; height: auto; }
 
-.clinic-name {
-    color: #fff;
-    font-size: 24px;
-    font-weight: bold;
-}
+.clinic-name { color: #fff; font-size: 22px; font-weight: bold; }
 
-/* Hero Banner */
-.hero-banner {
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    padding: 10px 0;
-}
+/* Hero Banner */ .hero-banner img { width: 100%; max-width: 500px; height: auto; display: block; margin: 0 auto; padding: 10px 0; }
 
-/* Navigation Grid */
-.nav-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    justify-items: center;
-    padding: 20px;
-}
+/* Navigation Grid */ .nav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; justify-items: center; padding: 20px; flex: 1; }
 
-/* Button Style */
-.nav-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 140px;
-    height: 50px;
-    background-color: #000;
-    color: #fff;
-    border-radius: 10px;
-    text-decoration: none;
-    font-size: 16px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    transition: background-color 0.3s ease;
-}
+/* Button Style */ .nav-button { display: flex; align-items: center; justify-content: center; width: 140px; height: 50px; background-color: #000; color: #fff; border-radius: 10px; text-decoration: none; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: background-color 0.3s ease; }
 
-.nav-button:hover {
-    background-color: #222;
-}
+.nav-button:hover { background-color: #222; }
 
-/* Footer */
-footer {
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-    margin-top: 30px;
-}
+/* Footer */ footer { background-color: #000; color: #fff; text-align: center; padding: 20px; margin-top: auto; }
 
-/* Toggle Theme Button */
-.toggle-theme {
-    background-color: #fff;
-    color: #000;
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
+/* Toggle Theme Button */ .toggle-theme { background-color: #fff; color: #000; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; margin-bottom: 10px; }
 
-/* Responsive Image Fix */
-img {
-    max-width: 100%;
-    height: auto;
-}
+/* Dark Mode */ body.dark-mode { background-color: #000; color: #fff; }
 
-/* Dark Mode (Optional Toggle Ready) */
-body.dark-mode {
-    background-color: #000;
-    color: #fff;
-}
+body.dark-mode .header, body.dark-mode footer { background-color: #1f1f1f; }
 
-body.dark-mode .nav-button {
-    background-color: #fff;
-    color: #000;
-}
+body.dark-mode .nav-button { background-color: #333; }
 
-body.dark-mode .toggle-theme {
-    background-color: #222;
-    color: #fff;
-}
+body.dark-mode .nav-button:hover { background-color: #555; }
 
-body.dark-mode footer {
-    background-color: #222;
-}
+body.dark-mode .toggle-theme { background-color: #333; color: #fff; }
+
+/* Responsive Image Fix */ img { max-width: 100%; height: auto; }
+
