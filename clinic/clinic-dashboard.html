@@ -8,22 +8,34 @@
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-    <div class="header">
-        <h1>Onestop AI Clinic Dashboard</h1>
+    <header class="header">
+        <img src="logo.png" alt="Clinic Logo" class="logo">
+        <h1>Onestop AI Clinic</h1>
         <button id="themeToggle">Toggle Theme</button>
-    </div>
+    </header>
 
-    <!-- Hero Banner Image -->
     <div class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Dashboard Banner" class="hero-img">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Dashboard Hero" class="hero-img">
     </div>
 
     <div class="container">
-        <p>Welcome to your clinic dashboard. Choose a panel below:</p>
-        <a href="clinic-dashboard.html" class="btn">Clinic Dashboard</a>
-        <a href="bookings.html" class="btn">Patient Bookings</a>
-        <a href="logs.html" class="btn">Booking Logs</a>
-        <a href="staff-panel.html" class="btn">Staff Panel</a>
+        <p>Welcome to your clinic dashboard. Select a panel below:</p>
+
+        <div class="card">
+            <a href="clinic-dashboard.html">🏥 Clinic Dashboard</a>
+        </div>
+        <div class="card">
+            <a href="bookings.html">🗓️ Patient Bookings</a>
+        </div>
+        <div class="card">
+            <a href="logs.html">📊 Booking Logs</a>
+        </div>
+        <div class="card">
+            <a href="staff-panel.html">👥 Staff Panel</a>
+        </div>
+        <div class="card">
+            <a href="sync.html">🔄 Sync Panel</a>
+        </div>
     </div>
 
     <footer>
@@ -31,14 +43,12 @@
     </footer>
 
     <script>
-        // Theme Toggle Logic
         const toggleButton = document.getElementById('themeToggle');
         toggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
             localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
         });
 
-        // Load preferred theme
         window.onload = () => {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
