@@ -3,44 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookings - Onestop AI Clinic</title>
+    <title>Onestop AI Clinic Booking</title>
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+
     <header class="header">
         <img src="logo.png" alt="Clinic Logo" class="logo">
-        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
+        <h1>Onestop AI Clinic Demo</h1>
     </header>
 
     <section class="hero-banner">
         <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
     </section>
 
-    <section class="booking-form">
-        <select class="input-field">
-            <option>Select Date</option>
-            <option>Today</option>
-            <option>Tomorrow</option>
-        </select>
-
-        <select class="input-field">
-            <option>Select Time Slot</option>
-            <option>10:00 AM</option>
-            <option>10:30 AM</option>
-            <option>11:00 AM</option>
-        </select>
-
-        <input type="text" class="input-field" placeholder="Patient Name">
-        <input type="text" class="input-field" placeholder="Reason for Visit">
-
-        <a href="#" class="button">Book on WhatsApp</a>
-    </section>
+    <main>
+        <h2>Book Your Appointment</h2>
+        <form class="booking-form">
+            <select required>
+                <option value="">Select Date</option>
+                <!-- Dynamically load dates here -->
+            </select>
+            <select required>
+                <option value="">Select Time Slot</option>
+                <!-- Dynamically load time slots here -->
+            </select>
+            <input type="text" placeholder="Patient Name" required>
+            <input type="text" placeholder="Reason for Visit" required>
+            <a href="#" class="button">Book on WhatsApp</a>
+        </form>
+    </main>
 
     <footer>
         <button id="toggleTheme" class="toggle-theme">Toggle Theme</button>
         <p>Powered by Onestop AI</p>
     </footer>
 
-    <script src="assets/theme-toggle.js"></script>
+    <script>
+        document.getElementById('toggleTheme').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+
 </body>
 </html>
