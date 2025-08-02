@@ -3,56 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onestop AI Clinic Dashboard</title>
+    <title>Bookings - Onestop AI Clinic</title>
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-
-    <!-- Header with Logo and Clinic Name -->
-    <div class="header">
-        <img src="assets/clinic-logo.png" alt="Clinic Logo" class="logo">
+    <header class="header">
+        <img src="logo.png" alt="Clinic Logo" class="logo">
         <h1>Onestop AI Clinic Demo</h1>
-    </div>
+    </header>
 
-    <!-- Hero Banner -->
-    <div class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Dashboard Banner" class="hero-img">
-    </div>
+    <section class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
+    </section>
 
-    <!-- Dashboard Tabs -->
-    <div class="dashboard-container">
-        <a href="index.html" class="dashboard-btn">🏠 Home</a>
-        <a href="bookings.html" class="dashboard-btn">📋 Bookings</a>
-        <a href="logs.html" class="dashboard-btn">📄 Logs</a>
-        <a href="staff-panel.html" class="dashboard-btn">👥 Staff</a>
-        <a href="staff-attendance.html" class="dashboard-btn">🗓️ Attendance</a>
-        <a href="whatsapp-log.html" class="dashboard-btn">📱 WhatsApp</a>
-        <a href="sync.html" class="dashboard-btn">🔄 Sync Panel</a>
-        <a href="confirmation.html" class="dashboard-btn">✅ Confirmations</a>
-    </div>
+    <section style="padding: 20px; max-width: 500px; margin: 0 auto;">
+        <select class="nav-button" style="width: 100%;">
+            <option>Select Date</option>
+            <option>Today</option>
+            <option>Tomorrow</option>
+        </select>
 
-    <!-- Footer -->
+        <select class="nav-button" style="width: 100%;">
+            <option>Select Time Slot</option>
+            <option>10:00 AM</option>
+            <option>10:30 AM</option>
+            <option>11:00 AM</option>
+        </select>
+
+        <input type="text" placeholder="Patient Name" class="nav-button" style="width: 100%; text-align:left;">
+        <input type="text" placeholder="Reason for Visit" class="nav-button" style="width: 100%; text-align:left;">
+
+        <a href="#" class="nav-button" style="margin-top: 15px;">Book on WhatsApp</a>
+    </section>
+
     <footer>
-        <button id="themeToggle">Toggle Theme</button>
+        <button id="toggleTheme" class="toggle-theme">Toggle Theme</button>
         <p>Powered by Onestop AI</p>
     </footer>
 
     <script>
-        // Theme Toggle Logic
-        const toggleButton = document.getElementById('themeToggle');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        document.getElementById('toggleTheme').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
         });
-
-        // Load Preferred Theme
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
-        };
     </script>
-
 </body>
 </html>
