@@ -19,6 +19,13 @@
     <section class="logs-section">
         <h2>Booking Logs</h2>
 
+        <!-- Search & Filter -->
+        <div class="form-group">
+            <input type="text" id="searchName" placeholder="Search by Name" onkeyup="filterLogs()">
+            <input type="date" id="filterDate" onchange="filterLogs()">
+            <button onclick="resetFilters()" class="book-btn">Reset</button>
+        </div>
+
         <!-- Daily Summary -->
         <div class="daily-summary">
             <p>Total Bookings: <span id="totalBookings">0</span></p>
@@ -26,10 +33,10 @@
             <p>Next Token: <span id="nextToken">1</span></p>
         </div>
 
-        <!-- Export Buttons -->
+        <!-- Export -->
         <div class="form-group">
-            <button onclick="exportTableToCSV('BookingLogs.csv')" class="book-btn">Export as CSV</button>
-            <button onclick="window.print()" class="book-btn">Export as PDF (Print)</button>
+            <button onclick="exportTableToCSV('BookingLogs.csv')" class="book-btn">Export CSV</button>
+            <button onclick="window.print()" class="book-btn">Export PDF</button>
         </div>
 
         <table class="logs-table" id="logsTable">
@@ -79,17 +86,17 @@
 
         function exportTableToCSV(filename) {
             const csv = [];
-            const rows = document.querySelectorAll(\"table tr\");
+            const rows = document.querySelectorAll("table tr");
             for (let row of rows) {
-                const cols = row.querySelectorAll(\"td, th\");
-                const rowData = Array.from(cols).map(col => col.innerText).join(\",\");
+                const cols = row.querySelectorAll("td, th");
+                const rowData = Array.from(cols).map(col => col.innerText).join(",");
                 csv.push(rowData);
             }
-            const csvFile = new Blob([csv.join(\"\\n\")], { type: \"text/csv\" });
-            const downloadLink = document.createElement(\"a\");
+            const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            const downloadLink = document.createElement("a");
             downloadLink.download = filename;
             downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = \"none\";
+            downloadLink.style.display = "none";
             document.body.appendChild(downloadLink);
             downloadLink.click();
         }
@@ -111,6 +118,28 @@
         function updateRemindersCount() {
             remindersSent++;
             document.getElementById('remindersSent').innerText = remindersSent;
+        }
+
+        function filterLogs() {
+            const nameInput = document.getElementById('searchName').value.toLowerCase();
+            const dateInput = document.getElementById('filterDate').value;
+            const rows = document.querySelectorAll('#logsTable tbody tr');
+
+            rows.forEach(row => {
+                const name = row.cells[3].innerText.toLowerCase();
+                const date = row.cells[1].innerText;
+
+                const matchesName = name.includes(nameInput);
+                const matchesDate = dateInput === '' || date === dateInput;
+
+                row.style.display = (matchesName && matchesDate) ? '' : 'none';
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('filterDate').value = '';
+            filterLogs();
         }
 
         window.onload = updateSummary;
