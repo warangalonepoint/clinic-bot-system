@@ -1,12 +1,12 @@
-/* Reset Styles */
+/* Reset & Base Styles */
 body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
     background-color: #fff;
     color: #000;
 }
 
-/* Header */
+/* Header Section */
 .header {
     display: flex;
     align-items: center;
@@ -19,60 +19,59 @@ body {
     width: 40px;
     height: 40px;
     margin-right: 10px;
+    vertical-align: middle;
 }
 
-.clinic-name {
+h1 {
     color: #fff;
     font-size: 24px;
     font-weight: bold;
+    margin: 0;
 }
 
-/* Hero Banner */
+/* Hero Banner Image */
 .hero-banner {
     width: 100%;
-    max-width: 500px;
-    height: auto;
+    max-width: 600px;
     display: block;
     margin: 0 auto;
-    padding: 10px 0;
 }
 
-/* Navigation Grid */
+/* Button Grid */
 .nav-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
-    justify-items: center;
     padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-/* Button Style */
+/* Buttons Style */
 .nav-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 140px;
-    height: 50px;
     background-color: #000;
     color: #fff;
-    border-radius: 10px;
+    padding: 15px;
+    border-radius: 12px;
     text-decoration: none;
-    font-size: 16px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    transition: background-color 0.3s ease;
+    font-size: 18px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    height: 60px;
 }
 
 .nav-button:hover {
     background-color: #222;
 }
 
-/* Footer */
+/* Footer Section */
 footer {
     background-color: #000;
     color: #fff;
     text-align: center;
     padding: 20px;
-    margin-top: 30px;
 }
 
 /* Toggle Theme Button */
@@ -83,31 +82,12 @@ footer {
     border-radius: 10px;
     border: none;
     cursor: pointer;
+    font-size: 16px;
     margin-bottom: 10px;
 }
 
-/* Responsive Image Fix */
+/* General Images */
 img {
     max-width: 100%;
     height: auto;
-}
-
-/* Dark Mode (Optional Toggle Ready) */
-body.dark-mode {
-    background-color: #000;
-    color: #fff;
-}
-
-body.dark-mode .nav-button {
-    background-color: #fff;
-    color: #000;
-}
-
-body.dark-mode .toggle-theme {
-    background-color: #222;
-    color: #fff;
-}
-
-body.dark-mode footer {
-    background-color: #222;
 }
