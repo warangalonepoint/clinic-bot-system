@@ -1,122 +1,50 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinic Dashboard - Onestop AI</title>
-    <link rel="manifest" href="./manifest.json">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f9f9f9;
-            color: #333;
-        }
-        .header {
-            background: #0a74da;
-            color: #fff;
-            padding: 1rem;
-            text-align: center;
-            font-size: 1.5rem;
-            position: relative;
-        }
-        .theme-toggle {
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
-            background: #333;
-            color: #fff;
-            padding: 0.3rem 0.6rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .hero-image {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-        }
-        .container {
-            padding: 1rem;
-        }
-        .panel-btn {
-            display: block;
-            width: 100%;
-            background: #007bff;
-            color: #fff;
-            padding: 1rem;
-            margin: 0.5rem 0;
-            text-align: center;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .panel-btn:hover {
-            background: #0056b3;
-        }
-        .whatsapp-float {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #25D366;
-            color: white;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 28px;
-            z-index: 1000;
-        }
-        footer {
-            margin-top: 2rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #888;
-        }
-    </style>
+    <title>Onestop AI Clinic Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
     <div class="header">
-        Clinic Dashboard
-        <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
-    </div><img src="./dashboard-hero.png" alt="Dashboard Hero" class="hero-image">
+        <h1>Onestop AI Clinic Dashboard</h1>
+        <button id="themeToggle">Toggle Theme</button>
+    </div>
 
-<div class="container">
-    <a href="./bookings.html" class="panel-btn">📅 Patient Bookings</a>
-    <a href="./logs.html" class="panel-btn">📊 Booking Logs</a>
-    <a href="./staff-panel.html" class="panel-btn">👥 Staff Panel</a>
-    <a href="./staff-attendance.html" class="panel-btn">🗓️ Staff Attendance</a>
-    <a href="./staff-whatsapp-attendance.html" class="panel-btn">📲 WhatsApp Attendance</a>
-    <a href="./staff-monthly-summary.html" class="panel-btn">📈 Monthly Summary</a>
-    <a href="./staff-leave-tracker.html" class="panel-btn">🌴 Leave Tracker</a>
-    <a href="./staff-roster.html" class="panel-btn">📅 Staff Roster</a>
-    <a href="./sync.html" class="panel-btn">🔄 Sync Panel</a>
-</div>
+    <!-- Hero Banner Image -->
+    <div class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Dashboard Banner" class="hero-img">
+    </div>
 
-<a href="https://wa.me/918686019709?text=Hi, I need assistance" class="whatsapp-float" target="_blank">💬</a>
+    <div class="container">
+        <p>Welcome to your clinic dashboard. Choose a panel below:</p>
+        <a href="clinic-dashboard.html" class="btn">Clinic Dashboard</a>
+        <a href="bookings.html" class="btn">Patient Bookings</a>
+        <a href="logs.html" class="btn">Booking Logs</a>
+        <a href="staff-panel.html" class="btn">Staff Panel</a>
+    </div>
 
-<footer>
-    Powered by Onestop AI
-</footer>
+    <footer>
+        <p>Powered by Onestop AI</p>
+    </footer>
 
-<script>
-    function toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    }
-    window.onload = function() {
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
-    }
-</script>
+    <script>
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        });
 
+        // Load preferred theme
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+        };
+    </script>
 </body>
 </html>
