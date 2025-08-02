@@ -1,32 +1,39 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Appointment Confirmation</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Confirmation - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <header>
-    <h1>Booking Confirmed</h1>
-  </header>  <section class="confirmation-details">
-    <p><strong>Date:</strong> <span id="confirmDate"></span></p>
-    <p><strong>Time:</strong> <span id="confirmTime"></span></p>
-    <p><strong>Name:</strong> <span id="confirmName"></span></p>
-    <p><strong>Reason:</strong> <span id="confirmReason"></span></p>
-    <p><strong>Token No:</strong> <span id="confirmToken"></span></p>
-    <a href="bookings.html" class="button">Book Another Appointment</a>
-  </section>  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const date = urlParams.get('date');
-    const time = urlParams.get('time');
-    const name = urlParams.get('name');
-    const reason = urlParams.get('reason');
-    const token = urlParams.get('token');
+    <header class="header">
+        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
+        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
+    </header>
 
-    document.getElementById('confirmDate').textContent = date;
-    document.getElementById('confirmTime').textContent = time;
-    document.getElementById('confirmName').textContent = name;
-    document.getElementById('confirmReason').textContent = reason;
-    document.getElementById('confirmToken').textContent = token;
-  </script></body>
+    <section class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Banner">
+    </section>
+
+    <section class="form-section">
+        <h2>Appointment Confirmed ✅</h2>
+        <p>Your booking has been successfully recorded. Please reach the clinic on time.</p>
+        <div class="form-group">
+            <a href="index.html" class="book-btn">Go to Home</a>
+            <a href="bookings.html" class="book-btn">Book Another Appointment</a>
+        </div>
+    </section>
+
+    <footer>
+        <button class="toggle-theme">Toggle Theme</button>
+        <p>Powered by Onestop AI</p>
+    </footer>
+
+    <script>
+        document.querySelector('.toggle-theme').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
 </html>
