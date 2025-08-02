@@ -1,74 +1,77 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Logs - OneStop AI Clinic</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Logs - Onestop AI Clinic</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <header>
+
+<div class="header">
     <h1>Booking Logs</h1>
-  </header>  <section class="logs-table">
+    <button id="themeToggle">Toggle Theme</button>
+</div>
+
+<div class="logs-container">
     <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Name</th>
-          <th>Reason</th>
-          <th>Token</th>
-          <th>Reminder Sent</th>
-        </tr>
-      </thead>
-      <tbody id="logsBody">
-      </tbody>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Patient Name</th>
+                <th>Reason</th>
+                <th>Contact</th>
+                <th>Reminder</th>
+            </tr>
+        </thead>
+        <tbody id="logsTable">
+            <!-- Dynamic Logs Will Load Here -->
+        </tbody>
     </table>
-  </section><a href="https://wa.me/918686019709?text=Hi, I need assistance" class="whatsapp-float" target="_blank">💬</a>
+</div>
 
-  <style>
-    .whatsapp-float {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #25D366;
-      color: white;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 28px;
-      z-index: 1000;
+<footer>
+    <p>Powered by Onestop AI</p>
+    <a href="https://wa.me/919390664577" class="floating-whatsapp" target="_blank">💬</a>
+</footer>
+
+<script>
+// Theme Toggle Logic
+document.getElementById('themeToggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+    localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+});
+
+// Load Theme from Storage
+window.onload = () => {
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
     }
-  </style>  <script>
-    const logsUrl = "logs.csv";
+};
 
-    fetch(logsUrl)
-      .then(res => res.text())
-      .then(data => {
-        const lines = data.trim().split('\n').slice(1);
-        const logs = lines.map(line => {
-          const [date, time, name, reason, token, reminder] = line.split(',');
-          return { date, time, name, reason, token, reminder };
-        });
+// Dummy Logs Data (Replace with CSV Fetch Later)
+const logsData = [
+    {date: '2025-08-02', time: '17:00', name: 'John Doe', reason: 'Fever', contact: '9876543210', reminder: '✅'},
+    {date: '2025-08-02', time: '17:10', name: 'Jane Smith', reason: 'Check-up', contact: '9876543222', reminder: '❌'}
+];
 
-        const tbody = document.getElementById('logsBody');
-        logs.forEach(log => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
+// Populate Logs Table
+const logsTable = document.getElementById('logsTable');
+logsData.forEach(log => {
+    logsTable.innerHTML += `
+        <tr>
             <td>${log.date}</td>
             <td>${log.time}</td>
             <td>${log.name}</td>
             <td>${log.reason}</td>
-            <td>${log.token}</td>
+            <td><a href="tel:${log.contact}">${log.contact}</a></td>
             <td>${log.reminder}</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-  </script></body>
+        </tr>
+    `;
+});
+</script>
+
+</body>
 </html>
