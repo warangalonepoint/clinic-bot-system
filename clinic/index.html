@@ -1,69 +1,47 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onestop AI Clinic Demo</title>
     <link rel="stylesheet" href="assets/styles.css">
-    <style>
-        .theme-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: inherit;
-        }
-        body.dark-mode {
-            background-color: #121212;
-            color: #ffffff;
-        }
-        body.dark-mode .header,
-        body.dark-mode footer {
-            background-color: #1f1f1f;
-        }
-        body.dark-mode .nav-button {
-            background-color: #333 !important;
-            color: #fff !important;
-        }
-        body.dark-mode .form-group input,
-        body.dark-mode .form-group select {
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-        }
-    </style>
 </head>
 <body>
+    <!-- Header -->
     <header class="header">
         <img src="assets/logo.png" alt="Clinic Logo" class="logo">
         <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-        <button id="themeToggleBtn" class="theme-icon">🌓</button>
-    </header><section class="hero-banner">
-    <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
-</section>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+    </header>
 
-<section class="nav-grid">
-    <a href="index.html" class="nav-button">🏠 Home</a>
-    <a href="bookings.html" class="nav-button">📚 Bookings</a>
-    <a href="logs.html" class="nav-button">📖 Logs</a>
-    <a href="staff-panel.html" class="nav-button">👥 Staff</a>
-    <a href="staff-attendance.html" class="nav-button">📅 Attendance</a>
-    <a href="whatsapp-log.html" class="nav-button">📲 WhatsApp</a>
-    <a href="sync-panel.html" class="nav-button">🔄 Sync Panel</a>
-    <a href="confirmation.html" class="nav-button">✅ Confirmations</a>
-</section>
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+        <img src="assets/clinic-hero-banner.png" alt="Clinic Banner">
+    </section>
 
-<footer>
-    <p>Powered by Onestop AI</p>
-</footer>
+    <!-- Navigation Grid -->
+    <section class="nav-grid">
+        <a href="index.html" class="nav-button">🏠 Home</a>
+        <a href="bookings.html" class="nav-button">📚 Bookings</a>
+        <a href="logs.html" class="nav-button">📖 Logs</a>
+        <a href="staff-panel.html" class="nav-button">👥 Staff</a>
+        <a href="staff-attendance.html" class="nav-button">📅 Attendance</a>
+        <a href="whatsapp-log.html" class="nav-button">📲 WhatsApp</a>
+        <a href="sync-panel.html" class="nav-button">🔄 Sync Panel</a>
+        <a href="confirmation.html" class="nav-button">✅ Confirmations</a>
+    </section>
 
-<script>
-    document.getElementById('themeToggleBtn').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-    });
-</script>
+    <!-- Footer -->
+    <footer>
+        <p>Powered by Onestop AI</p>
+    </footer>
 
+    <!-- Theme Toggle Script -->
+    <script>
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
 </body>
 </html>
