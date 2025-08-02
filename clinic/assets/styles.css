@@ -1,4 +1,4 @@
-/* Base Reset */
+/* Reset Styles */
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
@@ -13,87 +13,57 @@ body {
     justify-content: center;
     background-color: #000;
     padding: 10px;
-    gap: 10px;
 }
 
 .logo {
     width: 40px;
-    height: auto;
+    height: 40px;
+    margin-right: 10px;
 }
 
 .clinic-name {
     color: #fff;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: bold;
 }
 
 /* Hero Banner */
-.hero-banner img {
+.hero-banner {
     width: 100%;
+    max-width: 500px;
     height: auto;
+    display: block;
+    margin: 0 auto;
+    padding: 10px 0;
 }
 
-/* Navigation Grid Buttons */
+/* Navigation Grid */
 .nav-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
+    justify-items: center;
     padding: 20px;
 }
 
+/* Button Style */
 .nav-button {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 140px;
+    height: 50px;
     background-color: #000;
     color: #fff;
-    padding: 15px;
-    border-radius: 12px;
+    border-radius: 10px;
     text-decoration: none;
-    font-size: 18px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
 }
 
 .nav-button:hover {
     background-color: #222;
-}
-
-/* Form Section */
-.form-section {
-    text-align: center;
-    padding: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.form-group select,
-.form-group input {
-    width: 80%;
-    max-width: 300px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-.book-btn {
-    display: inline-block;
-    background-color: #25D366;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.book-btn:hover {
-    background-color: #128C7E;
 }
 
 /* Footer */
@@ -102,7 +72,7 @@ footer {
     color: #fff;
     text-align: center;
     padding: 20px;
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 /* Toggle Theme Button */
@@ -116,39 +86,28 @@ footer {
     margin-bottom: 10px;
 }
 
-/* Dark Mode */
-body.dark-mode {
-    background-color: #121212;
-    color: #fff;
-}
-
-body.dark-mode .header,
-body.dark-mode footer {
-    background-color: #1f1f1f;
-}
-
-body.dark-mode .nav-button {
-    background-color: #333;
-}
-
-body.dark-mode .nav-button:hover {
-    background-color: #555;
-}
-
-body.dark-mode .form-group select,
-body.dark-mode .form-group input {
-    background-color: #333;
-    color: #fff;
-    border: 1px solid #555;
-}
-
-body.dark-mode .toggle-theme {
-    background-color: #333;
-    color: #fff;
-}
-
-/* General Image Responsive */
+/* Responsive Image Fix */
 img {
     max-width: 100%;
     height: auto;
+}
+
+/* Dark Mode (Optional Toggle Ready) */
+body.dark-mode {
+    background-color: #000;
+    color: #fff;
+}
+
+body.dark-mode .nav-button {
+    background-color: #fff;
+    color: #000;
+}
+
+body.dark-mode .toggle-theme {
+    background-color: #222;
+    color: #fff;
+}
+
+body.dark-mode footer {
+    background-color: #222;
 }
