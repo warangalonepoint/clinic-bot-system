@@ -1,4 +1,4 @@
-/* Universal Reset */
+/* Reset & Basics */
 body, h1, h2, h3, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
     margin: 0;
     padding: 0;
@@ -22,17 +22,30 @@ body.dark-mode {
 header {
     background-color: #000;
     color: #fff;
-    padding: 10px;
-    font-size: 18px;
-    text-align: center;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Banner Image */
+.logo-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 30px;
+    height: 30px;
+}
+
+/* Banner */
 .banner {
     width: 100%;
     height: auto;
     display: block;
-    margin-bottom: 20px;
+    max-height: 220px;
+    object-fit: cover;
 }
 
 /* Button Grid */
@@ -41,10 +54,10 @@ header {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     width: 80%;
-    margin: 0 auto 30px auto;
+    margin: 20px auto;
 }
 
-/* Button Cards */
+/* Buttons */
 .button-card {
     display: flex;
     justify-content: center;
@@ -66,15 +79,12 @@ header {
 footer {
     background-color: #000;
     color: #fff;
-    padding: 15px;
-    position: relative;
-    bottom: 0;
-    width: 100%;
+    padding: 20px;
+    margin-top: 30px;
 }
 
 .theme-toggle {
     padding: 10px 20px;
-    margin-bottom: 10px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
