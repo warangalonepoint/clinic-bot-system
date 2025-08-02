@@ -8,39 +8,52 @@
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-    <header>
-        <img src="clinic/logo.png" alt="Clinic Logo" class="logo">
-        <h1>Onestop AI Clinic Demo</h1>
-        <button id="themeToggle">Toggle Theme</button>
-    </header>
 
-    <main>
-        <div class="hero-banner">
-            <img src="assets/clinic-hero-banner.png" alt="Hero Banner">
-        </div>
+    <!-- Header with Logo and Clinic Name -->
+    <div style="display: flex; align-items: center; padding: 10px; background-color: black; color: white;">
+        <img src="./assets/logo.png" alt="Clinic Logo" style="height: 40px; margin-right: 10px;">
+        <h1 style="font-family: 'Arial Black', sans-serif; font-size: 1.2rem;">Onestop AI Clinic Demo</h1>
+    </div>
 
-        <p>Welcome to your clinic dashboard. Choose a panel below:</p>
-        <a href="clinic-dashboard.html" class="btn">Clinic Dashboard</a>
-        <a href="bookings.html" class="btn">Patient Bookings</a>
-        <a href="logs.html" class="btn">Booking Logs</a>
-        <a href="staff-panel.html" class="btn">Staff Panel</a>
-    </main>
+    <!-- Hero Banner -->
+    <div style="width: 100%; overflow: hidden;">
+        <img src="./assets/clinic-hero-banner.png" alt="Clinic Hero Banner" style="width: 100%; height: auto;">
+    </div>
 
-    <footer>
+    <!-- Navigation Buttons -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px;">
+        <a href="index.html" class="nav-btn">🏠 Home</a>
+        <a href="bookings.html" class="nav-btn">📋 Bookings</a>
+        <a href="logs.html" class="nav-btn">📄 Logs</a>
+        <a href="staff-panel.html" class="nav-btn">👥 Staff</a>
+        <a href="staff-attendance.html" class="nav-btn">📅 Attendance</a>
+        <a href="whatsapp-log.html" class="nav-btn">📲 WhatsApp</a>
+        <a href="sync.html" class="nav-btn">🔄 Sync Panel</a>
+        <a href="confirmation.html" class="nav-btn">✅ Confirmations</a>
+    </div>
+
+    <!-- Footer -->
+    <footer style="position: fixed; bottom: 0; width: 100%; background-color: black; color: white; text-align: center; padding: 10px;">
+        <button id="themeToggle" style="padding: 8px 16px; margin-bottom: 5px;">Toggle Theme</button>
         <p>Powered by Onestop AI</p>
     </footer>
 
     <script>
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => {
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
             localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
         });
 
+        // Load saved theme
         window.onload = () => {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') document.body.classList.add('dark-theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
         };
     </script>
+
 </body>
 </html>
