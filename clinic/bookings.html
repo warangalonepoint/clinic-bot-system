@@ -2,149 +2,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Appointment</title>
+  <title>Booking Logs - Onestop AI Clinic Demo</title>
   <link rel="stylesheet" href="./assets/styles.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-    }header {
-  background-color: #000;
-  color: #fff;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-header img {
-  height: 30px;
-}
-
-.hero-banner img {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-}
-
-.booking-form {
-  padding: 20px;
-}
-
-.booking-form h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-select, input {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 12px;
-  background-color: #000;
-  color: #fff;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-footer {
-  text-align: center;
-  padding: 10px;
-  background-color: #000;
-  color: #fff;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-  </style>
 </head>
 <body>
   <header>
-    <img src="./logo.png" alt="Clinic Logo">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo">
     <h1>Onestop AI Clinic Demo</h1>
   </header>  <section class="hero-banner">
-    <img src="./clinic-hero-banner.png" alt="Doctor Illustration">
-  </section>  <section class="booking-form">
-    <h2>Book Your Appointment</h2>
-    <form id="bookingForm">
-      <select id="dateDropdown" required>
-        <option value="">Select Date</option>
+    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+  </section>  <section class="logs-section">
+    <h2>Booking Logs</h2>
+    <div class="filters">
+      <input type="text" id="searchName" placeholder="Search by Name">
+      <select id="filterDate">
+        <option value="all">All Dates</option>
       </select>
-      <select id="timeDropdown" required>
-        <option value="">Select Time Slot</option>
-      </select>
-      <input type="text" id="patientName" placeholder="Patient Name" required>
-      <input type="text" id="visitReason" placeholder="Reason for Visit" required>
-      <button type="submit">Book on WhatsApp</button>
-    </form>
+      <button id="resetFilters">Reset</button>
+    </div>
+    <div class="summary">
+      <span id="totalBookings">Total Bookings: 0</span>
+      <span id="remindersSent">Reminders Sent: 0</span>
+      <span id="nextToken">Next Token: 1</span>
+    </div>
+    <div class="export-buttons">
+      <button id="exportCSV">Export CSV</button>
+      <button id="exportPDF">Export PDF</button>
+    </div><table id="logsTable">
+  <thead>
+    <tr>
+      <th>Token</th>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Patient Name</th>
+      <th>Reason</th>
+      <th>Contact</th>
+      <th>Reminder</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Logs will load here dynamically -->
+  </tbody>
+</table>
+
   </section>  <footer>
-    Powered by Onestop AI
-  </footer>  <script>
-    let slotsData = [];
-
-    fetch('./slots.csv')
-      .then(response => response.text())
-      .then(data => {
-        const lines = data.trim().split('\n').slice(1);
-        slotsData = lines.map(line => {
-          const [date, time, status] = line.split(',');
-          return { date: date.trim(), time: time.trim(), status: status.trim() };
-        });
-
-        const uniqueDates = [...new Set(slotsData.map(slot => slot.date))];
-        const dateDropdown = document.getElementById('dateDropdown');
-        uniqueDates.forEach(date => {
-          const option = document.createElement('option');
-          option.value = date;
-          option.textContent = date;
-          dateDropdown.appendChild(option);
-        });
-      });
-
-    document.getElementById('dateDropdown').addEventListener('change', function() {
-      const selectedDate = this.value;
-      const timeDropdown = document.getElementById('timeDropdown');
-      timeDropdown.innerHTML = '<option value="">Select Time Slot</option>';
-
-      slotsData
-        .filter(slot => slot.date === selectedDate && slot.status === 'Available')
-        .forEach(slot => {
-          const option = document.createElement('option');
-          option.value = slot.time;
-          option.textContent = slot.time;
-          timeDropdown.appendChild(option);
-        });
-    });
-
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const date = document.getElementById('dateDropdown').value;
-      const time = document.getElementById('timeDropdown').value;
-      const patientName = document.getElementById('patientName').value.trim();
-      const reason = document.getElementById('visitReason').value.trim();
-
-      if (!date || !time || !patientName || !reason) {
-        alert('Please fill all fields.');
-        return;
-      }
-
-      const whatsappMessage = `Booking Request:%0AName: ${patientName}%0AReason: ${reason}%0ADate: ${date}%0ATime: ${time}`;
-      window.location.href = `https://wa.me/919876543210?text=${whatsappMessage}`;
-    });
-  </script></body>
+    <p>Powered by Onestop AI</p>
+  </footer>  <script src="./assets/logs.js"></script></body>
 </html>
