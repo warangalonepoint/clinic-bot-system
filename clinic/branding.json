@@ -1,0 +1,13 @@
+{
+  "clinicName": "Onestop AI Clinic Demo",
+  "logoPath": "./assets/clinic-logo.png",
+  "bannerPath": "./assets/clinic-hero-banner.png",
+  "theme": {
+    "primaryColor": "#000000",
+    "secondaryColor": "#ffffff"
+  },
+  "contact": {
+    "phone": "+919390664577",
+    "email": "contact@onestopai.in"
+  }
+}
