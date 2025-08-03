@@ -1,145 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Staff Monthly Summary</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body.light {
-      background-color: #f4f4f4;
-      color: #111;
-    }
-
-    body.dark {
-      background-color: #121212;
-      color: #00f7ff;
-    }
-
-    .theme-toggle {
-      padding: 8px 14px;
-      margin-bottom: 15px;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .theme-toggle.light {
-      background-color: #333;
-      color: #fff;
-    }
-
-    .theme-toggle.dark {
-      background-color: #fff;
-      color: #111;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-
-    body.dark th, body.dark td {
-      border-color: #444;
-      background-color: #1e1e1e;
-      color: #00f7ff;
-    }
-
-    @media (max-width: 600px) {
-      table, th, td {
-        font-size: 14px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Staff Monthly Summary - Onestop AI Clinic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
-  <h1>📈 Staff Monthly Attendance Summary</h1>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+    <span>Onestop AI Clinic Demo</span>
+</div>
 
-  <table id="summaryTable">
-    <thead>
-      <tr>
-        <th>Employee ID</th>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Month</th>
-        <th>Present</th>
-        <th>Absent</th>
-        <th>Leave</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<div style="text-align:center; padding:20px;">
+    <img src="./assets/clinic-hero-banner.png" alt="Monthly Summary" style="width:80%; max-width:300px; border-radius:10px;">
+</div>
 
-  <script>
-    function toggleTheme() {
-      const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
-      document.body.className = newTheme;
-      localStorage.setItem('theme', newTheme);
-      document.querySelector('.theme-toggle').className = `theme-toggle ${newTheme}`;
-    }
+<h2 style="text-align:center;">Monthly Attendance Summary</h2>
 
-    function applySavedTheme() {
-      const saved = localStorage.getItem('theme') || 'light';
-      document.body.className = saved;
-      document.querySelector('.theme-toggle').className = `theme-toggle ${saved}`;
-    }
+<div style="padding: 0 20px;">
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <thead>
+            <tr style="background:#eee;">
+                <th style="padding:10px; border:1px solid #ddd;">Employee ID</th>
+                <th style="padding:10px; border:1px solid #ddd;">Name</th>
+                <th style="padding:10px; border:1px solid #ddd;">Total Days</th>
+                <th style="padding:10px; border:1px solid #ddd;">Present</th>
+                <th style="padding:10px; border:1px solid #ddd;">Leaves</th>
+            </tr>
+        </thead>
+        <tbody id="summaryTable">
+            <tr>
+                <td style="padding:10px; border:1px solid #ddd;">STF001</td>
+                <td style="padding:10px; border:1px solid #ddd;">Arun Kumar</td>
+                <td style="padding:10px; border:1px solid #ddd;">30</td>
+                <td style="padding:10px; border:1px solid #ddd;">28</td>
+                <td style="padding:10px; border:1px solid #ddd;">2</td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border:1px solid #ddd;">STF002</td>
+                <td style="padding:10px; border:1px solid #ddd;">Megha Rani</td>
+                <td style="padding:10px; border:1px solid #ddd;">30</td>
+                <td style="padding:10px; border:1px solid #ddd;">27</td>
+                <td style="padding:10px; border:1px solid #ddd;">3</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-    applySavedTheme();
+<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+    Powered by Onestop AI
+</footer>
 
-    fetch('./staff-attendance.csv')
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.trim().split('\n').slice(1);
-        const summaryMap = {};
-
-        rows.forEach(row => {
-          const [date, empId, name, role, status] = row.split(',').map(x => x.trim());
-          const month = new Date(date).toISOString().slice(0, 7); // YYYY-MM
-
-          const key = `${empId}-${month}`;
-          if (!summaryMap[key]) {
-            summaryMap[key] = { empId, name, role, month, Present: 0, Absent: 0, Leave: 0 };
-          }
-          if (status.toLowerCase() === 'present') summaryMap[key].Present++;
-          else if (status.toLowerCase() === 'absent') summaryMap[key].Absent++;
-          else if (status.toLowerCase() === 'leave') summaryMap[key].Leave++;
-        });
-
-        const tbody = document.querySelector('#summaryTable tbody');
-        Object.values(summaryMap).forEach(entry => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${entry.empId}</td>
-            <td>${entry.name}</td>
-            <td>${entry.role}</td>
-            <td>${entry.month}</td>
-            <td>${entry.Present}</td>
-            <td>${entry.Absent}</td>
-            <td>${entry.Leave}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      });
-  </script>
 </body>
 </html>
