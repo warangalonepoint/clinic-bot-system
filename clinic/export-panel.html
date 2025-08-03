@@ -1,114 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Export Panel</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 40px 20px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .dark-mode {
-      background-color: #111;
-      color: #eee;
-    }
-
-    .light-mode {
-      background-color: #f9f9f9;
-      color: #222;
-    }
-
-    .panel {
-      max-width: 600px;
-      margin: auto;
-      background-color: rgba(0,0,0,0.05);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .panel h1 {
-      text-align: center;
-      font-size: 26px;
-    }
-
-    .download-button {
-      display: block;
-      width: 100%;
-      text-align: center;
-      padding: 15px;
-      margin-top: 20px;
-      border: none;
-      font-size: 16px;
-      color: white;
-      background-color: #28a745;
-      border-radius: 8px;
-      text-decoration: none;
-    }
-
-    .note {
-      margin-top: 20px;
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .toggle-theme {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      border: none;
-      background-color: #444;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .light-mode .toggle-theme {
-      background-color: #ccc;
-      color: #000;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Export Panel - Onestop AI Clinic Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-  <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
 
-  <div class="panel">
-    <h1>Export Panel</h1>
+    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+        <span>Onestop AI Clinic Demo</span>
+    </div>
 
-    <a href="./logs.csv" class="download-button" download>⬇️ Download logs.csv Backup</a>
-    <a href="./slots.csv" class="download-button" download>⬇️ Download slots.csv Backup</a>
+    <div style="text-align:center; padding:20px;">
+        <h2>⬇️ Export Panel</h2>
+    </div>
 
-    <p class="note">
-      Note: These files reflect the most recent booking and slot data and are auto-updated when changes are pushed to GitHub.
+    <div style="padding: 0 20px; display:flex; flex-direction:column; gap:15px; align-items:center;">
+        <a href="logs.csv" download style="width:100%; max-width:300px; background:#28a745; color:white; text-align:center; padding:15px; text-decoration:none; border-radius:8px; font-size:16px;">⬇️ Download logs.csv Backup</a>
+        <a href="slots.csv" download style="width:100%; max-width:300px; background:#28a745; color:white; text-align:center; padding:15px; text-decoration:none; border-radius:8px; font-size:16px;">⬇️ Download slots.csv Backup</a>
+    </div>
+
+    <p style="text-align:center; font-size:14px; color:#555; padding:20px;">
+        Note: These files reflect the most recent booking and slot data and are auto-updated when changes are pushed to GitHub.
     </p>
-  </div>
 
-  <script>
-    const body = document.body;
-    function applyTheme(theme) {
-      if (theme === 'dark') {
-        body.classList.add('dark-mode');
-        body.classList.remove('light-mode');
-      } else {
-        body.classList.add('light-mode');
-        body.classList.remove('dark-mode');
-      }
-    }
+    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+        Powered by Onestop AI
+    </footer>
 
-    function toggleTheme() {
-      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
-      applyTheme(newTheme);
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-  </script>
 </body>
 </html>
