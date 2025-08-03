@@ -1,49 +1,84 @@
-
 <!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WhatsApp Attendance - Onestop AI Clinic</title>
+    <title>WhatsApp Attendance Dual Mode</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #f9f9f9; }
+        .header { background: #000; color: #fff; padding: 10px; display: flex; align-items: center; }
+        .header span { margin-left: 10px; font-size: 18px; }
+        .hero { text-align: center; padding: 20px; }
+        .toggle-btn { margin: 10px; padding: 10px 20px; background: #007bff; color: #fff; border: none; cursor: pointer; border-radius: 5px; }
+        .section { display: none; padding: 0 20px; }
+        .visible { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        .present-btn { background: #28a745; color: white; padding: 5px 10px; border-radius: 5px; }
+        .leave-btn { background: #ffc107; color: black; padding: 5px 10px; border-radius: 5px; }
+        .form-input { width: 100%; padding: 10px; margin: 10px 0; }
+        .send-btn { width: 100%; padding: 12px; background: #25D366; color: white; border: none; font-size: 16px; border-radius: 5px; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; text-align: center; padding: 10px; }
+    </style>
 </head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-    <span>Onestop AI Clinic Demo</span>
+<body>
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height: 30px;">
+        <span>Onestop AI Clinic Demo</span>
+    </div><div class="hero">
+    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
 </div>
 
-<div style="text-align:center; padding:20px;">
-    <img src="./assets/clinic-hero-banner.png" alt="WhatsApp Attendance" style="width:80%; max-width:300px; border-radius:10px;">
+<div style="text-align:center;">
+    <button class="toggle-btn" onclick="showSection('quick')">Quick Links Mode</button>
+    <button class="toggle-btn" onclick="showSection('manual')">Manual Entry Mode</button>
 </div>
 
-<h2 style="text-align:center;">WhatsApp Attendance</h2>
+<!-- Quick Links Section -->
+<div id="quick" class="section visible">
+    <table>
+        <tr><th>Employee ID</th><th>Name</th><th>Present</th><th>Leave</th></tr>
+        <tr><td>EMP101</td><td>Dr. Rajesh</td><td><button class="present-btn" onclick="sendWhatsApp('EMP101','Present')">Present</button></td><td><button class="leave-btn" onclick="sendWhatsApp('EMP101','Leave')">Leave</button></td></tr>
+        <tr><td>EMP102</td><td>Nurse Kavitha</td><td><button class="present-btn" onclick="sendWhatsApp('EMP102','Present')">Present</button></td><td><button class="leave-btn" onclick="sendWhatsApp('EMP102','Leave')">Leave</button></td></tr>
+        <tr><td>EMP103</td><td>Anil Kumar</td><td><button class="present-btn" onclick="sendWhatsApp('EMP103','Present')">Present</button></td><td><button class="leave-btn" onclick="sendWhatsApp('EMP103','Leave')">Leave</button></td></tr>
+    </table>
+</div>
 
-<div style="padding:20px;">
-    <h3>Mark Attendance via WhatsApp</h3>
-    <input type="text" id="waEmpID" placeholder="Employee ID" style="width:100%; padding:10px; margin-bottom:10px;">
-    <select id="waStatus" style="width:100%; padding:10px; margin-bottom:10px;">
-        <option value="On Duty">On Duty</option>
-        <option value="Off Duty">Off Duty</option>
+<!-- Manual Entry Section -->
+<div id="manual" class="section">
+    <input type="text" id="manualID" class="form-input" placeholder="Employee ID">
+    <select id="manualStatus" class="form-input">
+        <option value="">Select Status</option>
+        <option value="Present">On Duty</option>
+        <option value="Leave">Leave</option>
     </select>
-    <button onclick="sendWhatsAppAttendance()" style="width:100%; padding:12px; background:#25D366; color:white; border:none; font-size:16px;">Send on WhatsApp</button>
+    <button class="send-btn" onclick="sendManualWhatsApp()">Send on WhatsApp</button>
 </div>
 
-<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+<footer>
     Powered by Onestop AI
 </footer>
 
 <script>
-    function sendWhatsAppAttendance() {
-        const empID = document.getElementById('waEmpID').value.trim();
-        const status = document.getElementById('waStatus').value;
+    function showSection(mode) {
+        document.getElementById('quick').classList.remove('visible');
+        document.getElementById('manual').classList.remove('visible');
+        document.getElementById(mode).classList.add('visible');
+    }
 
-        if(!empID) {
-            alert('Please enter Employee ID.');
+    function sendWhatsApp(empID, status) {
+        const message = `Attendance Update:\nEmployee ID: ${empID}\nStatus: ${status}`;
+        const link = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
+        window.open(link, '_blank');
+    }
+
+    function sendManualWhatsApp() {
+        const empID = document.getElementById('manualID').value;
+        const status = document.getElementById('manualStatus').value;
+        if(!empID || !status) {
+            alert('Please enter Employee ID and select Status.');
             return;
         }
-
-        const message = `Attendance Marked:\nEmployee ID: ${empID}\nStatus: ${status}`;
-        const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
-
-        window.open(whatsappLink, '_blank');
+        sendWhatsApp(empID, status);
     }
 </script>
 
