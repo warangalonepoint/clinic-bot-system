@@ -1,59 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Onestop AI Clinic Demo - Staff Attendance</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { margin:0; font-family:sans-serif; background:#f9f9f9; }
+        .header { background:#000; color:#fff; padding:10px; display:flex; align-items:center; }
+        .header img { height:30px; margin-right:10px; }
+        .banner { text-align:center; padding:20px; }
+        .banner img { width:80%; max-width:300px; border-radius:10px; }
+        .container { padding: 0 20px; }
+        .filter-section { margin-bottom: 10px; }
+        select { width:100%; padding:10px; margin-bottom:10px; }
+        table { width:100%; border-collapse:collapse; font-size:14px; }
+        th, td { padding:8px; text-align:left; }
+        th { background:#ddd; }
+        .on-duty { color:green; }
+        .off-duty { color:red; }
+        footer { position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px; }
+    </style>
 </head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
+<body><div class="header">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+    <span>Onestop AI Clinic Demo</span>
+</div>
 
-    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-        <span>Onestop AI Clinic Demo</span>
+<div class="banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+</div>
+
+<h2 style="text-align:center;">Staff Attendance Panel</h2>
+
+<div class="container">
+    <div class="filter-section">
+        <select id="statusFilter">
+            <option value="All">All</option>
+            <option value="On Duty">On Duty</option>
+            <option value="Off Duty">Off Duty</option>
+        </select>
     </div>
 
-    <div style="text-align:center; padding:20px;">
-        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="staffTable">
+            <tr>
+                <td>STF001</td>
+                <td>Arun Kumar</td>
+                <td>Doctor</td>
+                <td class="on-duty">On Duty</td>
+            </tr>
+            <tr>
+                <td>STF002</td>
+                <td>Megha Rani</td>
+                <td>Nurse</td>
+                <td class="off-duty">Off Duty</td>
+            </tr>
+            <tr>
+                <td>STF003</td>
+                <td>Sunil Patel</td>
+                <td>Reception</td>
+                <td class="on-duty">On Duty</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-    <h2 style="text-align:center;">Staff Attendance Panel</h2>
+<footer>
+    Powered by Onestop AI
+</footer>
 
-    <div style="padding: 0 20px;">
-        <table style="width:100%; border-collapse:collapse; font-size:14px;">
-            <thead>
-                <tr style="background:#ddd;">
-                    <th style="padding:8px;">Employee ID</th>
-                    <th style="padding:8px;">Name</th>
-                    <th style="padding:8px;">Role</th>
-                    <th style="padding:8px;">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding:8px;">STF001</td>
-                    <td style="padding:8px;">Arun Kumar</td>
-                    <td style="padding:8px;">Doctor</td>
-                    <td style="padding:8px; color:green;">On Duty</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px;">STF002</td>
-                    <td style="padding:8px;">Megha Rani</td>
-                    <td style="padding:8px;">Nurse</td>
-                    <td style="padding:8px; color:red;">Off Duty</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px;">STF003</td>
-                    <td style="padding:8px;">Sunil Patel</td>
-                    <td style="padding:8px;">Reception</td>
-                    <td style="padding:8px; color:green;">On Duty</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<script>
+    const filterDropdown = document.getElementById('statusFilter');
+    const staffTable = document.getElementById('staffTable');
 
-    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
-        Powered by Onestop AI
-    </footer>
+    filterDropdown.addEventListener('change', function() {
+        const rows = staffTable.getElementsByTagName('tr');
+        for(let i = 0; i < rows.length; i++) {
+            const statusCell = rows[i].getElementsByTagName('td')[3];
+            if(this.value === 'All' || statusCell.textContent === this.value) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+</script>
 
 </body>
 </html>
