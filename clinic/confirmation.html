@@ -1,40 +1,51 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Booking Confirmation - Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmation - Onestop AI Clinic</title>
-    <link rel="stylesheet" href="./assets/styles.css">
 </head>
-<body>
-    <header class="header">
-        <img src="./assets/logo.png" alt="Clinic Logo" class="logo">
-        <span class="clinic-title">Onestop AI Clinic Demo</span>
-    </header><section class="hero-banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner">
-</section>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9; text-align:center;">
 
-<main class="confirmation-section">
-    <h2>Appointment Confirmed!</h2>
-    <p>Your booking has been successfully submitted.</p>
-    <p>Our team will contact you shortly for confirmation.</p>
-
-    <div class="confirmation-details">
-        <p><strong>Name:</strong> <span id="patientName">John Doe</span></p>
-        <p><strong>Date:</strong> <span id="appointmentDate">2025-08-05</span></p>
-        <p><strong>Time:</strong> <span id="appointmentTime">10:00 AM</span></p>
-        <p><strong>Token No:</strong> <span id="tokenNumber">12</span></p>
+    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center; justify-content:center;">
+        <span>Onestop AI Clinic Demo</span>
     </div>
 
-    <button onclick="goHome()">Go to Home</button>
-</main>
+    <div style="padding:30px;">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
+    </div>
 
-<footer class="footer">Powered by Onestop AI</footer>
+    <h2>Booking Confirmed!</h2>
 
-<script>
-    function goHome() {
-        window.location.href = 'index.html';
-    }
-</script>
+    <p style="font-size:18px;">Thank you, <span id="patientName">Patient Name</span></p>
+    <p>Your appointment is confirmed for:</p>
+    <p><b>Date:</b> <span id="appointmentDate">YYYY-MM-DD</span></p>
+    <p><b>Time:</b> <span id="appointmentTime">HH:MM</span></p>
+    <p><b>Reason:</b> <span id="appointmentReason">Reason</span></p>
+
+    <a id="whatsappLink" href="#" target="_blank" style="display:inline-block; margin-top:20px; padding:12px 20px; background:#25D366; color:#fff; text-decoration:none; border-radius:5px;">Send WhatsApp Confirmation</a>
+
+    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+        Powered by Onestop AI
+    </footer>
+
+    <script>
+        // Dummy Data (This would come via URL Params or Session in future)
+        const bookingData = {
+            name: 'Chaitanya Krishna',
+            date: '2025-08-01',
+            time: '09:00',
+            reason: 'Fever'
+        };
+
+        document.getElementById('patientName').innerText = bookingData.name;
+        document.getElementById('appointmentDate').innerText = bookingData.date;
+        document.getElementById('appointmentTime').innerText = bookingData.time;
+        document.getElementById('appointmentReason').innerText = bookingData.reason;
+
+        const whatsappMessage = `Booking Confirmed:\nName: ${bookingData.name}\nDate: ${bookingData.date}\nTime: ${bookingData.time}\nReason: ${bookingData.reason}`;
+        document.getElementById('whatsappLink').href = `https://wa.me/919390664577?text=${encodeURIComponent(whatsappMessage)}`;
+    </script>
 
 </body>
 </html>
