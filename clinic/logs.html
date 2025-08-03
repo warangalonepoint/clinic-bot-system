@@ -1,166 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Booking Logs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #fff;
-            color: #000;
-        }
-        header {
-            background: #000;
-            color: #fff;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-        .header-left img {
-            height: 25px;
-            margin-right: 10px;
-        }
-        .theme-toggle {
-            font-size: 20px;
-            cursor: pointer;
-        }
-        .hero {
-            text-align: center;
-            padding: 10px 0;
-        }
-        .hero img {
-            width: 60%;
-            max-width: 300px;
-        }
-        .container {
-            padding: 10px 20px;
-        }
-        .table-container {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f2f2f2;
-            text-align: left;
-        }
-        button, select, input {
-            padding: 5px 10px;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        .export-buttons {
-            margin-top: 10px;
-        }
-        footer {
-            background: #000;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-        .dark-mode {
-            background-color: #121212;
-            color: #fff;
-        }
-        .dark-mode th {
-            background-color: #222;
-        }
-    </style>
+    <title>Logs - Onestop AI Clinic Demo</title>
+    <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
-    <header>
-        <div class="header-left">
-            <img src="./assets/logo.png" alt="Logo">
-            <span>Onestop AI Clinic Demo</span>
+    <header class="header">
+        <div class="logo-section">
+            <img src="./assets/logo.png" alt="Logo" class="logo">
+            <span class="clinic-name">Onestop AI Clinic Demo</span>
         </div>
-        <span class="theme-toggle" onclick="toggleTheme()">🌙</span>
-    </header>
+    </header><main>
+    <section class="hero-section">
+        <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner" class="hero-banner">
+    </section>
 
-    <div class="hero">
-        <img src="./assets/doctor.png" alt="Doctor Illustration">
-    </div>
+    <section class="logs-section">
+        <h1>Booking Logs</h1>
 
-    <div class="container">
-        <h2>Booking Logs</h2>
-        <input type="text" placeholder="Search by Name">
-        <select>
-            <option>All Dates</option>
-        </select>
-        <button>Reset</button>
-
-        <p>Total Bookings: 2</p>
-        <p>Reminders Sent: 0</p>
-        <p>Next Token: 3</p>
-
-        <div class="export-buttons">
-            <button>Export CSV</button>
-            <button>Export PDF</button>
+        <div class="filter-bar">
+            <input type="text" id="searchName" placeholder="Search by Name">
+            <select id="dateFilter">
+                <option value="all">All Dates</option>
+                <!-- Dynamically populate dates -->
+            </select>
+            <button id="resetBtn">Reset</button>
         </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Token</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Patient Name</th>
-                        <th>Reason</th>
-                        <th>Contact</th>
-                        <th>Reminder</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>2025-08-01</td>
-                        <td>09:00</td>
-                        <td>Chaitanya Krishna</td>
-                        <td>Fever</td>
-                        <td>+919876543210</td>
-                        <td><button>Send</button></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>2025-08-01</td>
-                        <td>09:10</td>
-                        <td>Ravi Kumar</td>
-                        <td>Checkup</td>
-                        <td>+918888888888</td>
-                        <td><button>Send</button></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="summary">
+            <p>Total Bookings: <span id="totalBookings">0</span></p>
+            <p>Reminders Sent: <span id="remindersSent">0</span></p>
+            <p>Next Token: <span id="nextToken">1</span></p>
+            <button id="exportCSV">Export CSV</button>
+            <button id="exportPDF">Export PDF</button>
         </div>
-    </div>
 
-    <footer>
-        Powered by Onestop AI
-    </footer>
+        <table class="logs-table">
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient Name</th>
+                    <th>Reason</th>
+                    <th>Contact</th>
+                    <th>Reminder</th>
+                </tr>
+            </thead>
+            <tbody id="logsBody">
+                <!-- Logs will load here dynamically -->
+            </tbody>
+        </table>
+    </section>
+</main>
 
-    <script>
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-        }
-    </script>
+<footer>
+    <p>Powered by Onestop AI</p>
+</footer>
+
+<script src="./assets/logs.js"></script>
+
 </body>
 </html>
