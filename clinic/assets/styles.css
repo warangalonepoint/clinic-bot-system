@@ -1,155 +1,118 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --button-bg: #000000;
+    --button-text: #ffffff;
+}
+
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: var(--bg-color, #ffffff);
-    color: var(--text-color, #000000);
-    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
-header {
-    background-color: #000;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    justify-content: space-between;
-    position: relative;
-}
-
-header img.logo {
-    height: 30px;
-    margin-right: 10px;
-}
-
-header .title {
-    font-size: 18px;
-    font-weight: bold;
-    flex-grow: 1;
-}
-
-.theme-toggle {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-}
-
-.banner {
+.container {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-main {
-    flex: 1;
-    padding: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 10px;
     box-sizing: border-box;
+    flex: 1;
 }
 
-footer {
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-    position: sticky;
-    bottom: 0;
+.banner-img {
     width: 100%;
-    margin-top: auto;
-}
-
-button, input, select {
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 100%;
-    max-width: 300px;
+    height: auto;
     display: block;
+    margin-bottom: 20px;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.button-grid a {
+    display: block;
+    background: var(--button-bg);
+    color: var(--button-text);
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.button-grid a:hover {
+    background: #333333;
+}
+
+.footer {
+    background: var(--button-bg);
+    color: var(--button-text);
+    text-align: center;
+    padding: 12px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
     box-sizing: border-box;
 }
 
 button {
-    background-color: #28a745;
-    color: white;
-    border: none;
+    background: var(--button-bg);
+    color: var(--button-text);
     cursor: pointer;
+    transition: background 0.3s ease;
 }
 
 button:hover {
-    background-color: #218838;
-}
-
-.table-container {
-    overflow-x: auto;
+    background: #333333;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    font-size: 14px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
 }
 
 th, td {
-    border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* Theme Variables */
-.light-theme {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-}
-
-.dark-theme {
-    --bg-color: #121212;
-    --text-color: #ffffff;
-}
-
-button.export-btn {
-    background-color: #007bff;
-    margin-right: 10px;
-}
-
-.nav-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.nav-links a {
-    padding: 10px 15px;
-    background-color: #000;
-    color: #fff;
-    border-radius: 10px;
     text-align: center;
-    display: inline-block;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 600px) {
-    .nav-links a {
-        width: 100px;
-    }
+.toggle-theme {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+/* Dark Theme */
+body.dark-mode {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --button-bg: #ffffff;
+    --button-text: #000000;
 }
