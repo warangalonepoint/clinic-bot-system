@@ -1,39 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment Confirmation - Onestop AI Clinic</title>
-    <link rel="stylesheet" href="assets/styles.css">
+    <title>Confirmation - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
     <header class="header">
-        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
-        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-    </header>
+        <img src="./assets/logo.png" alt="Clinic Logo" class="logo">
+        <span class="clinic-title">Onestop AI Clinic Demo</span>
+    </header><section class="hero-banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner">
+</section>
 
-    <section class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Banner">
-    </section>
+<main class="confirmation-section">
+    <h2>Appointment Confirmed!</h2>
+    <p>Your booking has been successfully submitted.</p>
+    <p>Our team will contact you shortly for confirmation.</p>
 
-    <section class="form-section">
-        <h2>Appointment Confirmed ✅</h2>
-        <p>Your booking has been successfully recorded. Please reach the clinic on time.</p>
-        <div class="form-group">
-            <a href="index.html" class="book-btn">Go to Home</a>
-            <a href="bookings.html" class="book-btn">Book Another Appointment</a>
-        </div>
-    </section>
+    <div class="confirmation-details">
+        <p><strong>Name:</strong> <span id="patientName">John Doe</span></p>
+        <p><strong>Date:</strong> <span id="appointmentDate">2025-08-05</span></p>
+        <p><strong>Time:</strong> <span id="appointmentTime">10:00 AM</span></p>
+        <p><strong>Token No:</strong> <span id="tokenNumber">12</span></p>
+    </div>
 
-    <footer>
-        <button class="toggle-theme">Toggle Theme</button>
-        <p>Powered by Onestop AI</p>
-    </footer>
+    <button onclick="goHome()">Go to Home</button>
+</main>
 
-    <script>
-        document.querySelector('.toggle-theme').addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-        });
-    </script>
+<footer class="footer">Powered by Onestop AI</footer>
+
+<script>
+    function goHome() {
+        window.location.href = 'index.html';
+    }
+</script>
+
 </body>
 </html>
