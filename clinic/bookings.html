@@ -1,50 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Your Appointment</title>
-    <link rel="stylesheet" href="assets/styles.css">
+    <title>Book Appointment - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
     <header class="header">
-        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
-        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-    </header>
+        <img src="./assets/logo.png" alt="Clinic Logo" class="logo">
+        <span class="clinic-title">Onestop AI Clinic Demo</span>
+    </header><section class="hero-banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner">
+</section>
 
-    <section class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Banner">
-    </section>
+<main class="booking-section">
+    <h2>Book Your Appointment</h2>
 
-    <section class="form-section">
-        <h2>Book Your Appointment</h2>
-        <div class="form-group">
-            <select>
-                <option>Select Date</option>
-                <option>2025-08-01</option>
-                <option>2025-08-02</option>
-            </select>
-            <select>
-                <option>Select Time Slot</option>
-                <option>09:00 AM</option>
-                <option>09:10 AM</option>
-                <option>09:20 AM</option>
-            </select>
-            <input type="text" placeholder="Patient Name">
-            <input type="text" placeholder="Reason for Visit">
-            <a href="https://wa.me/919876543210" class="book-btn">Book on WhatsApp</a>
-        </div>
-    </section>
+    <form id="bookingForm">
+        <label for="patientName">Patient Name</label>
+        <input type="text" id="patientName" required>
 
-    <footer>
-        <button class="toggle-theme">Toggle Theme</button>
-        <p>Powered by Onestop AI</p>
-    </footer>
+        <label for="visitReason">Reason for Visit</label>
+        <input type="text" id="visitReason" required>
 
-    <script>
-        document.querySelector('.toggle-theme').addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
+        <label for="appointmentDate">Select Date</label>
+        <select id="appointmentDate" required></select>
+
+        <label for="appointmentSlot">Select Time Slot</label>
+        <select id="appointmentSlot" required></select>
+
+        <button type="submit">Book Appointment</button>
+    </form>
+</main>
+
+<footer class="footer">Powered by Onestop AI</footer>
+
+<script>
+    let slotsData = [];
+
+    async function loadSlots() {
+        const response = await fetch('./Slots.csv');
+        const data = await response.text();
+        const rows = data.trim().split('\n').slice(1);
+        slotsData = rows.map(row => {
+            const [date, time, status] = row.split(',');
+            return { date, time, status };
         });
-    </script>
+
+        populateDateDropdown();
+    }
+
+    function populateDateDropdown() {
+        const uniqueDates = [...new Set(slotsData.map(slot => slot.date))];
+        const dateSelect = document.getElementById('appointmentDate');
+        dateSelect.innerHTML = '<option value="">Select Date</option>';
+        uniqueDates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            dateSelect.appendChild(option);
+        });
+    }
+
+    function populateSlotsDropdown(selectedDate) {
+        const slotSelect = document.getElementById('appointmentSlot');
+        slotSelect.innerHTML = '<option value="">Select Slot</option>';
+        const availableSlots = slotsData.filter(slot => slot.date === selectedDate && slot.status === 'Available');
+
+        availableSlots.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot.time;
+            option.textContent = slot.time;
+            slotSelect.appendChild(option);
+        });
+    }
+
+    document.getElementById('appointmentDate').addEventListener('change', (e) => {
+        populateSlotsDropdown(e.target.value);
+    });
+
+    document.getElementById('bookingForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('patientName').value;
+        const reason = document.getElementById('visitReason').value;
+        const date = document.getElementById('appointmentDate').value;
+        const slot = document.getElementById('appointmentSlot').value;
+
+        const whatsappMessage = `Hi, I would like to book an appointment.\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${slot}`;
+        const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(whatsappMessage)}`;
+        window.location.href = whatsappLink;
+    });
+
+    window.onload = loadSlots;
+</script>
+
 </body>
 </html>
