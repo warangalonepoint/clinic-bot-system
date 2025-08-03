@@ -1,51 +1,48 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WhatsApp Logs - OneStop AI Clinic</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Logs - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
-  <header>
-    <h1>WhatsApp Logs</h1>
-  </header>  <section class="whatsapp-log-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Patient Name</th>
-          <th>Message Sent</th>
-          <th>Response</th>
-        </tr>
-      </thead>
-      <tbody id="whatsappBody">
-      </tbody>
+    <header class="header">
+        <img src="./assets/logo.png" alt="Clinic Logo" class="logo">
+        <span class="clinic-title">Onestop AI Clinic Demo</span>
+    </header><section class="hero-banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner">
+</section>
+
+<main class="whatsapp-logs-section">
+    <h2>WhatsApp Logs</h2>
+    <table class="logs-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Patient Name</th>
+                <th>Message</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2025-08-05</td>
+                <td>Chaitanya Krishna</td>
+                <td>Booked for 10:00 AM</td>
+                <td>Sent</td>
+            </tr>
+            <tr>
+                <td>2025-08-05</td>
+                <td>Ravi Kumar</td>
+                <td>Reminder Sent</td>
+                <td>Delivered</td>
+            </tr>
+            <!-- More log rows -->
+        </tbody>
     </table>
-  </section>  <script>
-    const whatsappLogUrl = "whatsapp-log.csv";
+</main>
 
-    fetch(whatsappLogUrl)
-      .then(res => res.text())
-      .then(data => {
-        const lines = data.trim().split('\n').slice(1);
-        const logs = lines.map(line => {
-          const [date, time, name, message, response] = line.split(',');
-          return { date, time, name, message, response };
-        });
+<footer class="footer">Powered by Onestop AI</footer>
 
-        const tbody = document.getElementById('whatsappBody');
-        logs.forEach(log => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${log.date}</td>
-            <td>${log.time}</td>
-            <td>${log.name}</td>
-            <td>${log.message}</td>
-            <td>${log.response}</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-  </script></body>
+</body>
 </html>
