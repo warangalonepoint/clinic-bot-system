@@ -20,6 +20,11 @@
 
     <div style="padding: 0 10px;">
         <input type="text" id="searchStaff" placeholder="Search Staff Name" style="width:100%; padding:10px; margin-bottom:10px;">
+        <select id="dutyFilter" style="width:100%; padding:10px; margin-bottom:10px;">
+            <option value="">Show All</option>
+            <option value="On">On Duty</option>
+            <option value="Off">Off Duty</option>
+        </select>
         <button onclick="markAttendance()" style="width:100%; padding:10px; background:black; color:white; border:none;">Mark Attendance</button>
     </div>
 
@@ -52,10 +57,16 @@
 
         const staffTable = document.getElementById('staffTable');
         const searchStaff = document.getElementById('searchStaff');
+        const dutyFilter = document.getElementById('dutyFilter');
 
         function renderStaff() {
-            const filter = searchStaff.value.toLowerCase();
-            const filteredStaff = staffList.filter(staff => staff.name.toLowerCase().includes(filter));
+            const nameFilter = searchStaff.value.toLowerCase();
+            const duty = dutyFilter.value;
+
+            const filteredStaff = staffList.filter(staff =>
+                (nameFilter === '' || staff.name.toLowerCase().includes(nameFilter)) &&
+                (duty === '' || (duty === 'On' && staff.onDuty === 'Yes') || (duty === 'Off' && staff.onDuty === 'No'))
+            );
 
             staffTable.innerHTML = '';
             filteredStaff.forEach(staff => {
@@ -76,6 +87,7 @@
         }
 
         searchStaff.addEventListener('input', renderStaff);
+        dutyFilter.addEventListener('change', renderStaff);
 
         renderStaff();
     </script>
