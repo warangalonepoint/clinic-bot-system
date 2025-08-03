@@ -1,43 +1,36 @@
 <!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Onestop AI Clinic Demo - Sync Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sync Panel - Onestop AI Clinic</title>
-    <link rel="stylesheet" href="./assets/styles.css">
+    <style>
+        body { font-family: sans-serif; margin: 0; background: #f9f9f9; }
+        .header { background: #000; color: #fff; padding: 10px; display: flex; align-items: center; }
+        .header img { height: 30px; margin-right: 10px; }
+        .container { padding: 20px; text-align: center; }
+        .sync-button { width: 80%; max-width: 300px; padding: 12px; margin: 10px auto; background: black; color: white; border: none; font-size: 16px; border-radius: 8px; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; text-align: center; padding: 10px; }
+    </style>
 </head>
-<body>
-    <header class="header">
-        <img src="./assets/logo.png" alt="Clinic Logo" class="logo">
-        <span class="clinic-title">Onestop AI Clinic Demo</span>
-    </header><section class="hero-banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner">
-</section>
-
-<main class="sync-panel">
-    <h2>Data Sync Panel</h2>
-
-    <div class="sync-section">
-        <button onclick="syncLogs()">Sync Logs</button>
-        <button onclick="syncSlots()">Sync Slots</button>
-        <button onclick="backupData()">Backup Data</button>
-    </div>
-</main>
-
-<footer class="footer">Powered by Onestop AI</footer>
-
-<script>
-    function syncLogs() {
-        alert('Logs synced successfully.');
+<body><div class="header">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+    <span>Onestop AI Clinic Demo</span>
+</div><div class="container">
+    <img src="./assets/clinic-hero-banner.png" alt="Sync Illustration" style="width:80%; max-width:300px; border-radius:10px;">
+    <h2>Sync Panel</h2>
+    <button class="sync-button" onclick="downloadFile('Slots.csv')">Download Slots Backup</button>
+    <button class="sync-button" onclick="downloadFile('Logs.csv')">Download Logs Backup</button>
+    <button class="sync-button" onclick="uploadFile('Slots.csv')">Upload Updated Slots</button>
+    <button class="sync-button" onclick="uploadFile('Logs.csv')">Upload Updated Logs</button>
+</div><footer>
+    Powered by Onestop AI
+</footer><script>
+    function downloadFile(fileName) {
+        window.open(`https://warangalonepoint.github.io/clinic-bot-system/clinic/${fileName}`, '_blank');
     }
 
-    function syncSlots() {
-        alert('Slots synced successfully.');
+    function uploadFile(fileType) {
+        alert(`Please upload the updated ${fileType} file via GitHub manually.`);
     }
-
-    function backupData() {
-        alert('Data backup created successfully.');
-    }
-</script>
-
-</body>
+</script></body>
 </html>
