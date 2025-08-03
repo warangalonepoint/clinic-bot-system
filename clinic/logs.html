@@ -2,128 +2,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Logs - Onestop AI Clinic</title>
-    <link rel="stylesheet" href="./assets/styles.css">
+    <title>Booking Logs - Onestop AI Clinic Demo</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="header">
-        <img src="./assets/logo.png" alt="Clinic Logo" class="logo">
-        <span class="clinic-title">Onestop AI Clinic Demo</span>
-    </header><section class="hero-banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner">
+        <img src="assets/clinic-logo.png" alt="Clinic Logo" class="logo">
+        <span class="title">Onestop AI Clinic Demo</span>
+    </header><section class="hero">
+    <img src="assets/clinic-hero-banner.png" alt="Doctor Illustration" class="hero-banner">
 </section>
 
-<main class="logs-section">
+<section class="logs-section">
     <h2>Booking Logs</h2>
     <div class="filters">
-        <input type="text" id="searchInput" placeholder="Search by Name">
-        <select id="dateFilter">
-            <option value="All">All Dates</option>
+        <input type="text" id="searchName" placeholder="Search by Name">
+        <select id="filterDate">
+            <option value="">All Dates</option>
+            <!-- Dates will be dynamically populated -->
         </select>
-        <button onclick="resetFilters()">Reset</button>
+        <button id="resetBtn">Reset</button>
     </div>
 
     <div class="summary">
-        <p>Total Bookings: <span id="totalBookings">0</span></p>
-        <p>Reminders Sent: <span id="remindersSent">0</span></p>
-        <p>Next Token: <span id="nextToken">1</span></p>
+        Total Bookings: <span id="totalBookings">0</span>
+        Reminders Sent: <span id="remindersSent">0</span>
+        Next Token: <span id="nextToken">1</span>
     </div>
 
-    <table class="logs-table">
-        <thead>
-            <tr>
-                <th>Token</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Patient Name</th>
-                <th>Reason</th>
-                <th>Contact</th>
-                <th>Reminder</th>
-            </tr>
-        </thead>
-        <tbody id="logsBody">
-            <!-- Loaded via JS -->
-        </tbody>
-    </table>
-</main>
+    <div class="export-buttons">
+        <button id="exportCSV">Export CSV</button>
+        <button id="exportPDF">Export PDF</button>
+    </div>
 
-<footer class="footer">Powered by Onestop AI</footer>
+    <div class="table-container">
+        <table class="logs-table">
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient Name</th>
+                    <th>Reason</th>
+                    <th>Contact</th>
+                    <th>Reminder</th>
+                </tr>
+            </thead>
+            <tbody id="logsBody">
+                <!-- Booking logs will populate here -->
+            </tbody>
+        </table>
+    </div>
+</section>
 
-<script>
-    let logsData = [];
+<footer class="footer">
+    Powered by Onestop AI
+</footer>
 
-    async function loadLogs() {
-        const response = await fetch('./logs.csv');
-        const data = await response.text();
-        const rows = data.trim().split('\n').slice(1);
-        logsData = rows.map(row => {
-            const [token, date, time, name, reason, contact, reminder] = row.split(',');
-            return { token, date, time, name, reason, contact, reminder };
-        });
-
-        populateDateFilter();
-        renderLogs();
-    }
-
-    function populateDateFilter() {
-        const uniqueDates = [...new Set(logsData.map(log => log.date))];
-        const dateFilter = document.getElementById('dateFilter');
-        uniqueDates.forEach(date => {
-            const option = document.createElement('option');
-            option.value = date;
-            option.textContent = date;
-            dateFilter.appendChild(option);
-        });
-    }
-
-    function renderLogs() {
-        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-        const dateQuery = document.getElementById('dateFilter').value;
-
-        const filteredLogs = logsData.filter(log => {
-            const matchesName = log.name.toLowerCase().includes(searchQuery);
-            const matchesDate = (dateQuery === 'All' || log.date === dateQuery);
-            return matchesName && matchesDate;
-        });
-
-        const tbody = document.getElementById('logsBody');
-        tbody.innerHTML = '';
-        filteredLogs.forEach(log => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${log.token}</td>
-                <td>${log.date}</td>
-                <td>${log.time}</td>
-                <td>${log.name}</td>
-                <td>${log.reason}</td>
-                <td>${log.contact}</td>
-                <td><button onclick="markReminder(this)">${log.reminder}</button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        document.getElementById('totalBookings').innerText = filteredLogs.length;
-        document.getElementById('nextToken').innerText = filteredLogs.length + 1;
-        document.getElementById('remindersSent').innerText = filteredLogs.filter(log => log.reminder === 'Yes').length;
-    }
-
-    function resetFilters() {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('dateFilter').value = 'All';
-        renderLogs();
-    }
-
-    function markReminder(btn) {
-        btn.innerText = 'Yes';
-        btn.style.backgroundColor = '#28a745';
-        renderLogs();
-    }
-
-    document.getElementById('searchInput').addEventListener('input', renderLogs);
-    document.getElementById('dateFilter').addEventListener('change', renderLogs);
-
-    window.onload = loadLogs;
-</script>
+<script src="logs.js"></script>
 
 </body>
 </html>
