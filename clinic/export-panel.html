@@ -1,34 +1,106 @@
 <!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Export Panel - Onestop AI Clinic Demo</title>
+    <title>Reset PIN - Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { margin:0; font-family: sans-serif; background:#000; color:#fff; text-align: center; }
-        .header { background:#000; color:#fff; padding:10px; display:flex; align-items:center; }
-        .header img { height:30px; margin-right:10px; }
-        .container { padding:20px; }
-        .button { display:block; width:80%; max-width:300px; margin:10px auto; padding:15px; background:#000; color:#fff; border:none; font-size:16px; border-radius:8px; text-decoration:none; }
-        .footer { position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px; }
-        .banner { width:80%; max-width:300px; border-radius:10px; margin:20px auto; }
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background: #ffffff;
+            color: #000000;
+            text-align: center;
+        }
+        .header {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .header img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .banner {
+            padding: 20px;
+        }
+        .banner img {
+            width: 80%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+        .input-box {
+            width: 80%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 10px auto;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .button {
+            width: 80%;
+            max-width: 300px;
+            padding: 12px;
+            margin: 10px auto;
+            background: #000;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
     </style>
 </head>
-<body>
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-        <span>Onestop AI Clinic Demo</span>
-    </div><div class="container">
-    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" class="banner">
-
-    <h2>Export Panel</h2>
-
-    <a href="./logs.csv" download class="button">⬇️ Download logs.csv Backup</a>
-    <a href="./slots.csv" download class="button">⬇️ Download slots.csv Backup</a>
-
-    <p style="color:#ccc; font-size:14px; margin-top:20px;">Note: These files reflect the most recent booking and slot data and are auto-updated when changes are pushed to GitHub.</p>
+<body><div class="header">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+    <span>Onestop AI Clinic Demo</span>
 </div>
 
-<div class="footer">Powered by Onestop AI</div>
+<div class="banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+</div>
+
+<h2>Reset PIN</h2>
+
+<input type="password" id="newPin" placeholder="Enter New PIN" class="input-box">
+<input type="password" id="confirmPin" placeholder="Confirm New PIN" class="input-box">
+
+<button class="button" onclick="resetPin()">Reset PIN</button>
+
+<footer>
+    Powered by Onestop AI
+</footer>
+
+<script>
+    function resetPin() {
+        const newPin = document.getElementById('newPin').value;
+        const confirmPin = document.getElementById('confirmPin').value;
+
+        if (newPin === '' || confirmPin === '') {
+            alert('Please fill both fields');
+            return;
+        }
+
+        if (newPin !== confirmPin) {
+            alert('PINs do not match');
+            return;
+        }
+
+        alert('PIN Reset Successful');
+    }
+</script>
 
 </body>
 </html>
