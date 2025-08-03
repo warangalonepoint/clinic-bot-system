@@ -1,52 +1,42 @@
-/* Reset Styles */ body { margin: 0; font-family: 'Arial', sans-serif; background-color: #fff; color: #000; }
+/* Base Reset */ body { margin: 0; font-family: 'Arial', sans-serif; background-color: #fff; color: #000; }
 
-/* Header */ .header { display: flex; align-items: center; justify-content: space-between; background-color: #000; padding: 10px; }
+/* Header */ .header { display: flex; align-items: center; justify-content: center; background-color: #000; padding: 10px; position: relative; }
 
-.logo { width: 40px; height: auto; margin-left: 10px; }
+.logo { width: 40px; height: 40px; margin-right: 10px; }
 
-.clinic-name { color: #fff; font-size: 20px; font-weight: bold; margin-left: 10px; flex-grow: 1; }
+.clinic-name { color: #fff; font-size: 24px; font-weight: bold; }
 
-.theme-toggle { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; margin-right: 10px; }
+.toggle-theme { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #fff; }
 
-/* Hero Banner */ .hero-banner img { width: 100%; height: auto; display: block; }
+/* Banner */ .hero-banner { width: 100%; max-width: 500px; margin: 0 auto; }
 
-/* Navigation Grid */ .nav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; justify-items: center; padding: 20px; }
+/* Logs Section */ .logs-section { padding: 20px; }
 
-/* Nav Buttons */ .nav-button { display: flex; align-items: center; justify-content: center; width: 140px; height: 50px; background-color: #000; color: #fff; border-radius: 10px; text-decoration: none; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: background-color 0.3s ease; }
+.logs-section h2 { text-align: center; font-size: 22px; margin-bottom: 10px; }
 
-.nav-button:hover { background-color: #222; }
+.logs-summary { text-align: center; margin-bottom: 20px; font-size: 16px; }
 
-/* Form Styles */ .form-section { text-align: center; padding: 20px; }
+.logs-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
 
-.form-group { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 20px; }
+.logs-table th, .logs-table td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 14px; }
 
-.form-group select, .form-group input { width: 80%; max-width: 300px; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+.logs-table th { background-color: #f2f2f2; }
 
-.book-btn { display: inline-block; background-color: #25D366; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+.export-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
 
-.book-btn:hover { background-color: #128C7E; }
+.export-buttons button { background-color: #28a745; color: #fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
 
-/* Logs Table */ .logs-table { width: 90%; margin: 20px auto; border-collapse: collapse; font-size: 14px; }
+/* Footer */ footer { background-color: #000; color: #fff; text-align: center; padding: 20px; position: fixed; width: 100%; bottom: 0; }
 
-.logs-table th, .logs-table td { border: 1px solid #ddd; padding: 8px; }
+/* Dark Mode */ body.dark-mode { background-color: #000; color: #fff; }
 
-.logs-table th { background-color: #f2f2f2; text-align: left; }
+body.dark-mode .header { background-color: #222; }
 
-/* Footer */ footer { background-color: #000; color: #fff; text-align: center; padding: 15px; margin-top: 20px; }
+body.dark-mode .toggle-theme { color: #fff; }
 
-/* Dark Mode */ body.dark-mode { background-color: #121212; color: #fff; }
+body.dark-mode .logs-table th { background-color: #333; }
 
-body.dark-mode .header { background-color: #1f1f1f; }
+body.dark-mode .export-buttons button { background-color: #444; }
 
-body.dark-mode .nav-button { background-color: #333; color: #fff; }
-
-body.dark-mode .nav-button:hover { background-color: #555; }
-
-body.dark-mode .form-group select, body.dark-mode .form-group input { background-color: #333; color: #fff; border: 1px solid #555; }
-
-body.dark-mode footer { background-color: #1f1f1f; }
-
-/* Responsive Image Fix */ img { max-width: 100%; height: auto; }
-
-/* Table Responsive */ @media (max-width: 600px) { .logs-table th, .logs-table td { font-size: 12px; padding: 6px; } }
+body.dark-mode footer { background-color: #222; }
 
