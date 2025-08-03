@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Staff Attendance Panel</title>
+    <title>Staff Attendance - Onestop AI Clinic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
@@ -18,28 +18,30 @@
 
     <h2 style="text-align:center;">Staff Attendance Panel</h2>
 
-    <div style="padding: 0 20px; margin-bottom: 20px;">
-        <input type="text" id="searchInput" placeholder="Search by Name" style="width:100%; padding:10px; margin-bottom:10px;">
-        <select id="statusFilter" style="width:100%; padding:10px;">
-            <option value="All">All Status</option>
-            <option value="On Duty">On Duty</option>
-            <option value="Off Duty">Off Duty</option>
+    <div style="padding: 0 10px;">
+        <input type="text" id="searchStaff" placeholder="Search Staff Name" style="width:100%; padding:10px; margin-bottom:10px;">
+        <select id="dutyFilter" style="width:100%; padding:10px; margin-bottom:10px;">
+            <option value="">Show All</option>
+            <option value="On">On Duty</option>
+            <option value="Off">Off Duty</option>
         </select>
+        <button onclick="markAttendance()" style="width:100%; padding:10px; background:black; color:white; border:none;">Mark Attendance</button>
     </div>
 
-    <table style="width:100%; border-collapse: collapse; text-align:left;">
-        <thead>
-            <tr>
-                <th style="padding:8px; border-bottom:1px solid #ccc;">ID</th>
-                <th style="padding:8px; border-bottom:1px solid #ccc;">Name</th>
-                <th style="padding:8px; border-bottom:1px solid #ccc;">Role</th>
-                <th style="padding:8px; border-bottom:1px solid #ccc;">Status</th>
-            </tr>
-        </thead>
-        <tbody id="staffTable">
-            <!-- Data will load here -->
-        </tbody>
-    </table>
+    <div style="padding:0 10px; overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+            <thead>
+                <tr>
+                    <th style="border:1px solid #ddd; padding:8px;">Staff ID</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Name</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Role</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Status</th>
+                    <th style="border:1px solid #ddd; padding:8px;">On Duty</th>
+                </tr>
+            </thead>
+            <tbody id="staffTable"></tbody>
+        </table>
+    </div>
 
     <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
         Powered by Onestop AI
@@ -47,44 +49,47 @@
 
     <script>
         const staffList = [
-            { id: 'STF001', name: 'Arun Kumar', role: 'Doctor', status: 'On Duty' },
-            { id: 'STF002', name: 'Megha Rani', role: 'Nurse', status: 'Off Duty' },
-            { id: 'STF003', name: 'Sunil Patel', role: 'Reception', status: 'On Duty' },
-            { id: 'STF004', name: 'Sita Rao', role: 'Lab Technician', status: 'Off Duty' }
+            { id: 'S101', name: 'Chaitanya Krishna', role: 'Doctor', status: 'Present', onDuty: 'Yes' },
+            { id: 'S102', name: 'Ravi Kumar', role: 'Nurse', status: 'Absent', onDuty: 'No' },
+            { id: 'S103', name: 'Suma Reddy', role: 'Receptionist', status: 'Present', onDuty: 'Yes' },
+            { id: 'S104', name: 'Anil Sharma', role: 'Lab Technician', status: 'Present', onDuty: 'No' }
         ];
 
-        const tableBody = document.getElementById('staffTable');
-        const searchInput = document.getElementById('searchInput');
-        const statusFilter = document.getElementById('statusFilter');
+        const staffTable = document.getElementById('staffTable');
+        const searchStaff = document.getElementById('searchStaff');
+        const dutyFilter = document.getElementById('dutyFilter');
 
-        function loadStaffTable() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const statusTerm = statusFilter.value;
+        function renderStaff() {
+            const nameFilter = searchStaff.value.toLowerCase();
+            const duty = dutyFilter.value;
 
-            tableBody.innerHTML = '';
+            const filteredStaff = staffList.filter(staff =>
+                (nameFilter === '' || staff.name.toLowerCase().includes(nameFilter)) &&
+                (duty === '' || (duty === 'On' && staff.onDuty === 'Yes') || (duty === 'Off' && staff.onDuty === 'No'))
+            );
 
-            staffList
-                .filter(staff => 
-                    (staff.name.toLowerCase().includes(searchTerm)) &&
-                    (statusTerm === 'All' || staff.status === statusTerm)
-                )
-                .forEach(staff => {
-                    const color = staff.status === 'On Duty' ? '#d4edda' : '#f8d7da';
-                    tableBody.innerHTML += `
-                        <tr style="background:${color};">
-                            <td style="padding:8px;">${staff.id}</td>
-                            <td style="padding:8px;">${staff.name}</td>
-                            <td style="padding:8px;">${staff.role}</td>
-                            <td style="padding:8px;">${staff.status}</td>
-                        </tr>
-                    `;
-                });
+            staffTable.innerHTML = '';
+            filteredStaff.forEach(staff => {
+                staffTable.innerHTML += `
+                    <tr>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.id}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.name}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.role}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.status}</td>
+                        <td style="border:1px solid #ddd; padding:8px; color:${staff.onDuty === 'Yes' ? 'green' : 'gray'};">${staff.onDuty}</td>
+                    </tr>
+                `;
+            });
         }
 
-        searchInput.addEventListener('input', loadStaffTable);
-        statusFilter.addEventListener('change', loadStaffTable);
+        function markAttendance() {
+            alert('Attendance Marked (Simulation)');
+        }
 
-        loadStaffTable();
+        searchStaff.addEventListener('input', renderStaff);
+        dutyFilter.addEventListener('change', renderStaff);
+
+        renderStaff();
     </script>
 
 </body>
