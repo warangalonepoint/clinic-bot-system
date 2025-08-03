@@ -1,34 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Onestop AI Clinic Demo - Dashboard</title>
+    <title>Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
+<body>
+    <header class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo">
+        <h1>Onestop AI Clinic Demo</h1>
+    </header><main class="dashboard">
+    <img src="./assets/clinic-hero-banner.png" alt="Clinic Hero Banner" class="hero-image">
+    <h2>Clinic Dashboard</h2>
 
-    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-        <span>Onestop AI Clinic Demo</span>
+    <div class="button-grid">
+        <a href="bookings.html" class="dashboard-button">📅 Bookings</a>
+        <a href="logs.html" class="dashboard-button">📖 Logs</a>
+        <a href="staff-dashboard.html" class="dashboard-button">👥 Staff</a>
+        <a href="sync.html" class="dashboard-button">🔄 Sync Panel</a>
+        <a href="confirmation.html" class="dashboard-button">✅ Confirmations</a>
+        <a href="token-summary.html" class="dashboard-button">🎫 Tokens</a>
     </div>
+</main>
 
-    <div style="text-align:center; padding:20px;">
-        <img src="./assets/clinic-hero-banner.png" alt="Clinic Hero Banner" style="width:80%; max-width:300px; border-radius:10px;">
-    </div>
-
-    <h2 style="text-align:center;">Clinic Dashboard</h2>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
-        <a href="bookings.html" style="background:#000; color:#fff; text-decoration:none; padding:20px; border-radius:10px; text-align:center;">📅 Bookings</a>
-        <a href="logs.html" style="background:#000; color:#fff; text-decoration:none; padding:20px; border-radius:10px; text-align:center;">📖 Logs</a>
-        <a href="staff-dashboard.html" style="background:#000; color:#fff; text-decoration:none; padding:20px; border-radius:10px; text-align:center;">👥 Staff</a>
-        <a href="sync-panel.html" style="background:#000; color:#fff; text-decoration:none; padding:20px; border-radius:10px; text-align:center;">🔄 Sync Panel</a>
-        <a href="confirmation.html" style="background:#000; color:#fff; text-decoration:none; padding:20px; border-radius:10px; text-align:center;">✅ Confirmations</a>
-    </div>
-
-    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
-        Powered by Onestop AI
-    </footer>
+<footer class="footer">
+    Powered by Onestop AI
+</footer>
 
 </body>
 </html>
