@@ -1,31 +1,90 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background: #f9f9f9;
+        }
+        .header {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .header img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .banner {
+            text-align: center;
+            padding: 20px;
+        }
+        .banner img {
+            width: 80%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+        }
+        .btn {
+            background: #000;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <header class="header">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo">
-        <h1>Onestop AI Clinic Demo</h1>
-    </header><main class="dashboard">
-    <img src="./assets/clinic-hero-banner.png" alt="Clinic Hero Banner" class="hero-image">
+
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <span>Onestop AI Clinic Demo</span>
+    </div>
+
+    <div class="banner">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+    </div>
+
     <h2>Clinic Dashboard</h2>
 
     <div class="button-grid">
-        <a href="bookings.html" class="dashboard-button">📅 Bookings</a>
-        <a href="logs.html" class="dashboard-button">📖 Logs</a>
-        <a href="staff-dashboard.html" class="dashboard-button">👥 Staff</a>
-        <a href="sync.html" class="dashboard-button">🔄 Sync Panel</a>
-        <a href="confirmation.html" class="dashboard-button">✅ Confirmations</a>
-        <a href="token-summary.html" class="dashboard-button">🎫 Tokens</a>
+        <a href="bookings.html" class="btn">📅 Bookings</a>
+        <a href="logs.html" class="btn">📖 Logs</a>
+        <a href="staff-dashboard.html" class="btn">👥 Staff</a>
+        <a href="sync.html" class="btn">🔄 Sync Panel</a>
+        <a href="confirmation.html" class="btn">✅ Confirmations</a>
+        <a href="token-summary.html" class="btn">🎟️ Tokens</a>
     </div>
-</main>
 
-<footer class="footer">
-    Powered by Onestop AI
-</footer>
+    <footer>
+        Powered by Onestop AI
+    </footer>
 
 </body>
 </html>
