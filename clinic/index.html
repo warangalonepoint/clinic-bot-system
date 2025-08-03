@@ -1,53 +1,110 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Onestop AI Clinic - PIN Login</title>
+    <title>Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background: #f9f9f9;
+            text-align: center;
+        }
+        .top-bar {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .top-bar img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .hero {
+            padding: 20px;
+        }
+        .hero img {
+            width: 80%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+        .dashboard-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+        }
+        .dashboard-buttons button {
+            background: black;
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
 </head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:20px; text-align:center; font-size:20px;">
-    Onestop AI Clinic Demo
-</div>
+<body>
 
-<div id="pin-section" style="padding:20px; text-align:center;">
-    <h2>Enter PIN to Access Dashboard</h2>
-    <input type="password" id="pinInput" placeholder="Enter PIN" style="padding:12px; width:80%; max-width:300px; font-size:16px;">
-    <br><br>
-    <button onclick="checkPIN()" style="padding:12px 20px; background:black; color:white; border:none; font-size:16px;">Unlock</button>
-    <p id="pinError" style="color:red; display:none; margin-top:10px;">Incorrect PIN. Try again.</p>
-</div>
-
-<div id="dashboard-section" style="display:none;">
-    <!-- Your existing Dashboard code (buttons, layout, footer, etc) will be here -->
-    <h2 style="text-align:center;">Dashboard Unlocked ✅</h2>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px;">
-        <a href="bookings.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📅 Bookings</a>
-        <a href="logs.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📖 Logs</a>
-        <a href="staff-dashboard.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">👥 Staff</a>
-        <a href="sync-panel.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">🔄 Sync Panel</a>
-        <a href="confirmation.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">✅ Confirmations</a>
-        <a href="token-summary.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">🎟️ Tokens</a>
-        <a href="export-panel.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📤 Export Panel</a>
-        <a href="reset-pin.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">♻️ Reset PIN</a>
+    <div class="top-bar">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <span>Onestop AI Clinic Demo</span>
     </div>
 
-    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+    <div class="hero">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+    </div>
+
+    <div id="pinSection">
+        <h2>Enter PIN to Access Dashboard</h2>
+        <input type="password" id="pinInput" placeholder="Enter PIN" style="padding:10px; width:80%; max-width:300px; margin-bottom:10px;">
+        <br>
+        <button onclick="checkPIN()" style="padding:10px 20px; background:black; color:white; border:none;">Unlock</button>
+    </div>
+
+    <div id="dashboard" style="display:none;">
+        <h2>Dashboard Unlocked ✅</h2>
+        <div class="dashboard-buttons">
+            <button onclick="location.href='bookings.html'">📅 Bookings</button>
+            <button onclick="location.href='logs.html'">📖 Logs</button>
+            <button onclick="location.href='staff-dashboard.html'">👥 Staff</button>
+            <button onclick="location.href='sync-panel.html'">🔄 Sync Panel</button>
+            <button onclick="location.href='confirmation.html'">✅ Confirmations</button>
+            <button onclick="location.href='token-summary.html'">🎟️ Tokens</button>
+            <button onclick="location.href='export-panel.html'">📤 Export Panel</button>
+            <button onclick="location.href='reset-pin.html'">♻️ Reset PIN</button>
+        </div>
+    </div>
+
+    <footer>
         Powered by Onestop AI
     </footer>
-</div>
 
-<script>
-    function checkPIN() {
-        const enteredPIN = document.getElementById('pinInput').value;
-        const savedPIN = localStorage.getItem('clinicPIN') || '2525'; // Default PIN is 2525
+    <script>
+        function checkPIN() {
+            const enteredPIN = document.getElementById('pinInput').value;
+            const correctPIN = '2525';  // Change this PIN if needed
 
-        if(enteredPIN === savedPIN) {
-            document.getElementById('pin-section').style.display = 'none';
-            document.getElementById('dashboard-section').style.display = 'block';
-        } else {
-            document.getElementById('pinError').style.display = 'block';
+            if (enteredPIN === correctPIN) {
+                document.getElementById('pinSection').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } else {
+                alert('Incorrect PIN');
+            }
         }
-    }
-</script>
+    </script>
 
 </body>
 </html>
