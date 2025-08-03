@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reset PIN - Onestop AI Clinic Demo</title>
+    <title>Export Panel - Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -30,14 +31,8 @@
             max-width: 300px;
             border-radius: 10px;
         }
-        .input-box {
-            width: 80%;
-            max-width: 300px;
-            padding: 10px;
-            margin: 10px auto;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+        h2 {
+            margin-top: 0;
         }
         .button {
             width: 80%;
@@ -51,6 +46,11 @@
             border-radius: 8px;
             cursor: pointer;
             display: block;
+            text-decoration: none;
+        }
+        .note {
+            margin: 20px;
+            font-size: 14px;
         }
         footer {
             position: fixed;
@@ -63,44 +63,29 @@
         }
     </style>
 </head>
-<body><div class="header">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-    <span>Onestop AI Clinic Demo</span>
-</div>
+<body>
 
-<div class="banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
-</div>
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <span>Onestop AI Clinic Demo</span>
+    </div>
 
-<h2>Reset PIN</h2>
+    <div class="banner">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+    </div>
 
-<input type="password" id="newPin" placeholder="Enter New PIN" class="input-box">
-<input type="password" id="confirmPin" placeholder="Confirm New PIN" class="input-box">
+    <h2>Export Panel</h2>
 
-<button class="button" onclick="resetPin()">Reset PIN</button>
+    <a href="./logs.csv" download class="button">⬇️ Download logs.csv Backup</a>
+    <a href="./slots.csv" download class="button">⬇️ Download slots.csv Backup</a>
 
-<footer>
-    Powered by Onestop AI
-</footer>
+    <div class="note">
+        Note: These files reflect the most recent booking and slot data and are auto-updated when changes are pushed to GitHub.
+    </div>
 
-<script>
-    function resetPin() {
-        const newPin = document.getElementById('newPin').value;
-        const confirmPin = document.getElementById('confirmPin').value;
-
-        if (newPin === '' || confirmPin === '') {
-            alert('Please fill both fields');
-            return;
-        }
-
-        if (newPin !== confirmPin) {
-            alert('PINs do not match');
-            return;
-        }
-
-        alert('PIN Reset Successful');
-    }
-</script>
+    <footer>
+        Powered by Onestop AI
+    </footer>
 
 </body>
 </html>
