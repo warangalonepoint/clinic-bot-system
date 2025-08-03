@@ -1,134 +1,84 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Attendance - Onestop AI Clinic</title>
-    <link rel="stylesheet" href="assets/styles.css">
-    <style>
-        .theme-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: inherit;
-        }
-        body.dark-mode {
-            background-color: #121212;
-            color: #ffffff;
-        }
-        body.dark-mode .header,
-        body.dark-mode footer {
-            background-color: #1f1f1f;
-        }
-        body.dark-mode .book-btn {
-            background-color: #333 !important;
-            color: #fff !important;
-        }
-        body.dark-mode .logs-table {
-            background-color: #1e1e1e;
-        }
-        body.dark-mode input {
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-    <header class="header">
-        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
-        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-        <button id="themeToggleBtn" class="theme-icon">🌓</button>
-    </header><section class="hero-banner">
-    <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
-</section>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
 
-<section class="logs-section">
-    <h2>Staff Daily Attendance</h2>
-
-    <!-- Search & Export -->
-    <div class="form-group">
-        <input type="text" id="searchStaff" placeholder="Search by Staff Name" onkeyup="filterStaffLogs()">
-        <button onclick="exportTableToCSV('StaffAttendance.csv')" class="book-btn">Export CSV</button>
-        <button onclick="window.print()" class="book-btn">Export PDF</button>
+    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+        <span>Onestop AI Clinic Demo</span>
     </div>
 
-    <table class="logs-table" id="staffLogsTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Staff Name</th>
-                <th>Role</th>
-                <th>Shift</th>
-                <th>Contact</th>
-                <th>Mark Present</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>2025-08-01</td>
-                <td>Chaitanya Krishna</td>
-                <td>Receptionist</td>
-                <td>Morning</td>
-                <td>+919876543210</td>
-                <td><button onclick="markPresent('Chaitanya Krishna', '919876543210')" class="book-btn">Mark</button></td>
-            </tr>
-            <tr>
-                <td>2025-08-01</td>
-                <td>Ravi Kumar</td>
-                <td>Assistant</td>
-                <td>Afternoon</td>
-                <td>+918888888888</td>
-                <td><button onclick="markPresent('Ravi Kumar', '918888888888')" class="book-btn">Mark</button></td>
-            </tr>
-        </tbody>
-    </table>
-</section>
+    <div style="text-align:center; padding:20px;">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
+    </div>
 
-<footer>
-    <p>Powered by Onestop AI</p>
-</footer>
+    <h2 style="text-align:center;">Staff Attendance Panel</h2>
 
-<script>
-    document.getElementById('themeToggleBtn').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-    });
+    <div style="padding: 0 10px;">
+        <input type="text" id="searchStaff" placeholder="Search Staff Name" style="width:100%; padding:10px; margin-bottom:10px;">
+        <button onclick="markAttendance()" style="width:100%; padding:10px; background:black; color:white; border:none;">Mark Attendance</button>
+    </div>
 
-    function exportTableToCSV(filename) {
-        const csv = [];
-        const rows = document.querySelectorAll("table tr");
-        for (let row of rows) {
-            const cols = row.querySelectorAll("td, th");
-            const rowData = Array.from(cols).map(col => col.innerText).join(",");
-            csv.push(rowData);
+    <div style="padding:0 10px; overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+            <thead>
+                <tr>
+                    <th style="border:1px solid #ddd; padding:8px;">Staff ID</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Name</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Role</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Status</th>
+                    <th style="border:1px solid #ddd; padding:8px;">On Duty</th>
+                </tr>
+            </thead>
+            <tbody id="staffTable"></tbody>
+        </table>
+    </div>
+
+    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+        Powered by Onestop AI
+    </footer>
+
+    <script>
+        const staffList = [
+            { id: 'S101', name: 'Chaitanya Krishna', role: 'Doctor', status: 'Present', onDuty: 'Yes' },
+            { id: 'S102', name: 'Ravi Kumar', role: 'Nurse', status: 'Absent', onDuty: 'No' },
+            { id: 'S103', name: 'Suma Reddy', role: 'Receptionist', status: 'Present', onDuty: 'Yes' },
+            { id: 'S104', name: 'Anil Sharma', role: 'Lab Technician', status: 'Present', onDuty: 'No' }
+        ];
+
+        const staffTable = document.getElementById('staffTable');
+        const searchStaff = document.getElementById('searchStaff');
+
+        function renderStaff() {
+            const filter = searchStaff.value.toLowerCase();
+            const filteredStaff = staffList.filter(staff => staff.name.toLowerCase().includes(filter));
+
+            staffTable.innerHTML = '';
+            filteredStaff.forEach(staff => {
+                staffTable.innerHTML += `
+                    <tr>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.id}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.name}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.role}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${staff.status}</td>
+                        <td style="border:1px solid #ddd; padding:8px; color:${staff.onDuty === 'Yes' ? 'green' : 'gray'};">${staff.onDuty}</td>
+                    </tr>
+                `;
+            });
         }
-        const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-        const downloadLink = document.createElement("a");
-        downloadLink.download = filename;
-        downloadLink.href = window.URL.createObjectURL(csvFile);
-        downloadLink.style.display = "none";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-    }
 
-    function markPresent(name, contact) {
-        const msg = `Attendance Marked: ${name} Present.`;
-        const encodedMsg = encodeURIComponent(msg);
-        window.open(`https://wa.me/${contact}?text=${encodedMsg}`, '_blank');
-    }
+        function markAttendance() {
+            alert('Attendance Marked (Simulation)');
+        }
 
-    function filterStaffLogs() {
-        const input = document.getElementById('searchStaff').value.toLowerCase();
-        const rows = document.querySelectorAll('#staffLogsTable tbody tr');
-        rows.forEach(row => {
-            const name = row.cells[1].innerText.toLowerCase();
-            row.style.display = name.includes(input) ? '' : 'none';
-        });
-    }
-</script>
+        searchStaff.addEventListener('input', renderStaff);
+
+        renderStaff();
+    </script>
 
 </body>
 </html>
