@@ -1,23 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Onestop AI Clinic Demo</title>
+    <title>Onestop AI Clinic - PIN Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:20px; text-align:center; font-size:20px;">
+    Onestop AI Clinic Demo
+</div>
 
-    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-        <span>Onestop AI Clinic Demo</span>
-    </div>
+<div id="pin-section" style="padding:20px; text-align:center;">
+    <h2>Enter PIN to Access Dashboard</h2>
+    <input type="password" id="pinInput" placeholder="Enter PIN" style="padding:12px; width:80%; max-width:300px; font-size:16px;">
+    <br><br>
+    <button onclick="checkPIN()" style="padding:12px 20px; background:black; color:white; border:none; font-size:16px;">Unlock</button>
+    <p id="pinError" style="color:red; display:none; margin-top:10px;">Incorrect PIN. Try again.</p>
+</div>
 
-    <div style="text-align:center; padding:20px;">
-        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
-    </div>
-
-    <h2 style="text-align:center;">Clinic Dashboard</h2>
-
+<div id="dashboard-section" style="display:none;">
+    <!-- Your existing Dashboard code (buttons, layout, footer, etc) will be here -->
+    <h2 style="text-align:center;">Dashboard Unlocked ✅</h2>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px;">
         <a href="bookings.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📅 Bookings</a>
         <a href="logs.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📖 Logs</a>
@@ -32,6 +33,21 @@
     <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
         Powered by Onestop AI
     </footer>
+</div>
+
+<script>
+    function checkPIN() {
+        const enteredPIN = document.getElementById('pinInput').value;
+        const savedPIN = localStorage.getItem('clinicPIN') || '2525'; // Default PIN is 2525
+
+        if(enteredPIN === savedPIN) {
+            document.getElementById('pin-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'block';
+        } else {
+            document.getElementById('pinError').style.display = 'block';
+        }
+    }
+</script>
 
 </body>
 </html>
