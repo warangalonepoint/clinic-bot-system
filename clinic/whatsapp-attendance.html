@@ -1,146 +1,51 @@
-<!DOCTYPE html><html lang="en"><head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📋 Staff Attendance</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
-      transition: background-color 0.3s, color 0.3s;
-    }.light-mode {
-  background-color: #fff;
-  color: #000;
-}
 
-h1 {
-  text-align: center;
-  padding-top: 15px;
-  font-size: 26px;
-}
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WhatsApp Attendance - Onestop AI Clinic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+    <span>Onestop AI Clinic Demo</span>
+</div>
 
-.btn-container {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px;
-}
+<div style="text-align:center; padding:20px;">
+    <img src="./assets/clinic-hero-banner.png" alt="WhatsApp Attendance" style="width:80%; max-width:300px; border-radius:10px;">
+</div>
 
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
+<h2 style="text-align:center;">WhatsApp Attendance</h2>
 
-.theme-btn {
-  background-color: #00ffff;
-  color: #000;
-}
+<div style="padding:20px;">
+    <h3>Mark Attendance via WhatsApp</h3>
+    <input type="text" id="waEmpID" placeholder="Employee ID" style="width:100%; padding:10px; margin-bottom:10px;">
+    <select id="waStatus" style="width:100%; padding:10px; margin-bottom:10px;">
+        <option value="On Duty">On Duty</option>
+        <option value="Off Duty">Off Duty</option>
+    </select>
+    <button onclick="sendWhatsAppAttendance()" style="width:100%; padding:12px; background:#25D366; color:white; border:none; font-size:16px;">Send on WhatsApp</button>
+</div>
 
-.filter-btn {
-  background-color: #00ffff;
-  color: #000;
-}
+<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+    Powered by Onestop AI
+</footer>
 
-table {
-  width: 95%;
-  margin: 10px auto;
-  border-collapse: collapse;
-  background-color: #111;
-  color: #fff;
-}
+<script>
+    function sendWhatsAppAttendance() {
+        const empID = document.getElementById('waEmpID').value.trim();
+        const status = document.getElementById('waStatus').value;
 
-.light-mode table {
-  background-color: #f8f8f8;
-  color: #000;
-}
-
-th, td {
-  padding: 10px;
-  border: 1px solid #444;
-  text-align: left;
-}
-
-.on-duty {
-  background-color: #00ff00;
-  color: #000;
-  font-weight: bold;
-}
-
-.off-duty {
-  background-color: #444;
-  color: #ccc;
-}
-
-  </style>
-</head><body>
-  <h1>👥 <span style="color:#00ffff">Staff Attendance</span></h1>  <div class="btn-container">
-    <button class="theme-btn" onclick="toggleTheme()">🎨 Toggle Theme</button>
-    <button class="filter-btn" onclick="toggleFilter()">🟢 Show Only On Duty</button>
-  </div>  <table id="attendance-table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Role</th>
-        <th>Name</th>
-        <th>Shift</th>
-        <th>Contact</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-  </table>  <script>
-    let light = false;
-    let filterOn = false;
-
-    function toggleTheme() {
-      document.body.classList.toggle('light-mode');
-      light = !light;
-    }
-
-    function toggleFilter() {
-      filterOn = !filterOn;
-      renderTable();
-    }
-
-    async function fetchCSV() {
-      const response = await fetch('./whatsapp-log.csv');
-      const text = await response.text();
-      const rows = text.trim().split('\n').slice(1);
-      return rows.map(row => row.split(','));
-    }
-
-    function isOnDuty(status) {
-      return status.toLowerCase().includes("morning") || status.toLowerCase().includes("evening") || status.toLowerCase().includes("night");
-    }
-
-    async function renderTable() {
-      const tbody = document.getElementById('table-body');
-      tbody.innerHTML = '';
-
-      const data = await fetchCSV();
-      data.forEach(row => {
-        const [date, role, name, shift, contact, status] = row;
-        const onDuty = isOnDuty(status);
-
-        if (!filterOn || onDuty) {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${date}</td>
-            <td>${role}</td>
-            <td>${name}</td>
-            <td>${shift}</td>
-            <td>${contact}</td>
-            <td class="${onDuty ? 'on-duty' : 'off-duty'}">${status}</td>
-          `;
-          tbody.appendChild(tr);
+        if(!empID) {
+            alert('Please enter Employee ID.');
+            return;
         }
-      });
-    }
 
-    renderTable();
-  </script></body></html>
+        const message = `Attendance Marked:\nEmployee ID: ${empID}\nStatus: ${status}`;
+        const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
+
+        window.open(whatsappLink, '_blank');
+    }
+</script>
+
+</body>
+</html>
