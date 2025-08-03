@@ -1,65 +1,119 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Onestop AI Clinic Demo - Booking Logs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Logs - Onestop AI Clinic Demo</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <header class="header">
-        <img src="assets/clinic-logo.png" alt="Clinic Logo" class="logo">
-        <span class="title">Onestop AI Clinic Demo</span>
-    </header><section class="hero">
-    <img src="assets/clinic-hero-banner.png" alt="Doctor Illustration" class="hero-banner">
-</section>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
 
-<section class="logs-section">
-    <h2>Booking Logs</h2>
-    <div class="filters">
-        <input type="text" id="searchName" placeholder="Search by Name">
-        <select id="filterDate">
-            <option value="">All Dates</option>
-            <!-- Dates will be dynamically populated -->
-        </select>
-        <button id="resetBtn">Reset</button>
+    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+        <span>Onestop AI Clinic Demo</span>
     </div>
 
-    <div class="summary">
-        Total Bookings: <span id="totalBookings">0</span>
-        Reminders Sent: <span id="remindersSent">0</span>
-        Next Token: <span id="nextToken">1</span>
+    <div style="text-align:center; padding:20px;">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
     </div>
 
-    <div class="export-buttons">
-        <button id="exportCSV">Export CSV</button>
-        <button id="exportPDF">Export PDF</button>
+    <h2 style="text-align:center;">Booking Logs</h2>
+
+    <div style="padding:0 10px; text-align:center;">
+        <input type="text" id="searchName" placeholder="Search by Name" style="width:100%; padding:10px; margin-bottom:10px;">
+        <select id="dateFilter" style="width:100%; padding:10px; margin-bottom:10px;"></select>
+        <button onclick="resetFilters()" style="width:100%; padding:10px; background:black; color:white; border:none;">Reset</button>
     </div>
 
-    <div class="table-container">
-        <table class="logs-table">
+    <div style="padding:0 10px;">
+        <p>Total Bookings: <span id="totalBookings">0</span> | Reminders Sent: <span id="remindersSent">0</span> | Next Token: <span id="nextToken">1</span></p>
+    </div>
+
+    <div style="padding:0 10px; overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
             <thead>
                 <tr>
-                    <th>Token</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Patient Name</th>
-                    <th>Reason</th>
-                    <th>Contact</th>
-                    <th>Reminder</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Token</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Date</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Time</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Patient Name</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Reason</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Contact</th>
+                    <th style="border:1px solid #ddd; padding:8px;">Reminder</th>
                 </tr>
             </thead>
-            <tbody id="logsBody">
-                <!-- Booking logs will populate here -->
-            </tbody>
+            <tbody id="logsTable"></tbody>
         </table>
     </div>
-</section>
 
-<footer class="footer">
-    Powered by Onestop AI
-</footer>
+    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+        Powered by Onestop AI
+    </footer>
 
-<script src="logs.js"></script>
+    <script>
+        const logs = [
+            {token:1, date:'2025-08-01', time:'09:00', name:'Chaitanya Krishna', reason:'Fever', contact:'+919876543210', reminder:'No'},
+            {token:2, date:'2025-08-01', time:'09:10', name:'Ravi Kumar', reason:'Checkup', contact:'+918888888888', reminder:'No'},
+            {token:3, date:'2025-08-01', time:'09:20', name:'Suma Reddy', reason:'Cold', contact:'+917777777777', reminder:'No'},
+            {token:4, date:'2025-08-02', time:'09:30', name:'Anil Sharma', reason:'Diabetes', contact:'+916666666666', reminder:'No'},
+            {token:5, date:'2025-08-02', time:'09:40', name:'Pooja Mehta', reason:'Blood Test', contact:'+915555555555', reminder:'No'}
+        ];
+
+        const logsTable = document.getElementById('logsTable');
+        const searchName = document.getElementById('searchName');
+        const dateFilter = document.getElementById('dateFilter');
+        const totalBookings = document.getElementById('totalBookings');
+        const remindersSent = document.getElementById('remindersSent');
+        const nextToken = document.getElementById('nextToken');
+
+        function renderLogs() {
+            const filterName = searchName.value.toLowerCase();
+            const filterDate = dateFilter.value;
+
+            const filteredLogs = logs.filter(log =>
+                (filterName === '' || log.name.toLowerCase().includes(filterName)) &&
+                (filterDate === '' || log.date === filterDate)
+            );
+
+            logsTable.innerHTML = '';
+            filteredLogs.forEach(log => {
+                logsTable.innerHTML += `
+                    <tr>
+                        <td style="border:1px solid #ddd; padding:8px;">${log.token}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${log.date}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${log.time}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${log.name}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${log.reason}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${log.contact}</td>
+                        <td style="border:1px solid #ddd; padding:8px;">${log.reminder}</td>
+                    </tr>
+                `;
+            });
+
+            totalBookings.textContent = logs.length;
+            remindersSent.textContent = logs.filter(l => l.reminder === 'Yes').length;
+            nextToken.textContent = logs.length + 1;
+        }
+
+        function populateDateFilter() {
+            const uniqueDates = [...new Set(logs.map(log => log.date))];
+            dateFilter.innerHTML = '<option value="">All Dates</option>';
+            uniqueDates.forEach(date => {
+                dateFilter.innerHTML += `<option value="${date}">${date}</option>`;
+            });
+        }
+
+        function resetFilters() {
+            searchName.value = '';
+            dateFilter.value = '';
+            renderLogs();
+        }
+
+        searchName.addEventListener('input', renderLogs);
+        dateFilter.addEventListener('change', renderLogs);
+
+        populateDateFilter();
+        renderLogs();
+    </script>
 
 </body>
 </html>
