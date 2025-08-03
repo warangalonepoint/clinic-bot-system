@@ -1,130 +1,17 @@
-:root {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --button-bg: #000000;
-    --button-text: #ffffff;
-}
-
 body {
     margin: 0;
-    padding: 0;
     font-family: Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    background-color: #ffffff;
+    color: #000000;
 }
 
-.container {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 10px;
-    box-sizing: border-box;
-    flex: 1;
-}
-
-.banner-img {
-    width: 100%;
-    height: auto;
-    display: block;
-    margin-bottom: 20px;
-}
-
-.button-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.button-grid a {
-    display: block;
-    background: var(--button-bg);
-    color: var(--button-text);
-    text-align: center;
-    padding: 12px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-size: 16px;
-    transition: background 0.3s ease;
-}
-
-.button-grid a:hover {
-    background: #333333;
-}
-
-.footer {
-    background: var(--button-bg);
-    color: var(--button-text);
-    text-align: center;
-    padding: 12px 0;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
-
-input, select, button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    box-sizing: border-box;
-}
-
-button {
-    background: var(--button-bg);
-    color: var(--button-text);
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background: #333333;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 8px;
-    text-align: center;
-}
-
-.toggle-theme {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-}
-
-/* Dark Theme */
-body.dark-mode {
-    --bg-color: #000000;
-    --text-color: #ffffff;
-    --button-bg: #ffffff;
-    --button-text: #000000;
-}
+/* Header Bar */
 .header-bar {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    background-color: #000;
-    color: #fff;
+    background-color: #000000;
+    color: #ffffff;
     padding: 10px 15px;
-    font-size: 18px;
-    font-weight: bold;
 }
 
 .clinic-logo {
@@ -135,12 +22,53 @@ body.dark-mode {
 
 .clinic-title {
     font-size: 16px;
+    font-weight: bold;
 }
 
+/* Banner */
 .clinic-banner {
     width: 100%;
     height: auto;
     display: block;
-    margin: 0 auto;
     border-radius: 0;
+}
+
+/* Navigation Buttons */
+.button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 20px;
+}
+
+.nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+    color: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+}
+
+.nav-button:hover {
+    background-color: #333333;
+}
+
+/* Footer */
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #000000;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+}    border-radius: 0;
 }
