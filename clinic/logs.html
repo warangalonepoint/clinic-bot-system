@@ -1,94 +1,167 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Logs</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            color: #000;
+        }
+        header {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            position: relative;
+        }
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
+        .header-logo img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .hero {
+            text-align: center;
+            padding: 20px;
+        }
+        .hero img {
+            width: 50%;
+            max-width: 300px;
+        }
+        .container {
+            padding: 10px 20px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        button, select, input {
+            padding: 5px 10px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .export-buttons {
+            margin-top: 10px;
+        }
+        footer {
+            background: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #fff;
+        }
+        .dark-mode th {
+            background-color: #222;
+        }
+    </style>
 </head>
 <body>
-    <header class="header">
-        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
-        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-    </header><section class="hero-banner">
-    <img src="assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
-</section>
+    <header>
+        <div class="header-logo">
+            <img src="logo.png" alt="Clinic Logo" />
+            Onestop AI Clinic Demo
+        </div>
+        <span class="theme-toggle" onclick="toggleTheme()">🌙</span>
+    </header>
 
-<main>
-    <h2>Booking Logs</h2>
-
-    <input type="text" placeholder="Search by Name" class="search-input">
-
-    <div class="filter-bar">
-        <select>
-            <option value="">All Dates</option>
-            <option value="2025-08-01">2025-08-01</option>
-        </select>
-        <button class="reset-btn">Reset</button>
+    <div class="hero">
+        <img src="doctor-illustration.png" alt="Doctor Illustration">
     </div>
 
-    <div class="summary-panel">
+    <div class="container">
+        <h2>Booking Logs</h2>
+        <input type="text" placeholder="Search by Name">
+        <select>
+            <option>All Dates</option>
+        </select>
+        <button>Reset</button>
+
         <p>Total Bookings: 2</p>
         <p>Reminders Sent: 0</p>
         <p>Next Token: 3</p>
+
+        <div class="export-buttons">
+            <button>Export CSV</button>
+            <button>Export PDF</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Patient Name</th>
+                        <th>Reason</th>
+                        <th>Contact</th>
+                        <th>Reminder</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>2025-08-01</td>
+                        <td>09:00</td>
+                        <td>Chaitanya Krishna</td>
+                        <td>Fever</td>
+                        <td>+919876543210</td>
+                        <td><button>Send</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>2025-08-01</td>
+                        <td>09:10</td>
+                        <td>Ravi Kumar</td>
+                        <td>Checkup</td>
+                        <td>+918888888888</td>
+                        <td><button>Send</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="export-buttons">
-        <button class="export-btn">Export CSV</button>
-        <button class="export-btn">Export PDF</button>
-    </div>
+    <footer>
+        Powered by Onestop AI
+    </footer>
 
-    <table class="logs-table">
-        <thead>
-            <tr>
-                <th>Token</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Patient Name</th>
-                <th>Reason</th>
-                <th>Contact</th>
-                <th>Reminder</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>2025-08-01</td>
-                <td>09:00</td>
-                <td>Chaitanya Krishna</td>
-                <td>Fever</td>
-                <td>+919876543210</td>
-                <td><button class="reminder-btn">Send</button></td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>2025-08-01</td>
-                <td>09:10</td>
-                <td>Ravi Kumar</td>
-                <td>Checkup</td>
-                <td>+918888888888</td>
-                <td><button class="reminder-btn">Send</button></td>
-            </tr>
-        </tbody>
-    </table>
-</main>
-
-<footer>
-    <p>Powered by Onestop AI</p>
-</footer>
-
-<script>
-    function toggleTheme() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-    }
-
-    window.onload = function() {
-        if(localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>
