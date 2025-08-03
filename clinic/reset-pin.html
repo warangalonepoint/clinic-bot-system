@@ -1,45 +1,114 @@
 <!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reset PIN - Onestop AI Clinic</title>
+    <title>Reset Dashboard PIN - Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { margin:0; font-family:sans-serif; background:#f9f9f9; text-align:center; }
-        .header { background:#000; color:#fff; padding:10px; display:flex; align-items:center; justify-content:center; }
-        .header img { height:30px; margin-right:10px; }
-        .container { padding:20px; }
-        .container input { width:80%; max-width:300px; padding:10px; margin:10px 0; font-size:16px; }
-        .container button { padding:12px 20px; background:black; color:white; border:none; border-radius:8px; font-size:16px; }
-        .banner { width:80%; max-width:300px; border-radius:10px; margin:20px auto; }
-        footer { position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px; }
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background: #ffffff;
+            color: #000000;
+            text-align: center;
+        }
+        .header {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .header img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .banner {
+            padding: 20px;
+        }
+        .banner img {
+            width: 80%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+        .input-field {
+            width: 80%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 10px auto;
+            font-size: 16px;
+            display: block;
+        }
+        .button {
+            width: 80%;
+            max-width: 300px;
+            padding: 12px;
+            margin: 10px auto;
+            background: #000;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
     </style>
 </head>
-<body>
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-        <span>Onestop AI Clinic Demo</span>
-    </div><div class="container">
-    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" class="banner">
-
-    <h2>Reset Dashboard PIN</h2>
-    <input type="password" id="newPIN" placeholder="Enter New PIN">
-    <br>
-    <button onclick="resetPIN()">Set New PIN</button>
-
-    <p id="successMsg" style="color:green; display:none; margin-top:20px;">PIN has been successfully updated!</p>
+<body><div class="header">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+    <span>Onestop AI Clinic Demo</span>
 </div>
 
-<footer>Powered by Onestop AI</footer>
+<div class="banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+</div>
+
+<h2>Reset Dashboard PIN</h2>
+
+<input type="password" id="currentPin" class="input-field" placeholder="Enter Current PIN">
+<input type="password" id="newPin" class="input-field" placeholder="Enter New PIN">
+<input type="password" id="confirmPin" class="input-field" placeholder="Confirm New PIN">
+<button class="button" onclick="resetPin()">Set New PIN</button>
+
+<footer>
+    Powered by Onestop AI
+</footer>
 
 <script>
-    function resetPIN() {
-        const newPIN = document.getElementById('newPIN').value;
-        if(newPIN.length === 0) {
-            alert('Please enter a new PIN');
+    let storedPin = localStorage.getItem('dashboardPin') || '2525';
+
+    function resetPin() {
+        const currentPin = document.getElementById('currentPin').value;
+        const newPin = document.getElementById('newPin').value;
+        const confirmPin = document.getElementById('confirmPin').value;
+
+        if (currentPin !== storedPin) {
+            alert('Current PIN is incorrect!');
             return;
         }
-        localStorage.setItem('clinicPIN', newPIN);
-        document.getElementById('successMsg').style.display = 'block';
+
+        if (newPin.length < 4) {
+            alert('New PIN must be at least 4 digits.');
+            return;
+        }
+
+        if (newPin !== confirmPin) {
+            alert('New PIN and Confirm PIN do not match.');
+            return;
+        }
+
+        localStorage.setItem('dashboardPin', newPin);
+        storedPin = newPin;
+        alert('PIN successfully updated!');
+        window.location.href = 'index.html';
     }
 </script>
 
