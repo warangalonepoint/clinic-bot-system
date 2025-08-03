@@ -1,23 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Book Your Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment</title>
   <link rel="stylesheet" href="./assets/styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }header {
+  background-color: #000;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header img {
+  height: 30px;
+}
+
+.hero-banner img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.booking-form {
+  padding: 20px;
+}
+
+.booking-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+select, input {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 12px;
+  background-color: #000;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #000;
+  color: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+  </style>
 </head>
 <body>
   <header>
-    <div class="header-logo">
-      <img src="./logo.png" alt="Clinic Logo">
-      <h1>Onestop AI Clinic Demo</h1>
-    </div>
-  </header>
-
-  <section class="hero-banner">
+    <img src="./logo.png" alt="Clinic Logo">
+    <h1>Onestop AI Clinic Demo</h1>
+  </header>  <section class="hero-banner">
     <img src="./clinic-hero-banner.png" alt="Doctor Illustration">
-  </section>
-
-  <section class="booking-form">
+  </section>  <section class="booking-form">
     <h2>Book Your Appointment</h2>
     <form id="bookingForm">
       <select id="dateDropdown" required>
@@ -30,26 +92,20 @@
       <input type="text" id="visitReason" placeholder="Reason for Visit" required>
       <button type="submit">Book on WhatsApp</button>
     </form>
-  </section>
-
-  <footer>
-    <p>Powered by Onestop AI</p>
-  </footer>
-
-  <script>
+  </section>  <footer>
+    Powered by Onestop AI
+  </footer>  <script>
     let slotsData = [];
 
-    // Fetch Slots CSV
     fetch('./slots.csv')
       .then(response => response.text())
       .then(data => {
-        const lines = data.trim().split('\n').slice(1); // skip header
+        const lines = data.trim().split('\n').slice(1);
         slotsData = lines.map(line => {
           const [date, time, status] = line.split(',');
           return { date: date.trim(), time: time.trim(), status: status.trim() };
         });
 
-        // Populate Date Dropdown
         const uniqueDates = [...new Set(slotsData.map(slot => slot.date))];
         const dateDropdown = document.getElementById('dateDropdown');
         uniqueDates.forEach(date => {
@@ -60,7 +116,6 @@
         });
       });
 
-    // Populate Time Slots based on selected Date
     document.getElementById('dateDropdown').addEventListener('change', function() {
       const selectedDate = this.value;
       const timeDropdown = document.getElementById('timeDropdown');
@@ -76,7 +131,6 @@
         });
     });
 
-    // Booking Form Submission
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const date = document.getElementById('dateDropdown').value;
@@ -92,6 +146,5 @@
       const whatsappMessage = `Booking Request:%0AName: ${patientName}%0AReason: ${reason}%0ADate: ${date}%0ATime: ${time}`;
       window.location.href = `https://wa.me/919876543210?text=${whatsappMessage}`;
     });
-  </script>
-</body>
+  </script></body>
 </html>
