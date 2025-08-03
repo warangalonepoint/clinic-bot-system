@@ -1,98 +1,66 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Token Summary</title>
+  <meta charset="UTF‑8">
+  <title>Token Summary – Onestop AI Clinic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #fff;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #00ffcc;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid #444;
-      text-align: center;
-    }
-    th {
-      background-color: #222;
-    }
-    #dateFilter {
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
+    body { margin:0; font-family:sans-serif; background:#f9f9f9; }
+    .header { background:#000; color:#fff; padding:10px; display:flex; align-items:center; }
+    .header img { height:30px; margin-right:10px; }
+    .banner { text-align:center; padding:20px; }
+    .banner img { width:80%; max-width:300px; border-radius:10px; }
+    h2 { text-align:center; margin-top:0; }
+    .container { padding:0 20px; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #ddd; padding:12px; text-align:left; font-size:14px; }
+    th { background:#eee; }
+    .export-btn { width:100%; padding:12px; margin:20px 0; background:#000; color:#fff; border:none; border-radius:8px; font-size:16px; }
+    footer { position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px; }
   </style>
 </head>
 <body>
-  <h1>📅 Token Summary</h1>
-  <label for="dateFilter">Select Date:</label>
-  <input type="date" id="dateFilter" />  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Total Tokens Issued</th>
-      </tr>
-    </thead>
-    <tbody id="tokenTableBody">
-      <tr><td colspan="2">Loading...</td></tr>
-    </tbody>
-  </table>  <script>
-    const csvUrl = './logs.csv';
 
-    async function fetchCSV() {
-      const res = await fetch(csvUrl);
-      const data = await res.text();
-      const lines = data.trim().split('\n').slice(1);
+  <div class="header">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+    <span>Onestop AI Clinic Demo</span>
+  </div>
 
-      const tokenMap = {};
-      lines.forEach(row => {
-        const cols = row.split(',');
-        const date = cols[0].trim(); // assuming date is in col 0
-        if (date) {
-          tokenMap[date] = (tokenMap[date] || 0) + 1;
-        }
-      });
+  <div class="banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Token Summary">
+  </div>
 
-      return tokenMap;
+  <h2>Token Summary</h2>
+
+  <div class="container">
+    <button class="export-btn" onclick="downloadCSV('token-summary.csv')">Export Token List CSV</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Booked</th>
+          <th>Reminder Sent</th>
+        </tr>
+      </thead>
+      <tbody id="tokenTable">
+        <tr>
+          <td>1</td><td>2025‑08‑01</td><td>09:00</td><td>✓</td><td>No</td>
+        </tr>
+        <!-- More rows -->
+      </tbody>
+    </table>
+  </div>
+
+  <footer>Powered by Onestop AI</footer>
+
+  <script>
+    function downloadCSV(name) {
+      window.open(`https://warangalonepoint.github.io/clinic-bot-system/clinic/${name}`, '_blank');
     }
+  </script>
 
-    function renderTable(data) {
-      const tbody = document.getElementById('tokenTableBody');
-      tbody.innerHTML = '';
-      const selected = document.getElementById('dateFilter').value;
-
-      Object.keys(data).sort().forEach(date => {
-        if (!selected || selected === date) {
-          const row = `<tr><td>${date}</td><td>${data[date]}</td></tr>`;
-          tbody.innerHTML += row;
-        }
-      });
-
-      if (!tbody.innerHTML) {
-        tbody.innerHTML = '<tr><td colspan="2">No records found.</td></tr>';
-      }
-    }
-
-    document.getElementById('dateFilter').addEventListener('change', async () => {
-      const tokenData = await fetchCSV();
-      renderTable(tokenData);
-    });
-
-    window.onload = async () => {
-      const tokenData = await fetchCSV();
-      renderTable(tokenData);
-    };
-  </script></body>
+</body>
 </html>
