@@ -1,55 +1,78 @@
 <!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Staff Panel - Add/Delete Staff</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Panel - Onestop AI Clinic</title>
-    <link rel="stylesheet" href="./assets/styles.css">
 </head>
-<body>
-    <header class="header">
-        <img src="./assets/logo.png" alt="Clinic Logo" class="logo">
-        <span class="clinic-title">Onestop AI Clinic Demo</span>
-    </header><section class="hero-banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner">
-</section>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+    <span>Onestop AI Clinic Demo</span>
+</div>
 
-<main class="staff-panel">
-    <h2>Staff Attendance Panel</h2>
+<div style="text-align:center; padding:20px;">
+    <img src="./assets/clinic-hero-banner.png" alt="Staff Panel" style="width:80%; max-width:300px; border-radius:10px;">
+</div>
 
-    <table class="staff-table">
-        <thead>
-            <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>STF001</td>
-                <td>Arun Kumar</td>
-                <td>Doctor</td>
-                <td>On Duty</td>
-            </tr>
-            <tr>
-                <td>STF002</td>
-                <td>Megha Rani</td>
-                <td>Nurse</td>
-                <td>Off Duty</td>
-            </tr>
-            <tr>
-                <td>STF003</td>
-                <td>Sunil Patel</td>
-                <td>Reception</td>
-                <td>On Duty</td>
-            </tr>
-            <!-- More Staff Rows -->
-        </tbody>
-    </table>
-</main>
+<h2 style="text-align:center;">Staff Panel</h2>
 
-<footer class="footer">Powered by Onestop AI</footer>
+<!-- Add New Staff Form -->
+<div style="padding:20px;">
+    <h3>Add New Staff</h3>
+    <input type="text" id="newStaffID" placeholder="Employee ID" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="newStaffName" placeholder="Name" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="newStaffRole" placeholder="Role" style="width:100%; padding:10px; margin-bottom:10px;">
+    <button onclick="addStaff()" style="width:100%; padding:12px; background:black; color:white; border:none; font-size:16px;">Add Staff</button>
+</div>
+
+<!-- Delete Staff Section -->
+<div style="padding:20px;">
+    <h3>Delete Staff</h3>
+    <select id="deleteStaffSelect" style="width:100%; padding:10px; margin-bottom:10px;">
+        <option value="STF001">STF001 - Arun Kumar</option>
+        <option value="STF002">STF002 - Megha Rani</option>
+        <option value="STF003">STF003 - Sunil Patel</option>
+    </select>
+    <button onclick="deleteStaff()" style="width:100%; padding:12px; background:red; color:white; border:none; font-size:16px;">Delete Staff</button>
+</div>
+
+<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+    Powered by Onestop AI
+</footer>
+
+<script>
+    function addStaff() {
+        const id = document.getElementById('newStaffID').value.trim();
+        const name = document.getElementById('newStaffName').value.trim();
+        const role = document.getElementById('newStaffRole').value.trim();
+
+        if(!id || !name || !role) {
+            alert('Please fill all fields to add new staff.');
+            return;
+        }
+
+        const select = document.getElementById('deleteStaffSelect');
+        const option = document.createElement('option');
+        option.value = id;
+        option.text = `${id} - ${name}`;
+        select.add(option);
+
+        alert(`${name} added successfully.`);
+
+        // Clear fields
+        document.getElementById('newStaffID').value = '';
+        document.getElementById('newStaffName').value = '';
+        document.getElementById('newStaffRole').value = '';
+    }
+
+    function deleteStaff() {
+        const select = document.getElementById('deleteStaffSelect');
+        const selectedOption = select.options[select.selectedIndex];
+        if(selectedOption) {
+            alert(`${selectedOption.text} deleted successfully.`);
+            select.remove(select.selectedIndex);
+        }
+    }
+</script>
 
 </body>
 </html>
