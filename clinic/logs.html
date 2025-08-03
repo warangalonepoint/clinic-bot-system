@@ -16,29 +16,28 @@
             background: #000;
             color: #fff;
             padding: 10px;
-            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .theme-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 20px;
-        }
-        .header-logo {
+        .header-left {
             display: flex;
             align-items: center;
         }
-        .header-logo img {
-            height: 30px;
+        .header-left img {
+            height: 25px;
             margin-right: 10px;
+        }
+        .theme-toggle {
+            font-size: 20px;
+            cursor: pointer;
         }
         .hero {
             text-align: center;
-            padding: 20px;
+            padding: 10px 0;
         }
         .hero img {
-            width: 50%;
+            width: 60%;
             max-width: 300px;
         }
         .container {
@@ -89,9 +88,9 @@
 </head>
 <body>
     <header>
-        <div class="header-logo">
-            <img src="logo.png" alt="Clinic Logo" />
-            Onestop AI Clinic Demo
+        <div class="header-left">
+            <img src="kakatiya-icon.png" alt="Logo">
+            <span>Onestop AI Clinic Demo</span>
         </div>
         <span class="theme-toggle" onclick="toggleTheme()">🌙</span>
     </header>
