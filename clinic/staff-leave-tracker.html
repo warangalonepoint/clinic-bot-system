@@ -1,69 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Staff Leave Tracker - Onestop AI Clinic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leave Tracker - Onestop AI Clinic</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="assets/styles.css">
 </head>
-<body>
-    <div class="header">
-        <h1>Leave Tracker</h1>
-        <button id="themeToggle">Toggle Theme</button>
-    </div>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+    <span>Onestop AI Clinic Demo</span>
+</div>
 
-    <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Employee ID</th>
-                    <th>Name</th>
-                    <th>Leave Date</th>
-                    <th>Reason</th>
-                </tr>
-            </thead>
-            <tbody id="leaveTableBody">
-                <!-- Leave entries will load here -->
-            </tbody>
-        </table>
-    </div>
+<div style="text-align:center; padding:20px;">
+    <img src="./assets/clinic-hero-banner.png" alt="Leave Tracker" style="width:80%; max-width:300px; border-radius:10px;">
+</div>
 
-    <footer>
-        <p>Powered by Onestop AI</p>
-    </footer>
+<h2 style="text-align:center;">Leave Tracker</h2>
 
-    <script>
-        // Theme Toggle Logic
-        const toggleButton = document.getElementById('themeToggle');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-        });
+<div style="padding: 0 20px;">
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <thead>
+            <tr style="background:#eee;">
+                <th style="padding:10px; border:1px solid #ddd;">Employee ID</th>
+                <th style="padding:10px; border:1px solid #ddd;">Name</th>
+                <th style="padding:10px; border:1px solid #ddd;">Date</th>
+                <th style="padding:10px; border:1px solid #ddd;">Reason</th>
+            </tr>
+        </thead>
+        <tbody id="leaveTable">
+            <tr>
+                <td style="padding:10px; border:1px solid #ddd;">STF001</td>
+                <td style="padding:10px; border:1px solid #ddd;">Arun Kumar</td>
+                <td style="padding:10px; border:1px solid #ddd;">2025-08-01</td>
+                <td style="padding:10px; border:1px solid #ddd;">Medical Leave</td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border:1px solid #ddd;">STF002</td>
+                <td style="padding:10px; border:1px solid #ddd;">Megha Rani</td>
+                <td style="padding:10px; border:1px solid #ddd;">2025-08-02</td>
+                <td style="padding:10px; border:1px solid #ddd;">Personal Leave</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
+<!-- Add Leave Entry -->
+<div style="padding:20px;">
+    <h3>Record a Leave</h3>
+    <input type="text" id="leaveEmpID" placeholder="Employee ID" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="leaveName" placeholder="Name" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="date" id="leaveDate" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="leaveReason" placeholder="Reason" style="width:100%; padding:10px; margin-bottom:10px;">
+    <button onclick="addLeaveEntry()" style="width:100%; padding:12px; background:black; color:white; border:none; font-size:16px;">Add Leave</button>
+</div>
 
-            fetch('staff-leave-tracker.csv')
-                .then(response => response.text())
-                .then(data => {
-                    const rows = data.trim().split('\n').slice(1);
-                    const tableBody = document.getElementById('leaveTableBody');
-                    rows.forEach(row => {
-                        const cols = row.split(',');
-                        const tr = document.createElement('tr');
-                        cols.forEach(col => {
-                            const td = document.createElement('td');
-                            td.textContent = col.trim();
-                            tr.appendChild(td);
-                        });
-                        tableBody.appendChild(tr);
-                    });
-                });
-        };
-    </script>
+<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+    Powered by Onestop AI
+</footer>
+
+<script>
+    function addLeaveEntry() {
+        const id = document.getElementById('leaveEmpID').value.trim();
+        const name = document.getElementById('leaveName').value.trim();
+        const date = document.getElementById('leaveDate').value;
+        const reason = document.getElementById('leaveReason').value.trim();
+
+        if(!id || !name || !date || !reason) {
+            alert('Please fill all fields.');
+            return;
+        }
+
+        const table = document.getElementById('leaveTable');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td style="padding:10px; border:1px solid #ddd;">${id}</td>
+            <td style="padding:10px; border:1px solid #ddd;">${name}</td>
+            <td style="padding:10px; border:1px solid #ddd;">${date}</td>
+            <td style="padding:10px; border:1px solid #ddd;">${reason}</td>
+        `;
+        table.appendChild(newRow);
+
+        alert(`Leave recorded for ${name}.`);
+
+        // Clear fields
+        document.getElementById('leaveEmpID').value = '';
+        document.getElementById('leaveName').value = '';
+        document.getElementById('leaveDate').value = '';
+        document.getElementById('leaveReason').value = '';
+    }
+</script>
+
 </body>
 </html>
