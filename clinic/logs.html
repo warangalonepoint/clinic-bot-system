@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Logs</title>
+    <title>Booking Logs - Onestop AI Clinic</title>
     <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
@@ -16,8 +16,8 @@
 <main class="logs-section">
     <h2>Booking Logs</h2>
     <div class="filters">
-        <input type="text" id="searchName" placeholder="Search by Name">
-        <select id="filterDate">
+        <input type="text" id="searchInput" placeholder="Search by Name">
+        <select id="dateFilter">
             <option value="All">All Dates</option>
         </select>
         <button onclick="resetFilters()">Reset</button>
@@ -27,11 +27,6 @@
         <p>Total Bookings: <span id="totalBookings">0</span></p>
         <p>Reminders Sent: <span id="remindersSent">0</span></p>
         <p>Next Token: <span id="nextToken">1</span></p>
-    </div>
-
-    <div class="export-buttons">
-        <button>Export CSV</button>
-        <button>Export PDF</button>
     </div>
 
     <table class="logs-table">
@@ -55,37 +50,77 @@
 <footer class="footer">Powered by Onestop AI</footer>
 
 <script>
+    let logsData = [];
+
     async function loadLogs() {
         const response = await fetch('./logs.csv');
         const data = await response.text();
         const rows = data.trim().split('\n').slice(1);
-        const logsBody = document.getElementById('logsBody');
-        logsBody.innerHTML = '';
-        
-        rows.forEach(row => {
-            const [token, date, time, name, reason, contact] = row.split(',');
-            logsBody.innerHTML += `
-                <tr>
-                    <td>${token}</td>
-                    <td>${date}</td>
-                    <td>${time}</td>
-                    <td>${name}</td>
-                    <td>${reason}</td>
-                    <td>${contact}</td>
-                    <td><button>Send</button></td>
-                </tr>
-            `;
+        logsData = rows.map(row => {
+            const [token, date, time, name, reason, contact, reminder] = row.split(',');
+            return { token, date, time, name, reason, contact, reminder };
         });
 
-        document.getElementById('totalBookings').textContent = rows.length;
-        document.getElementById('nextToken').textContent = rows.length + 1;
+        populateDateFilter();
+        renderLogs();
+    }
+
+    function populateDateFilter() {
+        const uniqueDates = [...new Set(logsData.map(log => log.date))];
+        const dateFilter = document.getElementById('dateFilter');
+        uniqueDates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            dateFilter.appendChild(option);
+        });
+    }
+
+    function renderLogs() {
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+        const dateQuery = document.getElementById('dateFilter').value;
+
+        const filteredLogs = logsData.filter(log => {
+            const matchesName = log.name.toLowerCase().includes(searchQuery);
+            const matchesDate = (dateQuery === 'All' || log.date === dateQuery);
+            return matchesName && matchesDate;
+        });
+
+        const tbody = document.getElementById('logsBody');
+        tbody.innerHTML = '';
+        filteredLogs.forEach(log => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${log.token}</td>
+                <td>${log.date}</td>
+                <td>${log.time}</td>
+                <td>${log.name}</td>
+                <td>${log.reason}</td>
+                <td>${log.contact}</td>
+                <td><button onclick="markReminder(this)">${log.reminder}</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('totalBookings').innerText = filteredLogs.length;
+        document.getElementById('nextToken').innerText = filteredLogs.length + 1;
+        document.getElementById('remindersSent').innerText = filteredLogs.filter(log => log.reminder === 'Yes').length;
     }
 
     function resetFilters() {
-        document.getElementById('searchName').value = '';
-        document.getElementById('filterDate').value = 'All';
-        // Future logic to refresh the table with all logs
+        document.getElementById('searchInput').value = '';
+        document.getElementById('dateFilter').value = 'All';
+        renderLogs();
     }
+
+    function markReminder(btn) {
+        btn.innerText = 'Yes';
+        btn.style.backgroundColor = '#28a745';
+        renderLogs();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderLogs);
+    document.getElementById('dateFilter').addEventListener('change', renderLogs);
 
     window.onload = loadLogs;
 </script>
