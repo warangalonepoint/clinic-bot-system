@@ -4,85 +4,32 @@
     <meta charset="UTF-8">
     <title>Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-            background: #f9f9f9;
-        }
-        .header {
-            background: #000;
-            color: #fff;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .header img {
-            height: 30px;
-            margin-right: 10px;
-        }
-        .banner {
-            text-align: center;
-            padding: 20px;
-        }
-        .banner img {
-            width: 80%;
-            max-width: 300px;
-            border-radius: 10px;
-        }
-        h2 {
-            text-align: center;
-            margin-top: 0;
-        }
-        .button-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 20px;
-        }
-        .btn {
-            background: #000;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 16px;
-        }
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #000;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-        }
-    </style>
 </head>
-<body>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
 
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
         <span>Onestop AI Clinic Demo</span>
     </div>
 
-    <div class="banner">
-        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
+    <div style="text-align:center; padding:20px;">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
     </div>
 
-    <h2>Clinic Dashboard</h2>
+    <h2 style="text-align:center;">Clinic Dashboard</h2>
 
-    <div class="button-grid">
-        <a href="bookings.html" class="btn">📅 Bookings</a>
-        <a href="logs.html" class="btn">📖 Logs</a>
-        <a href="staff-dashboard.html" class="btn">👥 Staff</a>
-        <a href="sync-panel.html" class="btn">🔄 Sync Panel</a>
-        <a href="confirmation.html" class="btn">✅ Confirmations</a>
-        <a href="token-summary.html" class="btn">🎟️ Tokens</a>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px;">
+        <a href="bookings.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📅 Bookings</a>
+        <a href="logs.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📖 Logs</a>
+        <a href="staff-dashboard.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">👥 Staff</a>
+        <a href="sync.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">🔄 Sync Panel</a>
+        <a href="confirmation.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">✅ Confirmations</a>
+        <a href="token-summary.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">🎟️ Tokens</a>
+        <a href="export-panel.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">📤 Export Panel</a>
+        <a href="reset-pin.html" style="background:#000; color:#fff; text-align:center; padding:15px; border-radius:10px; text-decoration:none;">♻️ Reset PIN</a>
     </div>
 
-    <footer>
+    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
         Powered by Onestop AI
     </footer>
 
