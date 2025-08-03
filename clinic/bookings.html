@@ -1,51 +1,96 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Logs - Onestop AI Clinic Demo</title>
-  <link rel="stylesheet" href="./assets/styles.css">
+    <meta charset="UTF-8">
+    <title>Book Appointment - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
-  <header>
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo">
-    <h1>Onestop AI Clinic Demo</h1>
-  </header>  <section class="hero-banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
-  </section>  <section class="logs-section">
-    <h2>Booking Logs</h2>
-    <div class="filters">
-      <input type="text" id="searchName" placeholder="Search by Name">
-      <select id="filterDate">
-        <option value="all">All Dates</option>
-      </select>
-      <button id="resetFilters">Reset</button>
-    </div>
-    <div class="summary">
-      <span id="totalBookings">Total Bookings: 0</span>
-      <span id="remindersSent">Reminders Sent: 0</span>
-      <span id="nextToken">Next Token: 1</span>
-    </div>
-    <div class="export-buttons">
-      <button id="exportCSV">Export CSV</button>
-      <button id="exportPDF">Export PDF</button>
-    </div><table id="logsTable">
-  <thead>
-    <tr>
-      <th>Token</th>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Patient Name</th>
-      <th>Reason</th>
-      <th>Contact</th>
-      <th>Reminder</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Logs will load here dynamically -->
-  </tbody>
-</table>
+    <header class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo">
+        <h1>Onestop AI Clinic Demo</h1>
+    </header>
 
-  </section>  <footer>
-    <p>Powered by Onestop AI</p>
-  </footer>  <script src="./assets/logs.js"></script></body>
+    <section class="hero-section">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" class="hero-image">
+    </section>
+
+    <section class="booking-section">
+        <h2>Book Your Appointment</h2>
+        <div class="form-container">
+            <select id="dateDropdown">
+                <option value="">Select Date</option>
+            </select>
+
+            <select id="timeDropdown">
+                <option value="">Select Time Slot</option>
+            </select>
+
+            <input type="text" id="patientName" placeholder="Patient Name">
+            <input type="text" id="visitReason" placeholder="Reason for Visit">
+
+            <button id="bookButton">Book on WhatsApp</button>
+        </div>
+    </section>
+
+    <footer>
+        Powered by Onestop AI
+    </footer>
+
+    <script>
+        const dateDropdown = document.getElementById('dateDropdown');
+        const timeDropdown = document.getElementById('timeDropdown');
+        const bookButton = document.getElementById('bookButton');
+
+        let slotsData = [];
+
+        fetch('./Slots.csv')
+            .then(response => response.text())
+            .then(data => {
+                const lines = data.trim().split('\n').slice(1); // Skip header
+                slotsData = lines.map(line => {
+                    const [date, time, status] = line.split(',');
+                    return { date, time, status };
+                });
+
+                const uniqueDates = [...new Set(slotsData.map(slot => slot.date))];
+                uniqueDates.forEach(date => {
+                    const option = document.createElement('option');
+                    option.value = date;
+                    option.textContent = date;
+                    dateDropdown.appendChild(option);
+                });
+            });
+
+        dateDropdown.addEventListener('change', () => {
+            const selectedDate = dateDropdown.value;
+            timeDropdown.innerHTML = '<option value="">Select Time Slot</option>';
+
+            const filteredSlots = slotsData.filter(slot => slot.date === selectedDate && slot.status.trim() === 'Available');
+            filteredSlots.forEach(slot => {
+                const option = document.createElement('option');
+                option.value = slot.time;
+                option.textContent = slot.time;
+                timeDropdown.appendChild(option);
+            });
+        });
+
+        bookButton.addEventListener('click', () => {
+            const date = dateDropdown.value;
+            const time = timeDropdown.value;
+            const name = document.getElementById('patientName').value;
+            const reason = document.getElementById('visitReason').value;
+
+            if (!date || !time || !name || !reason) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const whatsappMessage = `Appointment Booking:%0APatient Name: ${name}%0AReason: ${reason}%0ADate: ${date}%0ATime: ${time}`;
+            const whatsappLink = `https://wa.me/?text=${whatsappMessage}`;
+
+            window.open(whatsappLink, '_blank');
+        });
+    </script>
+</body>
 </html>
