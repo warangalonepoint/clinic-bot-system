@@ -1,47 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en" class="light-theme"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onestop AI Clinic Demo</title>
-    <link rel="stylesheet" href="assets/styles.css">
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <img src="assets/logo.png" alt="Clinic Logo" class="logo">
-        <h1 class="clinic-name">Onestop AI Clinic Demo</h1>
-        <button class="theme-toggle" id="themeToggle">🌙</button>
-    </header>
+    <link rel="stylesheet" href="./assets/styles.css">
+</head><body>
+    <header>
+        <img src="./logo.png" alt="Logo" class="logo">
+        <span class="title">Onestop AI Clinic Demo</span>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </header><img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
 
-    <!-- Hero Banner -->
-    <section class="hero-banner">
-        <img src="assets/clinic-hero-banner.png" alt="Clinic Banner">
-    </section>
+<main>
+    <div class="nav-links">
+        <a href="index.html">🏠 Home</a>
+        <a href="bookings.html">📚 Bookings</a>
+        <a href="logs.html">📖 Logs</a>
+        <a href="staff.html">👥 Staff</a>
+        <a href="staff-attendance.html">🗓️ Attendance</a>
+        <a href="sync-panel.html">🔄 Sync Panel</a>
+        <a href="confirmation.html">✅ Confirmations</a>
+    </div>
+</main>
 
-    <!-- Navigation Grid -->
-    <section class="nav-grid">
-        <a href="index.html" class="nav-button">🏠 Home</a>
-        <a href="bookings.html" class="nav-button">📚 Bookings</a>
-        <a href="logs.html" class="nav-button">📖 Logs</a>
-        <a href="staff-panel.html" class="nav-button">👥 Staff</a>
-        <a href="staff-attendance.html" class="nav-button">📅 Attendance</a>
-        <a href="whatsapp-log.html" class="nav-button">📲 WhatsApp</a>
-        <a href="sync-panel.html" class="nav-button">🔄 Sync Panel</a>
-        <a href="confirmation.html" class="nav-button">✅ Confirmations</a>
-    </section>
+<footer>
+    Powered by Onestop AI
+</footer>
 
-    <!-- Footer -->
-    <footer>
-        <p>Powered by Onestop AI</p>
-    </footer>
+<script>
+    function toggleTheme() {
+        document.documentElement.classList.toggle('dark-theme');
+        document.documentElement.classList.toggle('light-theme');
+    }
+</script>
 
-    <!-- Theme Toggle Script -->
-    <script>
-        const toggleButton = document.getElementById('themeToggle');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-        });
-    </script>
-</body>
-</html>
+</body></html>
