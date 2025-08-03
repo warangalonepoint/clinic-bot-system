@@ -1,42 +1,155 @@
-/* Base Reset */ body { margin: 0; font-family: 'Arial', sans-serif; background-color: #fff; color: #000; }
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color, #ffffff);
+    color: var(--text-color, #000000);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-/* Header */ .header { display: flex; align-items: center; justify-content: center; background-color: #000; padding: 10px; position: relative; }
+header {
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    justify-content: space-between;
+    position: relative;
+}
 
-.logo { width: 40px; height: 40px; margin-right: 10px; }
+header img.logo {
+    height: 30px;
+    margin-right: 10px;
+}
 
-.clinic-name { color: #fff; font-size: 24px; font-weight: bold; }
+header .title {
+    font-size: 18px;
+    font-weight: bold;
+    flex-grow: 1;
+}
 
-.toggle-theme { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #fff; }
+.theme-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+}
 
-/* Banner */ .hero-banner { width: 100%; max-width: 500px; margin: 0 auto; }
+.banner {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
 
-/* Logs Section */ .logs-section { padding: 20px; }
+main {
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
-.logs-section h2 { text-align: center; font-size: 22px; margin-bottom: 10px; }
+footer {
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    margin-top: auto;
+}
 
-.logs-summary { text-align: center; margin-bottom: 20px; font-size: 16px; }
+button, input, select {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 300px;
+    display: block;
+    box-sizing: border-box;
+}
 
-.logs-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
 
-.logs-table th, .logs-table td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 14px; }
+button:hover {
+    background-color: #218838;
+}
 
-.logs-table th { background-color: #f2f2f2; }
+.table-container {
+    overflow-x: auto;
+}
 
-.export-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
 
-.export-buttons button { background-color: #28a745; color: #fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
 
-/* Footer */ footer { background-color: #000; color: #fff; text-align: center; padding: 20px; position: fixed; width: 100%; bottom: 0; }
+th {
+    background-color: #f2f2f2;
+}
 
-/* Dark Mode */ body.dark-mode { background-color: #000; color: #fff; }
+a {
+    color: #007bff;
+    text-decoration: none;
+}
 
-body.dark-mode .header { background-color: #222; }
+a:hover {
+    text-decoration: underline;
+}
 
-body.dark-mode .toggle-theme { color: #fff; }
+/* Theme Variables */
+.light-theme {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+}
 
-body.dark-mode .logs-table th { background-color: #333; }
+.dark-theme {
+    --bg-color: #121212;
+    --text-color: #ffffff;
+}
 
-body.dark-mode .export-buttons button { background-color: #444; }
+button.export-btn {
+    background-color: #007bff;
+    margin-right: 10px;
+}
 
-body.dark-mode footer { background-color: #222; }
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
 
+.nav-links a {
+    padding: 10px 15px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 10px;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .nav-links a {
+        width: 100px;
+    }
+}
