@@ -1,38 +1,34 @@
-/* Base Styles */ body { margin: 0; font-family: Arial, sans-serif; background-color: #ffffff; color: #000000; }
+/* styles.css */ body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; }
 
-.header { display: flex; align-items: center; background-color: #000; color: #fff; padding: 10px 15px; }
+.header { background-color: #000; color: #fff; display: flex; align-items: center; padding: 10px; }
 
 .logo { width: 30px; height: 30px; margin-right: 10px; }
 
-.clinic-title { font-size: 16px; font-weight: bold; }
+.title { font-size: 1.2rem; font-weight: bold; }
 
-.hero-banner img { width: 100%; height: auto; display: block; }
+.hero-banner { width: 100%; height: auto; }
 
-h2 { text-align: center; margin: 20px 0 10px; font-size: 20px; }
+.logs-section { padding: 10px; }
 
-.filters, .summary, .export-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0; }
+.filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 
-.filters input, .filters select, .filters button { padding: 10px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; flex: 1 1 40%; min-width: 120px; }
+.filters input, .filters select, .filters button { padding: 8px; font-size: 1rem; flex: 1; min-width: 120px; }
 
-button { background-color: #000; color: #fff; border: none; border-radius: 6px; padding: 10px 15px; cursor: pointer; font-size: 14px; }
+.summary { margin-bottom: 10px; }
 
-button:hover { background-color: #333; }
+.export-buttons { margin-bottom: 10px; }
 
-.table-container, .logs-table, .staff-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+.export-buttons button { padding: 8px 12px; margin-right: 10px; }
 
-.logs-table th, .logs-table td, .staff-table th, .staff-table td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 14px; }
+.table-container { overflow-x: auto; }
 
-.footer { background-color: #000; color: #fff; text-align: center; padding: 10px 0; position: fixed; width: 100%; bottom: 0; }
+.logs-table { width: 100%; border-collapse: collapse; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-.booking-section form { display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: 0 auto; }
+.logs-table th, .logs-table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
 
-.booking-section input, .booking-section select { padding: 10px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; }
+.footer { text-align: center; padding: 10px; background-color: #000; color: #fff; position: fixed; bottom: 0; width: 100%; }
 
-.confirmation-details p { margin: 5px 0; text-align: center; }
+@media (max-width: 600px) { .filters { flex-direction: column; } }
 
-.sync-section { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 20px; }
-
-@media (min-width: 600px) { .sync-section { flex-direction: row; justify-content: center; } }
-
-button:disabled { background-color: #ccc; cursor: not-allowed; }
+/* JS will populate the logs dynamically */
 
