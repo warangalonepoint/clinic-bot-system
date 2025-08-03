@@ -2,86 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Onestop AI Clinic Demo - Book Appointment</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment - Onestop AI Clinic Demo</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <header class="header">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="clinic-logo">
-        <span class="clinic-title">Onestop AI Clinic Demo</span>
-    </header>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
 
-    <main>
-        <img src="./assets/doctor-illustration.png" alt="Doctor Illustration" class="hero-image">
-        <h2>Book Your Appointment</h2>
-        <form id="bookingForm">
-            <select id="dateSelect" required>
-                <option value="">Select Date</option>
-            </select>
-            <select id="timeSelect" required>
-                <option value="">Select Time Slot</option>
-            </select>
-            <input type="text" id="patientName" placeholder="Patient Name" required>
-            <input type="text" id="reason" placeholder="Reason for Visit" required>
-            <button type="submit">Book on WhatsApp</button>
-        </form>
-    </main>
+    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+        <span>Onestop AI Clinic Demo</span>
+    </div>
 
-    <footer>
+    <div style="text-align:center; padding:20px;">
+        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
+    </div>
+
+    <h2 style="text-align:center;">Book Your Appointment</h2>
+
+    <div style="padding: 0 20px;">
+        <select id="dateSelect" style="width:100%; padding:10px; margin-bottom:10px;"></select>
+        <select id="timeSelect" style="width:100%; padding:10px; margin-bottom:10px;"></select>
+        <input type="text" id="patientName" placeholder="Patient Name" style="width:100%; padding:10px; margin-bottom:10px;">
+        <input type="text" id="reason" placeholder="Reason for Visit" style="width:100%; padding:10px; margin-bottom:10px;">
+        <button onclick="bookWhatsApp()" style="width:100%; padding:12px; background:black; color:white; border:none; font-size:16px;">Book on WhatsApp</button>
+    </div>
+
+    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
         Powered by Onestop AI
     </footer>
 
     <script>
+        const slots = [
+            { date: '2025-08-01', time: '17:00', status: 'Available' },
+            { date: '2025-08-01', time: '17:20', status: 'Available' },
+            { date: '2025-08-02', time: '17:00', status: 'Available' },
+            { date: '2025-08-02', time: '17:10', status: 'Available' },
+            { date: '2025-08-03', time: '16:00', status: 'Available' },
+            { date: '2025-08-03', time: '16:10', status: 'Available' }
+        ];
+
         const dateSelect = document.getElementById('dateSelect');
         const timeSelect = document.getElementById('timeSelect');
-        const bookingForm = document.getElementById('bookingForm');
 
-        let slotsData = [];
-
-        async function fetchSlots() {
-            const response = await fetch('./Slots.csv');
-            const text = await response.text();
-            const lines = text.trim().split('\n').slice(1);
-
-            slotsData = lines.map(line => {
-                const [date, time, status] = line.split(',');
-                return { date, time, status };
-            });
-
-            const uniqueDates = [...new Set(slotsData.map(slot => slot.date))];
+        function loadDates() {
+            const uniqueDates = [...new Set(slots.map(s => s.date))];
+            dateSelect.innerHTML = '<option value="">Select Date</option>';
             uniqueDates.forEach(date => {
-                const option = document.createElement('option');
-                option.value = date;
-                option.textContent = date;
-                dateSelect.appendChild(option);
+                dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
             });
         }
 
-        dateSelect.addEventListener('change', () => {
+        function loadTimeSlots(selectedDate) {
             timeSelect.innerHTML = '<option value="">Select Time Slot</option>';
-            const selectedDate = dateSelect.value;
-            const availableSlots = slotsData.filter(slot => slot.date === selectedDate && slot.status.trim() === 'Available');
-            availableSlots.forEach(slot => {
-                const option = document.createElement('option');
-                option.value = slot.time;
-                option.textContent = slot.time;
-                timeSelect.appendChild(option);
-            });
+            slots.filter(s => s.date === selectedDate && s.status === 'Available')
+                 .forEach(slot => {
+                     timeSelect.innerHTML += `<option value="${slot.time}">${slot.time}</option>`;
+                 });
+        }
+
+        dateSelect.addEventListener('change', function() {
+            loadTimeSlots(this.value);
         });
 
-        bookingForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('patientName').value.trim();
-            const reason = document.getElementById('reason').value.trim();
+        function bookWhatsApp() {
             const date = dateSelect.value;
             const time = timeSelect.value;
-            const message = `Appointment Booking:\nName: ${name}\nDate: ${date}\nTime: ${time}\nReason: ${reason}`;
-            const whatsappLink = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(whatsappLink, '_blank');
-        });
+            const name = document.getElementById('patientName').value;
+            const reason = document.getElementById('reason').value;
 
-        fetchSlots();
+            if(!date || !time || !name || !reason) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const message = `Appointment Booking:\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${time}`;
+            const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
+            window.open(whatsappLink, '_blank');
+        }
+
+        loadDates();
     </script>
+
 </body>
 </html>
