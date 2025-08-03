@@ -1,51 +1,92 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Roster - OneStop AI Clinic</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <title>Staff Roster - Onestop AI Clinic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-  <header>
-    <h1>Staff Roster Schedule</h1>
-  </header>  <section class="roster-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Employee ID</th>
-          <th>Name</th>
-          <th>Shift Date</th>
-          <th>Shift Time</th>
-          <th>Assigned Role</th>
-        </tr>
-      </thead>
-      <tbody id="rosterBody">
-      </tbody>
+<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
+    <span>Onestop AI Clinic Demo</span>
+</div>
+
+<div style="text-align:center; padding:20px;">
+    <img src="./assets/clinic-hero-banner.png" alt="Staff Roster" style="width:80%; max-width:300px; border-radius:10px;">
+</div>
+
+<h2 style="text-align:center;">Staff Roster</h2>
+
+<div style="padding: 0 20px;">
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <thead>
+            <tr style="background:#eee;">
+                <th style="padding:10px; border:1px solid #ddd;">Employee ID</th>
+                <th style="padding:10px; border:1px solid #ddd;">Name</th>
+                <th style="padding:10px; border:1px solid #ddd;">Shift</th>
+                <th style="padding:10px; border:1px solid #ddd;">Day</th>
+            </tr>
+        </thead>
+        <tbody id="rosterTable">
+            <tr>
+                <td style="padding:10px; border:1px solid #ddd;">STF001</td>
+                <td style="padding:10px; border:1px solid #ddd;">Arun Kumar</td>
+                <td style="padding:10px; border:1px solid #ddd;">Morning</td>
+                <td style="padding:10px; border:1px solid #ddd;">Monday</td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border:1px solid #ddd;">STF002</td>
+                <td style="padding:10px; border:1px solid #ddd;">Megha Rani</td>
+                <td style="padding:10px; border:1px solid #ddd;">Evening</td>
+                <td style="padding:10px; border:1px solid #ddd;">Tuesday</td>
+            </tr>
+        </tbody>
     </table>
-  </section>  <script>
-    const rosterUrl = "staff-roster.csv";
+</div>
 
-    fetch(rosterUrl)
-      .then(res => res.text())
-      .then(data => {
-        const lines = data.trim().split('\n').slice(1);
-        const roster = lines.map(line => {
-          const [id, name, date, time, role] = line.split(',');
-          return { id, name, date, time, role };
-        });
+<!-- Add New Roster Entry -->
+<div style="padding:20px;">
+    <h3>Add to Roster</h3>
+    <input type="text" id="rosterEmpID" placeholder="Employee ID" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="rosterName" placeholder="Name" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="rosterShift" placeholder="Shift (Morning/Evening)" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="rosterDay" placeholder="Day" style="width:100%; padding:10px; margin-bottom:10px;">
+    <button onclick="addRosterEntry()" style="width:100%; padding:12px; background:black; color:white; border:none; font-size:16px;">Add to Roster</button>
+</div>
 
-        const tbody = document.getElementById('rosterBody');
-        roster.forEach(entry => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${entry.id}</td>
-            <td>${entry.name}</td>
-            <td>${entry.date}</td>
-            <td>${entry.time}</td>
-            <td>${entry.role}</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-  </script></body>
+<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
+    Powered by Onestop AI
+</footer>
+
+<script>
+    function addRosterEntry() {
+        const id = document.getElementById('rosterEmpID').value.trim();
+        const name = document.getElementById('rosterName').value.trim();
+        const shift = document.getElementById('rosterShift').value.trim();
+        const day = document.getElementById('rosterDay').value.trim();
+
+        if(!id || !name || !shift || !day) {
+            alert('Please fill all fields.');
+            return;
+        }
+
+        const table = document.getElementById('rosterTable');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td style="padding:10px; border:1px solid #ddd;">${id}</td>
+            <td style="padding:10px; border:1px solid #ddd;">${name}</td>
+            <td style="padding:10px; border:1px solid #ddd;">${shift}</td>
+            <td style="padding:10px; border:1px solid #ddd;">${day}</td>
+        `;
+        table.appendChild(newRow);
+
+        alert(`${name} added to roster.`);
+
+        // Clear fields
+        document.getElementById('rosterEmpID').value = '';
+        document.getElementById('rosterName').value = '';
+        document.getElementById('rosterShift').value = '';
+        document.getElementById('rosterDay').value = '';
+    }
+</script>
+
+</body>
 </html>
