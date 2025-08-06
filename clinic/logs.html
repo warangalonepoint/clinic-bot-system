@@ -1,70 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Booking Logs - Onestop AI Clinic Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Logs - Onestop AI Clinic Demo</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f5f5f5;
-        }
-        .header {
-            background: #000;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-        }
-        .header img {
-            height: 24px;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        .banner {
-            width: 100%;
-            max-width: 600px;
-            display: block;
-            margin: 20px auto;
-        }
-        .title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .embed-container {
-            width: 100%;
-            height: 600px;
-            border: none;
-            margin-top: 20px;
-        }
-        .footer {
-            background: #000;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
+        header { background: #000; color: #fff; padding: 10px; text-align: center; }
+        .banner { text-align: center; padding: 20px; background: #fff; }
+        .banner img { width: 100%; max-width: 600px; border-radius: 20px; }
+        h1 { text-align: center; margin-top: 20px; }
+        table { width: 90%; margin: 20px auto; border-collapse: collapse; background: #fff; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+        th { background: #000; color: #fff; }
+        button { background: #000; color: #fff; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
+        footer { background: #000; color: #fff; text-align: center; padding: 10px; position: fixed; width: 100%; bottom: 0; }
     </style>
 </head>
-<body>
-
-<div class="header">
-    <img src="./assets/warangal-icon.png" alt="Logo">
-    Onestop AI Clinic Demo
-</div>
-
-<img src="./assets/clinic-hero-banner.png" class="banner" alt="Banner">
-
-<div class="title">Booking Logs</div>
-
-<iframe class="embed-container" src="https://airtable.com/embed/appgIT8WiqnZlR44Y/shriTI45uOVNTvMWZ?viewControls=on" frameborder="0"></iframe>
-
-<div class="footer">
+<body><header>
+    <img src="./assets/logo.png" alt="Logo" height="30">
+    <div>Onestop AI Clinic Demo</div>
+</header><div class="banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Clinic Hero">
+</div><h1>Booking Logs</h1><table id="logsTable">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Patient Name</th>
+            <th>Reason</th>
+            <th>Contact</th>
+            <th>Reminder</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Data will be injected here -->
+    </tbody>
+</table><footer>
     Powered by Onestop AI
-</div>
+</footer><script>
+const airtableApiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+const baseId = 'appgIT8WiqnZlR44Y';
+const tableName = 'BookingsLogs';
 
-</body>
+async function fetchLogs() {
+    const url = `https://api.airtable.com/v0/${baseId}/${tableName}`;
+
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${airtableApiKey}`
+        }
+    });
+
+    const data = await response.json();
+    const tbody = document.querySelector('#logsTable tbody');
+    tbody.innerHTML = '';
+
+    data.records.forEach(record => {
+        const row = document.createElement('tr');
+
+        const dateCell = document.createElement('td');
+        dateCell.textContent = record.fields.Timestamp ? record.fields.Timestamp.split(',')[0] : '';
+        row.appendChild(dateCell);
+
+        const timeCell = document.createElement('td');
+        timeCell.textContent = record.fields['Slot Time'] || '';
+        row.appendChild(timeCell);
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = record.fields['Patient Name'] || '';
+        row.appendChild(nameCell);
+
+        const reasonCell = document.createElement('td');
+        reasonCell.textContent = record.fields.Reason || '';
+        row.appendChild(reasonCell);
+
+        const contactCell = document.createElement('td');
+        contactCell.textContent = record.fields.Contact || '';
+        row.appendChild(contactCell);
+
+        const reminderCell = document.createElement('td');
+        const reminderBtn = document.createElement('button');
+        reminderBtn.textContent = 'Send Reminder';
+        reminderBtn.onclick = () => alert(`Reminder sent to ${record.fields.Contact}`);
+        reminderCell.appendChild(reminderBtn);
+        row.appendChild(reminderCell);
+
+        tbody.appendChild(row);
+    });
+}
+
+fetchLogs();
+</script></body>
 </html>
