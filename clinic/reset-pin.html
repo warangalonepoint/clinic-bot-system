@@ -1,116 +1,33 @@
 <!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reset Dashboard PIN - Onestop AI Clinic Demo</title>
+    <title>Reset PIN - Onestop AI Clinic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-            background: #ffffff;
-            color: #000000;
-            text-align: center;
-        }
-        .header {
-            background: #000;
-            color: #fff;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .header img {
-            height: 30px;
-            margin-right: 10px;
-        }
-        .banner {
-            padding: 20px;
-        }
-        .banner img {
-            width: 80%;
-            max-width: 300px;
-            border-radius: 10px;
-        }
-        .input-field {
-            width: 80%;
-            max-width: 300px;
-            padding: 10px;
-            margin: 10px auto;
-            font-size: 16px;
-            display: block;
-        }
-        .button {
-            width: 80%;
-            max-width: 300px;
-            padding: 12px;
-            margin: 10px auto;
-            background: #000;
-            color: #fff;
-            border: none;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: block;
-        }
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #000;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
+        .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+        .header img { height: 30px; vertical-align: middle; margin-right: 10px; }
+        .hero-banner { width: 100%; max-width: 400px; margin: 20px auto; display: block; border-radius: 10px; }
+        .container { text-align: center; padding: 20px; }
+        input { width: 80%; max-width: 300px; padding: 10px; margin: 10px 0; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+        .btn { background: #000; color: #fff; padding: 12px 25px; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; text-align: center; padding: 10px 0; font-size: 14px; }
     </style>
 </head>
-<body><div class="header">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-    <span>Onestop AI Clinic Demo</span>
+<body>
+    <div class="header">
+        <img src="assets/clinic-logo.png" alt="Logo">
+        Onestop AI Clinic Demo
+    </div><img src="assets/clinic-hero-banner.png" alt="Banner" class="hero-banner">
+
+<div class="container">
+    <h2>Reset PIN</h2>
+    <input type="text" placeholder="Enter New PIN">
+    <input type="text" placeholder="Confirm New PIN">
+    <button class="btn" onclick="alert('PIN Reset Successfully! (Demo)')">Reset PIN</button>
 </div>
 
-<div class="banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
-</div>
-
-<h2>Reset Dashboard PIN</h2>
-
-<input type="password" id="currentPin" class="input-field" placeholder="Enter Current PIN">
-<input type="password" id="newPin" class="input-field" placeholder="Enter New PIN">
-<input type="password" id="confirmPin" class="input-field" placeholder="Confirm New PIN">
-<button class="button" onclick="resetPin()">Set New PIN</button>
-
-<footer>
-    Powered by Onestop AI
-</footer>
-
-<script>
-    let storedPin = localStorage.getItem('dashboardPin') || '2525';
-
-    function resetPin() {
-        const currentPin = document.getElementById('currentPin').value;
-        const newPin = document.getElementById('newPin').value;
-        const confirmPin = document.getElementById('confirmPin').value;
-
-        if (currentPin !== storedPin) {
-            alert('Current PIN is incorrect!');
-            return;
-        }
-
-        if (newPin.length < 4) {
-            alert('New PIN must be at least 4 digits.');
-            return;
-        }
-
-        if (newPin !== confirmPin) {
-            alert('New PIN and Confirm PIN do not match.');
-            return;
-        }
-
-        localStorage.setItem('dashboardPin', newPin);
-        storedPin = newPin;
-        alert('PIN successfully updated!');
-        window.location.href = 'index.html';
-    }
-</script>
+<footer>Powered by Onestop AI</footer>
 
 </body>
 </html>
