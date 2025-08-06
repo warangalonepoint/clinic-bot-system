@@ -9,7 +9,7 @@
         .banner { width: 100%; max-width: 400px; margin: 20px auto; }
         .form-group { margin: 10px 0; }
         input, select { padding: 10px; width: 80%; max-width: 300px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background: black; color: white; border: none; cursor: pointer; }
+        button { padding: 10px 20px; background: black; color: white; border: none; cursor: pointer; margin: 5px; }
         footer { position: fixed; bottom: 0; width: 100%; background: black; color: white; padding: 5px 0; }
     </style>
 </head>
@@ -22,7 +22,7 @@
 
     <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
 
-    <h2>Add Staff</h2>
+    <h2>Staff Panel</h2>
 
     <div class="form-group">
         <input type="text" id="staffName" placeholder="Staff Name">
@@ -42,9 +42,18 @@
 
     <button onclick="addStaff()">Add Staff</button>
 
+    <h3>Delete Staff</h3>
+    <div class="form-group">
+        <input type="text" id="deleteStaffName" placeholder="Enter Name to Delete">
+    </div>
+    <button onclick="deleteStaff()">Delete Staff</button>
+
     <footer>Powered by Onestop AI</footer>
 
     <script>
+        const airtableApiUrl = "https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList";
+        const airtableApiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
+
         async function addStaff() {
             const name = document.getElementById('staffName').value;
             const role = document.getElementById('staffRole').value;
@@ -56,26 +65,15 @@
                 return;
             }
 
-            const airtableApiUrl = "https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList";
-            const airtableApiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
-
             const data = {
                 records: [{
-                    fields: {
-                        Name: name,
-                        Role: role,
-                        Contact: contact,
-                        Status: status
-                    }
+                    fields: { Name: name, Role: role, Contact: contact, Status: status }
                 }]
             };
 
             const response = await fetch(airtableApiUrl, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + airtableApiKey
-                },
+                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + airtableApiKey },
                 body: JSON.stringify(data)
             });
 
@@ -87,6 +85,38 @@
                 document.getElementById('staffStatus').value = 'Active';
             } else {
                 alert("Failed to add staff.");
+            }
+        }
+
+        async function deleteStaff() {
+            const deleteName = document.getElementById('deleteStaffName').value;
+            if (!deleteName) {
+                alert("Please enter a name to delete.");
+                return;
+            }
+
+            const listResponse = await fetch(`${airtableApiUrl}?filterByFormula=Name="${deleteName}"`, {
+                headers: { "Authorization": "Bearer " + airtableApiKey }
+            });
+
+            const listData = await listResponse.json();
+            if (listData.records.length === 0) {
+                alert("No staff found with that name.");
+                return;
+            }
+
+            const recordId = listData.records[0].id;
+
+            const deleteResponse = await fetch(`${airtableApiUrl}/${recordId}`, {
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + airtableApiKey }
+            });
+
+            if (deleteResponse.ok) {
+                alert("Staff deleted successfully.");
+                document.getElementById('deleteStaffName').value = '';
+            } else {
+                alert("Failed to delete staff.");
             }
         }
     </script>
