@@ -1,125 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Staff Panel — Onestop AI Clinic</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #f8f8f8; }
-        .header { background: black; color: white; padding: 10px; }
-        .banner { width: 100%; max-width: 400px; margin: 20px auto; }
-        .form-group { margin: 10px 0; }
-        input, select { padding: 10px; width: 80%; max-width: 300px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background: black; color: white; border: none; cursor: pointer; margin: 5px; }
-        footer { position: fixed; bottom: 0; width: 100%; background: black; color: white; padding: 5px 0; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Staff Panel — Onestop AI Clinic</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f8f8f8; margin: 0;}
+    .header { background: black; color: white; padding: 10px; }
+    .header img { height:30px; vertical-align: middle; margin-right: 8px;}
+    .banner { width: 100%; max-width: 400px; margin: 20px auto; }
+    .form-group { margin: 10px 0; }
+    input, select { padding: 10px; width: 80%; max-width: 280px; margin-bottom: 10px; }
+    button { padding: 10px 20px; background: black; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 5px; }
+    footer { background: black; color: white; padding: 8px; position: fixed; bottom: 0; width: 100%; }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Logo" style="height:30px; vertical-align: middle;">
-        <span>Onestop AI Clinic Demo</span>
-    </div>
+  <div class="header">
+    <img src="./assets/clinic-logo.png" alt="Logo">
+    <span>Onestop AI Clinic Demo</span>
+  </div>
 
-    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
+  <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
 
-    <h2>Staff Panel</h2>
+  <h2>Add Staff</h2>
+  <div class="form-group"><input type="text" id="staffName" placeholder="Staff Name"></div>
+  <div class="form-group"><input type="text" id="staffRole" placeholder="Role"></div>
+  <div class="form-group"><input type="text" id="staffContact" placeholder="Contact Number"></div>
+  <div class="form-group">
+    <select id="staffStatus">
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+  </div>
+  <button onclick="redirectToForm()">Add Staff via Airtable Form</button>
 
-    <div class="form-group">
-        <input type="text" id="staffName" placeholder="Staff Name">
-    </div>
-    <div class="form-group">
-        <input type="text" id="staffRole" placeholder="Role (Doctor/Nurse)">
-    </div>
-    <div class="form-group">
-        <input type="text" id="staffContact" placeholder="Contact Number">
-    </div>
-    <div class="form-group">
-        <select id="staffStatus">
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-        </select>
-    </div>
+  <h2>Delete Staff</h2>
+  <div class="form-group"><input type="text" id="deleteStaffName" placeholder="Name to Delete"></div>
+  <button onclick="deleteStaff()">Delete Staff</button>
 
-    <button onclick="addStaff()">Add Staff</button>
+  <footer>Powered by Onestop AI</footer>
 
-    <h3>Delete Staff</h3>
-    <div class="form-group">
-        <input type="text" id="deleteStaffName" placeholder="Enter Name to Delete">
-    </div>
-    <button onclick="deleteStaff()">Delete Staff</button>
+  <script>
+    async function deleteStaff() {
+      const name = document.getElementById('deleteStaffName').value.trim();
+      if (!name) {
+        alert('Enter a name to delete.');
+        return;
+      }
+      const url = "https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList?filterByFormula=Name=\""+encodeURIComponent(name)+"\"";
+      const res = await fetch(url, {
+        headers: { "Authorization": "Bearer patLNwoJQKE3Tjb8J.c2a0...yourKey" }
+      });
+      const { records } = await res.json();
+      if (!records || records.length === 0) {
+        alert('Staff not found.');
+        return;
+      }
+      const recId = records[0].id;
+      const delRes = await fetch("https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList/" + recId, {
+        method: 'DELETE',
+        headers: { "Authorization": "Bearer patLNwoJQKE3Tjb8J.c2a0...yourKey" }
+      });
+      if (delRes.ok) {
+        alert('Deleted successfully.');
+        document.getElementById('deleteStaffName').value = '';
+      } else {
+        alert('Delete failed.');
+      }
+    }
 
-    <footer>Powered by Onestop AI</footer>
-
-    <script>
-        const airtableApiUrl = "https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList";
-        const airtableApiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
-
-        async function addStaff() {
-            const name = document.getElementById('staffName').value;
-            const role = document.getElementById('staffRole').value;
-            const contact = document.getElementById('staffContact').value;
-            const status = document.getElementById('staffStatus').value;
-
-            if (!name || !role || !contact) {
-                alert("Please fill all fields.");
-                return;
-            }
-
-            const data = {
-                records: [{
-                    fields: { Name: name, Role: role, Contact: contact, Status: status }
-                }]
-            };
-
-            const response = await fetch(airtableApiUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + airtableApiKey },
-                body: JSON.stringify(data)
-            });
-
-            if (response.ok) {
-                alert("Staff added successfully!");
-                document.getElementById('staffName').value = '';
-                document.getElementById('staffRole').value = '';
-                document.getElementById('staffContact').value = '';
-                document.getElementById('staffStatus').value = 'Active';
-            } else {
-                alert("Failed to add staff.");
-            }
-        }
-
-        async function deleteStaff() {
-            const deleteName = document.getElementById('deleteStaffName').value;
-            if (!deleteName) {
-                alert("Please enter a name to delete.");
-                return;
-            }
-
-            const listResponse = await fetch(`${airtableApiUrl}?filterByFormula=Name="${deleteName}"`, {
-                headers: { "Authorization": "Bearer " + airtableApiKey }
-            });
-
-            const listData = await listResponse.json();
-            if (listData.records.length === 0) {
-                alert("No staff found with that name.");
-                return;
-            }
-
-            const recordId = listData.records[0].id;
-
-            const deleteResponse = await fetch(`${airtableApiUrl}/${recordId}`, {
-                method: "DELETE",
-                headers: { "Authorization": "Bearer " + airtableApiKey }
-            });
-
-            if (deleteResponse.ok) {
-                alert("Staff deleted successfully.");
-                document.getElementById('deleteStaffName').value = '';
-            } else {
-                alert("Failed to delete staff.");
-            }
-        }
-    </script>
-
+    function redirectToForm() {
+      const name = document.getElementById('staffName').value.trim();
+      const role = document.getElementById('staffRole').value.trim();
+      const contact = document.getElementById('staffContact').value.trim();
+      const status = document.getElementById('staffStatus').value;
+      if (!name || !role || !contact) {
+        alert('Please fill all fields.');
+        return;
+      }
+      const baseFormUrl = "https://airtable.com/appgIT8WiqnZlR44Y/shrkrP7Bk4Gxco65O";
+      const params = `?prefill_Name=${encodeURIComponent(name)}&prefill_Role=${encodeURIComponent(role)}&prefill_Contact=${encodeURIComponent(contact)}&prefill_Status=${encodeURIComponent(status)}`;
+      window.open(baseFormUrl + params, '_blank');
+    }
+  </script>
 </body>
 </html>
