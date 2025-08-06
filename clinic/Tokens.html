@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Token Summary - Onestop Clinic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f5f5f5; padding: 20px; }
+        .header { background: black; color: white; padding: 15px; font-size: 20px; }
+        .token-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .token-no { font-size: 24px; font-weight: bold; }
+        .slot-time { color: #333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">Today's Token Summary</div>
+
+    <div id="tokenList">Loading tokens...</div>
+
+    <script>
+        const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+        const BASE_ID = 'appgIT8WiqnZlR44Y';
+        const BOOKINGS_TABLE = 'BookingsLogs';
+
+        function fetchTokens() {
+            fetch(`https://api.airtable.com/v0/${BASE_ID}/${BOOKINGS_TABLE}?sort%5B0%5D%5Bfield%5D=Timestamp&sort%5B0%5D%5Bdirection%5D=asc`, {
+                headers: { 'Authorization': `Bearer ${API_KEY}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tokenList = document.getElementById('tokenList');
+                tokenList.innerHTML = '';
+
+                let tokenNo = 1;
+                const today = new Date().toISOString().split('T')[0];
+
+                data.records.forEach(record => {
+                    const timestamp = record.fields.Timestamp;
+                    const slotTime = record.fields['Slot Time'];
+                    const patientName = record.fields['Patient Name'];
+
+                    if (timestamp && timestamp.includes(today)) {
+                        const card = document.createElement('div');
+                        card.className = 'token-card';
+                        card.innerHTML = `
+                            <div class="token-no">Token #${tokenNo}</div>
+                            <div>Patient: ${patientName}</div>
+                            <div class="slot-time">Slot: ${slotTime}</div>
+                        `;
+                        tokenList.appendChild(card);
+                        tokenNo++;
+                    }
+                });
+
+                if (tokenNo === 1) {
+                    tokenList.innerHTML = 'No bookings yet today.';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('tokenList').innerText = 'Failed to load tokens.';
+            });
+        }
+
+        fetchTokens();
+    </script>
+
+</body>
+</html>
