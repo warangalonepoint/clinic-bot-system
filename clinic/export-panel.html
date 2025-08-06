@@ -2,90 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Export Panel - Onestop AI Clinic Demo</title>
+    <title>Export Panel - Onestop AI Clinic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-            background: #ffffff;
-            color: #000000;
-            text-align: center;
-        }
-        .header {
-            background: #000;
-            color: #fff;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .header img {
-            height: 30px;
-            margin-right: 10px;
-        }
-        .banner {
-            padding: 20px;
-        }
-        .banner img {
-            width: 80%;
-            max-width: 300px;
-            border-radius: 10px;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .button {
-            width: 80%;
-            max-width: 300px;
-            padding: 12px;
-            margin: 10px auto;
-            background: #000;
-            color: #fff;
-            border: none;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: block;
-            text-decoration: none;
-        }
-        .note {
-            margin: 20px;
-            font-size: 14px;
-        }
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #000;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f5f5f5; padding: 20px; }
+        .header { background: black; color: white; padding: 15px; font-size: 20px; }
+        .export-btn { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; font-size: 18px; background: #333; color: white; text-decoration: none; display: inline-block; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-        <span>Onestop AI Clinic Demo</span>
-    </div>
+    <div class="header">Export Panel</div>
 
-    <div class="banner">
-        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration">
-    </div>
+    <a href="https://airtable.com/appgIT8WiqnZlR44Y/tbl9eFDXv7OF6YFfy/viwq2Nc2IXkfGgbgo?blocks=hide" target="_blank" class="export-btn">📥 Export Bookings Logs</a>
 
-    <h2>Export Panel</h2>
-
-    <a href="./logs.csv" download class="button">⬇️ Download logs.csv Backup</a>
-    <a href="./slots.csv" download class="button">⬇️ Download slots.csv Backup</a>
-
-    <div class="note">
-        Note: These files reflect the most recent booking and slot data and are auto-updated when changes are pushed to GitHub.
-    </div>
-
-    <footer>
-        Powered by Onestop AI
-    </footer>
+    <a href="https://airtable.com/appgIT8WiqnZlR44Y/tblam7hybkDxHQSpg/viwpIFbCBqeBxXcg?blocks=hide" target="_blank" class="export-btn">📥 Export Available Slots</a>
 
 </body>
 </html>
