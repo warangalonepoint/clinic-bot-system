@@ -1,70 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
-    <title>Token Summary - Onestop Clinic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Summary - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="./assets/styles.css">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #f5f5f5; padding: 20px; }
-        .header { background: black; color: white; padding: 15px; font-size: 20px; }
-        .token-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .token-no { font-size: 24px; font-weight: bold; }
-        .slot-time { color: #333; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+        .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+        .header img { height: 40px; }
+        .container { padding: 20px; }
+        .banner { width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background: #222; color: #fff; }
     </style>
-</head>
-<body>
+</head><body>
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <h1>Onestop AI Clinic Demo</h1>
+    </div><div class="container">
+    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
+    <h2>Token Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Total Tokens</th>
+            </tr>
+        </thead>
+        <tbody id="tokenTable">
+            <!-- Data will load here -->
+        </tbody>
+    </table>
+</div>
 
-    <div class="header">Today's Token Summary</div>
+<script>
+    const tokenData = [
+        { date: '2025-08-07', tokens: 12 },
+        { date: '2025-08-08', tokens: 8 },
+        { date: '2025-08-09', tokens: 15 }
+    ];
 
-    <div id="tokenList">Loading tokens...</div>
+    const tableBody = document.getElementById('tokenTable');
 
-    <script>
-        const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
-        const BASE_ID = 'appgIT8WiqnZlR44Y';
-        const BOOKINGS_TABLE = 'BookingsLogs';
+    function loadTokens() {
+        tableBody.innerHTML = '';
+        tokenData.forEach(entry => {
+            const row = `<tr><td>${entry.date}</td><td>${entry.tokens}</td></tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
 
-        function fetchTokens() {
-            fetch(`https://api.airtable.com/v0/${BASE_ID}/${BOOKINGS_TABLE}?sort%5B0%5D%5Bfield%5D=Timestamp&sort%5B0%5D%5Bdirection%5D=asc`, {
-                headers: { 'Authorization': `Bearer ${API_KEY}` }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const tokenList = document.getElementById('tokenList');
-                tokenList.innerHTML = '';
+    loadTokens();
+</script>
 
-                let tokenNo = 1;
-                const today = new Date().toISOString().split('T')[0];
-
-                data.records.forEach(record => {
-                    const timestamp = record.fields.Timestamp;
-                    const slotTime = record.fields['Slot Time'];
-                    const patientName = record.fields['Patient Name'];
-
-                    if (timestamp && timestamp.includes(today)) {
-                        const card = document.createElement('div');
-                        card.className = 'token-card';
-                        card.innerHTML = `
-                            <div class="token-no">Token #${tokenNo}</div>
-                            <div>Patient: ${patientName}</div>
-                            <div class="slot-time">Slot: ${slotTime}</div>
-                        `;
-                        tokenList.appendChild(card);
-                        tokenNo++;
-                    }
-                });
-
-                if (tokenNo === 1) {
-                    tokenList.innerHTML = 'No bookings yet today.';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('tokenList').innerText = 'Failed to load tokens.';
-            });
-        }
-
-        fetchTokens();
-    </script>
-
-</body>
-</html>
+</body></html>
