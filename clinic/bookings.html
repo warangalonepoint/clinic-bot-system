@@ -2,84 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Onestop AI Clinic Demo - Book Appointment</title>
+    <title>Clinic Bot — Book Appointment</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        input, select, button { display: block; width: 100%; padding: 12px; margin-top: 15px; border-radius: 10px; font-size: 16px; }
+        button { background: black; color: white; border: none; cursor: pointer; }
+    </style>
 </head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
+<body>
 
-    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-        <span>Onestop AI Clinic Demo</span>
-    </div>
+    <h2>Clinic Appointment Booking (Airtable Connected)</h2>
 
-    <div style="text-align:center; padding:20px;">
-        <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
-    </div>
+    <input type="text" id="patientName" placeholder="Patient Name">
+    <input type="text" id="slotTime" placeholder="Slot Time (e.g., 10:30 AM)">
+    <input type="text" id="reason" placeholder="Reason for Visit">
 
-    <h2 style="text-align:center;">Book Your Appointment</h2>
-
-    <div style="padding: 0 20px;">
-        <select id="dateSelect" style="width:100%; padding:10px; margin-bottom:10px;"></select>
-        <select id="timeSelect" style="width:100%; padding:10px; margin-bottom:10px;"></select>
-        <input type="text" id="patientName" placeholder="Patient Name" style="width:100%; padding:10px; margin-bottom:10px;">
-        <input type="text" id="reason" placeholder="Reason for Visit" style="width:100%; padding:10px; margin-bottom:10px;">
-        <button onclick="bookWhatsApp()" style="width:100%; padding:12px; background:black; color:white; border:none; font-size:16px;">Book on WhatsApp</button>
-    </div>
-
-    <footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
-        Powered by Onestop AI
-    </footer>
+    <button onclick="submitBooking()">Book Appointment</button>
+    <div id="status" style="margin-top: 20px; color: green;"></div>
 
     <script>
-        const slots = [
-            { date: '2025-08-01', time: '17:00', status: 'Available' },
-            { date: '2025-08-01', time: '17:20', status: 'Available' },
-            { date: '2025-08-02', time: '17:00', status: 'Available' },
-            { date: '2025-08-02', time: '17:10', status: 'Available' },
-            { date: '2025-08-03', time: '16:00', status: 'Available' },
-            { date: '2025-08-03', time: '16:10', status: 'Available' }
-        ];
+        const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+        const BASE_ID = 'appgIT8WiqnZlR44Y';
+        const TABLE_NAME = 'BookingsLogs';
 
-        const dateSelect = document.getElementById('dateSelect');
-        const timeSelect = document.getElementById('timeSelect');
+        function submitBooking() {
+            const patientName = document.getElementById('patientName').value.trim();
+            const slotTime = document.getElementById('slotTime').value.trim();
+            const reason = document.getElementById('reason').value.trim();
 
-        function loadDates() {
-            const uniqueDates = [...new Set(slots.map(s => s.date))];
-            dateSelect.innerHTML = '<option value="">Select Date</option>';
-            uniqueDates.forEach(date => {
-                dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
-            });
-        }
-
-        function loadTimeSlots(selectedDate) {
-            timeSelect.innerHTML = '<option value="">Select Time Slot</option>';
-            slots.filter(s => s.date === selectedDate && s.status === 'Available')
-                 .forEach(slot => {
-                     timeSelect.innerHTML += `<option value="${slot.time}">${slot.time}</option>`;
-                 });
-        }
-
-        dateSelect.addEventListener('change', function() {
-            loadTimeSlots(this.value);
-        });
-
-        function bookWhatsApp() {
-            const date = dateSelect.value;
-            const time = timeSelect.value;
-            const name = document.getElementById('patientName').value;
-            const reason = document.getElementById('reason').value;
-
-            if(!date || !time || !name || !reason) {
-                alert('Please fill all fields');
+            if(patientName === "" || slotTime === "" || reason === "") {
+                alert("Please fill all fields.");
                 return;
             }
 
-            const message = `Appointment Booking:\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${time}`;
-            const whatsappLink = `https://wa.me/919390664577?text=${encodeURIComponent(message)}`;
-            window.open(whatsappLink, '_blank');
-        }
+            const data = {
+                records: [
+                    {
+                        fields: {
+                            "Timestamp": new Date().toLocaleString(),
+                            "Patient Name": patientName,
+                            "Slot Time": slotTime,
+                            "Reason": reason
+                        }
+                    }
+                ]
+            };
 
-        loadDates();
+            fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('status').innerText = "Booking Logged Successfully!";
+                document.getElementById('patientName').value = "";
+                document.getElementById('slotTime').value = "";
+                document.getElementById('reason').value = "";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Failed to log booking.");
+            });
+        }
     </script>
 
 </body>
