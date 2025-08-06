@@ -1,57 +1,66 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Token Summary - Onestop AI Clinic</title>
+    <title>Clinic Bookings</title>
     <link rel="stylesheet" href="./assets/styles.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
-        .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+        body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+        .header { background: #000; color: #fff; padding: 10px; text-align: center; }
         .header img { height: 40px; }
         .container { padding: 20px; }
         .banner { width: 100%; border-radius: 10px; margin-bottom: 20px; }
-        h2 { text-align: center; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        th { background: #222; color: #fff; }
+        .form-section { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-section select, .form-section input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; }
+        .form-section button { background: #000; color: #fff; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
     </style>
-</head><body>
+</head>
+<body>
     <div class="header">
         <img src="./assets/clinic-logo.png" alt="Clinic Logo">
         <h1>Onestop AI Clinic Demo</h1>
     </div><div class="container">
-    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
-    <h2>Token Summary</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Total Tokens</th>
-            </tr>
-        </thead>
-        <tbody id="tokenTable">
-            <!-- Data will load here -->
-        </tbody>
-    </table>
+    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner" class="banner">
+
+    <div class="form-section">
+        <h2>Book an Appointment</h2>
+        <label for="dateSelect">Select Date:</label>
+        <select id="dateSelect">
+            <option value="2025-08-07">August 7, 2025</option>
+            <option value="2025-08-08">August 8, 2025</option>
+        </select>
+
+        <label for="slotSelect">Select Time Slot:</label>
+        <select id="slotSelect">
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="10:30 AM">10:30 AM</option>
+        </select>
+
+        <label for="nameInput">Your Name:</label>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+
+        <label for="reasonInput">Reason for Visit:</label>
+        <input type="text" id="reasonInput" placeholder="Reason (e.g., Fever)">
+
+        <button onclick="confirmBooking()">Book Now</button>
+    </div>
 </div>
 
 <script>
-    const tokenData = [
-        { date: '2025-08-07', tokens: 12 },
-        { date: '2025-08-08', tokens: 8 },
-        { date: '2025-08-09', tokens: 15 }
-    ];
+    function confirmBooking() {
+        const name = document.getElementById('nameInput').value;
+        const reason = document.getElementById('reasonInput').value;
+        const date = document.getElementById('dateSelect').value;
+        const slot = document.getElementById('slotSelect').value;
 
-    const tableBody = document.getElementById('tokenTable');
-
-    function loadTokens() {
-        tableBody.innerHTML = '';
-        tokenData.forEach(entry => {
-            const row = `<tr><td>${entry.date}</td><td>${entry.tokens}</td></tr>`;
-            tableBody.innerHTML += row;
-        });
+        if (name && reason) {
+            const whatsappMsg = `Hello, I would like to book an appointment on ${date} at ${slot} for ${reason}. My name is ${name}.`;
+            window.location.href = `https://wa.me/919390664577?text=${encodeURIComponent(whatsappMsg)}`;
+        } else {
+            alert('Please fill all fields.');
+        }
     }
-
-    loadTokens();
 </script>
 
-</body></html>
+</body>
+</html>
