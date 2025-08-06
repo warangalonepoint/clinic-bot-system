@@ -1,45 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Staff Panel — Onestop AI Clinic</title>
+    <title>Sync Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9f9; }
-        header { background: black; color: white; padding: 10px; text-align: center; font-size: 18px; }
-        .banner { width: 100%; }
-        .section { padding: 20px; text-align: center; }
-        button { background: black; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 8px; font-size: 16px; }
-        .footer { position: fixed; bottom: 0; width: 100%; text-align: center; padding: 10px; background: black; color: white; font-size: 14px; }
+        body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
+        .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+        .header img { height: 30px; vertical-align: middle; margin-right: 10px; }
+        .hero-banner { width: 100%; max-width: 400px; margin: 20px auto; display: block; border-radius: 10px; }
+        .container { text-align: center; padding: 10px; }
+        .btn { background: #000; color: #fff; padding: 15px; margin: 10px 0; width: 80%; max-width: 300px; border: none; border-radius: 10px; font-size: 16px; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; text-align: center; padding: 10px 0; font-size: 14px; }
     </style>
 </head>
 <body>
+    <div class="header">
+        <img src="assets/clinic-logo.png" alt="Logo">
+        Onestop AI Clinic Demo
+    </div><img src="assets/clinic-hero-banner.png" alt="Banner" class="hero-banner">
 
-<header>
-    <img src="assets/clinic-logo.png" alt="Logo" height="30">
-    <span>Onestop AI Clinic Demo</span>
-</header>
-
-<img src="assets/clinic-hero-banner.png" class="banner" alt="Clinic Banner">
-
-<div class="section">
-    <h2>Staff Panel</h2>
-    <button onclick="addStaff()">➕ Add Staff</button>
-    <button onclick="deleteStaff()">🗑️ Delete Staff</button>
+<div class="container">
+    <h2>Sync Panel</h2>
+    <button class="btn" onclick="alert('Syncing Bookings Logs... (Demo)')">🔄 Sync Bookings Logs</button><br>
+    <button class="btn" onclick="alert('Syncing Available Slots... (Demo)')">🔄 Sync Available Slots</button>
 </div>
 
-<div class="footer">
-    Powered by Onestop AI
-</div>
-
-<script>
-    function addStaff() {
-        alert("Add Staff clicked (functionality to be implemented)");
-    }
-    function deleteStaff() {
-        alert("Delete Staff clicked (functionality to be implemented)");
-    }
-</script>
+<footer>Powered by Onestop AI</footer>
 
 </body>
 </html>
