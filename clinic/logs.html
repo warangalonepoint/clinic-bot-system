@@ -1,29 +1,28 @@
-<button onclick="exportLogs()" class="export-btn">⬇️ Export Logs as CSV</button>
-
-<script>
-function exportLogs() {
-    if (!logsData || logsData.length === 0) {
-        alert("No data to export.");
-        return;
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Logs</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; }
+        .header { background: #000; color: #fff; padding: 10px; text-align: center; }
+        .container { padding: 20px; }
+        iframe { width: 100%; height: 600px; border: none; }
+        .export-btn { background: #000; color: #fff; padding: 10px 20px; border: none; cursor: pointer; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Onestop AI Clinic Demo</h1>
+    </div>
+    <div class="container">
+        <button class="export-btn" onclick="exportCSV()">⬇️ Export Logs as CSV</button>
+        <iframe src="https://airtable.com/embed/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w?backgroundColor=gray" frameborder="0"></iframe>
+    </div><script>
+    function exportCSV() {
+        window.location.href = 'https://airtable.com/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w/export';
     }
-
-    let csvContent = "Date,Time,Patient Name,Reason,Contact\n";
-    logsData.forEach(record => {
-        const dateTime = record.fields.Timestamp ? record.fields.Timestamp.split(',')[0] : '';
-        const time = record.fields['Slot Time'] || '';
-        const name = record.fields['Patient Name'] || '';
-        const reason = record.fields.Reason || '';
-        const contact = record.fields.Contact || '';
-        csvContent += `${dateTime},${time},${name},${reason},${contact}\n`;
-    });
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "booking_logs.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
 </script>
+
+</body>
+</html>
