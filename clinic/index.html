@@ -10,7 +10,8 @@
         .header img { height: 40px; }
         .container { padding: 20px; }
         .banner { width: 100%; border-radius: 10px; margin-bottom: 20px; }
-        .nav-button { display: block; padding: 15px; background: black; color: white; text-align: center; border-radius: 8px; margin: 10px 0; text-decoration: none; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .nav-button { display: block; padding: 15px; background: black; color: white; text-align: center; border-radius: 8px; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -19,13 +20,14 @@
         <h1>Onestop AI Clinic Dashboard</h1>
     </div><div class="container">
     <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
-
-    <a href="./bookings.html" class="nav-button">📅 Book Appointments</a>
-    <a href="./logs.html" class="nav-button">📊 Booking Logs</a>
-    <a href="./tokens.html" class="nav-button">🔢 Token Summary</a>
-    <a href="./admin-slots.html" class="nav-button">🗓️ Manage Slots</a>
-    <a href="./staff-panel.html" class="nav-button">👥 Staff Panel</a>
-    <a href="./sync-panel.html" class="nav-button">🔄 Sync Panel</a>
+    <div class="grid">
+        <a href="./bookings.html" class="nav-button">📅 Book Appointments</a>
+        <a href="./logs.html" class="nav-button">📊 Booking Logs</a>
+        <a href="./tokens.html" class="nav-button">🔢 Token Summary</a>
+        <a href="./admin-slots.html" class="nav-button">🗓️ Manage Slots</a>
+        <a href="./staff-panel.html" class="nav-button">👥 Staff Panel</a>
+        <a href="./sync-panel.html" class="nav-button">🔄 Sync Panel</a>
+    </div>
 </div>
 
 </body>
