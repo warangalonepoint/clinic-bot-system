@@ -1,128 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Booking Logs - Onestop AI Clinic Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Logs</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
-    .header { background: #000; color: #fff; text-align: center; padding: 10px; }
-    .header img { height: 30px; vertical-align: middle; margin-right: 10px; }
-    .banner { width: 100%; }
-    h2 { text-align: center; margin-top: 10px; }
-    .export-btn { display: block; width: 90%; margin: 10px auto; padding: 10px; background: #000; color: #fff; text-align: center; border: none; cursor: pointer; }
-    table { width: 95%; margin: 20px auto; border-collapse: collapse; }
+    body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    .header { background: #000; color: #fff; padding: 10px; text-align: center; }
+    .hero { text-align: center; margin: 20px 0; }
+    .hero img { max-width: 80%; height: auto; }
+    table { width: 90%; margin: auto; border-collapse: collapse; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #000; color: #fff; }
-    .footer { background: #000; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; }
+    th { background: #eee; }
+    .footer { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; text-align: center; padding: 8px; }
+    button { padding: 5px 10px; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:disabled { background: #888; }
   </style>
 </head>
-<body>
+<body><div class="header">
+  🏛️ Onestop AI Clinic Demo
+</div><div class="hero">
+  <img src="./assets/clinic-hero-banner.png" alt="Doctor Banner">
+</div><h2 style="text-align:center">Booking Logs</h2><table>
+  <tr>
+    <th>Date</th>
+    <th>Time</th>
+    <th>Patient Name</th>
+    <th>Reason</th>
+    <th>Contact</th>
+    <th>Reminder</th>
+  </tr>
+  <tr>
+    <td>06/08/2025</td>
+    <td>10:00 AM</td>
+    <td>Chaitanya</td>
+    <td>Fever</td>
+    <td>9390664577</td>
+    <td><button onclick="sendReminder('9390664577', 'Chaitanya', this)">Send Reminder</button></td>
+  </tr>
+  <!-- Repeat rows dynamically -->
+</table><div class="footer">
+  Powered by Onestop AI
+</div><script>
+  function sendReminder(phone, name, btn) {
+    const message = `Hello ${name}, this is a reminder for your clinic appointment today. Please arrive on time.`;
+    const url = `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
 
-<div class="header">
-  <img src="./assets/clinic-logo.png" alt="Logo"> Onestop AI Clinic Demo
-</div>
+    // UI Update
+    btn.innerText = 'Reminder Sent';
+    btn.disabled = true;
 
-<img src="./assets/clinic-hero-banner.png" class="banner">
-
-<h2>Booking Logs</h2>
-
-<button class="export-btn" onclick="exportToCSV()">⬇️ Export Logs</button>
-
-<table id="logsTable">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Patient Name</th>
-      <th>Reason</th>
-      <th>Contact</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td colspan="5">Loading...</td></tr>
-  </tbody>
-</table>
-
-<div class="footer">Powered by Onestop AI</div>
-
-<script>
-const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
-const BASE_ID = 'appgIT8WiqnZlR44Y';
-const TABLE_NAME = 'BookingsLogs';
-
-let logsData = [];
-
-fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
-  headers: { 'Authorization': `Bearer ${API_KEY}` }
-})
-.then(response => response.json())
-.then(data => {
-  logsData = data.records;
-  const tableBody = document.querySelector('#logsTable tbody');
-  tableBody.innerHTML = '';
-
-  logsData.forEach(record => {
-    const dateTime = record.fields['Timestamp'] || '';
-    const patientName = record.fields['Patient Name'] || '';
-    const reason = record.fields['Reason'] || '';
-    const contact = record.fields['Contact'] || '';
-    const slotTime = record.fields['Slot Time'] || '';
-
-    const date = dateTime.split('T')[0];
-    const time = slotTime ? slotTime : (dateTime.split('T')[1] || '').substring(0,5);
-
-    const row = `<tr>
-      <td>${date}</td>
-      <td>${time}</td>
-      <td>${patientName}</td>
-      <td>${reason}</td>
-      <td><a href="tel:${contact}">${contact}</a></td>
-    </tr>`;
-    tableBody.innerHTML += row;
-  });
-
-  if (logsData.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="5">No bookings found.</td></tr>`;
+    // TODO: Airtable API update will be added next
   }
-})
-.catch(error => {
-  console.error('Error fetching logs:', error);
-  document.querySelector('#logsTable tbody').innerHTML = `<tr><td colspan="5">Failed to load data.</td></tr>`;
-});
-
-function exportToCSV() {
-  if (logsData.length === 0) {
-    alert('No data to export.');
-    return;
-  }
-
-  let csvContent = "Date,Time,Patient Name,Reason,Contact\n";
-
-  logsData.forEach(record => {
-    const dateTime = record.fields['Timestamp'] || '';
-    const patientName = record.fields['Patient Name'] || '';
-    const reason = record.fields['Reason'] || '';
-    const contact = record.fields['Contact'] || '';
-    const slotTime = record.fields['Slot Time'] || '';
-
-    const date = dateTime.split('T')[0];
-    const time = slotTime ? slotTime : (dateTime.split('T')[1] || '').substring(0,5);
-
-    const row = `${date},${time},${patientName},${reason},${contact}\n`;
-    csvContent += row;
-  });
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'booking_logs.csv');
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-</script>
-
-</body>
+</script></body>
 </html>
