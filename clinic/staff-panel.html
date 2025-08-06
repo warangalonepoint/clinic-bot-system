@@ -1,89 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Staff Panel — Onestop AI Clinic</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #f8f8f8; margin: 0;}
-    .header { background: black; color: white; padding: 10px; }
-    .header img { height:30px; vertical-align: middle; margin-right: 8px;}
-    .banner { width: 100%; max-width: 400px; margin: 20px auto; }
-    .form-group { margin: 10px 0; }
-    input, select { padding: 10px; width: 80%; max-width: 280px; margin-bottom: 10px; }
-    button { padding: 10px 20px; background: black; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 5px; }
-    footer { background: black; color: white; padding: 8px; position: fixed; bottom: 0; width: 100%; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Staff Panel - Onestop AI Clinic Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; text-align: center; margin: 0; padding: 0; }
+        .navbar { background: #000; color: #fff; padding: 10px; display: flex; align-items: center; justify-content: center; }
+        .navbar img { height: 30px; margin-right: 10px; }
+        .hero-banner { width: 100%; max-width: 400px; margin: 20px auto; }
+        h1 { font-size: 20px; }
+        input, select { width: 80%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 10px; border: none; background: #000; color: #fff; border-radius: 5px; }
+        footer { background: #000; color: #fff; padding: 10px; position: fixed; width: 100%; bottom: 0; }
+    </style>
 </head>
 <body>
+    <div class="navbar">
+        <img src="./assets/clinic-logo.png" alt="Logo">
+        Onestop AI Clinic Demo
+    </div>
+    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="hero-banner">
 
-  <div class="header">
-    <img src="./assets/clinic-logo.png" alt="Logo">
-    <span>Onestop AI Clinic Demo</span>
-  </div>
-
-  <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
-
-  <h2>Add Staff</h2>
-  <div class="form-group"><input type="text" id="staffName" placeholder="Staff Name"></div>
-  <div class="form-group"><input type="text" id="staffRole" placeholder="Role"></div>
-  <div class="form-group"><input type="text" id="staffContact" placeholder="Contact Number"></div>
-  <div class="form-group">
+    <h1>Add Staff</h1>
+    <input type="text" id="staffName" placeholder="Name">
+    <input type="text" id="staffRole" placeholder="Role">
+    <input type="text" id="staffContact" placeholder="Contact">
     <select id="staffStatus">
-      <option value="Active">Active</option>
-      <option value="Inactive">Inactive</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
     </select>
-  </div>
-  <button onclick="redirectToForm()">Add Staff via Airtable Form</button>
+    <button onclick="addStaff()">Add Staff</button>
 
-  <h2>Delete Staff</h2>
-  <div class="form-group"><input type="text" id="deleteStaffName" placeholder="Name to Delete"></div>
-  <button onclick="deleteStaff()">Delete Staff</button>
+    <h1>Delete Staff</h1>
+    <input type="text" id="deleteName" placeholder="Enter Name to Delete">
+    <button onclick="deleteStaff()">Delete Staff</button>
 
-  <footer>Powered by Onestop AI</footer>
+    <footer>Powered by Onestop AI</footer>
 
-  <script>
-    async function deleteStaff() {
-      const name = document.getElementById('deleteStaffName').value.trim();
-      if (!name) {
-        alert('Enter a name to delete.');
-        return;
-      }
-      const url = "https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList?filterByFormula=Name=\""+encodeURIComponent(name)+"\"";
-      const res = await fetch(url, {
-        headers: { "Authorization": "Bearer patLNwoJQKE3Tjb8J.c2a0...yourKey" }
-      });
-      const { records } = await res.json();
-      if (!records || records.length === 0) {
-        alert('Staff not found.');
-        return;
-      }
-      const recId = records[0].id;
-      const delRes = await fetch("https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList/" + recId, {
-        method: 'DELETE',
-        headers: { "Authorization": "Bearer patLNwoJQKE3Tjb8J.c2a0...yourKey" }
-      });
-      if (delRes.ok) {
-        alert('Deleted successfully.');
-        document.getElementById('deleteStaffName').value = '';
-      } else {
-        alert('Delete failed.');
-      }
-    }
+    <script>
+        const airtableApiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
+        const baseId = "appgIT8WiqnZlR44Y";
+        const tableName = "StaffList";
 
-    function redirectToForm() {
-      const name = document.getElementById('staffName').value.trim();
-      const role = document.getElementById('staffRole').value.trim();
-      const contact = document.getElementById('staffContact').value.trim();
-      const status = document.getElementById('staffStatus').value;
-      if (!name || !role || !contact) {
-        alert('Please fill all fields.');
-        return;
-      }
-      const baseFormUrl = "https://airtable.com/appgIT8WiqnZlR44Y/shrkrP7Bk4Gxco65O";
-      const params = `?prefill_Name=${encodeURIComponent(name)}&prefill_Role=${encodeURIComponent(role)}&prefill_Contact=${encodeURIComponent(contact)}&prefill_Status=${encodeURIComponent(status)}`;
-      window.open(baseFormUrl + params, '_blank');
-    }
-  </script>
+        async function addStaff() {
+            const name = document.getElementById("staffName").value.trim();
+            const role = document.getElementById("staffRole").value.trim();
+            const contact = document.getElementById("staffContact").value.trim();
+            const status = document.getElementById("staffStatus").value;
+
+            if (!name || !role || !contact) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            const record = {
+                fields: {
+                    Name: name,
+                    Role: role,
+                    Contact: contact,
+                    Status: status
+                }
+            };
+
+            const response = await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${airtableApiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(record)
+            });
+
+            if (response.ok) {
+                alert("Staff added successfully!");
+                location.reload();
+            } else {
+                alert("Failed to add staff.");
+            }
+        }
+
+        async function deleteStaff() {
+            const nameToDelete = document.getElementById("deleteName").value.trim();
+            if (!nameToDelete) {
+                alert("Please enter a name to delete.");
+                return;
+            }
+
+            const recordsResponse = await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}?filterByFormula={Name}='${nameToDelete}'`, {
+                headers: { Authorization: `Bearer ${airtableApiKey}` }
+            });
+
+            const recordsData = await recordsResponse.json();
+
+            if (recordsData.records.length === 0) {
+                alert("Staff not found.");
+                return;
+            }
+
+            const recordId = recordsData.records[0].id;
+
+            const deleteResponse = await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}/${recordId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${airtableApiKey}` }
+            });
+
+            if (deleteResponse.ok) {
+                alert("Staff deleted successfully!");
+                location.reload();
+            } else {
+                alert("Failed to delete staff.");
+            }
+        }
+    </script>
 </body>
 </html>
