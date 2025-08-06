@@ -2,98 +2,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Logs - Onestop AI Clinic</title>
+    <title>Booking Logs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #000;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .header img {
+            height: 30px;
+        }
+        h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .container {
+            padding: 10px;
+        }
+        .filters {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .export-btn {
+            background-color: black;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Booking Logs</h1><div>
-    <label for="dateFilter">Filter by Date:</label>
-    <input type="date" id="dateFilter">
+    <div class="header">
+        <img src="logo.png" alt="Logo">
+        <h1>Onestop AI Clinic Demo</h1>
+    </div>
+    <div class="container">
+        <h2>Booking Logs</h2>
+        <div class="filters">
+            <label for="dateFilter">Filter by Date:</label>
+            <select id="dateFilter"></select>
+            <label for="statusFilter">Status:</label>
+            <select id="statusFilter">
+                <option value="All">All</option>
+                <option value="Booked">Booked</option>
+                <option value="Available">Available</option>
+            </select>
+        </div>
+        <button class="export-btn" onclick="exportCSV()">⬇️ Export Logs as CSV</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time Slot</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="logsTable">
+                <!-- Logs will be populated here -->
+            </tbody>
+        </table>
+    </div><script>
+    const logsData = [
+        { date: '2025-08-07', time: '10:00am', status: 'Booked' },
+        { date: '2025-08-07', time: '10:40am', status: 'Available' },
+        { date: '2025-08-07', time: '10:30am', status: 'Booked' },
+        { date: '2025-08-07', time: '11:00am', status: 'Available' },
+        { date: '2025-08-07', time: '11:10am', status: 'Booked' },
+        { date: '2025-08-07', time: '10:50am', status: 'Available' },
+        { date: '2025-08-07', time: '10:20am', status: 'Available' },
+        { date: '2025-08-07', time: '10:10am', status: 'Available' }
+    ];
 
-    <label for="statusFilter">Status:</label>
-    <select id="statusFilter">
-        <option value="">All</option>
-        <option value="Booked">Booked</option>
-        <option value="Available">Available</option>
-    </select>
+    const dateFilter = document.getElementById('dateFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const logsTable = document.getElementById('logsTable');
 
-    <button onclick="exportCSV()">⬇️ Export Logs as CSV</button>
-</div>
-
-<table border="1" id="logsTable">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Time Slot</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-
-<script>
-    const apiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
-    const baseId = 'appgIT8WiqnZlR44Y';
-    const tableName = 'AvailableSlots';
-
-    async function fetchData() {
-        const url = `https://api.airtable.com/v0/${baseId}/${tableName}`;
-        const response = await fetch(url, {
-            headers: { Authorization: `Bearer ${apiKey}` }
-        });
-        const data = await response.json();
-        return data.records;
-    }
-
-    function renderTable(records) {
-        const tbody = document.querySelector('#logsTable tbody');
-        tbody.innerHTML = '';
-
-        records.forEach(record => {
-            const date = record.fields['Date'] || '';
-            const time = record.fields['Time Slot'] || '';
-            const status = record.fields['Status'] || '';
-
-            const row = `<tr>
-                <td>${date}</td>
-                <td>${time}</td>
-                <td>${status}</td>
-            </tr>`;
-
-            tbody.insertAdjacentHTML('beforeend', row);
+    function populateDateFilter() {
+        const uniqueDates = [...new Set(logsData.map(log => log.date))];
+        dateFilter.innerHTML = '<option value="All">All</option>';
+        uniqueDates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            dateFilter.appendChild(option);
         });
     }
 
-    function filterTable() {
-        const dateFilter = document.getElementById('dateFilter').value;
-        const statusFilter = document.getElementById('statusFilter').value;
+    function filterLogs() {
+        const selectedDate = dateFilter.value;
+        const selectedStatus = statusFilter.value;
+        logsTable.innerHTML = '';
 
-        fetchData().then(records => {
-            let filtered = records;
-            if (dateFilter) {
-                filtered = filtered.filter(r => r.fields['Date'] === dateFilter);
-            }
-            if (statusFilter) {
-                filtered = filtered.filter(r => r.fields['Status'] === statusFilter);
-            }
-            renderTable(filtered);
+        logsData.filter(log => {
+            return (selectedDate === 'All' || log.date === selectedDate) &&
+                   (selectedStatus === 'All' || log.status === selectedStatus);
+        }).forEach(log => {
+            const row = `<tr><td>${log.date}</td><td>${log.time}</td><td>${log.status}</td></tr>`;
+            logsTable.innerHTML += row;
         });
     }
 
     function exportCSV() {
-        const rows = [...document.querySelectorAll('#logsTable tr')]
-            .map(row => [...row.children].map(cell => cell.innerText).join(","))
-            .join("\n");
+        let csv = 'Date,Time Slot,Status\n';
+        logsData.forEach(log => {
+            csv += `${log.date},${log.time},${log.status}\n`;
+        });
 
-        const blob = new Blob([rows], { type: 'text/csv' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'BookingLogs.csv';
-        link.click();
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'booking_logs.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
-    document.getElementById('dateFilter').addEventListener('change', filterTable);
-    document.getElementById('statusFilter').addEventListener('change', filterTable);
+    dateFilter.addEventListener('change', filterLogs);
+    statusFilter.addEventListener('change', filterLogs);
 
-    fetchData().then(renderTable);
-</script></body>
+    populateDateFilter();
+    filterLogs();
+</script>
+
+</body>
 </html>
