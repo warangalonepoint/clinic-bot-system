@@ -1,96 +1,84 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Staff Attendance - Onestop AI Clinic</title>
+    <title>Staff Attendance | Airtable Connected</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        input, select, button { display: block; width: 100%; padding: 12px; margin-top: 15px; border-radius: 10px; font-size: 16px; }
+        button { background: black; color: white; border: none; cursor: pointer; }
+    </style>
 </head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-    <span>Onestop AI Clinic Demo</span>
-</div>
+<body>
 
-<div style="text-align:center; padding:20px;">
-    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
-</div>
+    <h2>Staff Attendance Panel (Airtable Connected)</h2>
 
-<h2 style="text-align:center;">Staff Attendance Panel</h2>
+    <input type="text" id="staffName" placeholder="Staff Name">
 
-<!-- Attendance Table -->
-<div style="padding: 0 10px;">
-    <table style="width:100%; border-collapse:collapse; font-size:14px;">
-        <thead>
-            <tr style="background:#eee;">
-                <th style="padding:10px; border:1px solid #ddd;">Employee ID</th>
-                <th style="padding:10px; border:1px solid #ddd;">Name</th>
-                <th style="padding:10px; border:1px solid #ddd;">Role</th>
-                <th style="padding:10px; border:1px solid #ddd;">Status</th>
-            </tr>
-        </thead>
-        <tbody id="attendanceTable">
-            <tr>
-                <td style="padding:10px; border:1px solid #ddd;">STF001</td>
-                <td style="padding:10px; border:1px solid #ddd;">Arun Kumar</td>
-                <td style="padding:10px; border:1px solid #ddd;">Doctor</td>
-                <td style="padding:10px; border:1px solid #ddd; color:green;">On Duty</td>
-            </tr>
-            <tr>
-                <td style="padding:10px; border:1px solid #ddd;">STF002</td>
-                <td style="padding:10px; border:1px solid #ddd;">Megha Rani</td>
-                <td style="padding:10px; border:1px solid #ddd;">Nurse</td>
-                <td style="padding:10px; border:1px solid #ddd; color:red;">Off Duty</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<!-- Mark Attendance Form -->
-<div style="padding:20px;">
-    <h3>Mark Attendance</h3>
-    <select id="employeeSelect" style="width:100%; padding:10px; margin-bottom:10px;">
-        <option value="STF001">STF001 - Arun Kumar</option>
-        <option value="STF002">STF002 - Megha Rani</option>
-        <option value="STF003">STF003 - Sunil Patel</option>
+    <select id="role">
+        <option>Doctor</option>
+        <option>Nurse</option>
+        <option>Receptionist</option>
     </select>
-    <select id="statusSelect" style="width:100%; padding:10px; margin-bottom:10px;">
-        <option value="On Duty">On Duty</option>
-        <option value="Off Duty">Off Duty</option>
+
+    <select id="attendanceStatus">
+        <option>Check-in</option>
+        <option>Check-out</option>
     </select>
-    <button onclick="markAttendance()" style="width:100%; padding:12px; background:black; color:white; border:none; font-size:16px;">Submit Attendance</button>
-</div>
 
-<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
-    Powered by Onestop AI
-</footer>
+    <button onclick="markAttendance()">Mark Attendance</button>
+    <div id="status" style="margin-top: 20px; color: green;"></div>
 
-<script>
-    function markAttendance() {
-        const empId = document.getElementById('employeeSelect').value;
-        const status = document.getElementById('statusSelect').value;
-        const tableRows = document.getElementById('attendanceTable').getElementsByTagName('tr');
+    <script>
+        const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+        const BASE_ID = 'appgIT8WiqnZlR44Y';
+        const TABLE_NAME = 'StaffAttendance';
 
-        for(let i = 0; i < tableRows.length; i++) {
-            const cells = tableRows[i].getElementsByTagName('td');
-            if(cells[0].innerText === empId) {
-                cells[3].innerText = status;
-                cells[3].style.color = (status === 'On Duty') ? 'green' : 'red';
-                alert(empId + ' status updated to ' + status);
+        function markAttendance() {
+            const staffName = document.getElementById('staffName').value.trim();
+            const role = document.getElementById('role').value;
+            const status = document.getElementById('attendanceStatus').value;
+
+            if(staffName === "") {
+                alert("Enter Staff Name.");
                 return;
             }
-        }
 
-        // If not found, add a new row (for new employees)
-        const table = document.getElementById('attendanceTable');
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td style="padding:10px; border:1px solid #ddd;">${empId}</td>
-            <td style="padding:10px; border:1px solid #ddd;">New Staff</td>
-            <td style="padding:10px; border:1px solid #ddd;">Unknown</td>
-            <td style="padding:10px; border:1px solid #ddd; color:${status === 'On Duty' ? 'green' : 'red'};">${status}</td>
-        `;
-        table.appendChild(newRow);
-        alert(empId + ' added with status ' + status);
-    }
-</script>
+            const data = {
+                records: [
+                    {
+                        fields: {
+                            "Timestamp": new Date().toLocaleString(),
+                            "Staff Name": staffName,
+                            "Role": role,
+                            "Attendance Status": status
+                        }
+                    }
+                ]
+            };
+
+            fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('status').innerText = "Attendance Marked Successfully!";
+                document.getElementById('staffName').value = "";
+                document.getElementById('role').selectedIndex = 0;
+                document.getElementById('attendanceStatus').selectedIndex = 0;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Failed to mark attendance.");
+            });
+        }
+    </script>
 
 </body>
 </html>
