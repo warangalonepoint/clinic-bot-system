@@ -3,112 +3,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Logs</title>
+    <link rel="stylesheet" href="./assets/styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .header {
-            background-color: #000;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .header img {
-            height: 30px;
-        }
-        h1 {
-            font-size: 20px;
-            margin: 0;
-        }
-        .container {
-            padding: 10px;
-        }
-        .filters {
-            margin-bottom: 10px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .export-btn {
-            background-color: black;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 0; padding: 0; }
+        .header { background-color: #000; color: #fff; padding: 10px; text-align: center; }
+        .header img { height: 40px; vertical-align: middle; }
+        .container { padding: 20px; }
+        .hero-banner { width: 100%; border-radius: 10px; margin: 10px 0; }
+        h1 { text-align: center; color: #333; }
+        .filter-bar { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background: #222; color: #fff; }
+        .export-btn { background: #000; color: #fff; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="logo.png" alt="Logo">
-        <h1>Onestop AI Clinic Demo</h1>
-    </div>
-    <div class="container">
-        <h2>Booking Logs</h2>
-        <div class="filters">
-            <label for="dateFilter">Filter by Date:</label>
-            <select id="dateFilter"></select>
-            <label for="statusFilter">Status:</label>
-            <select id="statusFilter">
-                <option value="All">All</option>
-                <option value="Booked">Booked</option>
-                <option value="Available">Available</option>
-            </select>
-        </div>
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <span>Onestop AI Clinic Demo</span>
+    </div><div class="container">
+    <img src="./assets/clinic-hero-banner.png" alt="Hero Banner" class="hero-banner">
+
+    <h1>Booking Logs</h1>
+
+    <div class="filter-bar">
+        <label for="dateFilter">Filter by Date:</label>
+        <select id="dateFilter">
+            <option value="All">All</option>
+            <!-- Populate Dates Dynamically -->
+        </select>
+
+        <label for="statusFilter">Status:</label>
+        <select id="statusFilter">
+            <option value="All">All</option>
+            <option value="Booked">Booked</option>
+            <option value="Available">Available</option>
+        </select>
+
         <button class="export-btn" onclick="exportCSV()">⬇️ Export Logs as CSV</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time Slot</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="logsTable">
-                <!-- Logs will be populated here -->
-            </tbody>
-        </table>
-    </div><script>
+    </div>
+
+    <table id="logsTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time Slot</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will load here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<script>
     const logsData = [
         { date: '2025-08-07', time: '10:00am', status: 'Booked' },
-        { date: '2025-08-07', time: '10:40am', status: 'Available' },
-        { date: '2025-08-07', time: '10:30am', status: 'Booked' },
-        { date: '2025-08-07', time: '11:00am', status: 'Available' },
-        { date: '2025-08-07', time: '11:10am', status: 'Booked' },
-        { date: '2025-08-07', time: '10:50am', status: 'Available' },
+        { date: '2025-08-07', time: '10:10am', status: 'Available' },
         { date: '2025-08-07', time: '10:20am', status: 'Available' },
-        { date: '2025-08-07', time: '10:10am', status: 'Available' }
+        { date: '2025-08-07', time: '10:30am', status: 'Booked' },
+        { date: '2025-08-07', time: '10:40am', status: 'Available' },
+        { date: '2025-08-07', time: '10:50am', status: 'Available' },
     ];
 
+    const tableBody = document.querySelector('#logsTable tbody');
     const dateFilter = document.getElementById('dateFilter');
     const statusFilter = document.getElementById('statusFilter');
-    const logsTable = document.getElementById('logsTable');
 
-    function populateDateFilter() {
+    function populateTable() {
+        tableBody.innerHTML = '';
+        const selectedDate = dateFilter.value;
+        const selectedStatus = statusFilter.value;
+
+        const filtered = logsData.filter(log => 
+            (selectedDate === 'All' || log.date === selectedDate) &&
+            (selectedStatus === 'All' || log.status === selectedStatus)
+        );
+
+        filtered.forEach(log => {
+            const row = `<tr><td>${log.date}</td><td>${log.time}</td><td>${log.status}</td></tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    function populateFilters() {
         const uniqueDates = [...new Set(logsData.map(log => log.date))];
-        dateFilter.innerHTML = '<option value="All">All</option>';
+        uniqueDates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            dateFilter.appendChild(option);
+        });
+    }
+
+    function exportCSV() {
+        window.location.href = 'https://airtable.com/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w/export';
+    }
+
+    dateFilter.addEventListener('change', populateTable);
+    statusFilter.addEventListener('change', populateTable);
+
+    populateFilters();
+    populateTable();
+</script>
+
+</body>
+</html>        dateFilter.innerHTML = '<option value="All">All</option>';
         uniqueDates.forEach(date => {
             const option = document.createElement('option');
             option.value = date;
