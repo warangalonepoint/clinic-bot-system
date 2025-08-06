@@ -1,27 +1,44 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Staff Panel — Onestop AI Clinic</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <title>Staff Panel — Onestop AI Clinic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f8f8f8; }
+        .header { background: black; color: white; padding: 15px; text-align: center; }
+        .logo { width: 60px; margin-top: 20px; }
+        .banner { width: 100%; }
+        .container { padding: 20px; text-align: center; }
+        .btn { display: block; width: 80%; margin: 10px auto; padding: 15px; background: black; color: white; border-radius: 10px; font-size: 18px; }
+        .footer { position: fixed; bottom: 0; width: 100%; background: black; color: white; text-align: center; padding: 10px; }
+    </style>
 </head>
 <body>
-  <header>
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo">
-    <h1>Onestop AI Clinic Demo</h1>
-  </header>
-  <section class="hero-banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Clinic Hero Banner">
-  </section>
-  <main class="container">
-    <h2>Staff Panel</h2>
-    <div class="button-panel">
-      <button onclick="location.href='add-staff.html'">➕ Add Staff</button>
-      <button onclick="location.href='delete-staff.html'">🗑️ Delete Staff</button>
+
+    <div class="header">
+        <img src="assets/clinic-logo.png" class="logo" alt="Logo">
+        <div>Onestop AI Clinic Demo</div>
     </div>
-  </main>
-  <footer>
-    Powered by Onestop AI
-  </footer>
+
+    <img src="assets/clinic-hero-banner.png" class="banner" alt="Banner">
+
+    <div class="container">
+        <h2>Staff Panel</h2>
+        <button class="btn" onclick="addStaff()">➕ Add Staff</button>
+        <button class="btn" onclick="deleteStaff()">🗑️ Delete Staff</button>
+    </div>
+
+    <div class="footer">Powered by Onestop AI</div>
+
+    <script>
+        function addStaff() {
+            alert("Add Staff clicked! (Demo Purpose)");
+        }
+        function deleteStaff() {
+            alert("Delete Staff clicked! (Demo Purpose)");
+        }
+    </script>
+
 </body>
 </html>
