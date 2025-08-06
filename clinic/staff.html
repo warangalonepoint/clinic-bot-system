@@ -1,44 +1,31 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sync Panel - OneStop AI Clinic</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <title>Sync Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
+        .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+        .header img { height: 30px; vertical-align: middle; margin-right: 10px; }
+        .hero-banner { width: 100%; max-width: 400px; margin: 20px auto; display: block; border-radius: 10px; }
+        .container { text-align: center; padding: 10px; }
+        .btn { background: #000; color: #fff; padding: 15px; margin: 10px 0; width: 80%; max-width: 300px; border: none; border-radius: 10px; font-size: 16px; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; text-align: center; padding: 10px 0; font-size: 14px; }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Sync Panel</h1>
-  </header>  <section class="sync-panel">
-    <button onclick="downloadCSV('slots.csv')">Download Slots CSV</button>
-    <button onclick="downloadCSV('logs.csv')">Download Logs CSV</button>
-    <button onclick="downloadCSV('staff.csv')">Download Staff CSV</button>
-  </section><a href="https://wa.me/918686019709?text=Hi, I need assistance" class="whatsapp-float" target="_blank">💬</a>
+    <div class="header">
+        <img src="assets/clinic-logo.png" alt="Logo">
+        Onestop AI Clinic Demo
+    </div><img src="assets/clinic-hero-banner.png" alt="Banner" class="hero-banner">
 
-  <style>
-    .whatsapp-float {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #25D366;
-      color: white;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 28px;
-      z-index: 1000;
-    }
-  </style>  <script>
-    function downloadCSV(file) {
-      const link = document.createElement('a');
-      link.href = file;
-      link.download = file;
-      link.click();
-    }
-  </script></body>
+<div class="container">
+    <h2>Sync Panel</h2>
+    <button class="btn" onclick="alert('Syncing Bookings Logs... (Demo)')">🔄 Sync Bookings Logs</button><br>
+    <button class="btn" onclick="alert('Syncing Available Slots... (Demo)')">🔄 Sync Available Slots</button>
+</div>
+
+<footer>Powered by Onestop AI</footer>
+
+</body>
 </html>
