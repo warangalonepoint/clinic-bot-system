@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Clinic Appointment Booking | Slot Selection</title>
+    <title>Clinic Appointment Booking | Dynamic Slots</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
@@ -12,24 +12,12 @@
 </head>
 <body>
 
-    <h2>Clinic Appointment Booking (Slot Selection)</h2>
+    <h2>Clinic Appointment Booking (Live Slots)</h2>
 
     <input type="text" id="patientName" placeholder="Patient Name">
 
-    <select id="bookingDate">
-        <option>Select Date</option>
-        <option>2025-08-06</option>
-        <option>2025-08-07</option>
-        <option>2025-08-08</option>
-    </select>
-
-    <select id="slotTime">
-        <option>Select Time Slot</option>
-        <option>10:00 AM</option>
-        <option>10:30 AM</option>
-        <option>11:00 AM</option>
-        <option>11:30 AM</option>
-        <option>12:00 PM</option>
+    <select id="slotDropdown">
+        <option>Loading available slots...</option>
     </select>
 
     <input type="text" id="reason" placeholder="Reason for Visit">
@@ -40,18 +28,43 @@
     <script>
         const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
         const BASE_ID = 'appgIT8WiqnZlR44Y';
-        const TABLE_NAME = 'BookingsLogs';
+        const SLOTS_TABLE = 'AvailableSlots';
+        const BOOKINGS_TABLE = 'BookingsLogs';
+
+        // Load Available Slots
+        fetch(`https://api.airtable.com/v0/${BASE_ID}/${SLOTS_TABLE}?filterByFormula=Status='Available'`, {
+            headers: { 'Authorization': `Bearer ${API_KEY}` }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const dropdown = document.getElementById('slotDropdown');
+            dropdown.innerHTML = "<option>Select Slot</option>";
+            data.records.forEach(record => {
+                const date = record.fields.Date;
+                const time = record.fields['Time Slot'];
+                const slotID = record.id;
+                const option = document.createElement('option');
+                option.value = slotID + "|" + date + " " + time;
+                option.text = `${date} — ${time}`;
+                dropdown.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Failed to load slots.");
+        });
 
         function submitBooking() {
             const patientName = document.getElementById('patientName').value.trim();
-            const bookingDate = document.getElementById('bookingDate').value;
-            const slotTime = document.getElementById('slotTime').value;
+            const selectedSlot = document.getElementById('slotDropdown').value;
             const reason = document.getElementById('reason').value.trim();
 
-            if(patientName === "" || bookingDate === "Select Date" || slotTime === "Select Time Slot" || reason === "") {
-                alert("Please fill all fields correctly.");
+            if(patientName === "" || selectedSlot === "Select Slot" || reason === "") {
+                alert("Please fill all fields.");
                 return;
             }
+
+            const [slotID, slotTime] = selectedSlot.split("|");
 
             const data = {
                 records: [
@@ -59,14 +72,15 @@
                         fields: {
                             "Timestamp": new Date().toLocaleString(),
                             "Patient Name": patientName,
-                            "Slot Time": bookingDate + " " + slotTime,
+                            "Slot Time": slotTime,
                             "Reason": reason
                         }
                     }
                 ]
             };
 
-            fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
+            // Log Booking
+            fetch(`https://api.airtable.com/v0/${BASE_ID}/${BOOKINGS_TABLE}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${API_KEY}`,
@@ -76,20 +90,29 @@
             })
             .then(response => response.json())
             .then(result => {
-                document.getElementById('status').innerText = "Booking Logged Successfully! Redirecting to WhatsApp...";
-                
-                const clinicName = "Onestop Clinic";
-                const whatsappNumber = "919390664577";
+                document.getElementById('status').innerText = "Booking Logged Successfully!";
 
-                const message = `Hello, this is ${patientName}. My appointment has been booked for ${bookingDate} at ${slotTime} with ${clinicName}.`;
+                // Mark Slot as Booked in Airtable
+                const updateData = {
+                    records: [
+                        {
+                            id: slotID,
+                            fields: { Status: 'Booked' }
+                        }
+                    ]
+                };
 
-                const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-                window.location.href = whatsappURL;
-
-                document.getElementById('patientName').value = "";
-                document.getElementById('bookingDate').selectedIndex = 0;
-                document.getElementById('slotTime').selectedIndex = 0;
-                document.getElementById('reason').value = "";
+                fetch(`https://api.airtable.com/v0/${BASE_ID}/${SLOTS_TABLE}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                }).then(() => {
+                    alert("Slot Booked. Refreshing Available Slots.");
+                    window.location.reload();
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
