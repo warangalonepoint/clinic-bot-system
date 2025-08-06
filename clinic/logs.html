@@ -2,25 +2,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Logs</title>
+    <title>Onestop AI Clinic Demo</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; }
-        .header { background: #000; color: #fff; padding: 10px; text-align: center; }
+        body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }
+        .header { background: #000; color: #fff; text-align: center; padding: 20px; font-size: 24px; }
         .container { padding: 20px; }
+        .button { background: #000; color: #fff; padding: 10px 20px; text-align: center; display: inline-block; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+        .filter { margin-bottom: 20px; }
         iframe { width: 100%; height: 600px; border: none; }
-        .export-btn { background: #000; color: #fff; padding: 10px 20px; border: none; cursor: pointer; margin-bottom: 20px; }
+        select { padding: 10px; margin-right: 10px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Onestop AI Clinic Demo</h1>
-    </div>
+    <div class="header">Onestop AI Clinic Demo</div>
     <div class="container">
-        <button class="export-btn" onclick="exportCSV()">⬇️ Export Logs as CSV</button>
-        <iframe src="https://airtable.com/embed/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w?backgroundColor=gray" frameborder="0"></iframe>
-    </div><script>
+        <div class="button" onclick="exportCSV()">⬇️ Export Logs as CSV</div><div class="filter">
+        <select id="dateFilter" onchange="filterLogs()">
+            <option value="">All Dates</option>
+            <option value="2025-07-08">July 8, 2025</option>
+            <option value="2025-07-09">July 9, 2025</option>
+        </select>
+
+        <select id="statusFilter" onchange="filterLogs()">
+            <option value="">All Status</option>
+            <option value="Booked">Booked</option>
+            <option value="Available">Available</option>
+        </select>
+    </div>
+
+    <iframe id="logsFrame" src="https://airtable.com/embed/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w?viewControls=on"></iframe>
+</div>
+
+<script>
     function exportCSV() {
         window.location.href = 'https://airtable.com/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w/export';
+    }
+
+    function filterLogs() {
+        const date = document.getElementById('dateFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        let url = 'https://airtable.com/embed/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w?viewControls=on';
+
+        if (date || status) {
+            url += `&filter=AND(`;
+            if (date) url += `{Date}='${date}'`;
+            if (date && status) url += `,`;
+            if (status) url += `{Status}='${status}'`;
+            url += `)`;
+        }
+
+        document.getElementById('logsFrame').src = url;
     }
 </script>
 
