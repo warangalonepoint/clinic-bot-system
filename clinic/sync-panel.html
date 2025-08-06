@@ -1,38 +1,43 @@
 <!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sync Panel - Onestop AI Clinic</title>
-</head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;">
-    <div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-        <span>Onestop AI Clinic Demo</span>
-    </div><div style="text-align:center; padding:20px;">
-    <img src="./assets/clinic-hero-banner.png" alt="Doctor Illustration" style="width:80%; max-width:300px; border-radius:10px;">
-</div>
-
-<h2 style="text-align:center;">Data Sync Panel</h2>
-
-<div style="padding:20px;">
-    <button onclick="downloadCSV('logs.csv')" style="width:100%; padding:15px; margin-bottom:10px; background:#000; color:#fff; border:none; font-size:16px;">Download Logs Backup</button>
-
-    <button onclick="downloadCSV('slots.csv')" style="width:100%; padding:15px; margin-bottom:10px; background:#000; color:#fff; border:none; font-size:16px;">Download Slots Backup</button>
-
-    <button onclick="downloadCSV('staff-attendance.csv')" style="width:100%; padding:15px; margin-bottom:10px; background:#000; color:#fff; border:none; font-size:16px;">Download Staff Attendance</button>
-
-    <button onclick="downloadCSV('staff-leave-tracker.csv')" style="width:100%; padding:15px; margin-bottom:10px; background:#000; color:#fff; border:none; font-size:16px;">Download Leave Tracker</button>
-</div>
-
-<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
-    Powered by Onestop AI
-</footer>
-
-<script>
-    function downloadCSV(fileName) {
-        window.open(`https://warangalonepoint.github.io/clinic-bot-system/clinic/${fileName}`, '_blank');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sync Panel - Onestop AI Clinic</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      text-align: center;
     }
-</script>
+    .banner {
+      width: 100%;
+    }
+    .title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+    .button {
+      display: block;
+      width: 80%;
+      margin: 1rem auto;
+      padding: 1rem;
+      background-color: black;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+    .button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner" class="banner">
+  <div class="title">Sync Panel</div><a href="./BookingsLogs.csv" download class="button">📥 Download Logs CSV</a> <a href="./AvailableSlots.csv" download class="button">📥 Download Slots CSV</a>
 
 </body>
 </html>
