@@ -3,40 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Staff Panel — Onestop AI Clinic</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f8f8f8; }
-        .header { background: black; color: white; padding: 15px; text-align: center; }
-        .logo { width: 60px; margin-top: 20px; }
-        .banner { width: 100%; }
-        .container { padding: 20px; text-align: center; }
-        .btn { display: block; width: 80%; margin: 10px auto; padding: 15px; background: black; color: white; border-radius: 10px; font-size: 18px; }
-        .footer { position: fixed; bottom: 0; width: 100%; background: black; color: white; text-align: center; padding: 10px; }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f8f8f8; }
+        .header { background: black; color: white; padding: 10px; }
+        .banner { width: 100%; max-width: 400px; margin: 20px auto; }
+        .form-group { margin: 10px 0; }
+        input, select { padding: 10px; width: 80%; max-width: 300px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background: black; color: white; border: none; cursor: pointer; }
+        footer { position: fixed; bottom: 0; width: 100%; background: black; color: white; padding: 5px 0; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <img src="assets/clinic-logo.png" class="logo" alt="Logo">
-        <div>Onestop AI Clinic Demo</div>
+        <img src="./assets/clinic-logo.png" alt="Logo" style="height:30px; vertical-align: middle;">
+        <span>Onestop AI Clinic Demo</span>
     </div>
 
-    <img src="assets/clinic-hero-banner.png" class="banner" alt="Banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
 
-    <div class="container">
-        <h2>Staff Panel</h2>
-        <button class="btn" onclick="addStaff()">➕ Add Staff</button>
-        <button class="btn" onclick="deleteStaff()">🗑️ Delete Staff</button>
+    <h2>Add Staff</h2>
+
+    <div class="form-group">
+        <input type="text" id="staffName" placeholder="Staff Name">
+    </div>
+    <div class="form-group">
+        <input type="text" id="staffRole" placeholder="Role (Doctor/Nurse)">
+    </div>
+    <div class="form-group">
+        <input type="text" id="staffContact" placeholder="Contact Number">
+    </div>
+    <div class="form-group">
+        <select id="staffStatus">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
     </div>
 
-    <div class="footer">Powered by Onestop AI</div>
+    <button onclick="addStaff()">Add Staff</button>
+
+    <footer>Powered by Onestop AI</footer>
 
     <script>
-        function addStaff() {
-            alert("Add Staff clicked! (Demo Purpose)");
-        }
-        function deleteStaff() {
-            alert("Delete Staff clicked! (Demo Purpose)");
+        async function addStaff() {
+            const name = document.getElementById('staffName').value;
+            const role = document.getElementById('staffRole').value;
+            const contact = document.getElementById('staffContact').value;
+            const status = document.getElementById('staffStatus').value;
+
+            if (!name || !role || !contact) {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            const airtableApiUrl = "https://api.airtable.com/v0/appgIT8WiqnZlR44Y/StaffList";
+            const airtableApiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
+
+            const data = {
+                records: [{
+                    fields: {
+                        Name: name,
+                        Role: role,
+                        Contact: contact,
+                        Status: status
+                    }
+                }]
+            };
+
+            const response = await fetch(airtableApiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + airtableApiKey
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert("Staff added successfully!");
+                document.getElementById('staffName').value = '';
+                document.getElementById('staffRole').value = '';
+                document.getElementById('staffContact').value = '';
+                document.getElementById('staffStatus').value = 'Active';
+            } else {
+                alert("Failed to add staff.");
+            }
         }
     </script>
 
