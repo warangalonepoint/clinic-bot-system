@@ -1,46 +1,86 @@
-<style>
-  .logs-table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: collapse;
-  }
-  .logs-table th, .logs-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-  }
-  .logs-table th {
-    background-color: #f2f2f2;
-  }
-  .export-btn {
-    background-color: black;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    margin: 20px auto;
-    display: block;
-    border-radius: 8px;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Logs - Onestop AI Clinic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; text-align: center; }
+    .top-bar { background: black; color: white; padding: 10px; }
+    .banner { width: 100%; max-width: 500px; margin: 10px auto; display: block; }
+    h1 { font-size: 20px; margin: 10px 0; }
+    .export-btn {
+      background-color: black;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin: 20px auto;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .logs-table {
+      width: 90%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: white;
+    }
+    .logs-table th, .logs-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .logs-table th {
+      background-color: #f2f2f2;
+    }
+    .footer {
+      background: black;
+      color: white;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    a { color: blue; text-decoration: underline; }
+    button[disabled] {
+      background: #ccc;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
 
-<h2>Booking Logs</h2>
-<button class="export-btn">Export Logs</button>
+  <div class="top-bar">
+    <img src="./assets/logo.png" alt="Logo" height="30">
+    <div>Onestop AI Clinic Demo</div>
+  </div>
 
-<table class="logs-table">
-  <tr>
-    <th>Date</th>
-    <th>Time</th>
-    <th>Patient Name</th>
-    <th>Reason</th>
-    <th>Contact</th>
-    <th>Reminder</th>
-  </tr>
-  <tr>
-    <td>2025-08-06</td>
-    <td>10:00 AM</td>
-    <td>Chaitanya</td>
-    <td>Fever</td>
-    <td><a href="tel:9390664577">9390664577</a></td>
-    <td><button disabled>Reminder Sent</button></td>
-  </tr>
-</table>
+  <img src="./assets/clinic-hero-banner.png" class="banner" alt="Clinic Banner">
+
+  <h1>Booking Logs</h1>
+  <button class="export-btn">Export Logs</button>
+
+  <table class="logs-table">
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Patient Name</th>
+      <th>Reason</th>
+      <th>Contact</th>
+      <th>Reminder</th>
+    </tr>
+    <tr>
+      <td>2025-08-06</td>
+      <td>10:00 AM</td>
+      <td>Chaitanya</td>
+      <td>Fever</td>
+      <td><a href="tel:9390664577">9390664577</a></td>
+      <td><button disabled>Reminder Sent</button></td>
+    </tr>
+  </table>
+
+  <div class="footer">Powered by Onestop AI</div>
+
+</body>
+</html>
