@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Clinic Bot — Book Appointment</title>
+    <title>Clinic Appointment Booking | Slot Selection</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
@@ -12,10 +12,26 @@
 </head>
 <body>
 
-    <h2>Clinic Appointment Booking (Airtable Connected)</h2>
+    <h2>Clinic Appointment Booking (Slot Selection)</h2>
 
     <input type="text" id="patientName" placeholder="Patient Name">
-    <input type="text" id="slotTime" placeholder="Slot Time (e.g., 10:30 AM)">
+
+    <select id="bookingDate">
+        <option>Select Date</option>
+        <option>2025-08-06</option>
+        <option>2025-08-07</option>
+        <option>2025-08-08</option>
+    </select>
+
+    <select id="slotTime">
+        <option>Select Time Slot</option>
+        <option>10:00 AM</option>
+        <option>10:30 AM</option>
+        <option>11:00 AM</option>
+        <option>11:30 AM</option>
+        <option>12:00 PM</option>
+    </select>
+
     <input type="text" id="reason" placeholder="Reason for Visit">
 
     <button onclick="submitBooking()">Book Appointment</button>
@@ -28,11 +44,12 @@
 
         function submitBooking() {
             const patientName = document.getElementById('patientName').value.trim();
-            const slotTime = document.getElementById('slotTime').value.trim();
+            const bookingDate = document.getElementById('bookingDate').value;
+            const slotTime = document.getElementById('slotTime').value;
             const reason = document.getElementById('reason').value.trim();
 
-            if(patientName === "" || slotTime === "" || reason === "") {
-                alert("Please fill all fields.");
+            if(patientName === "" || bookingDate === "Select Date" || slotTime === "Select Time Slot" || reason === "") {
+                alert("Please fill all fields correctly.");
                 return;
             }
 
@@ -42,7 +59,7 @@
                         fields: {
                             "Timestamp": new Date().toLocaleString(),
                             "Patient Name": patientName,
-                            "Slot Time": slotTime,
+                            "Slot Time": bookingDate + " " + slotTime,
                             "Reason": reason
                         }
                     }
@@ -61,7 +78,8 @@
             .then(result => {
                 document.getElementById('status').innerText = "Booking Logged Successfully!";
                 document.getElementById('patientName').value = "";
-                document.getElementById('slotTime').value = "";
+                document.getElementById('bookingDate').selectedIndex = 0;
+                document.getElementById('slotTime').selectedIndex = 0;
                 document.getElementById('reason').value = "";
             })
             .catch(error => {
