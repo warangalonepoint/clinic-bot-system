@@ -1,125 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Clinic Appointment Booking | Dynamic Slots</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Bookings</title>
+    <link rel="stylesheet" href="./assets/styles.css">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
-        input, select, button { display: block; width: 100%; padding: 12px; margin-top: 15px; border-radius: 10px; font-size: 16px; }
-        button { background: black; color: white; border: none; cursor: pointer; }
+        body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+        .header { background: #000; color: #fff; padding: 10px; text-align: center; }
+        .header img { height: 40px; }
+        .container { padding: 20px; }
+        .banner { width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        .form-section { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-section select, .form-section input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; }
+        .form-section button { background: #000; color: #fff; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <h1>Onestop AI Clinic Demo</h1>
+    </div><div class="container">
+    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner" class="banner">
 
-    <h2>Clinic Appointment Booking (Live Slots)</h2>
+    <div class="form-section">
+        <h2>Book an Appointment</h2>
+        <label for="dateSelect">Select Date:</label>
+        <select id="dateSelect">
+            <option value="2025-08-07">August 7, 2025</option>
+            <option value="2025-08-08">August 8, 2025</option>
+        </select>
 
-    <input type="text" id="patientName" placeholder="Patient Name">
+        <label for="slotSelect">Select Time Slot:</label>
+        <select id="slotSelect">
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="10:30 AM">10:30 AM</option>
+        </select>
 
-    <select id="slotDropdown">
-        <option>Loading available slots...</option>
-    </select>
+        <label for="nameInput">Your Name:</label>
+        <input type="text" id="nameInput" placeholder="Enter your name">
 
-    <input type="text" id="reason" placeholder="Reason for Visit">
+        <label for="reasonInput">Reason for Visit:</label>
+        <input type="text" id="reasonInput" placeholder="Reason (e.g., Fever)">
 
-    <button onclick="submitBooking()">Book Appointment</button>
-    <div id="status" style="margin-top: 20px; color: green;"></div>
+        <button onclick="confirmBooking()">Book Now</button>
+    </div>
+</div>
 
-    <script>
-        const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
-        const BASE_ID = 'appgIT8WiqnZlR44Y';
-        const SLOTS_TABLE = 'AvailableSlots';
-        const BOOKINGS_TABLE = 'BookingsLogs';
+<script>
+    function confirmBooking() {
+        const name = document.getElementById('nameInput').value;
+        const reason = document.getElementById('reasonInput').value;
+        const date = document.getElementById('dateSelect').value;
+        const slot = document.getElementById('slotSelect').value;
 
-        // Load Available Slots
-        fetch(`https://api.airtable.com/v0/${BASE_ID}/${SLOTS_TABLE}?filterByFormula=Status='Available'`, {
-            headers: { 'Authorization': `Bearer ${API_KEY}` }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const dropdown = document.getElementById('slotDropdown');
-            dropdown.innerHTML = "<option>Select Slot</option>";
-            data.records.forEach(record => {
-                const date = record.fields.Date;
-                const time = record.fields['Time Slot'];
-                const slotID = record.id;
-                const option = document.createElement('option');
-                option.value = slotID + "|" + date + " " + time;
-                option.text = `${date} — ${time}`;
-                dropdown.appendChild(option);
-            });
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Failed to load slots.");
-        });
-
-        function submitBooking() {
-            const patientName = document.getElementById('patientName').value.trim();
-            const selectedSlot = document.getElementById('slotDropdown').value;
-            const reason = document.getElementById('reason').value.trim();
-
-            if(patientName === "" || selectedSlot === "Select Slot" || reason === "") {
-                alert("Please fill all fields.");
-                return;
-            }
-
-            const [slotID, slotTime] = selectedSlot.split("|");
-
-            const data = {
-                records: [
-                    {
-                        fields: {
-                            "Timestamp": new Date().toLocaleString(),
-                            "Patient Name": patientName,
-                            "Slot Time": slotTime,
-                            "Reason": reason
-                        }
-                    }
-                ]
-            };
-
-            // Log Booking
-            fetch(`https://api.airtable.com/v0/${BASE_ID}/${BOOKINGS_TABLE}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                document.getElementById('status').innerText = "Booking Logged Successfully!";
-
-                // Mark Slot as Booked in Airtable
-                const updateData = {
-                    records: [
-                        {
-                            id: slotID,
-                            fields: { Status: 'Booked' }
-                        }
-                    ]
-                };
-
-                fetch(`https://api.airtable.com/v0/${BASE_ID}/${SLOTS_TABLE}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updateData)
-                }).then(() => {
-                    alert("Slot Booked. Refreshing Available Slots.");
-                    window.location.reload();
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Failed to log booking.");
-            });
+        if (name && reason) {
+            const whatsappMsg = `Hello, I would like to book an appointment on ${date} at ${slot} for ${reason}. My name is ${name}.`;
+            window.location.href = `https://wa.me/919390664577?text=${encodeURIComponent(whatsappMsg)}`;
+        } else {
+            alert('Please fill all fields.');
         }
-    </script>
+    }
+</script>
 
 </body>
 </html>
