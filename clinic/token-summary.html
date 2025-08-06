@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Token Summary - Onestop AI Clinic</title>
-    <link rel="stylesheet" href="./assets/styles.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+        body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
         .header { background: #000; color: #fff; text-align: center; padding: 10px; }
         .header img { height: 40px; }
         .container { padding: 20px; }
@@ -14,7 +14,8 @@
         th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
         th { background: #222; color: #fff; }
     </style>
-</head><body>
+</head>
+<body>
     <div class="header">
         <img src="./assets/clinic-logo.png" alt="Clinic Logo">
         <h1>Onestop AI Clinic Demo</h1>
@@ -29,29 +30,43 @@
             </tr>
         </thead>
         <tbody id="tokenTable">
-            <!-- Data will load here -->
+            <tr><td colspan="2">Loading...</td></tr>
         </tbody>
     </table>
 </div>
 
 <script>
-    const tokenData = [
-        { date: '2025-08-07', tokens: 12 },
-        { date: '2025-08-08', tokens: 8 },
-        { date: '2025-08-09', tokens: 15 }
-    ];
+    const apiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+    const baseId = 'appgIT8WiqnZlR44Y';
+    const tableName = 'BookingsLogs';
 
-    const tableBody = document.getElementById('tokenTable');
+    async function fetchTokens() {
+        const url = `https://api.airtable.com/v0/${baseId}/${tableName}`;
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+        const data = await response.json();
 
-    function loadTokens() {
+        const tokenCountByDate = {};
+        data.records.forEach(record => {
+            const timestamp = record.fields.Timestamp;
+            if (timestamp) {
+                const date = timestamp.split(',')[0];
+                tokenCountByDate[date] = (tokenCountByDate[date] || 0) + 1;
+            }
+        });
+
+        const tableBody = document.getElementById('tokenTable');
         tableBody.innerHTML = '';
-        tokenData.forEach(entry => {
-            const row = `<tr><td>${entry.date}</td><td>${entry.tokens}</td></tr>`;
+
+        Object.entries(tokenCountByDate).forEach(([date, count]) => {
+            const row = `<tr><td>${date}</td><td>${count}</td></tr>`;
             tableBody.innerHTML += row;
         });
     }
 
-    loadTokens();
+    fetchTokens();
 </script>
 
-</body></html>
+</body>
+</html>
