@@ -1,66 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF‑8">
-  <title>Token Summary – Onestop AI Clinic</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { margin:0; font-family:sans-serif; background:#f9f9f9; }
-    .header { background:#000; color:#fff; padding:10px; display:flex; align-items:center; }
-    .header img { height:30px; margin-right:10px; }
-    .banner { text-align:center; padding:20px; }
-    .banner img { width:80%; max-width:300px; border-radius:10px; }
-    h2 { text-align:center; margin-top:0; }
-    .container { padding:0 20px; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    th, td { border:1px solid #ddd; padding:12px; text-align:left; font-size:14px; }
-    th { background:#eee; }
-    .export-btn { width:100%; padding:12px; margin:20px 0; background:#000; color:#fff; border:none; border-radius:8px; font-size:16px; }
-    footer { position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px; }
-  </style>
-</head>
-<body>
-
-  <div class="header">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-    <span>Onestop AI Clinic Demo</span>
-  </div>
-
-  <div class="banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Token Summary">
-  </div>
-
-  <h2>Token Summary</h2>
-
-  <div class="container">
-    <button class="export-btn" onclick="downloadCSV('token-summary.csv')">Export Token List CSV</button>
-
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Summary - Onestop AI Clinic</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+        .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+        .header img { height: 40px; }
+        .container { padding: 20px; }
+        .banner { width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background: #222; color: #fff; }
+    </style>
+</head><body>
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <h1>Onestop AI Clinic Demo</h1>
+    </div><div class="container">
+    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
+    <h2>Token Summary</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Token</th>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Booked</th>
-          <th>Reminder Sent</th>
-        </tr>
-      </thead>
-      <tbody id="tokenTable">
-        <tr>
-          <td>1</td><td>2025‑08‑01</td><td>09:00</td><td>✓</td><td>No</td>
-        </tr>
-        <!-- More rows -->
-      </tbody>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Total Tokens</th>
+            </tr>
+        </thead>
+        <tbody id="tokenTable">
+            <!-- Data will load here -->
+        </tbody>
     </table>
-  </div>
+</div>
 
-  <footer>Powered by Onestop AI</footer>
+<script>
+    const tokenData = [
+        { date: '2025-08-07', tokens: 12 },
+        { date: '2025-08-08', tokens: 8 },
+        { date: '2025-08-09', tokens: 15 }
+    ];
 
-  <script>
-    function downloadCSV(name) {
-      window.open(`https://warangalonepoint.github.io/clinic-bot-system/clinic/${name}`, '_blank');
+    const tableBody = document.getElementById('tokenTable');
+
+    function loadTokens() {
+        tableBody.innerHTML = '';
+        tokenData.forEach(entry => {
+            const row = `<tr><td>${entry.date}</td><td>${entry.tokens}</td></tr>`;
+            tableBody.innerHTML += row;
+        });
     }
-  </script>
 
-</body>
-</html>
+    loadTokens();
+</script>
+
+</body></html>
