@@ -1,33 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Staff Panel | Onestop AI Clinic</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { margin: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; }
-    .header { background: black; color: white; padding: 10px; text-align: center; }
-    .header img { height: 30px; vertical-align: middle; }
-    .header span { font-size: 18px; margin-left: 10px; }
-    .banner { width: 100%; display: block; }
-    iframe { width: 100%; height: 80vh; border: none; }
-    .footer { background: black; color: white; text-align: center; padding: 10px; position: fixed; width: 100%; bottom: 0; }
-  </style>
-</head>
-<body>
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Panel - Onestop AI Clinic Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }.header {
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
 
-  <div class="header">
-    <img src="./assets/clinic-logo.png" alt="Logo">
-    <span>Onestop AI Clinic Demo</span>
-  </div>
+    .header img {
+        height: 40px;
+        vertical-align: middle;
+    }
 
-  <img src="./assets/clinic-hero-banner.png" class="banner" alt="Clinic Banner">
+    .header span {
+        vertical-align: middle;
+        font-size: 18px;
+        margin-left: 10px;
+    }
 
-  <iframe src="https://airtable.com/embed/appgIT8WiqnZlR44Y/tbl4dnerbp1gcmp94/viwcEZoCPUNdgSl2C?backgroundColor=cyan"></iframe>
+    .banner {
+        text-align: center;
+        padding: 10px;
+    }
 
-  <div class="footer">
-    Powered by Onestop AI
-  </div>
+    .banner img {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+    }
 
-</body>
-</html>
+    .title {
+        text-align: center;
+        font-size: 24px;
+        margin: 10px 0;
+    }
+
+    .airtable-embed {
+        width: 95%;
+        height: 600px;
+        border: 1px solid #ccc;
+        margin: 0 auto 20px auto;
+        display: block;
+    }
+
+    .footer {
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+
+</head><body>
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Logo">
+        <span>Onestop AI Clinic Demo</span>
+    </div><div class="banner">
+    <img src="./assets/clinic-hero-banner.png" alt="Banner">
+</div>
+
+<div class="title">Manage Staff</div>
+
+<iframe class="airtable-embed" src="https://airtable.com/embed/appgIT8WiqnZlR44Y/shriTI45uOVNTvMWZ?viewControls=on" frameborder="0" onmousewheel=""></iframe>
+
+<div class="footer">Powered by Onestop AI</div>
+
+</body></html>
