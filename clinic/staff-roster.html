@@ -1,39 +1,71 @@
-<!DOCTYPE html><html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Roster</title>
-    <link rel="icon" href="assets/clinic-logo.png">
+    <title>Staff Roster - Onestop AI Clinic</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
-        .banner { width: 100%; }
-        .container { padding: 20px; }
-        .title { text-align: center; font-size: 1.8rem; margin: 20px 0; }
-        .staff-roster { background: #fff; padding: 15px; margin: 10px 0; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .staff-roster h3 { margin: 0 0 10px 0; }
-        .footer { text-align: center; font-size: 0.9rem; padding: 10px; background: #000; color: #fff; position: fixed; bottom: 0; width: 100%; }
-    </style>
-</head>
-<body>
-    <img src="assets/clinic-hero-banner.png" class="banner"><div class="container">
-    <div class="title">Staff Roster</div>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            text-align: center;
+        }.header {
+        background-color: black;
+        color: white;
+        padding: 15px;
+        font-size: 20px;
+    }
 
-    <div class="staff-roster">
+    .hero {
+        width: 100%;
+    }
+
+    .container {
+        margin: 20px auto;
+        width: 90%;
+    }
+
+    .roster-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: left;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: black;
+        color: white;
+        padding: 8px 0;
+        font-size: 14px;
+    }
+</style>
+
+</head><body>
+    <div class="header">Onestop AI Clinic Demo</div>
+    <img src="assets/clinic-hero-banner.png" class="hero" alt="Hero Banner"><div class="container">
+    <h2>Staff Roster</h2>
+
+    <div class="roster-card">
         <h3>Dr. Anjali Mehta</h3>
         <p>Duty Time: 9:00 AM - 1:00 PM</p>
     </div>
-    <div class="staff-roster">
+
+    <div class="roster-card">
         <h3>Dr. Rakesh Sharma</h3>
         <p>Duty Time: 2:00 PM - 6:00 PM</p>
     </div>
-    <div class="staff-roster">
+
+    <div class="roster-card">
         <h3>Nurse Priya Singh</h3>
         <p>Duty Time: 9:00 AM - 5:00 PM</p>
     </div>
 
 </div>
 
-<div class="footer">Powered by Onestop AI</div>
+<footer>Powered by Onestop AI</footer>
 
-</body>
-</html>
+</body></html>
