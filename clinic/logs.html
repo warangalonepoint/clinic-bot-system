@@ -13,6 +13,7 @@
     </style>
 </head>
 <body><div class="header">
+    <img src="assets/banner.png" alt="Banner" style="width:100%;">
     <img src="assets/clinic-logo.png" alt="Logo" style="height:40px; vertical-align: middle;"> Onestop AI Clinic Logs
 </div>
 
@@ -28,20 +29,48 @@
 
 <!-- Logs Entries -->
 <div id="logsContainer">
-    <!-- Sample Log Entry (Dynamic in real scenario) -->
-    <div class="log-entry">
+    <div class="log-entry" data-id="recXXXXXXXXXXXX">
         <p><strong>Date:</strong> 06/08/2025, 11:30:20</p>
         <p><strong>Patient Name:</strong> Krishna</p>
         <p><strong>Slot Time:</strong> 2025-08-07 10:00 AM</p>
         <p><strong>Reason:</strong> Fever</p>
-        <a href="https://wa.me/919390664577?text=Dear Krishna, your appointment at Onestop Clinic is confirmed for 10:00 AM. Token No: 1." target="_blank" class="reminder-btn">Send WhatsApp Reminder</a>
+        <a href="https://wa.me/919390664577?text=Dear Krishna, your appointment at Onestop Clinic is confirmed for 10:00 AM. Token No: 1." target="_blank" class="reminder-btn" onclick="updateReminderStatus(this, 'recXXXXXXXXXXXX')">Send WhatsApp Reminder</a>
     </div>
 </div>
 
 <script>
-    // Dummy Counter Update Example
+    const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+    const BASE_ID = 'appgIT8WiqnZlR44Y';
+    const BOOKINGS_TABLE = 'BookingsLogs';
+
+    function updateReminderStatus(element, recordId) {
+        fetch(`https://api.airtable.com/v0/${BASE_ID}/${BOOKINGS_TABLE}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                records: [
+                    {
+                        id: recordId,
+                        fields: { 'Reminder Sent': 'Sent' }
+                    }
+                ]
+            })
+        }).then(() => {
+            element.innerText = 'Reminder Sent ✅';
+            element.style.background = 'gray';
+            element.onclick = null;
+            const sentCount = document.getElementById('remindersSent');
+            sentCount.innerText = parseInt(sentCount.innerText) + 1;
+        }).catch(err => {
+            console.error('Failed to update Reminder Status', err);
+        });
+    }
+
     document.getElementById('totalBookings').innerText = document.querySelectorAll('.log-entry').length;
-    document.getElementById('remindersSent').innerText = 0; // We'll increment on button click later.
+    document.getElementById('remindersSent').innerText = 0; // Will increment on button click
 </script>
 
 </body>
