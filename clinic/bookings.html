@@ -76,7 +76,16 @@
             })
             .then(response => response.json())
             .then(result => {
-                document.getElementById('status').innerText = "Booking Logged Successfully!";
+                document.getElementById('status').innerText = "Booking Logged Successfully! Redirecting to WhatsApp...";
+                
+                const clinicName = "Onestop Clinic";
+                const whatsappNumber = "919390664577";
+
+                const message = `Hello, this is ${patientName}. My appointment has been booked for ${bookingDate} at ${slotTime} with ${clinicName}.`;
+
+                const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+                window.location.href = whatsappURL;
+
                 document.getElementById('patientName').value = "";
                 document.getElementById('bookingDate').selectedIndex = 0;
                 document.getElementById('slotTime').selectedIndex = 0;
