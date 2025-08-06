@@ -10,6 +10,7 @@
     .header img { height: 30px; vertical-align: middle; margin-right: 10px; }
     .banner { width: 100%; }
     h2 { text-align: center; margin-top: 10px; }
+    .export-btn { display: block; width: 90%; margin: 10px auto; padding: 10px; background: #000; color: #fff; text-align: center; border: none; cursor: pointer; }
     table { width: 95%; margin: 20px auto; border-collapse: collapse; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
     th { background: #000; color: #fff; }
@@ -25,6 +26,8 @@
 <img src="./assets/clinic-hero-banner.png" class="banner">
 
 <h2>Booking Logs</h2>
+
+<button class="export-btn" onclick="exportToCSV()">⬇️ Export Logs</button>
 
 <table id="logsTable">
   <thead>
@@ -48,15 +51,18 @@ const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232
 const BASE_ID = 'appgIT8WiqnZlR44Y';
 const TABLE_NAME = 'BookingsLogs';
 
+let logsData = [];
+
 fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
   headers: { 'Authorization': `Bearer ${API_KEY}` }
 })
 .then(response => response.json())
 .then(data => {
+  logsData = data.records;
   const tableBody = document.querySelector('#logsTable tbody');
-  tableBody.innerHTML = ''; // Clear loading text
+  tableBody.innerHTML = '';
 
-  data.records.forEach(record => {
+  logsData.forEach(record => {
     const dateTime = record.fields['Timestamp'] || '';
     const patientName = record.fields['Patient Name'] || '';
     const reason = record.fields['Reason'] || '';
@@ -76,7 +82,7 @@ fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
     tableBody.innerHTML += row;
   });
 
-  if (data.records.length === 0) {
+  if (logsData.length === 0) {
     tableBody.innerHTML = `<tr><td colspan="5">No bookings found.</td></tr>`;
   }
 })
@@ -84,6 +90,38 @@ fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
   console.error('Error fetching logs:', error);
   document.querySelector('#logsTable tbody').innerHTML = `<tr><td colspan="5">Failed to load data.</td></tr>`;
 });
+
+function exportToCSV() {
+  if (logsData.length === 0) {
+    alert('No data to export.');
+    return;
+  }
+
+  let csvContent = "Date,Time,Patient Name,Reason,Contact\n";
+
+  logsData.forEach(record => {
+    const dateTime = record.fields['Timestamp'] || '';
+    const patientName = record.fields['Patient Name'] || '';
+    const reason = record.fields['Reason'] || '';
+    const contact = record.fields['Contact'] || '';
+    const slotTime = record.fields['Slot Time'] || '';
+
+    const date = dateTime.split('T')[0];
+    const time = slotTime ? slotTime : (dateTime.split('T')[1] || '').substring(0,5);
+
+    const row = `${date},${time},${patientName},${reason},${contact}\n`;
+    csvContent += row;
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'booking_logs.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 </script>
 
 </body>
