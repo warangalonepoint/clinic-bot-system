@@ -1,84 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Staff Attendance | Airtable Connected</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
-        input, select, button { display: block; width: 100%; padding: 12px; margin-top: 15px; border-radius: 10px; font-size: 16px; }
-        button { background: black; color: white; border: none; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Attendance Panel</title>
+  <link rel="icon" href="./assets/clinic-logo.png" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      text-align: center;
+    }
+    .banner {
+      width: 100%;
+      height: auto;
+    }
+    h1 {
+      background-color: black;
+      color: white;
+      padding: 10px;
+      margin: 0;
+    }
+    .button {
+      display: block;
+      width: 80%;
+      margin: 20px auto;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background-color: black;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+    }
+    .button:hover {
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
-
-    <h2>Staff Attendance Panel (Airtable Connected)</h2>
-
-    <input type="text" id="staffName" placeholder="Staff Name">
-
-    <select id="role">
-        <option>Doctor</option>
-        <option>Nurse</option>
-        <option>Receptionist</option>
-    </select>
-
-    <select id="attendanceStatus">
-        <option>Check-in</option>
-        <option>Check-out</option>
-    </select>
-
-    <button onclick="markAttendance()">Mark Attendance</button>
-    <div id="status" style="margin-top: 20px; color: green;"></div>
-
-    <script>
-        const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
-        const BASE_ID = 'appgIT8WiqnZlR44Y';
-        const TABLE_NAME = 'StaffAttendance';
-
-        function markAttendance() {
-            const staffName = document.getElementById('staffName').value.trim();
-            const role = document.getElementById('role').value;
-            const status = document.getElementById('attendanceStatus').value;
-
-            if(staffName === "") {
-                alert("Enter Staff Name.");
-                return;
-            }
-
-            const data = {
-                records: [
-                    {
-                        fields: {
-                            "Timestamp": new Date().toLocaleString(),
-                            "Staff Name": staffName,
-                            "Role": role,
-                            "Attendance Status": status
-                        }
-                    }
-                ]
-            };
-
-            fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                document.getElementById('status').innerText = "Attendance Marked Successfully!";
-                document.getElementById('staffName').value = "";
-                document.getElementById('role').selectedIndex = 0;
-                document.getElementById('attendanceStatus').selectedIndex = 0;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Failed to mark attendance.");
-            });
-        }
-    </script>
+  <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner" class="banner" />
+  <h1>Staff Attendance Panel</h1><a href="./staff-attendance.csv" class="button" download>📥 Export Attendance CSV</a>
 
 </body>
 </html>
