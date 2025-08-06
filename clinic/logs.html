@@ -1,125 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Booking Logs - Onestop AI Clinic Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f9f9f9;
-        }
-        .header {
-            width: 100%;
-            text-align: center;
-            background-color: black;
-            color: white;
-            padding: 10px 0;
-        }
-        .header img {
-            height: 30px;
-            vertical-align: middle;
-        }
-        .banner {
-            width: 100%;
-            display: block;
-            margin: 0 auto;
-            border-radius: 10px;
-        }
-        h1 {
-            text-align: center;
-            font-size: 20px;
-            margin-top: 10px;
-        }
-        .table-container {
-            width: 90%;
-            margin: 0 auto;
-        }
-        button {
-            display: block;
-            margin: 15px auto;
-            padding: 10px 20px;
-            background-color: black;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: white;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        footer {
-            width: 100%;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            text-align: center;
-            background: black;
-            color: white;
-            padding: 10px 0;
-        }
-        a {
-            color: blue;
-            text-decoration: underline;
-        }
-        .disabled-button {
-            background-color: #ccc;
-            color: #666;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            cursor: not-allowed;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Booking Logs - Onestop AI Clinic Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+    .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+    .header img { height: 30px; vertical-align: middle; margin-right: 10px; }
+    .banner { width: 100%; }
+    h2 { text-align: center; margin-top: 10px; }
+    table { width: 95%; margin: 20px auto; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #000; color: #fff; }
+    .footer { background: #000; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Logo">
-        <div>Onestop AI Clinic Demo</div>
-    </div>
+<div class="header">
+  <img src="./assets/clinic-logo.png" alt="Logo"> Onestop AI Clinic Demo
+</div>
 
-    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
+<img src="./assets/clinic-hero-banner.png" class="banner">
 
-    <h1>Booking Logs</h1>
+<h2>Booking Logs</h2>
 
-    <div class="table-container">
-        <button>Export Logs</button>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Patient Name</th>
-                <th>Reason</th>
-                <th>Contact</th>
-                <th>Reminder</th>
-            </tr>
-            <tr>
-                <td>2025-08-06</td>
-                <td>10:00 AM</td>
-                <td>Chaitanya</td>
-                <td>Fever</td>
-                <td><a href="tel:9390664577">9390664577</a></td>
-                <td><button class="disabled-button" disabled>Reminder Sent</button></td>
-            </tr>
-        </table>
-    </div>
+<table id="logsTable">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Patient Name</th>
+      <th>Reason</th>
+      <th>Contact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td colspan="5">Loading...</td></tr>
+  </tbody>
+</table>
 
-    <footer>
-        Powered by Onestop AI
-    </footer>
+<div class="footer">Powered by Onestop AI</div>
+
+<script>
+const API_KEY = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+const BASE_ID = 'appgIT8WiqnZlR44Y';
+const TABLE_NAME = 'BookingsLogs';
+
+fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
+  headers: { 'Authorization': `Bearer ${API_KEY}` }
+})
+.then(response => response.json())
+.then(data => {
+  const tableBody = document.querySelector('#logsTable tbody');
+  tableBody.innerHTML = ''; // Clear loading text
+
+  data.records.forEach(record => {
+    const dateTime = record.fields['Timestamp'] || '';
+    const patientName = record.fields['Patient Name'] || '';
+    const reason = record.fields['Reason'] || '';
+    const contact = record.fields['Contact'] || '';
+    const slotTime = record.fields['Slot Time'] || '';
+
+    const date = dateTime.split('T')[0];
+    const time = slotTime ? slotTime : (dateTime.split('T')[1] || '').substring(0,5);
+
+    const row = `<tr>
+      <td>${date}</td>
+      <td>${time}</td>
+      <td>${patientName}</td>
+      <td>${reason}</td>
+      <td><a href="tel:${contact}">${contact}</a></td>
+    </tr>`;
+    tableBody.innerHTML += row;
+  });
+
+  if (data.records.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="5">No bookings found.</td></tr>`;
+  }
+})
+.catch(error => {
+  console.error('Error fetching logs:', error);
+  document.querySelector('#logsTable tbody').innerHTML = `<tr><td colspan="5">Failed to load data.</td></tr>`;
+});
+</script>
 
 </body>
 </html>
