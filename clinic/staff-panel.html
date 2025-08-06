@@ -1,78 +1,63 @@
-<!DOCTYPE html><html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
-    <title>Staff Panel - Add/Delete Staff</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin:0; font-family:sans-serif; background:#f9f9f9;"><div style="background:#000; color:#fff; padding:10px; display:flex; align-items:center;">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" style="height:30px; margin-right:10px;">
-    <span>Onestop AI Clinic Demo</span>
-</div>
-
-<div style="text-align:center; padding:20px;">
-    <img src="./assets/clinic-hero-banner.png" alt="Staff Panel" style="width:80%; max-width:300px; border-radius:10px;">
-</div>
-
-<h2 style="text-align:center;">Staff Panel</h2>
-
-<!-- Add New Staff Form -->
-<div style="padding:20px;">
-    <h3>Add New Staff</h3>
-    <input type="text" id="newStaffID" placeholder="Employee ID" style="width:100%; padding:10px; margin-bottom:10px;">
-    <input type="text" id="newStaffName" placeholder="Name" style="width:100%; padding:10px; margin-bottom:10px;">
-    <input type="text" id="newStaffRole" placeholder="Role" style="width:100%; padding:10px; margin-bottom:10px;">
-    <button onclick="addStaff()" style="width:100%; padding:12px; background:black; color:white; border:none; font-size:16px;">Add Staff</button>
-</div>
-
-<!-- Delete Staff Section -->
-<div style="padding:20px;">
-    <h3>Delete Staff</h3>
-    <select id="deleteStaffSelect" style="width:100%; padding:10px; margin-bottom:10px;">
-        <option value="STF001">STF001 - Arun Kumar</option>
-        <option value="STF002">STF002 - Megha Rani</option>
-        <option value="STF003">STF003 - Sunil Patel</option>
-    </select>
-    <button onclick="deleteStaff()" style="width:100%; padding:12px; background:red; color:white; border:none; font-size:16px;">Delete Staff</button>
-</div>
-
-<footer style="position:fixed; bottom:0; width:100%; background:#000; color:#fff; text-align:center; padding:10px;">
-    Powered by Onestop AI
-</footer>
-
-<script>
-    function addStaff() {
-        const id = document.getElementById('newStaffID').value.trim();
-        const name = document.getElementById('newStaffName').value.trim();
-        const role = document.getElementById('newStaffRole').value.trim();
-
-        if(!id || !name || !role) {
-            alert('Please fill all fields to add new staff.');
-            return;
-        }
-
-        const select = document.getElementById('deleteStaffSelect');
-        const option = document.createElement('option');
-        option.value = id;
-        option.text = `${id} - ${name}`;
-        select.add(option);
-
-        alert(`${name} added successfully.`);
-
-        // Clear fields
-        document.getElementById('newStaffID').value = '';
-        document.getElementById('newStaffName').value = '';
-        document.getElementById('newStaffRole').value = '';
+    <title>Staff Panel</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            text-align: center;
+        }.header {
+        background-color: black;
+        color: white;
+        padding: 10px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    function deleteStaff() {
-        const select = document.getElementById('deleteStaffSelect');
-        const selectedOption = select.options[select.selectedIndex];
-        if(selectedOption) {
-            alert(`${selectedOption.text} deleted successfully.`);
-            select.remove(select.selectedIndex);
-        }
+    .hero {
+        width: 100%;
     }
-</script>
 
-</body>
-</html>
+    .container {
+        margin: 20px auto;
+        width: 90%;
+    }
+
+    .button {
+        display: block;
+        width: 100%;
+        background-color: black;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: black;
+        color: white;
+        padding: 8px 0;
+        font-size: 14px;
+    }
+</style>
+
+</head><body>
+    <div class="header">Onestop AI Clinic Demo</div>
+    <img src="assets/clinic-hero-banner.png" class="hero" alt="Hero Banner"><div class="container">
+    <h2>Staff Panel (Add/Delete)</h2>
+    <a href="staff-add.html" class="button">➕ Add Staff</a>
+    <a href="staff-delete.html" class="button">🗑️ Delete Staff</a>
+</div>
+
+<footer>Powered by Onestop AI</footer>
+
+</body></html>
