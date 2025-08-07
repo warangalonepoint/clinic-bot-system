@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,92 +23,104 @@
     <div class="header">
         <img src="./assets/clinic-logo.png" alt="Clinic Logo">
         <span>Onestop AI Clinic Demo</span>
-    </div><div class="container">
-    <img src="./assets/clinic-hero-banner.png" alt="Hero Banner" class="hero-banner">
+    </div>
+    <div class="container">
+        <img src="./assets/clinic-hero-banner.png" alt="Hero Banner" class="hero-banner">
+        <h1>Booking Logs</h1>
 
-    <h1>Booking Logs</h1>
+        <div class="filter-bar">
+            <label for="dateFilter">Filter by Date:</label>
+            <select id="dateFilter">
+                <option value="All">All</option>
+                <!-- Populate Dates Dynamically -->
+            </select>
 
-    <div class="filter-bar">
-        <label for="dateFilter">Filter by Date:</label>
-        <select id="dateFilter">
-            <option value="All">All</option>
-            <!-- Populate Dates Dynamically -->
-        </select>
+            <label for="statusFilter">Status:</label>
+            <select id="statusFilter">
+                <option value="All">All</option>
+                <option value="Booked">Booked</option>
+                <option value="Available">Available</option>
+            </select>
 
-        <label for="statusFilter">Status:</label>
-        <select id="statusFilter">
-            <option value="All">All</option>
-            <option value="Booked">Booked</option>
-            <option value="Available">Available</option>
-        </select>
+            <button class="export-btn" onclick="exportCSV()">⬇️ Export Logs as CSV</button>
+        </div>
 
-        <button class="export-btn" onclick="exportCSV()">⬇️ Export Logs as CSV</button>
+        <table id="logsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time Slot</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will load here dynamically -->
+            </tbody>
+        </table>
     </div>
 
-    <table id="logsTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time Slot</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will load here dynamically -->
-        </tbody>
-    </table>
-</div>
+    <script>
+        const airtableApiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3'; // Mask in production
+        const baseId = 'appgIT8WiqnZlR44Y';
+        const tableName = 'BookingLogs'; // 👈 Correct this to your actual table name
+        const apiUrl = `https://api.airtable.com/v0/${baseId}/${tableName}`;
 
-<script>
-    const logsData = [
-        { date: '2025-08-07', time: '10:00am', status: 'Booked' },
-        { date: '2025-08-07', time: '10:10am', status: 'Available' },
-        { date: '2025-08-07', time: '10:20am', status: 'Available' },
-        { date: '2025-08-07', time: '10:30am', status: 'Booked' },
-        { date: '2025-08-07', time: '10:40am', status: 'Available' },
-        { date: '2025-08-07', time: '10:50am', status: 'Available' },
-    ];
+        const tableBody = document.querySelector('#logsTable tbody');
+        const dateFilter = document.getElementById('dateFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        let logsData = [];
 
-    const tableBody = document.querySelector('#logsTable tbody');
-    const dateFilter = document.getElementById('dateFilter');
-    const statusFilter = document.getElementById('statusFilter');
+        async function fetchLogs() {
+            const res = await fetch(apiUrl, {
+                headers: {
+                    Authorization: `Bearer ${airtableApiKey}`
+                }
+            });
+            const data = await res.json();
+            logsData = data.records.map(record => ({
+                date: record.fields.Date,
+                time: record.fields.TimeSlot,
+                status: record.fields.Status
+            }));
+            populateFilters();
+            populateTable();
+        }
 
-    function populateTable() {
-        tableBody.innerHTML = '';
-        const selectedDate = dateFilter.value;
-        const selectedStatus = statusFilter.value;
+        function populateTable() {
+            tableBody.innerHTML = '';
+            const selectedDate = dateFilter.value;
+            const selectedStatus = statusFilter.value;
 
-        const filtered = logsData.filter(log => 
-            (selectedDate === 'All' || log.date === selectedDate) &&
-            (selectedStatus === 'All' || log.status === selectedStatus)
-        );
+            const filtered = logsData.filter(log =>
+                (selectedDate === 'All' || log.date === selectedDate) &&
+                (selectedStatus === 'All' || log.status === selectedStatus)
+            );
 
-        filtered.forEach(log => {
-            const row = `<tr><td>${log.date}</td><td>${log.time}</td><td>${log.status}</td></tr>`;
-            tableBody.innerHTML += row;
-        });
-    }
+            filtered.forEach(log => {
+                const row = `<tr><td>${log.date}</td><td>${log.time}</td><td>${log.status}</td></tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
 
-    function populateFilters() {
-        const uniqueDates = [...new Set(logsData.map(log => log.date))];
-        uniqueDates.forEach(date => {
-            const option = document.createElement('option');
-            option.value = date;
-            option.textContent = date;
-            dateFilter.appendChild(option);
-        });
-    }
+        function populateFilters() {
+            dateFilter.innerHTML = '<option value="All">All</option>';
+            const uniqueDates = [...new Set(logsData.map(log => log.date))];
+            uniqueDates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = date;
+                dateFilter.appendChild(option);
+            });
+        }
 
-    function exportCSV() {
-        window.location.href = 'https://airtable.com/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w/export';
-    }
+        function exportCSV() {
+            window.location.href = 'https://airtable.com/appgIT8WiqnZlR44Y/shrbtjKPiVLasHx6w/export';
+        }
 
-    dateFilter.addEventListener('change', populateTable);
-    statusFilter.addEventListener('change', populateTable);
+        dateFilter.addEventListener('change', populateTable);
+        statusFilter.addEventListener('change', populateTable);
 
-    populateFilters();
-    populateTable();
-</script>
-
+        fetchLogs();
+    </script>
 </body>
-</html>        
+</html>
