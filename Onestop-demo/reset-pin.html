@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reset PIN | Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
+    .banner {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 13px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <img src="assets/banner.png" alt="Banner" class="banner" />
+  <h2>Reset PIN</h2>
+  <p>If you're facing login issues or want to switch accounts, use this to reset your stored PIN.</p>
+  <button onclick="resetPIN()">Reset Now</button>
+  <div class="footer">Powered by Onestop AI</div>
+
+  <script>
+    function resetPIN() {
+      localStorage.removeItem("clinicPIN");
+      localStorage.removeItem("clinicPlan");
+      alert("PIN reset successful. You can now re-login.");
+    }
+  </script>
+</body>
+</html>
