@@ -4,41 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Patient Bookings - Onestop C-Demo</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="light-theme">
-  <header class="header">
-    <img src="./assets/banner.png" alt="Banner" class="banner">
-  </header>
+<body>
+  <div class="container">
+    <img src="assets/banner.png" alt="Banner" class="banner" />
+    <h2 class="clinic-name">Onestop C-Demo</h2>
 
-  <main class="container">
-    <section class="card">
-      <img src="./assets/logo.png" alt="Clinic Logo" class="logo" style="width: 120px; border-radius: 50%; margin: 10px auto; display: block;" />
-      <h1 class="clinic-name">Onestop C-Demo</h1>
-      <h2>Patient Booking Options</h2>
+    <h3 class="section-title">Patient Booking Options</h3>
 
-      <div class="button-group">
-        <a href="./onestop-demo/manual-bookings.html" class="btn">Manual Booking</a>
-        <a href="./onestop-demo/whatsapp-booking.html" class="btn">WhatsApp Booking</a>
-      </div>
-    </section>
-  </main>
+    <div class="card-grid">
+      <a href="manual-bookings.html" class="card">
+        <img src="assets/logo.png" alt="Manual Booking" />
+        <div>
+          <h4>Manual Booking</h4>
+          <p>Fill booking form manually</p>
+        </div>
+      </a>
 
-  <footer class="footer">
-    <p>Powered by Onestop AI</p>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-  </footer>
+      <a href="whatsapp-bookings.html" class="card">
+        <img src="assets/logo.png" alt="WhatsApp Booking" />
+        <div>
+          <h4>WhatsApp Booking</h4>
+          <p>Book via WhatsApp chat</p>
+        </div>
+      </a>
+    </div>
 
-  <script>
-    function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle('dark-theme');
-      localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
-    }
-    (function () {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') document.body.classList.add('dark-theme');
-    })();
-  </script>
+    <footer class="footer">
+      <p>Powered by Onestop AI</p>
+    </footer>
+  </div>
 </body>
 </html>
