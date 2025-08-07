@@ -2,87 +2,105 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WhatsApp Booking - Onestop C-Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Booking | Onestop C-Demo</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="assets/logo.png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fefefe;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .banner {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-bottom: 2px solid #ddd;
+    }
+    .container {
+      padding: 20px;
+    }
+    h2 {
+      margin: 10px 0;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #25d366;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background-color: #1da851;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
 </head>
 <body>
-  <header class="header">
-    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
-    <div class="clinic-name">Onestop C-Demo</div>
-    <button id="themeToggle" class="theme-toggle">🌓</button>
-  </header>
+  <img src="assets/banner.png" alt="Banner" class="banner" />
+  <div class="container">
+    <h2>Onestop C-Demo</h2>
+    <h3>Book via WhatsApp</h3>
 
-  <main class="dashboard">
-    <h2 style="text-align:center; margin-bottom: 20px;">Book via WhatsApp</h2>
-    <form class="card" onsubmit="sendWhatsApp(event)">
-      <label>Date:</label>
-      <select id="waDate" required></select>
+    <label for="bookingDate">Date:</label>
+    <input type="date" id="bookingDate" />
 
-      <label>Time Slot:</label>
-      <select id="waSlot" required>
-        <option value="">Select a time</option>
-        <option>09:00 AM</option>
-        <option>09:30 AM</option>
-        <option>10:00 AM</option>
-        <option>10:30 AM</option>
-        <option>11:00 AM</option>
-      </select>
+    <label for="slotTime">Time Slot:</label>
+    <select id="slotTime">
+      <option value="">Select a time</option>
+      <option>9:00 AM</option>
+      <option>10:00 AM</option>
+      <option>11:00 AM</option>
+      <option>12:00 PM</option>
+      <option>2:00 PM</option>
+      <option>3:00 PM</option>
+      <option>4:00 PM</option>
+      <option>5:00 PM</option>
+    </select>
 
-      <label>Patient Name:</label>
-      <input type="text" id="waName" required placeholder="Full name" />
+    <input type="text" id="patientName" placeholder="Full Name" />
+    <input type="text" id="reason" placeholder="Reason for Visit (e.g. Fever)" />
 
-      <label>Reason for Visit:</label>
-      <input type="text" id="waReason" required placeholder="e.g. Fever, Consultation" />
+    <button onclick="bookWhatsApp()">Confirm & Open WhatsApp</button>
 
-      <button type="submit" class="card" style="margin-top: 15px;">💬 Book on WhatsApp</button>
-    </form>
-  </main>
-
-  <footer class="footer">
-    Powered by Onestop AI
-  </footer>
+    <footer>Powered by Onestop AI</footer>
+  </div>
 
   <script>
-    // Theme toggle
-    const toggle = document.getElementById("themeToggle");
-    toggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    // Auto-fill today’s date
+    document.addEventListener("DOMContentLoaded", () => {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("bookingDate").value = today;
     });
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
 
-    // Date dropdown (next 7 days)
-    const waDate = document.getElementById("waDate");
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(today.getDate() + i);
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      const opt = document.createElement("option");
-      opt.value = `${dd}-${mm}-${yyyy}`;
-      opt.textContent = opt.value;
-      waDate.appendChild(opt);
-    }
+    function bookWhatsApp() {
+      const date = document.getElementById("bookingDate").value;
+      const time = document.getElementById("slotTime").value;
+      const name = document.getElementById("patientName").value.trim();
+      const reason = document.getElementById("reason").value.trim();
 
-    // WhatsApp redirection logic
-    function sendWhatsApp(e) {
-      e.preventDefault();
-      const name = document.getElementById("waName").value.trim();
-      const reason = document.getElementById("waReason").value.trim();
-      const date = document.getElementById("waDate").value;
-      const slot = document.getElementById("waSlot").value;
+      if (!date || !time || !name || !reason) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
-      const message = `Hello, I want to book an appointment.\n\n👤 Name: ${name}\n📅 Date: ${date}\n⏰ Time: ${slot}\n📝 Reason: ${reason}`;
-      const phone = "919390664577"; // Change this to your clinic number
+      const message = `Hi, I’d like to book a slot on ${date} at ${time} for ${reason}. My name is ${name}.`;
       const encodedMsg = encodeURIComponent(message);
-      const waUrl = `https://wa.me/${phone}?text=${encodedMsg}`;
-      window.open(waUrl, "_blank");
+      window.open(`https://wa.me/919390664577?text=${encodedMsg}`, "_blank");
     }
   </script>
 </body>
