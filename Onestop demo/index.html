@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Book Appointment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onestop AI Clinic Demo</title>
   <link rel="stylesheet" href="./assets/styles.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      background-color: #f9f9f9;
       margin: 0;
       padding: 0;
     }
@@ -34,115 +34,70 @@
       text-align: center;
       color: #333;
     }
-    form {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    label {
-      display: block;
-      margin: 15px 0 5px;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
       margin-top: 20px;
-      background: #000;
-      color: #fff;
+    }
+    .btn {
+      padding: 10px 20px;
+      background-color: #000;
+      color: white;
       border: none;
+      cursor: pointer;
       border-radius: 5px;
       font-size: 16px;
-      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #444;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #222;
+      color: #fff;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
     }
   </style>
 </head>
 <body>
+
+  <!-- Header with logo and clinic name -->
   <div class="header">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" />
-    <span>Onestop AI Clinic Demo</span>
+    <img src="./assets/logo.png" alt="Clinic Logo" />
+    <h2>Onestop AI Clinic Demo</h2>
   </div>
 
+  <!-- Hero banner -->
   <div class="container">
-    <img src="./assets/clinic-hero-banner.png" alt="Hero Banner" class="hero-banner" />
-    <h1>Book Your Appointment</h1>
-
-    <form id="bookingForm">
-      <label for="name">Patient Name:</label>
-      <input type="text" id="name" required />
-
-      <label for="reason">Reason for Visit:</label>
-      <input type="text" id="reason" required />
-
-      <label for="date">Select Date:</label>
-      <select id="date" required>
-        <option value="">Loading...</option>
-      </select>
-
-      <label for="slot">Select Time Slot:</label>
-      <select id="slot" required>
-        <option value="">Select Date First</option>
-      </select>
-
-      <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" placeholder="Enter phone number" required />
-
-      <button type="submit">Book via WhatsApp</button>
-    </form>
+    <img src="./assets/banner.png" alt="Hero Banner" class="hero-banner" />
   </div>
 
-  <script>
-    const airtableKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
-    const baseId = "appgIT8WiqnZlR44Y";
-    const tableName = "AvailableSlots";
+  <!-- Main content with buttons -->
+  <div class="container">
+    <h1>Welcome to Onestop AI Clinic</h1>
+    <p>Choose your preferred option to book an appointment:</p>
 
-    const dateSelect = document.getElementById("date");
-    const slotSelect = document.getElementById("slot");
-    const form = document.getElementById("bookingForm");
+    <div class="button-container">
+      <a href="manual-bookings.html">
+        <button class="btn">Manual Booking</button>
+      </a>
+      <a href="bookings.html">
+        <button class="btn">Book via WhatsApp</button>
+      </a>
+    </div>
+  </div>
 
-    let slotsData = [];
+  <!-- Footer -->
+  <div class="footer">
+    <p>Powered by Onestop AI Services</p>
+  </div>
 
-    async function loadDatesAndSlots() {
-      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}?pageSize=100`, {
-        headers: { Authorization: `Bearer ${airtableKey}` }
-      });
-      const data = await res.json();
-      slotsData = data.records.map(r => ({
-        date: r.fields["Date"],
-        time: r.fields["Time Slot"],
-        status: r.fields["Status"]
-      })).filter(r => r.status === "Available");
-
-      const uniqueDates = [...new Set(slotsData.map(s => s.date))];
-      dateSelect.innerHTML = `<option value="">Select Date</option>`;
-      uniqueDates.forEach(d => {
-        const opt = document.createElement("option");
-        opt.value = d;
-        opt.textContent = d;
-        dateSelect.appendChild(opt);
-      });
-    }
-
-    dateSelect.addEventListener("change", () => {
-      const selectedDate = dateSelect.value;
-      const filteredSlots = slotsData.filter(s => s.date === selectedDate);
-      slotSelect.innerHTML = `<option value="">Select Time</option>`;
-      filteredSlots.forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s.time;
-        opt.textContent = s.time;
-        slotSelect.appendChild(opt);
-      });
-    });
-
+</body>
+</html>
     form.addEventListener("submit", e => {
       e.preventDefault();
       const name = document.getElementById("name").value.trim();
