@@ -1,182 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Staff Attendance</title>
-  <link rel="manifest" href="../manifest.json" />
-  <link rel="icon" href="assets/clinic-logo.png" />
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      transition: 0.3s ease;
-    }
-    :root {
-      --bg: #ffffff;
-      --text: #000000;
-      --card: #f0f0f0;
-    }
-    .dark {
-      --bg: #121212;
-      --text: #ffffff;
-      --card: #1e1e1e;
+      margin: 0;
+      padding: 0;
     }
     header {
       background-color: #00796b;
       color: white;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header img {
-      height: 32px;
-      margin-right: 8px;
-    }
-    .toggle-theme {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-    .banner {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-    }
-    .container {
-      padding: 1rem;
+      padding: 15px;
+      text-align: center;
     }
     table {
-      width: 100%;
+      width: 95%;
+      margin: 10px auto;
       border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: var(--card);
+      background-color: white;
+      color: black;
     }
     th, td {
-      padding: 12px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-    .export-btn {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #000;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
-    footer {
+      border: 1px solid #999;
+      padding: 8px;
       text-align: center;
-      font-size: 12px;
-      margin: 2rem 0;
-      color: #777;
+    }
+    img.banner {
+      max-width: 100%;
+      height: auto;
+    }
+    .export-button {
+      display: block;
+      width: 120px;
+      margin: 20px auto;
+      background: black;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <header>
-    <div style="display: flex; align-items: center;">
-      <img src="assets/clinic-logo.png" alt="Logo">
-      <h2>Staff Attendance</h2>
-    </div>
-    <button class="toggle-theme" onclick="toggleTheme()">🌓</button>
+    <h2>🧑‍⚕️ Staff Attendance</h2>
   </header>
 
-  <img src="assets/clinic-hero-banner.png" class="banner" alt="Banner"/>
+  <img src="./banner.png" alt="Banner" class="banner" />
 
-  <div class="container">
-    <h3>Onestop AI Clinic</h3>
-    <table id="attendanceTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Staff Name</th>
-          <th>Status</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="4">Loading data...</td></tr>
-      </tbody>
-    </table>
-    <button class="export-btn" onclick="exportCSV()">⬇️ Export</button>
-  </div>
+  <h3 style="text-align:center;">Onestop AI Clinic</h3>
 
-  <footer>Powered by Onestop AI</footer>
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Staff Name</th>
+        <th>Status</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="4">Loading data...</td></tr>
+    </tbody>
+  </table>
+
+  <button class="export-button" onclick="exportTableToExcel()">⬇️ Export</button>
+
+  <footer style="text-align:center; margin-bottom: 20px;">Powered by Onestop AI</footer>
 
   <script>
-    const tableBody = document.querySelector("#attendanceTable tbody");
-
     const API_KEY = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232eae6ebc644fa9073dfb3";
     const BASE_ID = "appgIT8WiqnZlR44Y";
     const TABLE_NAME = "StaffAttendance";
-    const VIEW_NAME = "Grid%20view";
-
-    const fetchURL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?view=${VIEW_NAME}`;
 
     async function fetchAttendance() {
+      const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?sort[0][field]=Date&sort[0][direction]=desc`;
+
       try {
-        const response = await fetch(fetchURL, {
+        const response = await fetch(url, {
           headers: {
-            Authorization: `Bearer ${API_KEY}`,
-          },
+            Authorization: `Bearer ${API_KEY}`
+          }
         });
         const data = await response.json();
-
-        if (!data.records) {
-          throw new Error("No records found");
-        }
-
-        tableBody.innerHTML = "";
-        data.records.forEach((record) => {
-          const { Date, "Staff Name": staffName, Status, Notes } = record.fields;
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${Date || ""}</td>
-            <td>${staffName || ""}</td>
-            <td>${Status || ""}</td>
-            <td>${Notes || ""}</td>
-          `;
-          tableBody.appendChild(row);
-        });
+        renderTable(data.records);
       } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="4">Error loading data</td></tr>`;
-        console.error("Error fetching attendance:", error);
+        document.querySelector("#attendanceTable tbody").innerHTML =
+          `<tr><td colspan="4">Error loading data</td></tr>`;
       }
     }
 
-    function exportCSV() {
-      const rows = [];
-      document.querySelectorAll("#attendanceTable tr").forEach((tr) => {
-        const cols = Array.from(tr.querySelectorAll("th, td")).map(td => td.innerText);
-        rows.push(cols);
+    function renderTable(records) {
+      const tbody = document.querySelector("#attendanceTable tbody");
+      if (!records.length) {
+        tbody.innerHTML = `<tr><td colspan="4">No records found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      records.forEach(record => {
+        const fields = record.fields;
+        const row = `
+          <tr>
+            <td>${fields.Date || ""}</td>
+            <td>${fields["Staff Name"] || ""}</td>
+            <td>${fields.Status || ""}</td>
+            <td>${fields.Notes || ""}</td>
+          </tr>
+        `;
+        tbody.insertAdjacentHTML("beforeend", row);
       });
-      const csv = Papa.unparse(rows);
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "StaffAttendance.csv";
-      a.click();
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    function exportTableToExcel() {
+      const table = document.getElementById("attendanceTable");
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Attendance" });
+      XLSX.writeFile(wb, "StaffAttendance.xlsx");
     }
-
-    (function loadTheme() {
-      if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
-      }
-    })();
 
     fetchAttendance();
   </script>
