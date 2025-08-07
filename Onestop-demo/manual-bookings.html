@@ -1,83 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Manual Booking - Onestop C-Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="assets/logo.png" />
 </head>
 <body>
-  <header class="header">
-    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
-    <div class="clinic-name">Onestop C-Demo</div>
-    <button id="themeToggle" class="theme-toggle">🌓</button>
-  </header>
+  <div class="container">
+    <img src="assets/banner.png" class="banner" alt="Banner" />
+    <h2 class="clinic-name">Onestop C-Demo</h2>
 
-  <main class="dashboard">
-    <h2 style="text-align:center; margin-bottom: 20px;">Manual Patient Booking</h2>
-    <form class="card" onsubmit="submitForm(event)">
-      <label>Date:</label>
-      <select id="dateSelect" required></select>
-
-      <label>Time Slot:</label>
-      <select id="slotSelect" required>
-        <option value="">Select a time</option>
-        <option>09:00 AM</option>
-        <option>09:30 AM</option>
-        <option>10:00 AM</option>
-        <option>10:30 AM</option>
-        <option>11:00 AM</option>
-      </select>
+    <h3 class="section-title">Manual Booking</h3>
+    <form id="bookingForm" class="form">
 
       <label>Patient Name:</label>
-      <input type="text" required placeholder="Full name" />
+      <input type="text" id="name" required>
 
       <label>Contact Number:</label>
-      <input type="tel" required placeholder="10-digit mobile" pattern="[0-9]{10}" />
+      <input type="tel" id="contact" required>
 
       <label>Reason for Visit:</label>
-      <input type="text" required placeholder="Reason (e.g. Fever, Consultation)" />
+      <input type="text" id="reason" required>
 
-      <button type="submit" class="card" style="margin-top: 15px;">✅ Confirm Booking</button>
+      <label>Select Date:</label>
+      <select id="dateDropdown" required></select>
+
+      <label>Select Time Slot:</label>
+      <select id="slotDropdown" required></select>
+
+      <button type="submit" class="btn">Confirm Booking</button>
     </form>
-  </main>
 
-  <footer class="footer">
-    Powered by Onestop AI
-  </footer>
+    <div id="confirmation" style="display:none; text-align:center; margin-top:20px;"></div>
+
+    <footer class="footer">
+      <p>Powered by Onestop AI</p>
+    </footer>
+  </div>
 
   <script>
-    // Theme
-    const toggle = document.getElementById("themeToggle");
-    toggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    const airtableApiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+    const baseId = 'app1T8WiRqZIR4xY';
+    const availableSlotsTable = 'AvailableSlots';
+    const bookingsTable = 'BookingsLogs';
+
+    const headers = { Authorization: `Bearer ${airtableApiKey}` };
+
+    async function fetchAvailableDates() {
+      const url = `https://api.airtable.com/v0/${baseId}/${availableSlotsTable}?pageSize=100&view=Grid%20view`;
+      const res = await fetch(url, { headers });
+      const data = await res.json();
+
+      const today = new Date();
+      const dates = [...new Set(data.records.map(r => r.fields.Date).filter(date => {
+        const [dd, mm, yyyy] = date.split("-");
+        return new Date(`${yyyy}-${mm}-${dd}`) >= today;
+      }))];
+
+      const dropdown = document.getElementById('dateDropdown');
+      dropdown.innerHTML = '<option value="">--Select Date--</option>';
+      dates.forEach(date => {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        dropdown.appendChild(option);
+      });
+    }
+
+    async function fetchTimeSlots(selectedDate) {
+      const url = `https://api.airtable.com/v0/${baseId}/${availableSlotsTable}?pageSize=100&view=Grid%20view&filterByFormula=AND(Date="${selectedDate}",Status="Available")`;
+      const res = await fetch(url, { headers });
+      const data = await res.json();
+
+      const dropdown = document.getElementById('slotDropdown');
+      dropdown.innerHTML = '<option value="">--Select Slot--</option>';
+      data.records.forEach(record => {
+        const opt = document.createElement('option');
+        opt.value = record.fields['Slot Time'];
+        opt.textContent = record.fields['Slot Time'];
+        dropdown.appendChild(opt);
+      });
+    }
+
+    async function getTokenNumber(date) {
+      const url = `https://api.airtable.com/v0/${baseId}/${bookingsTable}?filterByFormula=Date="${date}"`;
+      const res = await fetch(url, { headers });
+      const data = await res.json();
+      return data.records.length + 1;
+    }
+
+    async function submitBooking(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const contact = document.getElementById('contact').value.trim();
+      const reason = document.getElementById('reason').value.trim();
+      const date = document.getElementById('dateDropdown').value;
+      const slot = document.getElementById('slotDropdown').value;
+      const token = await getTokenNumber(date);
+      const timestamp = new Date().toLocaleString('en-IN');
+
+      const body = JSON.stringify({
+        records: [{
+          fields: {
+            'Timestamp': timestamp,
+            'Patient Name': name,
+            'Slot Time': slot,
+            'Date': date,
+            'Reason': reason,
+            'Contact': contact,
+            'Token': token,
+            'Reminder Sent': ''
+          }
+        }]
+      });
+
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${airtableApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body
+      });
+
+      if (res.ok) {
+        document.getElementById('bookingForm').style.display = 'none';
+        document.getElementById('confirmation').style.display = 'block';
+        document.getElementById('confirmation').innerHTML = `
+          <h3>✅ Booking Confirmed!</h3>
+          <p>Your Token Number is: <strong>#${token}</strong></p>
+          <p>Date: ${date} | Slot: ${slot}</p>
+        `;
+      } else {
+        alert("Failed to save. Try again.");
+      }
+    }
+
+    document.getElementById('dateDropdown').addEventListener('change', function() {
+      fetchTimeSlots(this.value);
     });
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
 
-    // Future Dates
-    const dateSelect = document.getElementById("dateSelect");
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      const futureDate = new Date();
-      futureDate.setDate(today.getDate() + i);
-      const yyyy = futureDate.getFullYear();
-      const mm = String(futureDate.getMonth() + 1).padStart(2, '0');
-      const dd = String(futureDate.getDate()).padStart(2, '0');
-      const option = document.createElement("option");
-      option.value = `${yyyy}-${mm}-${dd}`;
-      option.textContent = `${dd}-${mm}-${yyyy}`;
-      dateSelect.appendChild(option);
-    }
-
-    // Submit (Dummy Handler)
-    function submitForm(e) {
-      e.preventDefault();
-      alert("✅ Booking submitted successfully!");
-    }
+    document.getElementById('bookingForm').addEventListener('submit', submitBooking);
+    document.addEventListener('DOMContentLoaded', fetchAvailableDates);
   </script>
 </body>
 </html>
