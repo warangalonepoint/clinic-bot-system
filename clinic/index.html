@@ -1,89 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Onestop AI Clinic Dashboard</title>
-  <link rel="manifest" href="../manifest.json" />
-  <link rel="icon" href="assets/clinic-logo.png" type="image/png" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: #fff;
-      color: #000;
-      text-align: center;
-    }
-    header {
-      background-color: #000;
-      color: #fff;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      height: 32px;
-    }
-    .theme-toggle {
-      font-size: 24px;
-      cursor: pointer;
-    }
-    .banner {
-      max-width: 100%;
-      height: auto;
-    }
-    .button {
-      display: inline-block;
-      margin: 10px;
-      padding: 15px 25px;
-      background-color: #000;
-      color: #fff;
-      border-radius: 12px;
-      font-size: 16px;
-      text-decoration: none;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-    }
-    footer {
-      margin-top: 40px;
-      padding: 10px;
-      font-size: 14px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onestop AI Clinic Dashboard</title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 0; padding: 0; }
+        .header { background: #000; color: #fff; text-align: center; padding: 10px; }
+        .header img { height: 40px; }
+        .container { padding: 20px; }
+        .banner { width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .nav-button { display: block; padding: 15px; background: black; color: white; text-align: center; border-radius: 8px; text-decoration: none; }
+    </style>
 </head>
 <body>
-  <header>
-    <img src="assets/clinic-logo.png" alt="Logo" class="logo" />
-    <h2>Onestop AI Clinic</h2>
-    <div class="theme-toggle" onclick="toggleTheme()">🌗</div>
-  </header>
+    <div class="header">
+        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
+        <h1>Onestop AI Clinic Dashboard</h1>
+    </div><div class="container">
+    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
+    <div class="grid">
+        <a href="./bookings.html" class="nav-button">📅 Book Appointments</a>
+        <a href="./logs.html" class="nav-button">📊 Booking Logs</a>
+        <a href="./tokens.html" class="nav-button">🔢 Token Summary</a>
+        <a href="./staff-panel.html" class="nav-button">👥 Staff Panel</a>
+        <a href="./staff-dashboard.html" class="nav-button">📋 Staff Dashboard</a>
+        <a href="./sync-panel.html" class="nav-button">🔄 Sync Panel</a>
+        <a href="./whatsapp-logs.html" class="nav-button">💬 WhatsApp Logs</a>
+    </div>
+</div>
 
-  <img src="assets/clinic-hero-banner.png" alt="Banner" class="banner" />
-
-  <div>
-    <a href="bookings.html" class="button">📅 Book Appointments</a>
-    <a href="logs.html" class="button">📊 Booking Logs</a>
-    <a href="tokens.html" class="button">🔢 Token Summary</a>
-    <a href="staff-panel.html" class="button">👥 Staff Panel</a>
-
-    <!-- ✅ Moved staff tools grouped under Staff Panel -->
-    <a href="staff-attendance.html" class="button">📆 Staff Attendance</a>
-    <a href="staff-roster.html" class="button">📋 Staff Roster</a>
-    <a href="staff-summary.html" class="button">📈 Monthly Summary</a>
-    <a href="staff-leave.html" class="button">📝 Leave Tracker</a>
-
-    <a href="sync-panel.html" class="button">🔄 Sync Panel</a>
-    <a href="whatsapp-logs.html" class="button">💬 WhatsApp Logs</a>
-  </div>
-
-  <footer>
-    Powered by Onestop AI
-  </footer>
-
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-    }
-  </script>
 </body>
 </html>
