@@ -2,165 +2,203 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manual Booking</title>
+  <title>Manual Bookings – Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Arial', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       margin: 0;
       padding: 0;
-      background: #fff;
-      color: #000;
     }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    .banner {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 16px;
-    }
-    h2 {
+
+    header {
       text-align: center;
-      margin-bottom: 20px;
+      padding: 10px 0;
     }
-    label {
-      font-size: 15px;
-      margin-bottom: 4px;
-      display: block;
+
+    header img {
+      width: 60px;
+      margin-top: 10px;
     }
-    select, input {
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 20px;
+      margin: 10px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    select, input, button {
       width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-bottom: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      background-color: #000;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-    }
-    footer {
-      text-align: center;
       padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: black;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    .note {
       font-size: 14px;
-      margin-top: 20px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 12px;
+      color: gray;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row > div {
+      flex: 1;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="assets/banner.png" alt="Doctor Banner" class="banner" />
-    <h2>Manual Patient Booking</h2>
+  <header>
+    <img src="assets/logo.png" alt="Logo">
+    <h1>Manual Bookings – Onestop C-Demo</h1>
+    <img src="assets/banner.png" style="width: 100%; max-width: 500px; border-radius: 12px;">
+  </header>
 
-    <label for="dateDropdown">Select Date:</label>
-    <select id="dateDropdown">
-      <option>Loading dates...</option>
-    </select>
+  <div class="card">
+    <label for="bookingDate">Select Date:</label>
+    <select id="bookingDate"></select>
 
-    <label for="slotDropdown">Select Time Slot:</label>
-    <select id="slotDropdown">
-      <option>Select a date first</option>
-    </select>
+    <label for="bookingSlot">Select Time Slot:</label>
+    <select id="bookingSlot"></select>
 
-    <label for="name">Patient Name:</label>
-    <input type="text" id="name" placeholder="Enter name" />
+    <div class="row">
+      <div><input type="text" id="patientName" placeholder="Patient Name" /></div>
+      <div><input type="text" id="reason" placeholder="Reason for Visit" /></div>
+    </div>
 
-    <label for="reason">Reason:</label>
-    <input type="text" id="reason" placeholder="Enter reason" />
+    <div class="row">
+      <div><input type="tel" id="contact" placeholder="Contact Number" /></div>
+    </div>
 
-    <label for="contact">Contact:</label>
-    <input type="text" id="contact" placeholder="Enter phone number" />
-
-    <button id="confirmBtn">Confirm Booking</button>
-
-    <footer>Powered by Onestop AI</footer>
+    <button onclick="confirmBooking()">Confirm Booking</button>
+    <div id="confirmationMessage" class="success"></div>
+    <p class="note">Booked slots will be hidden automatically.</p>
   </div>
 
+  <div class="footer">Powered by Onestop AI</div>
+
   <script>
-    const airtableApiKey = "YOUR_SECRET_API_KEY"; // DO NOT SHARE PUBLICLY
-    const baseId = "appgPT8WiqnZlR44Y";
-    const table = "AvailableSlots";
-    const slotsURL = `https://api.airtable.com/v0/${baseId}/${table}`;
+    const availableSlotsCSV = "https://airtable.com/shrbtjKPiVLasHx6w/tblam7hyktbDXH2Qsp/viwprlFbcBqeBkcXg?format=csv";
+    const logsAPI = "https://api.airtable.com/v0/appgIT8WiqnZlR44Y/BookingsLogs";
+    const logsAPIKey = "Bearer patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
 
-    const headers = {
-      Authorization: "Bearer " + airtableApiKey,
-    };
+    let allSlots = [];
 
-    const dateDropdown = document.getElementById("dateDropdown");
-    const slotDropdown = document.getElementById("slotDropdown");
+    async function loadSlots() {
+      const res = await fetch(availableSlotsCSV);
+      const text = await res.text();
+      const rows = text.trim().split("\n").slice(1); // Skip header
 
-    async function loadDates() {
-      dateDropdown.innerHTML = '<option>Loading dates...</option>';
-      try {
-        const res = await fetch(`${slotsURL}?maxRecords=100&view=Grid%20view`, { headers });
-        const data = await res.json();
-        const dates = [...new Set(data.records
-          .filter(r => r.fields.Status === "Available")
-          .map(r => r.fields.Date)
-        )];
+      const slots = rows.map(row => {
+        const [date, time, status] = row.split(",");
+        return { date, time, status };
+      }).filter(slot => slot.status === "Available");
 
-        if (dates.length === 0) {
-          dateDropdown.innerHTML = '<option>No dates available</option>';
-          return;
+      allSlots = slots;
+
+      const uniqueDates = [...new Set(slots.map(s => s.date))];
+      const dateSelect = document.getElementById("bookingDate");
+      dateSelect.innerHTML = `<option value="">-- Select Date --</option>` +
+        uniqueDates.map(d => `<option value="${d}">${d}</option>`).join("");
+
+      dateSelect.addEventListener("change", () => {
+        const selected = dateSelect.value;
+        const slotSelect = document.getElementById("bookingSlot");
+        const options = slots.filter(s => s.date === selected).map(s =>
+          `<option value="${s.time}">${s.time}</option>`
+        );
+        slotSelect.innerHTML = `<option value="">-- Select Time --</option>` + options.join("");
+      });
+    }
+
+    async function confirmBooking() {
+      const date = document.getElementById("bookingDate").value;
+      const time = document.getElementById("bookingSlot").value;
+      const name = document.getElementById("patientName").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const contact = document.getElementById("contact").value.trim();
+
+      if (!date || !time || !name || !reason || !contact) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const token = await getTokenNumber(date);
+
+      const record = {
+        fields: {
+          "Timestamp": new Date().toISOString(),
+          "Patient Name": name,
+          "Slot Time": `${date} ${time}`,
+          "Reason": reason,
+          "Contact": contact,
+          "Token": token,
+          "Reminder Sent": ""
         }
+      };
 
-        dateDropdown.innerHTML = '<option disabled selected>Select Date</option>';
-        dates.forEach(date => {
-          const option = document.createElement("option");
-          option.value = date;
-          option.textContent = date;
-          dateDropdown.appendChild(option);
-        });
-      } catch (err) {
-        dateDropdown.innerHTML = '<option>Error loading dates</option>';
-        console.error("Date fetch error", err);
+      const res = await fetch(logsAPI, {
+        method: "POST",
+        headers: {
+          "Authorization": logsAPIKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(record)
+      });
+
+      if (res.ok) {
+        document.getElementById("confirmationMessage").innerText =
+          `✅ Booking confirmed. Token No: ${token}`;
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        alert("Failed to save booking.");
       }
     }
 
-    dateDropdown.addEventListener("change", async () => {
-      const selectedDate = dateDropdown.value;
-      slotDropdown.innerHTML = '<option>Loading slots...</option>';
-      try {
-        const res = await fetch(`${slotsURL}?maxRecords=100&view=Grid%20view`, { headers });
-        const data = await res.json();
-        const slots = data.records
-          .filter(r => r.fields.Date === selectedDate && r.fields.Status === "Available")
-          .map(r => r.fields["Time Slot"]);
+    async function getTokenNumber(date) {
+      const res = await fetch(`${logsAPI}?filterByFormula=FIND("${date}", {Slot Time})`, {
+        headers: { "Authorization": logsAPIKey }
+      });
+      const data = await res.json();
+      return data.records.length + 1;
+    }
 
-        slotDropdown.innerHTML = "";
-        if (slots.length === 0) {
-          slotDropdown.innerHTML = '<option>No slots available</option>';
-          return;
-        }
-
-        slotDropdown.innerHTML = '<option disabled selected>Select Slot</option>';
-        slots.forEach(slot => {
-          const option = document.createElement("option");
-          option.value = slot;
-          option.textContent = slot;
-          slotDropdown.appendChild(option);
-        });
-      } catch (err) {
-        slotDropdown.innerHTML = '<option>Error loading slots</option>';
-        console.error("Slot fetch error", err);
-      }
-    });
-
-    document.getElementById("confirmBtn").addEventListener("click", () => {
-      alert("Booking logic not connected yet — coming in next sprint.");
-    });
-
-    loadDates();
+    loadSlots();
   </script>
 </body>
 </html>
