@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Booking Confirmed | Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      max-width: 600px;
+      margin: auto;
+    }
+    .banner {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .box {
+      background-color: #f9f9f9;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .token {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .info {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background-color: #000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      text-decoration: none;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <img src="assets/banner.png" alt="Banner" class="banner" />
+
+  <div class="box">
+    <div class="token">Token No: <span id="tokenDisplay">#--</span></div>
+    <div class="info" id="nameDisplay">Name: --</div>
+    <div class="info" id="slotDisplay">Time: --</div>
+    <div class="info" id="reasonDisplay">Reason: --</div>
+  </div>
+
+  <a id="shareBtn" class="btn" target="_blank">📤 Share on WhatsApp</a>
+
+  <div class="footer">Powered by Onestop AI</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "--";
+    const time = params.get("slot") || "--";
+    const reason = params.get("reason") || "--";
+    const token = params.get("token") || "--";
+
+    document.getElementById("nameDisplay").textContent = `Name: ${name}`;
+    document.getElementById("slotDisplay").textContent = `Time: ${time}`;
+    document.getElementById("reasonDisplay").textContent = `Reason: ${reason}`;
+    document.getElementById("tokenDisplay").textContent = `#${token}`;
+
+    const msg = `✅ Booking Confirmed\nName: ${name}\nTime: ${time}\nReason: ${reason}\nToken No: #${token}`;
+    const shareURL = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    document.getElementById("shareBtn").href = shareURL;
+  </script>
+</body>
+</html>
