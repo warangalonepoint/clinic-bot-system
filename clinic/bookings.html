@@ -1,66 +1,200 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinic Bookings</title>
-    <link rel="stylesheet" href="./assets/styles.css">
-    <style>
-        body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
-        .header { background: #000; color: #fff; padding: 10px; text-align: center; }
-        .header img { height: 40px; }
-        .container { padding: 20px; }
-        .banner { width: 100%; border-radius: 10px; margin-bottom: 20px; }
-        .form-section { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .form-section select, .form-section input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; }
-        .form-section button { background: #000; color: #fff; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Available Slots</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #000;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    .header img {
+      height: 40px;
+      vertical-align: middle;
+    }
+    .container {
+      padding: 20px;
+    }
+    .hero-banner {
+      width: 100%;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    label {
+      font-weight: bold;
+    }
+    select {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .export-btn {
+      background: #000;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #222;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-        <h1>Onestop AI Clinic Demo</h1>
-    </div><div class="container">
-    <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner" class="banner">
+  <div class="header">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" />
+    <span>Onestop AI Clinic Demo</span>
+  </div>
 
-    <div class="form-section">
-        <h2>Book an Appointment</h2>
-        <label for="dateSelect">Select Date:</label>
-        <select id="dateSelect">
-            <option value="2025-08-07">August 7, 2025</option>
-            <option value="2025-08-08">August 8, 2025</option>
-        </select>
+  <div class="container">
+    <img src="./assets/clinic-hero-banner.png" alt="Hero Banner" class="hero-banner" />
+    <h1>Available Slots</h1>
 
-        <label for="slotSelect">Select Time Slot:</label>
-        <select id="slotSelect">
-            <option value="10:00 AM">10:00 AM</option>
-            <option value="10:30 AM">10:30 AM</option>
-        </select>
+    <div class="filter-bar">
+      <label for="dateFilter">Filter by Date:</label>
+      <select id="dateFilter">
+        <option value="All">All</option>
+      </select>
 
-        <label for="nameInput">Your Name:</label>
-        <input type="text" id="nameInput" placeholder="Enter your name">
+      <label for="statusFilter">Status:</label>
+      <select id="statusFilter">
+        <option value="All">All</option>
+        <option value="Available">Available</option>
+        <option value="Booked">Booked</option>
+      </select>
 
-        <label for="reasonInput">Reason for Visit:</label>
-        <input type="text" id="reasonInput" placeholder="Reason (e.g., Fever)">
-
-        <button onclick="confirmBooking()">Book Now</button>
+      <button class="export-btn" onclick="exportCSV()">⬇️ Export Logs</button>
     </div>
-</div>
 
-<script>
-    function confirmBooking() {
-        const name = document.getElementById('nameInput').value;
-        const reason = document.getElementById('reasonInput').value;
-        const date = document.getElementById('dateSelect').value;
-        const slot = document.getElementById('slotSelect').value;
+    <table id="logsTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time Slot</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="3">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-        if (name && reason) {
-            const whatsappMsg = `Hello, I would like to book an appointment on ${date} at ${slot} for ${reason}. My name is ${name}.`;
-            window.location.href = `https://wa.me/919390664577?text=${encodeURIComponent(whatsappMsg)}`;
-        } else {
-            alert('Please fill all fields.');
-        }
+  <script>
+    const apiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
+    const baseId = "appgIT8WiqnZlR44Y";
+    const tableName = "AvailableSlots";
+    const tableBody = document.querySelector("#logsTable tbody");
+    const dateFilter = document.getElementById("dateFilter");
+    const statusFilter = document.getElementById("statusFilter");
+
+    let allData = [];
+
+    async function fetchLogs() {
+      try {
+        const response = await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}?pageSize=100`, {
+          headers: { Authorization: `Bearer ${apiKey}` }
+        });
+        const data = await response.json();
+        const records = data.records.map(record => ({
+          date: record.fields["Date"] || "",
+          time: record.fields["Time Slot"] || "",
+          status: record.fields["Status"] || ""
+        }));
+
+        allData = records;
+        populateFilters(records);
+        populateTable(records);
+      } catch (err) {
+        tableBody.innerHTML = `<tr><td colspan="3">Error loading data</td></tr>`;
+        console.error(err);
+      }
     }
-</script>
 
+    function populateFilters(data) {
+      const uniqueDates = [...new Set(data.map(log => log.date))];
+      uniqueDates.forEach(date => {
+        const option = document.createElement("option");
+        option.value = date;
+        option.textContent = date;
+        dateFilter.appendChild(option);
+      });
+    }
+
+    function populateTable(data) {
+      const selectedDate = dateFilter.value;
+      const selectedStatus = statusFilter.value;
+      tableBody.innerHTML = "";
+
+      const filtered = data.filter(log =>
+        (selectedDate === "All" || log.date === selectedDate) &&
+        (selectedStatus === "All" || log.status === selectedStatus)
+      );
+
+      if (filtered.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="3">No records found</td></tr>`;
+      } else {
+        filtered.forEach(log => {
+          tableBody.innerHTML += `
+            <tr>
+              <td>${log.date}</td>
+              <td>${log.time}</td>
+              <td>${log.status}</td>
+            </tr>`;
+        });
+      }
+    }
+
+    function exportCSV() {
+      let csv = "Date,Time Slot,Status\n";
+      allData.forEach(log => {
+        csv += `${log.date},${log.time},${log.status}\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "AvailableSlots.csv";
+      link.click();
+    }
+
+    dateFilter.addEventListener("change", () => populateTable(allData));
+    statusFilter.addEventListener("change", () => populateTable(allData));
+
+    fetchLogs();
+  </script>
 </body>
 </html>
