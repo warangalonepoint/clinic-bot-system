@@ -1,20 +1,72 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mark Attendance</title>
-  <link rel="stylesheet" href="./assets/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mark Staff Attendance</title>
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    body { font-family: Arial, sans-serif; background-color: #fff; margin: 0; padding: 0; }
-    .header { background-color: #000; color: #fff; padding: 12px; text-align: center; font-size: 18px; }
-    .container { padding: 16px; }
-    iframe { width: 100%; height: 92vh; border: none; border-radius: 10px; }
+    .airtable-embed {
+      width: 100%;
+      height: 600px;
+      border: none;
+      background: #f0f0f0;
+      margin-bottom: 20px;
+      border-radius: 12px;
+    }
+    .header {
+      background-color: black;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      cursor: pointer;
+    }
+    footer {
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
-  <div class="header">Mark Staff Attendance</div>
-  <div class="container">
-    <iframe src="https://airtable.com/embed/shrkrP7Bk4Gxco65O?backgroundColor=blue" frameborder="0" onmousewheel="" width="100%"></iframe>
+
+  <div class="header">
+    <img src="banner.png" alt="Clinic Logo" style="height: 40px; vertical-align: middle; margin-right: 10px;">
+    Onestop AI Clinic – Mark Attendance
+    <span class="theme-toggle" onclick="toggleTheme()">🌓</span>
   </div>
+
+  <main style="padding: 1rem; margin-bottom: 100px;">
+    <iframe class="airtable-embed"
+      src="https://airtable.com/embed/shrkrP7Bk4Gxco65O?backgroundColor=gray&viewControls=on"
+      frameborder="0"
+      onmousewheel=""
+      title="Staff Attendance Form"
+      allowfullscreen>
+    </iframe>
+  </main>
+
+  <footer>
+    Powered by Onestop AI Services
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+
 </body>
 </html>
