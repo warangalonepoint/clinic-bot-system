@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Staff Attendance | Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+    }
+    input, select, button {
+      padding: 6px;
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="assets/banner.png" class="banner" />
+    <h2>Staff Attendance</h2>
+
+    <div class="filter-section">
+      <input type="date" id="filterDate" />
+      <select id="filterStatus">
+        <option value="">All Status</option>
+        <option value="Present">Present</option>
+        <option value="Absent">Absent</option>
+      </select>
+      <button onclick="filterData()">Apply Filter</button>
+      <button onclick="downloadCSV()">Export Attendance</button>
+    </div>
+
+    <table id="attendanceTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Staff Name</th>
+          <th>Status</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p class="footer">Powered by Onestop AI</p>
+  </div>
+
+  <script>
+    const apiKey = "YOUR_API_KEY_HERE";
+    const baseId = "app1T8WiRqZIR4xY";
+    const table = "StaffAttendance";
+    const headers = { Authorization: `Bearer ${apiKey}` };
+
+    let allData = [];
+
+    async function loadData() {
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${table}?maxRecords=200&view=Grid%20view`, { headers });
+      const data = await res.json();
+      allData = data.records;
+      displayData(allData);
+    }
+
+    function displayData(data) {
+      const tbody = document.querySelector("#attendanceTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(record => {
+        const f = record.fields;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${f.Date || ""}</td>
+          <td>${f["Staff Name"] || ""}</td>
+          <td>${f.Status || ""}</td>
+          <td>${f.Notes || ""}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function filterData() {
+      const date = document.getElementById("filterDate").value;
+      const status = document.getElementById("filterStatus").value;
+      const filtered = allData.filter(record => {
+        const f = record.fields;
+        const matchDate = !date || f.Date === date;
+        const matchStatus = !status || f.Status === status;
+        return matchDate && matchStatus;
+      });
+      displayData(filtered);
+    }
+
+    function downloadCSV() {
+      let csv = "Date,Staff Name,Status,Notes\n";
+      allData.forEach(record => {
+        const f = record.fields;
+        csv += `"${f.Date || ""}","${f["Staff Name"] || ""}","${f.Status || ""}","${f.Notes || ""}"\n`;
+      });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "staff-attendance.csv";
+      link.click();
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
