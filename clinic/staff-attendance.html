@@ -1,55 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Staff Attendance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="icon" href="favicon.png" />
   <style>
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #fff;
+      margin: 0;
+      background: white;
+      color: black;
     }
     header {
-      background-color: #000;
-      color: #fff;
+      background: black;
+      color: white;
       padding: 16px;
       text-align: center;
-      font-size: 24px;
+      font-size: 22px;
     }
-    .banner {
+    img.banner {
       width: 100%;
       height: auto;
     }
-    .clinic-name {
+    h2 {
       text-align: center;
-      font-weight: bold;
-      font-size: 20px;
-      margin-top: 10px;
+      margin: 12px 0;
+    }
+    table {
+      width: 95%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #f2f2f2;
     }
     .export-btn {
       display: block;
-      margin: 10px auto 20px auto;
+      margin: 15px auto;
       padding: 10px 20px;
-      font-size: 16px;
-      background-color: black;
+      background: black;
       color: white;
       border: none;
       border-radius: 6px;
+      font-size: 16px;
       cursor: pointer;
-    }
-    iframe {
-      width: 100%;
-      height: 80vh;
-      border: none;
     }
     footer {
       text-align: center;
-      font-size: 14px;
+      margin-top: 20px;
       color: gray;
-      margin-top: 10px;
-      margin-bottom: 20px;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -57,21 +63,64 @@
 
   <header>👨‍⚕️ Staff Attendance</header>
 
-  <img src="banner.png" alt="Banner" class="banner">
+  <img src="banner.png" alt="Banner" class="banner" />
 
-  <div class="clinic-name">Onestop AI Clinic</div>
+  <h2>Onestop AI Clinic</h2>
 
-  <button class="export-btn" onclick="exportAttendance()">⬇ Export Attendance</button>
+  <button class="export-btn" onclick="window.open('https://airtable.com/shrAa4pSN9jOm7EJ2', '_blank')">⬇ Export Attendance</button>
 
-  <iframe src="https://airtable.com/embed/shrAa4pSN9jOm7EJ2?backgroundColor=teal" 
-          style="background: transparent;" frameborder="0" onmousewheel="" width="100%" height="533"></iframe>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Staff Name</th>
+        <th>Status</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody id="attendanceTable">
+      <tr><td colspan="4">Loading...</td></tr>
+    </tbody>
+  </table>
 
   <footer>Powered by Onestop AI</footer>
 
   <script>
-    function exportAttendance() {
-      window.open("https://airtable.com/shrAa4pSN9jOm7EJ2", "_blank");
-    }
+    const airtableApiKey = 'YOUR_API_KEY_HERE';
+    const baseId = 'appgIT8WiqnZlR44Y';
+    const tableName = 'StaffAttendance';
+    const url = `https://api.airtable.com/v0/${baseId}/${tableName}?sort[0][field]=Date&sort[0][direction]=desc`;
+
+    fetch(url, {
+      headers: {
+        Authorization: `Bearer ${airtableApiKey}`
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const table = document.getElementById("attendanceTable");
+      table.innerHTML = '';
+
+      if (!data.records.length) {
+        table.innerHTML = '<tr><td colspan="4">No records found.</td></tr>';
+        return;
+      }
+
+      data.records.forEach(record => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${record.fields.Date || ''}</td>
+          <td>${record.fields['Staff Name'] || ''}</td>
+          <td>${record.fields.Status || ''}</td>
+          <td>${record.fields.Notes || ''}</td>
+        `;
+        table.appendChild(row);
+      });
+    })
+    .catch(error => {
+      document.getElementById("attendanceTable").innerHTML = `<tr><td colspan="4">Error loading data</td></tr>`;
+      console.error('Error fetching attendance:', error);
+    });
   </script>
 
 </body>
