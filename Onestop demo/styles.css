@@ -1,0 +1,107 @@
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f5f5f5;
+  color: #111;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 60px;
+}
+
+/* Dark Mode */
+body.dark {
+  background: #121212;
+  color: #f5f5f5;
+}
+
+/* Header */
+.header {
+  position: relative;
+  text-align: center;
+  background: white;
+  padding: 10px;
+}
+
+body.dark .header {
+  background: #1e1e1e;
+}
+
+.banner {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.clinic-name {
+  font-size: 22px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Card Grid */
+.dashboard {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  text-align: center;
+  font-size: 16px;
+  text-decoration: none;
+  color: #000;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+body.dark .card {
+  background: #242424;
+  color: #f5f5f5;
+}
+
+/* Footer */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #000;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 13px;
+}
+
+body.dark .footer {
+  background: #333;
+}
