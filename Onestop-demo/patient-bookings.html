@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Patient Booking Options</title>
+  <title>Patient Bookings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -16,30 +16,25 @@
   </header>
 
   <main>
-    <h2 style="text-align:center; margin: 20px 0;">Choose Booking Method</h2>
-
-    <div class="card">
-      <a href="manual-bookings.html" class="btn black-btn full-width">✍️ Manual Booking</a>
-      <a href="whatsapp-booking.html" class="btn black-btn full-width">💬 WhatsApp Booking</a>
-    </div>
+    <h2 style="text-align:center; margin-top: 30px;">Patient Bookings</h2>
+    <p style="text-align:center;">(Coming soon...)</p>
   </main>
 
   <footer>Powered by Onestop AI</footer>
 
   <script>
-    // Theme toggle logic
     function toggleTheme() {
       const body = document.body;
       body.classList.toggle("dark-mode");
       localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
     }
 
-    // Persist theme on load
     window.onload = () => {
       if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
       }
     };
   </script>
+
 </body>
 </html>
