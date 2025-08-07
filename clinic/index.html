@@ -4,39 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clinic Dashboard</title>
-  <link rel="stylesheet" href="./assets/styles.css" />
+  <link rel="stylesheet" href="https://warangalonepoint.github.io/clinic-bot-system/clinic/assets/styles.css" />
 </head>
 <body>
-  <div class="top-bar">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo" />
-    <h1>Onestop AI Clinic<br>Dashboard</h1>
-  </div>
-
-  <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner" />
-
   <div class="container">
-    <a href="./bookings.html" class="nav-button">📅 Book Appointments</a>
-    <a href="./logs.html" class="nav-button">📊 Booking Logs</a>
-    <a href="./tokens.html" class="nav-button">🔢 Token Summary</a>
-    <a href="./staff-panel.html" class="nav-button">👥 Staff Panel</a>
-    <a href="./sync.html" class="nav-button">🔄 Sync Panel</a>
-    <a href="./confirmation.html" class="nav-button">✅ Booking Confirmation</a>
-    <a href="./staff-dashboard.html" class="nav-button">📋 Staff Dashboard</a>
-    <a href="./staff-attendance.html" class="nav-button">⏰ Staff Attendance</a>
-    <a href="./leave-tracker.html" class="nav-button">📝 Leave Tracker</a>
-    <a href="./monthly-summary.html" class="nav-button">📈 Monthly Summary</a>
-    <a href="./roster-summary.html" class="nav-button">📅 Roster Summary</a>
-    <a href="./reset-pin.html" class="nav-button">🔐 Reset PIN</a>
-  </div>
+    <header class="header">
+      <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo" />
+      <h1>Onestop AI Clinic<br />Dashboard</h1>
+      <button id="themeToggle" class="theme-toggle">🌓</button>
+    </header>
 
-  <footer>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-    <p>Powered by Onestop AI</p>
-  </footer>
+    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner" />
+
+    <div class="button-grid">
+      <a href="bookings.html" class="nav-button">📅 Book Appointments</a>
+      <a href="logs.html" class="nav-button">📊 Booking Logs</a>
+      <a href="tokens.html" class="nav-button">🔢 Token Summary</a>
+      <a href="staff-panel.html" class="nav-button">👥 Staff Panel</a>
+      <a href="sync-panel.html" class="nav-button">🔄 Sync Panel</a>
+    </div>
+
+    <footer class="footer">
+      <p>Powered by Onestop AI</p>
+    </footer>
+  </div>
 
   <script>
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
+    const toggleBtn = document.getElementById('themeToggle');
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
     }
   </script>
 </body>
