@@ -3,137 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WhatsApp Booking</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>WhatsApp Booking | Onestop C-Demo</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      padding: 10px;
-      background-color: var(--bg);
-      color: var(--text);
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      background: var(--card);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-    }
-
-    select, input, button {
-      width: 100%;
-      padding: 12px;
+    .hidden { display: none; }
+    #tokenDisplay {
       margin-top: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background-color: black;
-      color: white;
-      border: none;
-      margin-top: 20px;
       font-weight: bold;
-    }
-
-    img.banner {
-      width: 100%;
-      border-radius: 10px;
-    }
-
-    h2, h4 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 14px;
-      margin-top: 20px;
+      color: green;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="assets/banner.png" alt="Banner" class="banner" />
+    <img src="assets/banner.png" class="banner" />
     <h2>Onestop C-Demo</h2>
-    <h4>Book via WhatsApp</h4>
 
-    <input type="text" id="name" placeholder="Your Name" required />
-    <input type="tel" id="contact" placeholder="Contact Number" required />
+    <input type="text" id="contact" placeholder="Contact Number" required />
     <input type="text" id="reason" placeholder="Reason for Visit" required />
-
-    <select id="dateSelect">
-      <option selected disabled>Select Date</option>
+    
+    <select id="dateDropdown">
+      <option value="">Select Date</option>
+    </select>
+    
+    <select id="slotDropdown">
+      <option value="">Select Slot</option>
     </select>
 
-    <select id="slotSelect">
-      <option selected disabled>Select Slot</option>
-    </select>
+    <button id="bookBtn">Book on WhatsApp</button>
 
-    <button onclick="bookWhatsApp()">Book on WhatsApp</button>
+    <div id="tokenDisplay"></div>
 
-    <footer>Powered by Onestop AI</footer>
+    <p class="footer">Powered by Onestop AI</p>
   </div>
 
   <script>
-    const airtableAPI = 'https://api.airtable.com/v0/app1T8WiRqZIR4xY/AvailableSlots';
+    const airtableKey = "YOUR_API_KEY_HERE"; // Replace during final test
+    const baseId = "appgplT8WiqnZlR44Y";
+    const slotsTable = "AvailableSlots";
+    const logsTable = "BookingsLogs";
+
+    const dateDropdown = document.getElementById("dateDropdown");
+    const slotDropdown = document.getElementById("slotDropdown");
+    const contactInput = document.getElementById("contact");
+    const reasonInput = document.getElementById("reason");
+    const bookBtn = document.getElementById("bookBtn");
+    const tokenDisplay = document.getElementById("tokenDisplay");
+
     const headers = {
-      Authorization: 'Bearer patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3'
+      Authorization: `Bearer ${airtableKey}`
     };
 
-    let slotsData = [];
+    async function fetchSlots() {
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${slotsTable}?view=Grid%20view`, { headers });
+      const data = await res.json();
+      const records = data.records.filter(r => r.fields.Status === "Available");
 
-    fetch(airtableAPI, { headers })
-      .then(res => res.json())
-      .then(data => {
-        slotsData = data.records;
-        const dates = [...new Set(slotsData.map(rec => rec.fields.Date))];
-        const dateSelect = document.getElementById('dateSelect');
-        dates.forEach(date => {
-          const option = document.createElement('option');
+      const dateMap = {};
+      records.forEach(record => {
+        const date = record.fields.Date;
+        const slot = record.fields["Time Slot"];
+        if (!dateMap[date]) dateMap[date] = [];
+        dateMap[date].push(slot);
+      });
+
+      // Populate unique future dates
+      const today = new Date().toISOString().split("T")[0];
+      Object.keys(dateMap).forEach(date => {
+        if (date >= today) {
+          const option = document.createElement("option");
           option.value = date;
           option.textContent = date;
-          dateSelect.appendChild(option);
+          dateDropdown.appendChild(option);
+        }
+      });
+
+      dateDropdown.addEventListener("change", () => {
+        slotDropdown.innerHTML = '<option value="">Select Slot</option>';
+        const slots = dateMap[dateDropdown.value] || [];
+        slots.forEach(slot => {
+          const option = document.createElement("option");
+          option.value = slot;
+          option.textContent = slot;
+          slotDropdown.appendChild(option);
         });
       });
+    }
 
-    document.getElementById('dateSelect').addEventListener('change', function() {
-      const selectedDate = this.value;
-      const slotSelect = document.getElementById('slotSelect');
-      slotSelect.innerHTML = '<option disabled selected>Select Slot</option>';
+    async function getTokenNumber(selectedDate) {
+      const url = `https://api.airtable.com/v0/${baseId}/${logsTable}?filterByFormula=IS_SAME({Slot Time}, "${selectedDate}", 'day')`;
+      const res = await fetch(url, { headers });
+      const data = await res.json();
+      return data.records.length + 1;
+    }
 
-      const availableSlots = slotsData.filter(
-        rec => rec.fields.Date === selectedDate && rec.fields.Status !== 'Booked'
-      );
+    async function bookNow() {
+      const contact = contactInput.value.trim();
+      const reason = reasonInput.value.trim();
+      const date = dateDropdown.value;
+      const slot = slotDropdown.value;
 
-      availableSlots.forEach(rec => {
-        const option = document.createElement('option');
-        option.value = rec.fields.Slot;
-        option.textContent = rec.fields.Slot;
-        slotSelect.appendChild(option);
-      });
-    });
-
-    function bookWhatsApp() {
-      const name = document.getElementById('name').value.trim();
-      const contact = document.getElementById('contact').value.trim();
-      const reason = document.getElementById('reason').value.trim();
-      const date = document.getElementById('dateSelect').value;
-      const slot = document.getElementById('slotSelect').value;
-
-      if (!name || !contact || !reason || !date || !slot) {
-        alert('Please fill all fields');
+      if (!contact || !reason || !date || !slot) {
+        alert("Please fill all fields.");
         return;
       }
 
-      const msg = `Appointment Request:\n\nName: ${name}\nContact: ${contact}\nReason: ${reason}\nDate: ${date}\nSlot: ${slot}`;
-      const encoded = encodeURIComponent(msg);
-      window.open(`https://wa.me/919000000000?text=${encoded}`, '_blank');
+      const tokenNo = await getTokenNumber(date);
+
+      // 1. Save booking
+      await fetch(`https://api.airtable.com/v0/${baseId}/${logsTable}`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          fields: {
+            "Patient Name": "WhatsApp Booking",
+            "Slot Time": date + " " + slot,
+            "Reason": reason,
+            "Contact": contact,
+            "Token": tokenNo
+          }
+        })
+      });
+
+      // 2. Mark slot as Booked
+      const slotUrl = `https://api.airtable.com/v0/${baseId}/${slotsTable}?filterByFormula=AND({Date}="${date}", {Time Slot}="${slot}")`;
+      const slotRes = await fetch(slotUrl, { headers });
+      const slotData = await slotRes.json();
+      const slotId = slotData.records[0]?.id;
+
+      if (slotId) {
+        await fetch(`https://api.airtable.com/v0/${baseId}/${slotsTable}/${slotId}`, {
+          method: "PATCH",
+          headers: {
+            ...headers,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ fields: { Status: "Booked" } })
+        });
+      }
+
+      // 3. Redirect to WhatsApp
+      const msg = `Booking Confirmed\nDate: ${date}\nSlot: ${slot}\nToken: ${tokenNo}\nReason: ${reason}`;
+      const whatsappURL = `https://wa.me/${contact.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
+
+      tokenDisplay.textContent = `Token No: ${tokenNo}`;
+      setTimeout(() => {
+        window.location.href = whatsappURL;
+      }, 1000);
     }
+
+    bookBtn.addEventListener("click", bookNow);
+
+    fetchSlots();
   </script>
 </body>
 </html>
