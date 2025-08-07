@@ -1,1 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Booking Logs - Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="icon" href="assets/logo.png" />
+</head>
+<body>
+  <header class="header">
+    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
+    <div class="clinic-name">Onestop C-Demo</div>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
+  </header>
 
+  <main class="dashboard">
+    <h2 style="text-align:center; margin-bottom: 15px;">Booking Logs</h2>
+
+    <div class="card" style="overflow-x:auto;">
+      <table id="logsTable" style="width:100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Contact</th>
+            <th>Reason</th>
+            <th>Token</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>07-08-2025</td>
+            <td>09:30 AM</td>
+            <td>Krishna</td>
+            <td>9390664577</td>
+            <td>Fever</td>
+            <td>#1</td>
+          </tr>
+          <!-- New rows will appear here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top: 20px; text-align:center;">
+      <button onclick="downloadCSV()" class="card">⬇️ Export CSV</button>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Powered by Onestop AI
+  </footer>
+
+  <script>
+    // Theme toggle
+    const toggle = document.getElementById("themeToggle");
+    toggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    });
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    // Export table to CSV
+    function downloadCSV() {
+      const table = document.getElementById("logsTable");
+      let csv = "";
+      for (let row of table.rows) {
+        let cells = Array.from(row.cells).map(cell => `"${cell.innerText}"`);
+        csv += cells.join(",") + "\n";
+      }
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "booking-logs.csv";
+      link.click();
+    }
+  </script>
+</body>
+</html>
