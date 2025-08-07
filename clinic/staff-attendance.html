@@ -1,110 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Staff Attendance</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.png" type="image/png">
   <style>
-    body { font-family: sans-serif; margin: 0; padding: 0; background: #fff; color: #000; }
-    header { background: #000; color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { margin: 0; font-size: 1.5rem; }
-    img.banner { width: 100%; height: auto; }
-    table { width: 90%; margin: 1rem auto; border-collapse: collapse; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
-    .export-btn { background: #000; color: #fff; padding: 10px 15px; border: none; cursor: pointer; border-radius: 5px; }
-    footer { text-align: center; padding: 1rem; color: #888; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff;
+    }
+    header {
+      background-color: #000;
+      color: #fff;
+      padding: 16px;
+      text-align: center;
+      font-size: 24px;
+    }
+    .banner {
+      width: 100%;
+      height: auto;
+    }
+    .clinic-name {
+      text-align: center;
+      font-weight: bold;
+      font-size: 20px;
+      margin-top: 10px;
+    }
+    .export-btn {
+      display: block;
+      margin: 10px auto 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: black;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    iframe {
+      width: 100%;
+      height: 80vh;
+      border: none;
+    }
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: gray;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🧑‍⚕️ Staff Attendance</h1>
-    <img src="toggle-icon.png" style="height: 24px;">
-  </header>
+  <header>👨‍⚕️ Staff Attendance</header>
 
-  <img src="banner.png" class="banner" alt="Banner" />
+  <img src="banner.png" alt="Banner" class="banner">
 
-  <h2 style="text-align:center;">Onestop AI Clinic</h2>
-  <div style="text-align:center;">
-    <button class="export-btn" onclick="exportCSV()">⬇ Export Attendance</button>
-  </div>
+  <div class="clinic-name">Onestop AI Clinic</div>
 
-  <table id="attendanceTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Staff Name</th>
-        <th>Status</th>
-        <th>Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="4">Loading...</td></tr>
-    </tbody>
-  </table>
+  <button class="export-btn" onclick="exportAttendance()">⬇ Export Attendance</button>
+
+  <iframe src="https://airtable.com/embed/shrAa4pSN9jOm7EJ2?backgroundColor=teal" 
+          style="background: transparent;" frameborder="0" onmousewheel="" width="100%" height="533"></iframe>
 
   <footer>Powered by Onestop AI</footer>
 
   <script>
-    const apiKey = 'patLNwoJQKE3Tjb83...'; // your API key here
-    const baseId = 'appgIT8WiqnZlR44Y';
-    const tableName = 'StaffAttendance';
-    const url = `https://api.airtable.com/v0/${baseId}/${tableName}`;
-
-    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-
-    fetch(proxyUrl, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      const contents = JSON.parse(data.contents);
-      const records = contents.records;
-      const tbody = document.querySelector("#attendanceTable tbody");
-      tbody.innerHTML = '';
-
-      if (records.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4">No records found</td></tr>';
-        return;
-      }
-
-      records.forEach(record => {
-        const date = record.fields["Date"] || '';
-        const name = record.fields["Staff Name"] || '';
-        const status = record.fields["Status"] || '';
-        const notes = record.fields["Notes"] || '';
-        const row = `<tr>
-          <td>${date}</td>
-          <td>${name}</td>
-          <td>${status}</td>
-          <td>${notes}</td>
-        </tr>`;
-        tbody.innerHTML += row;
-      });
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      document.querySelector("#attendanceTable tbody").innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
-    });
-
-    function exportCSV() {
-      const rows = Array.from(document.querySelectorAll("table tr"));
-      const csv = rows.map(row =>
-        Array.from(row.querySelectorAll("td, th"))
-          .map(cell => `"${cell.innerText}"`)
-          .join(",")
-      ).join("\n");
-
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "StaffAttendance.csv";
-      a.click();
-      URL.revokeObjectURL(url);
+    function exportAttendance() {
+      window.open("https://airtable.com/shrAa4pSN9jOm7EJ2", "_blank");
     }
   </script>
 
