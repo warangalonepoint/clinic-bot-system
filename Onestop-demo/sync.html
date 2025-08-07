@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sync Status | Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    .banner {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .status-box {
+      background: #f1f1f1;
+      border-left: 5px solid green;
+      padding: 10px 15px;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+    .error {
+      border-left-color: red;
+      background: #ffeaea;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <img src="assets/banner.png" alt="Banner" class="banner" />
+  <h2>Sync Status Check</h2>
+
+  <div id="logsStatus" class="status-box">Checking logs.csv...</div>
+  <div id="slotsStatus" class="status-box">Checking slots.csv...</div>
+
+  <div class="footer">Powered by Onestop AI</div>
+
+  <script>
+    async function checkCSV(url, elementId) {
+      try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const lines = text.split("\n");
+        const count = lines.length - 1;
+        const msg = count > 0 ? `✅ File Loaded: ${count} records` : "⚠️ File Empty";
+        document.getElementById(elementId).textContent = msg;
+      } catch (e) {
+        document.getElementById(elementId).classList.add("error");
+        document.getElementById(elementId).textContent = "❌ File could not be loaded";
+      }
+    }
+
+    checkCSV("https://warangalonepoint.github.io/onestop-demo/data/Logs.csv", "logsStatus");
+    checkCSV("https://warangalonepoint.github.io/onestop-demo/data/Slots.csv", "slotsStatus");
+  </script>
+</body>
+</html>
