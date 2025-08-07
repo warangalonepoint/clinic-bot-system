@@ -57,7 +57,7 @@ body.dark .header {
   cursor: pointer;
 }
 
-/* Card Grid */
+/* Main Dashboard Section */
 .dashboard {
   flex-grow: 1;
   padding: 20px;
@@ -71,8 +71,8 @@ body.dark .header {
 
 /* ✅ Black iPhone-style Buttons */
 .card {
-  background: #000;
-  color: #fff;
+  background-color: #000000 !important;
+  color: #ffffff !important;
   padding: 15px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -80,6 +80,7 @@ body.dark .header {
   font-size: 16px;
   text-decoration: none;
   transition: transform 0.2s;
+  display: block;
 }
 
 .card:hover {
@@ -87,8 +88,8 @@ body.dark .header {
 }
 
 body.dark .card {
-  background: #222;
-  color: #fff;
+  background-color: #222222 !important;
+  color: #ffffff !important;
 }
 
 /* Footer */
