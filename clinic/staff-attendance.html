@@ -6,53 +6,42 @@
   <title>Staff Attendance</title>
   <link rel="stylesheet" href="./assets/styles.css">
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 0; padding: 0; }
-    .header { background-color: #000; color: #fff; padding: 10px; text-align: center; }
-    .header img { height: 40px; vertical-align: middle; }
-    .container { padding: 20px; }
-    .hero-banner { width: 100%; border-radius: 10px; margin: 10px 0; }
+    body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }
+    .header { background-color: #000; color: #fff; padding: 12px; text-align: center; font-size: 18px; }
+    .container { padding: 16px; }
+    .banner { width: 100%; border-radius: 12px; margin: 16px 0; }
     h1 { text-align: center; color: #333; }
-    .filter-bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
-    table { width: 100%; border-collapse: collapse; background: #fff; }
-    th, td { padding: 10px; border: 1px solid #ddd; text-align: center; font-size: 14px; }
-    th { background: #222; color: #fff; }
-    .export-btn { background: #000; color: #fff; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; }
-    iframe { width: 100%; height: 600px; border: none; margin-bottom: 20px; border-radius: 10px; }
+    .filters { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+    select, button { padding: 8px; font-size: 14px; }
+    .export-btn { background: #000; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; font-size: 14px; }
+    th { background-color: #111; color: #fff; }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-    <span>Onestop AI Clinic Demo</span>
-  </div>
+  <div class="header">Onestop AI Clinic Demo</div>
 
   <div class="container">
-    <img src="./assets/clinic-hero-banner.png" alt="Hero Banner" class="hero-banner">
-    <h1>Staff Attendance Panel</h1>
+    <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner">
+    <h1>Staff Attendance</h1>
 
-    <!-- Embedded Airtable Form -->
-    <iframe src="https://airtable.com/embed/shrkrP7Bk4Gxco65O?backgroundColor=blue" frameborder="0" onmousewheel="" width="100%" height="600"></iframe>
-
-    <!-- Filter & Export -->
-    <div class="filter-bar">
-      <label for="dateFilter">Filter by Date:</label>
-      <select id="dateFilter">
-        <option value="All">All</option>
-      </select>
+    <div class="filters">
+      <label for="dateFilter">Date:</label>
+      <select id="dateFilter"><option value="All">All</option></select>
 
       <label for="statusFilter">Status:</label>
       <select id="statusFilter">
         <option value="All">All</option>
-        <option value="Present">Present</option>
-        <option value="Absent">Absent</option>
-        <option value="Leave">Leave</option>
+        <option value="present">Present</option>
+        <option value="absent">Absent</option>
+        <option value="leave">Leave</option>
       </select>
 
       <button class="export-btn" onclick="exportAttendance()">⬇️ Export Attendance</button>
     </div>
 
-    <!-- Attendance Table -->
     <table id="attendanceTable">
       <thead>
         <tr>
@@ -63,7 +52,7 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Populated by JS -->
+        <!-- Data from Airtable -->
       </tbody>
     </table>
   </div>
@@ -78,14 +67,13 @@
 
     async function fetchAttendance() {
       try {
-        const url = `https://api.airtable.com/v0/${baseId}/${tableName}?view=Grid%20view`;
-        const response = await fetch(url, {
+        const res = await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}?view=Grid%20view`, {
           headers: { Authorization: `Bearer ${airtableApiKey}` }
         });
-        const data = await response.json();
+        const data = await res.json();
         renderTable(data.records);
-        populateFilters(data.records);
-      } catch (error) {
+        populateDateFilter(data.records);
+      } catch (err) {
         tableBody.innerHTML = `<tr><td colspan="4">⚠️ Error loading data</td></tr>`;
       }
     }
@@ -97,13 +85,13 @@
 
       const filtered = records.filter(rec => {
         const date = rec.fields.Date || '';
-        const status = rec.fields.Status || '';
+        const status = (rec.fields.Status || '').toLowerCase();
         return (selectedDate === 'All' || date === selectedDate) &&
-               (selectedStatus === 'All' || status === selectedStatus);
+               (selectedStatus === 'All' || status === selectedStatus.toLowerCase());
       });
 
       filtered.forEach(rec => {
-        const { Date, Status, Notes, StaffName } = rec.fields;
+        const { Date, StaffName, Status, Notes } = rec.fields;
         const row = `<tr>
           <td>${Date || ''}</td>
           <td>${StaffName || ''}</td>
@@ -114,9 +102,9 @@
       });
     }
 
-    function populateFilters(records) {
-      const uniqueDates = [...new Set(records.map(r => r.fields.Date))];
-      uniqueDates.forEach(date => {
+    function populateDateFilter(records) {
+      const dates = [...new Set(records.map(r => r.fields.Date))].sort().reverse();
+      dates.forEach(date => {
         const opt = document.createElement("option");
         opt.value = date;
         opt.textContent = date;
@@ -128,8 +116,8 @@
       window.open("https://airtable.com/appgIT8WiqnZlR44Y/shrkrP7Bk4Gxco65O", "_blank");
     }
 
-    dateFilter.addEventListener("change", () => fetchAttendance());
-    statusFilter.addEventListener("change", () => fetchAttendance());
+    dateFilter.addEventListener("change", fetchAttendance);
+    statusFilter.addEventListener("change", fetchAttendance);
 
     fetchAttendance();
   </script>
