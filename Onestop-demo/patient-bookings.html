@@ -2,37 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Patient Bookings - Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Booking Options</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <img src="assets/banner.png" alt="Banner" class="banner" />
-    <h2 class="clinic-name">Onestop C-Demo</h2>
+    <img src="assets/banner.png" class="banner" />
+    <h2>Onestop C-Demo</h2>
+    <h3>Patient Booking</h3>
 
-    <h3 class="section-title">Patient Booking Options</h3>
-
-    <div class="card-grid">
-      <a href="manual-bookings.html" class="card">
-        <img src="assets/logo.png" alt="Manual Booking" />
-        <div>
-          <h4>Manual Booking</h4>
-          <p>Fill booking form manually</p>
-        </div>
-      </a>
-
-      <a href="whatsapp-bookings.html" class="card">
-        <img src="assets/logo.png" alt="WhatsApp Booking" />
-        <div>
-          <h4>WhatsApp Booking</h4>
-          <p>Book via WhatsApp chat</p>
-        </div>
-      </a>
+    <div class="card" onclick="location.href='manual-bookings.html'">
+      <h4>📋 Manual Booking</h4>
+      <p>Staff enters patient details and confirms</p>
     </div>
 
-    <footer class="footer">
-      <p>Powered by Onestop AI</p>
+    <div class="card" onclick="location.href='whatsapp-bookings.html'">
+      <h4>💬 WhatsApp Booking</h4>
+      <p>Patient books directly via WhatsApp</p>
+    </div>
+
+    <footer>
+      <button onclick="location.href='index.html'" class="small">← Back to Dashboard</button>
     </footer>
   </div>
 </body>
