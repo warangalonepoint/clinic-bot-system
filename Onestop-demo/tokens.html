@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Token Summary | Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      max-width: 700px;
+      margin: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 14px;
+      text-align: left;
+    }
+    .banner {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 20px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <img src="assets/banner.png" alt="Banner" class="banner" />
+  <h2>Daily Token Summary</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Total Bookings</th>
+      </tr>
+    </thead>
+    <tbody id="tokenTable"></tbody>
+  </table>
+  <p class="footer">Powered by Onestop AI</p>
+
+  <script>
+    const apiKey = "YOUR_API_KEY_HERE";
+    const baseId = "app1T8WiRqZIR4xY";
+    const table = "BookingsLogs";
+
+    async function fetchLogs() {
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${table}?maxRecords=200&view=Grid%20view`, {
+        headers: { Authorization: `Bearer ${apiKey}` }
+      });
+      const data = await res.json();
+      generateTokenSummary(data.records);
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toISOString().split("T")[0];
+    }
+
+    function generateTokenSummary(records) {
+      const countPerDay = {};
+      records.forEach(r => {
+        const timestamp = r.fields["Timestamp"];
+        const date = formatDate(timestamp);
+        if (!countPerDay[date]) countPerDay[date] = 0;
+        countPerDay[date]++;
+      });
+
+      const table = document.getElementById("tokenTable");
+      table.innerHTML = "";
+
+      Object.entries(countPerDay).sort().reverse().forEach(([date, count]) => {
+        const row = `<tr><td>${date}</td><td>${count}</td></tr>`;
+        table.innerHTML += row;
+      });
+    }
+
+    fetchLogs();
+  </script>
+</body>
+</html>
