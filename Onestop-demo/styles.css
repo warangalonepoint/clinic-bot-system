@@ -68,7 +68,7 @@ body.dark .header {
   gap: 15px;
 }
 
-/* Black Buttons */
+/* Black iPhone-style Buttons */
 .card {
   background-color: #000000 !important;
   color: #ffffff !important;
@@ -107,7 +107,7 @@ body.dark .footer {
   background: #333;
 }
 
-/* Full-width Inputs */
+/* Full-width Form Inputs */
 .card input,
 .card select {
   width: 100%;
@@ -124,19 +124,21 @@ body.dark .footer {
   border-color: #888;
 }
 
-/* Logs Table Styling */
+/* Booking Logs Table Styling */
 #logsTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 15px;
+  min-width: 600px;
 }
 
 #logsTable th,
 #logsTable td {
-  padding: 10px;
+  padding: 10px 12px;
   border-bottom: 1px solid #333;
   text-align: left;
-  word-break: break-word;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 #logsTable th {
@@ -147,4 +149,10 @@ body.dark .footer {
 body.dark #logsTable th {
   background-color: #222;
   color: white;
+}
+
+/* Make Table Scroll on Mobile */
+.card table {
+  overflow-x: auto;
+  display: block;
 }
