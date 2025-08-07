@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slot Manager | Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+    }
+    select, button {
+      font-size: 14px;
+      padding: 4px 6px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="assets/banner.png" class="banner" />
+    <h2>Admin Slot Manager</h2>
+
+    <table id="slotTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time Slot</th>
+          <th>Status</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p class="footer">Powered by Onestop AI</p>
+  </div>
+
+  <script>
+    const apiKey = "YOUR_API_KEY_HERE";
+    const baseId = "app1T8WiRqZIR4xY";
+    const table = "AvailableSlots";
+    const headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
+
+    async function fetchSlots() {
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${table}?maxRecords=200&view=Grid%20view`, { headers });
+      const data = await res.json();
+      renderTable(data.records);
+    }
+
+    function renderTable(records) {
+      const tbody = document.querySelector("#slotTable tbody");
+      tbody.innerHTML = "";
+      records.forEach(record => {
+        const row = document.createElement("tr");
+        const f = record.fields;
+        row.innerHTML = `
+          <td>${f.Date || ""}</td>
+          <td>${f["Time Slot"] || ""}</td>
+          <td>
+            <select id="status-${record.id}">
+              <option value="Available" ${f.Status === "Available" ? "selected" : ""}>Available</option>
+              <option value="Booked" ${f.Status === "Booked" ? "selected" : ""}>Booked</option>
+            </select>
+          </td>
+          <td><button onclick="updateStatus('${record.id}')">Save</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function updateStatus(id) {
+      const newStatus = document.getElementById(`status-${id}`).value;
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${table}/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ fields: { Status: newStatus } })
+      });
+      if (res.ok) {
+        alert("Slot updated!");
+        fetchSlots();
+      } else {
+        alert("Error updating.");
+      }
+    }
+
+    fetchSlots();
+  </script>
+</body>
+</html>
