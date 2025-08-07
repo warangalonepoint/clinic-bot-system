@@ -2,42 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Patient Bookings - Onestop C-Demo</title>
+  <title>Patient Booking Options</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="assets/logo.png" />
 </head>
 <body>
-  <header class="header">
-    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
+
+  <header>
+    <img src="assets/logo.png" alt="Logo" class="logo" />
+    <img src="assets/banner.png" alt="Banner" class="banner" />
     <div class="clinic-name">Onestop C-Demo</div>
-    <button id="themeToggle" class="theme-toggle">🌓</button>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
   </header>
 
-  <main class="dashboard">
-    <h2 style="text-align:center; margin-bottom: 20px;">Patient Booking Options</h2>
-    <div class="card-grid">
-      <a href="manual-booking.html" class="card">📋 Manual Booking</a>
-      <a href="whatsapp-booking.html" class="card">💬 WhatsApp Booking</a>
+  <main>
+    <h2 style="text-align:center; margin: 20px 0;">Choose Booking Method</h2>
+
+    <div class="card">
+      <a href="manual-bookings.html" class="btn black-btn full-width">✍️ Manual Booking</a>
+      <a href="whatsapp-booking.html" class="btn black-btn full-width">💬 WhatsApp Booking</a>
     </div>
   </main>
 
-  <footer class="footer">
-    Powered by Onestop AI
-  </footer>
+  <footer>Powered by Onestop AI</footer>
 
   <script>
-    const toggle = document.getElementById("themeToggle");
-    toggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-    });
+    // Theme toggle logic
+    function toggleTheme() {
+      const body = document.body;
+      body.classList.toggle("dark-mode");
+      localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
+    }
 
-    window.addEventListener("load", () => {
+    // Persist theme on load
+    window.onload = () => {
       if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
+        document.body.classList.add("dark-mode");
       }
-    });
+    };
   </script>
 </body>
 </html>
