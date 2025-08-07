@@ -1,113 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Booking Logs – Onestop C-Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background-color: #fff;
-      color: #000;
-    }
-
-    .dark-mode {
-      background-color: #111;
-      color: #fff;
-    }
-
-    .container {
-      max-width: 720px;
-      margin: auto;
-      padding: 16px;
-    }
-
-    .banner {
-      width: 100%;
-      height: auto;
-      border-radius: 12px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-top: 12px;
-    }
-
-    .filters input,
-    .filters select {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: left;
-      border-bottom: 1px solid #444;
-    }
-
-    .dark-mode table {
-      color: #fff;
-    }
-
-    .export-btn {
-      background-color: #000;
-      color: #fff;
-      border: none;
-      padding: 12px;
-      margin-top: 20px;
-      border-radius: 12px;
-      width: 100%;
-      font-size: 16px;
-    }
-
-    .theme-toggle {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: transparent;
-      border: none;
-      font-size: 24px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 14px;
-      margin-top: 32px;
-      color: #888;
-    }
-
-    @media screen and (max-width: 600px) {
-      th, td {
-        font-size: 14px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Logs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
+  <img src="assets/banner.png" alt="Banner" style="width:100%; border-radius: 12px;"/>
+  <h2 style="text-align:center; margin-top:10px;">Onestop C-Demo</h2>
+  <h3 style="text-align:center;">Booking Logs</h3>
 
-  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+  <div class="card">
+    <input type="text" id="searchName" placeholder="Search by name" onkeyup="filterTable()" />
+    <input type="text" id="searchReason" placeholder="Search by reason" onkeyup="filterTable()" />
+  </div>
 
-  <div class="container">
-    <img src="./assets/banner.png" alt="Banner" class="banner">
-    <h2>Onestop C-Demo</h2>
-    <h2>Booking Logs</h2>
-
-    <div class="filters">
-      <input type="text" id="nameFilter" placeholder="Search by name">
-      <input type="text" id="reasonFilter" placeholder="Search by reason">
-    </div>
-
-    <table>
+  <div class="table-container">
+    <table id="logsTable">
       <thead>
         <tr>
           <th>Date</th>
@@ -119,108 +30,81 @@
           <th>Reminder</th>
         </tr>
       </thead>
-      <tbody id="log-table">
+      <tbody id="logsBody">
         <tr><td colspan="7">Loading...</td></tr>
       </tbody>
     </table>
-
-    <button class="export-btn" onclick="exportCSV()">⬇️ Export CSV</button>
-
-    <footer>Powered by Onestop AI</footer>
   </div>
+
+  <div style="text-align:center; margin-top:15px;">
+    <button onclick="exportToCSV()" class="btn-black">⬇️ Export CSV</button>
+  </div>
+
+  <footer>Powered by Onestop AI</footer>
 
   <script>
     const airtableApiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
-    const baseId = "appg1T8WiQnZlR44Y";
+    const baseId = "app1T8WiRqZIR4xY";
     const tableName = "BookingsLogs";
 
-    const airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?pageSize=100`;
+    async function fetchLogs() {
+      const url = `https://api.airtable.com/v0/${baseId}/${tableName}?pageSize=100&sort[0][field]=Timestamp&sort[0][direction]=desc`;
+      const headers = { Authorization: `Bearer ${airtableApiKey}` };
 
-    let allRecords = [];
-
-    async function fetchBookings() {
       try {
-        const res = await fetch(airtableUrl, {
-          headers: { Authorization: `Bearer ${airtableApiKey}` }
-        });
+        const res = await fetch(url, { headers });
         const data = await res.json();
-        allRecords = data.records || [];
-        renderTable(allRecords);
+        const tbody = document.getElementById("logsBody");
+        tbody.innerHTML = "";
+
+        data.records.forEach((record) => {
+          const fields = record.fields;
+          const row = document.createElement("tr");
+
+          const dateTime = new Date(fields.Timestamp);
+          const date = dateTime.toLocaleDateString();
+          const time = fields["Slot Time"] || dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          row.innerHTML = `
+            <td>${date}</td>
+            <td>${time}</td>
+            <td>${fields["Patient Name"] || ""}</td>
+            <td><a href="tel:${fields.Contact}">${fields.Contact || ""}</a></td>
+            <td>${fields.Reason || ""}</td>
+            <td>${fields.Token || ""}</td>
+            <td>${fields["Reminder Sent"] || ""}</td>
+          `;
+
+          tbody.appendChild(row);
+        });
       } catch (err) {
-        console.error("Airtable error", err);
-        document.querySelector("#log-table").innerHTML = "<tr><td colspan='7'>Error loading data</td></tr>";
+        document.getElementById("logsBody").innerHTML = "<tr><td colspan='7'>Error loading data</td></tr>";
+        console.error("Error fetching logs:", err);
       }
     }
 
-    function renderTable(records) {
-      const table = document.querySelector("#log-table");
-      table.innerHTML = "";
+    function filterTable() {
+      const name = document.getElementById("searchName").value.toLowerCase();
+      const reason = document.getElementById("searchReason").value.toLowerCase();
+      const rows = document.querySelectorAll("#logsTable tbody tr");
 
-      records.forEach(rec => {
-        const f = rec.fields;
-        const row = `
-          <tr>
-            <td>${f["Timestamp"] || ""}</td>
-            <td>${f["Slot Time"] || ""}</td>
-            <td>${f["Patient Name"] || ""}</td>
-            <td><a href="tel:${f["Contact"] || ""}">${f["Contact"] || ""}</a></td>
-            <td>${f["Reason"] || ""}</td>
-            <td>${f["Token"] || ""}</td>
-            <td>
-              <a href="https://wa.me/${f["Contact"]}?text=Hello%20${f["Patient Name"]},%20your%20appointment%20at%20Onestop%20C-Demo%20is%20confirmed%20for%20${f["Slot Time"]}.%20Token%20No:%20${f["Token"]}" target="_blank">Send</a>
-            </td>
-          </tr>
-        `;
-        table.insertAdjacentHTML("beforeend", row);
+      rows.forEach(row => {
+        const nameText = row.cells[2].textContent.toLowerCase();
+        const reasonText = row.cells[4].textContent.toLowerCase();
+
+        row.style.display =
+          nameText.includes(name) && reasonText.includes(reason) ? "" : "none";
       });
     }
 
-    function filterRecords() {
-      const nameVal = document.getElementById("nameFilter").value.toLowerCase();
-      const reasonVal = document.getElementById("reasonFilter").value.toLowerCase();
-
-      const filtered = allRecords.filter(r => {
-        const f = r.fields;
-        return (
-          (!nameVal || (f["Patient Name"] || "").toLowerCase().includes(nameVal)) &&
-          (!reasonVal || (f["Reason"] || "").toLowerCase().includes(reasonVal))
-        );
-      });
-
-      renderTable(filtered);
+    function exportToCSV() {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(document.getElementById("logsTable"));
+      XLSX.utils.book_append_sheet(wb, ws, "Logs");
+      XLSX.writeFile(wb, "booking-logs.csv");
     }
 
-    function exportCSV() {
-      let csv = "Date,Time,Patient,Contact,Reason,Token\n";
-      allRecords.forEach(r => {
-        const f = r.fields;
-        csv += `"${f["Timestamp"] || ""}","${f["Slot Time"] || ""}","${f["Patient Name"] || ""}","${f["Contact"] || ""}","${f["Reason"] || ""}","${f["Token"] || ""}"\n`;
-      });
-
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "BookingLogs.csv";
-      a.click();
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle("dark-mode");
-      localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
-    }
-
-    function restoreTheme() {
-      const saved = localStorage.getItem("theme");
-      if (saved === "dark") document.body.classList.add("dark-mode");
-    }
-
-    document.getElementById("nameFilter").addEventListener("input", filterRecords);
-    document.getElementById("reasonFilter").addEventListener("input", filterRecords);
-
-    restoreTheme();
-    fetchBookings();
+    fetchLogs();
   </script>
-
 </body>
 </html>
