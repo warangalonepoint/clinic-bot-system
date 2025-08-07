@@ -68,7 +68,7 @@ body.dark .header {
   gap: 15px;
 }
 
-/* Black Rounded Buttons */
+/* Black Buttons */
 .card {
   background-color: #000000 !important;
   color: #ffffff !important;
@@ -107,7 +107,7 @@ body.dark .footer {
   background: #333;
 }
 
-/* ✅ Expanded Form Inputs and Dropdowns */
+/* Full-width Inputs */
 .card input,
 .card select {
   width: 100%;
@@ -122,4 +122,29 @@ body.dark .footer {
 .card select:focus {
   outline: none;
   border-color: #888;
+}
+
+/* Logs Table Styling */
+#logsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+#logsTable th,
+#logsTable td {
+  padding: 10px;
+  border-bottom: 1px solid #333;
+  text-align: left;
+  word-break: break-word;
+}
+
+#logsTable th {
+  background-color: #000;
+  color: white;
+}
+
+body.dark #logsTable th {
+  background-color: #222;
+  color: white;
 }
