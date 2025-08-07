@@ -12,25 +12,32 @@
     <div class="clinic-name">Onestop C-Demo</div>
     <button id="themeToggle" class="theme-toggle">🌓</button>
   </header>  <main class="dashboard">
-    <h2 style="text-align:center; margin-bottom: 15px;">Booking Logs</h2>
-    <div class="card" style="overflow-x:auto;">
-      <table id="logsTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Patient</th>
-            <th>Contact</th>
-            <th>Reason</th>
-            <th>Token</th>
-            <th>Reminder</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr><td colspan="7">Loading...</td></tr>
-        </tbody>
-      </table>
-    </div><div class="card" style="margin-top: 20px; text-align:center;">
+    <h2 style="text-align:center; margin-bottom: 15px;">Booking Logs</h2><div class="card">
+  <input type="date" id="filterDate" />
+  <input type="text" id="filterName" placeholder="Search by name" />
+  <input type="text" id="filterReason" placeholder="Search by reason" />
+</div>
+
+<div class="card" style="overflow-x:auto;">
+  <table id="logsTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Patient</th>
+        <th>Contact</th>
+        <th>Reason</th>
+        <th>Token</th>
+        <th>Reminder</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="7">Loading...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card" style="margin-top: 20px; text-align:center;">
   <button onclick="downloadCSV()" class="card">⬇️ Export CSV</button>
 </div>
 
@@ -49,50 +56,101 @@
     const apiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
     const baseId = 'appgIT8WiqnZlR44Y';
     const tableName = 'BookingsLogs';
+    let allRecords = [];
 
     fetch(`https://api.airtable.com/v0/${baseId}/${tableName}?sort[][field]=Timestamp&sort[][direction]=desc`, {
       headers: { Authorization: `Bearer ${apiKey}` }
     })
     .then(res => res.json())
     .then(data => {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-      data.records.forEach(record => {
-        const f = record.fields;
-        const dateObj = new Date(f['Slot Time']);
-        const date = dateObj.toLocaleDateString('en-GB');
-        const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-        const waLink = f.Contact ? `<a href="https://wa.me/91${f.Contact}?text=Hello ${f['Patient Name']}, this is a reminder for your appointment on ${date} at ${time}." target="_blank">Send</a>` : '';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${date}</td>
-          <td>${time}</td>
-          <td>${f['Patient Name'] || ''}</td>
-          <td>${f.Contact || ''}</td>
-          <td>${f.Reason || ''}</td>
-          <td>${f.Token || ''}</td>
-          <td>${waLink || f['Reminder Sent'] || ''}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+      allRecords = data.records;
+      renderTable(allRecords);
     })
     .catch(err => {
       document.getElementById('tableBody').innerHTML = `<tr><td colspan="7">Error loading data</td></tr>`;
     });
 
+    function renderTable(records) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      records.forEach(record => {
+        const f = record.fields;
+        const dateObj = new Date(f['Slot Time']);
+        const date = dateObj.toLocaleDateString('en-GB');
+        const isoDate = dateObj.toISOString().split('T')[0];
+        const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const contact = f.Contact || '';
+        const token = f.Token || '';
+        const name = f['Patient Name'] || '';
+        const reason = f.Reason || '';
+
+        let reminderHTML = f['Reminder Sent'] === true ? '✅ Sent' : '';
+
+        if (contact && f['Reminder Sent'] !== true) {
+          const msg = `Hi ${name}, this is a reminder for your appointment at ${time} regarding ${reason}.%0AToken: #${token}%0A– Onestop C-Demo Clinic%0A📞 9390664577`;
+          const waUrl = `https://wa.me/91${contact}?text=${msg}`;
+          reminderHTML = `<a href="${waUrl}" target="_blank" onclick="markReminderSent('${record.id}')">💬 Send</a>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.dataset.date = isoDate;
+        tr.dataset.name = name.toLowerCase();
+        tr.dataset.reason = reason.toLowerCase();
+        tr.innerHTML = `
+          <td>${date}</td>
+          <td>${time}</td>
+          <td>${name}</td>
+          <td><a href="tel:${contact}">${contact}</a></td>
+          <td>${reason}</td>
+          <td>#${token}</td>
+          <td>${reminderHTML}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('filterDate').addEventListener('input', applyFilters);
+    document.getElementById('filterName').addEventListener('input', applyFilters);
+    document.getElementById('filterReason').addEventListener('input', applyFilters);
+
+    function applyFilters() {
+      const date = document.getElementById('filterDate').value;
+      const name = document.getElementById('filterName').value.toLowerCase();
+      const reason = document.getElementById('filterReason').value.toLowerCase();
+
+      const rows = document.querySelectorAll('#logsTable tbody tr');
+      rows.forEach(row => {
+        const matchDate = !date || row.dataset.date === date;
+        const matchName = !name || row.dataset.name.includes(name);
+        const matchReason = !reason || row.dataset.reason.includes(reason);
+        row.style.display = (matchDate && matchName && matchReason) ? '' : 'none';
+      });
+    }
+
+    function markReminderSent(recordId) {
+      fetch(`https://api.airtable.com/v0/${baseId}/${tableName}/${recordId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fields: { 'Reminder Sent': true } })
+      });
+    }
+
     function downloadCSV() {
       const table = document.getElementById("logsTable");
-      let csv = "";
-      for (let row of table.rows) {
-        let cells = Array.from(row.cells).map(cell => `"${cell.innerText}"`);
+      let csv = "Date,Time,Patient,Contact,Reason,Token,Reminder\n";
+      for (let i = 1; i < table.rows.length; i++) {
+        let cells = Array.from(table.rows[i].cells).map(cell => cell.innerText.replace(/\n/g, ' ').trim());
         csv += cells.join(",") + "\n";
       }
       const blob = new Blob([csv], { type: "text/csv" });
       const link = document.createElement("a");
+      const now = new Date();
+      const dateString = now.toISOString().split("T")[0];
       link.href = URL.createObjectURL(blob);
-      link.download = "booking-logs.csv";
+      link.download = `booking-logs-${dateString}.csv`;
       link.click();
     }
   </script></body>
