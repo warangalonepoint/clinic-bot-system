@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mark Attendance</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #fff; margin: 0; padding: 0; }
+    .header { background-color: #000; color: #fff; padding: 12px; text-align: center; font-size: 18px; }
+    .container { padding: 16px; }
+    iframe { width: 100%; height: 92vh; border: none; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">Mark Staff Attendance</div>
+  <div class="container">
+    <iframe src="https://airtable.com/embed/shrkrP7Bk4Gxco65O?backgroundColor=blue" frameborder="0" onmousewheel="" width="100%"></iframe>
+  </div>
+</body>
+</html>
