@@ -48,11 +48,14 @@
     const tableName = "BookingsLogs";
 
     async function fetchLogs() {
-      const url = `https://api.airtable.com/v0/${baseId}/${tableName}?pageSize=100&sort[0][field]=Timestamp&sort[0][direction]=desc`;
-      const headers = { Authorization: `Bearer ${airtableApiKey}` };
+      const proxyUrl = "https://corsproxy.io/?";
+      const apiUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?pageSize=100&sort[0][field]=Timestamp&sort[0][direction]=desc`;
 
       try {
-        const res = await fetch(url, { headers });
+        const res = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
+          headers: { Authorization: `Bearer ${airtableApiKey}` }
+        });
+
         const data = await res.json();
         const tbody = document.getElementById("logsBody");
         tbody.innerHTML = "";
