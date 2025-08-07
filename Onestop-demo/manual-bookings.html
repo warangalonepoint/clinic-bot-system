@@ -136,44 +136,4 @@
 
     fetchAvailableSlots();
   </script></body>
-</html>            'Slot Time': slot,
-            'Date': date,
-            'Reason': reason,
-            'Contact': contact,
-            'Token': token,
-            'Reminder Sent': ''
-          }
-        }]
-      });
-
-      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${airtableApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body
-      });
-
-      if (res.ok) {
-        document.getElementById('bookingForm').style.display = 'none';
-        document.getElementById('confirmation').style.display = 'block';
-        document.getElementById('confirmation').innerHTML = `
-          <h3>✅ Booking Confirmed!</h3>
-          <p>Your Token Number is: <strong>#${token}</strong></p>
-          <p>Date: ${date} | Slot: ${slot}</p>
-        `;
-      } else {
-        alert("Failed to save. Try again.");
-      }
-    }
-
-    document.getElementById('dateDropdown').addEventListener('change', function() {
-      fetchTimeSlots(this.value);
-    });
-
-    document.getElementById('bookingForm').addEventListener('submit', submitBooking);
-    document.addEventListener('DOMContentLoaded', fetchAvailableDates);
-  </script>
-</body>
-</html>
+</html>            
