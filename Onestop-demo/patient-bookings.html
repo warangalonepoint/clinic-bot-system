@@ -2,29 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Patient Booking Options</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patient Booking | Onestop C-Demo</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <img src="assets/banner.png" class="banner" />
-    <h2>Onestop C-Demo</h2>
-    <h3>Patient Booking</h3>
+    <img src="assets/banner.png" class="banner" alt="Banner" />
+    <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
 
-    <div class="card" onclick="location.href='manual-bookings.html'">
-      <h4>📋 Manual Booking</h4>
-      <p>Staff enters patient details and confirms</p>
+    <h2 class="clinic-title">Onestop C-Demo</h2>
+    <h3 class="section-title">Patient Booking</h3>
+
+    <div class="card">
+      <a href="manual-bookings.html" class="btn full black">
+        📋 Manual Booking<br><small>Staff enters patient details and confirms</small>
+      </a>
     </div>
 
-    <div class="card" onclick="location.href='whatsapp-bookings.html'">
-      <h4>💬 WhatsApp Booking</h4>
-      <p>Patient books directly via WhatsApp</p>
+    <div class="card">
+      <a href="whatsapp-bookings.html" class="btn full black">
+        💬 WhatsApp Booking<br><small>Patient books directly via WhatsApp</small>
+      </a>
     </div>
 
-    <footer>
-      <button onclick="location.href='index.html'" class="small">← Back to Dashboard</button>
-    </footer>
+    <br>
+    <a href="index.html" class="btn small back">← Back to Dashboard</a>
   </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+      }
+    };
+  </script>
 </body>
 </html>
