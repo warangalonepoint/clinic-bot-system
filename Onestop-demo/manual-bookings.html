@@ -4,185 +4,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manual Bookings – Onestop C-Demo</title>
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: #fff;
-      margin: 0;
-      padding: 0;
-      color: #000;
-      text-align: center;
-    }
-    .container {
-      padding: 20px;
-      max-width: 480px;
-      margin: auto;
-    }
-    img.banner {
-      width: 100%;
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-    select, input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    .row {
-      display: flex;
-      gap: 10px;
-    }
-    .row input {
-      flex: 1;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      border: none;
-      background: #000;
-      color: #fff;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-    .footer-note {
-      font-size: 13px;
-      margin-top: 14px;
-      color: #555;
-    }
-  </style>
 </head>
 <body>
+  <img src="assets/banner.png" alt="Banner" class="banner" />
   <div class="container">
-    <img src="assets/banner.png" class="banner" alt="Clinic Banner">
-    <h2>Manual Bookings – Onestop C-Demo</h2><select id="dateDropdown">
-  <option value="">Select Date:</option>
-</select>
+    <h2>Manual Bookings – Onestop C-Demo</h2>
+    <label for="date">Select Date</label>
+    <input type="date" id="date" required /><label for="slot">Select Slot</label>
+<select id="slot" required></select>
 
-<select id="slotDropdown">
-  <option value="">Select Time Slot:</option>
-</select>
+<label for="name">Patient Name</label>
+<input type="text" id="name" required />
 
-<div class="row">
-  <input type="text" id="nameInput" placeholder="Patient Name" required>
-  <input type="text" id="reasonInput" placeholder="Reason for Visit" required>
-</div>
+<label for="reason">Reason</label>
+<input type="text" id="reason" required />
 
-<input type="tel" id="contactInput" placeholder="Contact Number" required>
+<label for="contact">Contact</label>
+<input type="text" id="contact" required />
 
 <button onclick="submitBooking()">Confirm Booking</button>
-
-<p class="footer-note">Booked slots will be hidden automatically.</p>
+<p>Booked slots will be hidden automatically.</p>
+<a href="index.html" class="back">&larr; Back to Dashboard</a>
 
   </div>  <script>
-    const apiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
-    const baseId = 'appgIT8WiqnZlR44Y';
+    const airtableToken = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+    const baseId = 'app1T8WiRqZIR4xY';
+    const bookingsTable = 'BookingsLogs';
     const slotsTable = 'AvailableSlots';
 
-    async function loadAvailableSlots() {
-      const url = `https://api.airtable.com/v0/${baseId}/${slotsTable}?view=Grid%20view`;
+    const slotDropdown = document.getElementById('slot');
+    const dateInput = document.getElementById('date');
+
+    dateInput.addEventListener('change', loadSlots);
+
+    async function loadSlots() {
+      slotDropdown.innerHTML = '';
+      const date = dateInput.value;
+      const url = `https://api.airtable.com/v0/${baseId}/${slotsTable}?filterByFormula=AND({Date}='${date}', {Status}='Available')`;
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${apiKey}` }
+        headers: { Authorization: `Bearer ${airtableToken}` }
       });
       const data = await res.json();
-
-      const dateDropdown = document.getElementById('dateDropdown');
-      const slotDropdown = document.getElementById('slotDropdown');
-
-      const groupedSlots = {};
       data.records.forEach(record => {
-        const date = record.fields['Date'];
-        const slot = record.fields['Time Slot'];
-        const status = record.fields['Status'];
-        if (status === 'Available') {
-          if (!groupedSlots[date]) groupedSlots[date] = [];
-          groupedSlots[date].push(slot);
-        }
-      });
-
-      // Populate date dropdown
-      Object.keys(groupedSlots).sort().forEach(date => {
-        const option = document.createElement('option');
-        option.value = date;
-        option.textContent = date;
-        dateDropdown.appendChild(option);
-      });
-
-      // Slot change on date select
-      dateDropdown.addEventListener('change', () => {
-        const selectedDate = dateDropdown.value;
-        slotDropdown.innerHTML = '<option value="">Select Time Slot:</option>';
-        if (groupedSlots[selectedDate]) {
-          groupedSlots[selectedDate].forEach(slot => {
-            const opt = document.createElement('option');
-            opt.value = slot;
-            opt.textContent = slot;
-            slotDropdown.appendChild(opt);
-          });
-        }
+        const opt = document.createElement('option');
+        opt.value = record.fields['Slot'];
+        opt.textContent = record.fields['Slot'];
+        opt.dataset.recordId = record.id;
+        slotDropdown.appendChild(opt);
       });
     }
 
     async function submitBooking() {
-      const date = document.getElementById('dateDropdown').value;
-      const slot = document.getElementById('slotDropdown').value;
-      const name = document.getElementById('nameInput').value;
-      const reason = document.getElementById('reasonInput').value;
-      const contact = document.getElementById('contactInput').value;
+      const date = dateInput.value;
+      const slot = slotDropdown.value;
+      const slotId = slotDropdown.options[slotDropdown.selectedIndex].dataset.recordId;
+      const name = document.getElementById('name').value;
+      const reason = document.getElementById('reason').value;
+      const contact = document.getElementById('contact').value;
 
-      if (!date || !slot || !name || !reason || !contact) return alert('Please fill all fields');
+      // Fetch existing tokens for the date
+      const bookingsURL = `https://api.airtable.com/v0/${baseId}/${bookingsTable}?filterByFormula=IS_SAME({Slot Time}, '${date} ${slot}', 'minute')`;
+      const bookingsRes = await fetch(bookingsURL, {
+        headers: { Authorization: `Bearer ${airtableToken}` }
+      });
+      const bookingsData = await bookingsRes.json();
+      const token = bookingsData.records.length + 1;
 
-      // Post booking to BookingsLogs
-      const logUrl = `https://api.airtable.com/v0/${baseId}/BookingsLogs`;
-      const tokenNumber = Math.floor(Math.random() * 1000); // Temporary logic
-
-      await fetch(logUrl, {
+      // Submit new booking
+      await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Bearer ${airtableToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           fields: {
-            Timestamp: new Date().toISOString(),
             'Patient Name': name,
             'Slot Time': `${date} ${slot}`,
-            Reason: reason,
-            Contact: contact,
-            Token: tokenNumber
+            'Reason': reason,
+            'Contact': contact,
+            'Token': token,
+            'Reminder Sent': '❌'
           }
         })
       });
 
-      // Update slot as Booked
-      const slotUrl = `https://api.airtable.com/v0/${baseId}/${slotsTable}?filterByFormula=AND({Date}='${date}',{Time Slot}='${slot}')`;
-      const slotRes = await fetch(slotUrl, {
-        headers: { Authorization: `Bearer ${apiKey}` }
+      // Mark slot as booked
+      await fetch(`https://api.airtable.com/v0/${baseId}/${slotsTable}/${slotId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${airtableToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fields: { 'Status': 'Booked' } })
       });
-      const slotData = await slotRes.json();
-      const slotId = slotData.records[0]?.id;
-
-      if (slotId) {
-        await fetch(`https://api.airtable.com/v0/${baseId}/${slotsTable}/${slotId}`, {
-          method: 'PATCH',
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ fields: { Status: 'Booked' } })
-        });
-      }
 
       alert('Booking confirmed!');
       window.location.reload();
     }
-
-    loadAvailableSlots();
   </script></body>
 </html>
