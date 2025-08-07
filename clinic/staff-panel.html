@@ -3,31 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Staff Panel</title>
+  <title>Staff Panel - Onestop Clinic</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-  <div class="top-banner">
-    <img src="banner.png" alt="Onestop Clinic" class="logo">
-    <h1>👥 Staff Panel</h1>
-    <p>Onestop Clinic</p>
+  <div class="header">
+    <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo" />
+    <h1 class="title">👥 Staff Panel</h1>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
   </div>
 
-  <div class="card">
-    <img src="banner.png" alt="Doctor" class="hero">
-  </div>
+  <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner" />
+
+  <h2 class="clinic-name">Onestop Clinic</h2>
 
   <div class="button-grid">
-    <a href="staff-attendance.html" class="btn black-btn">📝 Staff Attendance</a>
-    <a href="staff-roster.html" class="btn black-btn">📅 Staff Roster</a>
-    <a href="monthly-summary.html" class="btn black-btn">📊 Monthly Summary</a>
-    <a href="leave-tracker.html" class="btn black-btn">🛏️ Leave Tracker</a>
+    <a href="staff-attendance.html" class="btn">📝 Staff Attendance</a>
+    <a href="staff-roster.html" class="btn">🗓️ Staff Roster</a>
+    <a href="staff-monthly.html" class="btn">📊 Monthly Summary</a>
+    <a href="staff-leave.html" class="btn">🛏️ Leave Tracker</a>
   </div>
 
   <footer>
     <p>Powered by Onestop AI</p>
   </footer>
 
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+    }
+  </script>
 </body>
 </html>
