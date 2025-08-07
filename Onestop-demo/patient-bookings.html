@@ -2,108 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Patient Bookings</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      background-color: #f7f7f7;
-      color: #111;
-    }
-    .dark-mode {
-      background-color: #121212;
-      color: #fff;
-    }
-    header {
-      padding: 10px;
-    }
-    .logo {
-      width: 80px;
-      margin-top: 10px;
-    }
-    .banner {
-      width: 100%;
-      max-height: 180px;
-      object-fit: cover;
-    }
-    .clinic-name {
-      font-size: 20px;
-      font-weight: 600;
-      margin: 10px 0;
-    }
-    .theme-toggle {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      font-size: 18px;
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      margin-top: 50px;
-      padding: 0 20px;
-    }
-    .btn {
-      padding: 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      background-color: #111;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .btn:hover {
-      background-color: #333;
-    }
-    footer {
-      margin-top: 60px;
-      padding: 10px;
-      font-size: 14px;
-      opacity: 0.6;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patient Bookings - Onestop C-Demo</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
-<body>
-
-  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-
-  <header>
-    <img src="assets/logo.png" class="logo" alt="Logo">
-    <img src="assets/banner.png" class="banner" alt="Banner">
-    <div class="clinic-name">Onestop C-Demo</div>
+<body class="light-theme">
+  <header class="header">
+    <img src="./assets/banner.png" alt="Banner" class="banner">
   </header>
 
-  <main>
-    <h2>Patient Bookings</h2>
-    <div class="button-group">
-      <a href="manual-bookings.html"><button class="btn">Manual Booking</button></a>
-      <a href="whatsapp-booking.html"><button class="btn">WhatsApp Booking</button></a>
-    </div>
+  <main class="container">
+    <section class="card">
+      <img src="./assets/logo.png" alt="Clinic Logo" class="logo" style="width: 120px; border-radius: 50%; margin: 10px auto; display: block;" />
+      <h1 class="clinic-name">Onestop C-Demo</h1>
+      <h2>Patient Booking Options</h2>
+
+      <div class="button-group">
+        <a href="./onestop-demo/manual-bookings.html" class="btn">Manual Booking</a>
+        <a href="./onestop-demo/whatsapp-booking.html" class="btn">WhatsApp Booking</a>
+      </div>
+    </section>
   </main>
 
-  <footer>Powered by Onestop AI</footer>
+  <footer class="footer">
+    <p>Powered by Onestop AI</p>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+  </footer>
 
   <script>
     function toggleTheme() {
-      document.body.classList.toggle("dark-mode");
-      localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+      const body = document.body;
+      body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
     }
-
-    window.onload = () => {
-      if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark-mode");
-      }
-    };
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') document.body.classList.add('dark-theme');
+    })();
   </script>
-
 </body>
 </html>
