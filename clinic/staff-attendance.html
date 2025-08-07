@@ -1,103 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Staff Attendance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
   <style>
-    body {
-      font-family: -apple-system, sans-serif;
-      margin: 0;
-      background: #f9f9f9;
-      color: #000;
-      text-align: center;
-      padding: 10px;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #000;
-      color: #fff;
-      padding: 10px;
-    }
-    .header img {
-      height: 36px;
-    }
-    .theme-toggle {
-      font-size: 20px;
-      background: none;
-      border: none;
-      color: inherit;
-      cursor: pointer;
-    }
-    .banner {
-      width: 100%;
-      max-width: 500px;
-      border-radius: 10px;
-      margin: 10px auto;
-    }
-    h2.subtitle {
-      margin-top: 0;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-    .btn-export {
-      display: block;
-      margin: 10px auto;
-      padding: 8px 16px;
-      background: #000;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .btn-export:hover {
-      background: #222;
-    }
-    table {
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    .dark-mode {
-      background: #121212;
-      color: #ededed;
-    }
-    .dark-mode table {
-      color: #eee;
-    }
-    .dark-mode th {
-      background: #1e1e1e;
-    }
-    .footer {
-      font-size: 12px;
-      color: #777;
-    }
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #fff; color: #000; }
+    header { background: #000; color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    img.banner { width: 100%; height: auto; }
+    table { width: 90%; margin: 1rem auto; border-collapse: collapse; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    .export-btn { background: #000; color: #fff; padding: 10px 15px; border: none; cursor: pointer; border-radius: 5px; }
+    footer { text-align: center; padding: 1rem; color: #888; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo">
-    <h1>Staff Attendance</h1>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+  <header>
+    <h1>🧑‍⚕️ Staff Attendance</h1>
+    <img src="toggle-icon.png" style="height: 24px;">
+  </header>
+
+  <img src="banner.png" class="banner" alt="Banner" />
+
+  <h2 style="text-align:center;">Onestop AI Clinic</h2>
+  <div style="text-align:center;">
+    <button class="export-btn" onclick="exportCSV()">⬇ Export Attendance</button>
   </div>
-  <img src="./assets/clinic-hero-banner.png" class="banner" alt="Banner">
-  <h2 class="subtitle">Onestop AI Clinic</h2>
 
-  <button class="btn-export" onclick="exportToExcel()">⬇ Export Attendance</button>
-
-  <table id="att-table">
+  <table id="attendanceTable">
     <thead>
       <tr>
         <th>Date</th>
@@ -106,51 +39,74 @@
         <th>Notes</th>
       </tr>
     </thead>
-    <tbody id="att-body">
+    <tbody>
       <tr><td colspan="4">Loading...</td></tr>
     </tbody>
   </table>
 
-  <div class="footer">Powered by Onestop AI</div>
+  <footer>Powered by Onestop AI</footer>
 
   <script>
-    const airtableApiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+    const apiKey = 'patLNwoJQKE3Tjb83...'; // your API key here
     const baseId = 'appgIT8WiqnZlR44Y';
     const tableName = 'StaffAttendance';
-    const corsProxy = 'https://corsproxy.io/?';
+    const url = `https://api.airtable.com/v0/${baseId}/${tableName}`;
 
-    async function loadAttendance() {
-      const url = `${corsProxy}https://api.airtable.com/v0/${baseId}/${tableName}?view=Grid%20view`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${airtableApiKey}` }
-      });
-      const data = await res.json();
-      const html = data.records.map(rec => {
-        const f = rec.fields;
-        return `<tr>
-          <td>${f.Date || ''}</td>
-          <td>${f['Staff Name'] || ''}</td>
-          <td>${f.Status || ''}</td>
-          <td>${f.Notes || ''}</td>
+    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+
+    fetch(proxyUrl, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const contents = JSON.parse(data.contents);
+      const records = contents.records;
+      const tbody = document.querySelector("#attendanceTable tbody");
+      tbody.innerHTML = '';
+
+      if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">No records found</td></tr>';
+        return;
+      }
+
+      records.forEach(record => {
+        const date = record.fields["Date"] || '';
+        const name = record.fields["Staff Name"] || '';
+        const status = record.fields["Status"] || '';
+        const notes = record.fields["Notes"] || '';
+        const row = `<tr>
+          <td>${date}</td>
+          <td>${name}</td>
+          <td>${status}</td>
+          <td>${notes}</td>
         </tr>`;
-      }).join('');
-      document.getElementById('att-body').innerHTML = html || '<tr><td colspan="4">No records</td></tr>';
-    }
+        tbody.innerHTML += row;
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      document.querySelector("#attendanceTable tbody").innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+    });
 
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-    }
+    function exportCSV() {
+      const rows = Array.from(document.querySelectorAll("table tr"));
+      const csv = rows.map(row =>
+        Array.from(row.querySelectorAll("td, th"))
+          .map(cell => `"${cell.innerText}"`)
+          .join(",")
+      ).join("\n");
 
-    function exportToExcel() {
-      const table = document.getElementById('att-table');
-      const html = table.outerHTML.replace(/ /g, '%20');
-      const a = document.createElement('a');
-      a.href = 'data:application/vnd.ms-excel,' + html;
-      a.download = 'staff_attendance.xls';
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "StaffAttendance.csv";
       a.click();
+      URL.revokeObjectURL(url);
     }
-
-    loadAttendance();
   </script>
+
 </body>
 </html>
