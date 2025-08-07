@@ -2,28 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Booking Logs | Onestop C-Demo</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
   <style>
     table {
       width: 100%;
-      font-size: 14px;
       border-collapse: collapse;
+      font-size: 14px;
     }
     th, td {
-      padding: 6px;
-      border-bottom: 1px solid #ccc;
+      border: 1px solid #aaa;
+      padding: 8px;
       text-align: left;
     }
-    #exportBtn {
+    .search-box {
       margin: 10px 0;
     }
-    .btn-reminder {
-      background: green;
+    .search-box input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 6px 12px;
+      background: black;
       color: white;
       border: none;
-      padding: 5px 8px;
       border-radius: 4px;
       cursor: pointer;
     }
@@ -32,107 +37,111 @@
 <body>
   <div class="container">
     <img src="assets/banner.png" class="banner" />
-    <h2>Onestop C-Demo</h2>
+    <h2>Booking Logs</h2>
 
-    <button id="exportBtn">Export CSV</button>
+    <div class="search-box">
+      <input type="text" id="search" placeholder="Search by name, reason or contact">
+    </div>
 
-    <table id="logsTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Slot</th>
-          <th>Reason</th>
-          <th>Contact</th>
-          <th>Token</th>
-          <th>Reminder</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
+    <button onclick="downloadCSV()">Export CSV</button>
+    <div style="overflow-x:auto;">
+      <table id="logsTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Patient</th>
+            <th>Slot</th>
+            <th>Reason</th>
+            <th>Contact</th>
+            <th>Token</th>
+            <th>Reminder</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
     <p class="footer">Powered by Onestop AI</p>
   </div>
 
   <script>
-    const airtableKey = "YOUR_API_KEY_HERE";
+    const apiKey = "YOUR_API_KEY_HERE";
     const baseId = "appgplT8WiqnZlR44Y";
-    const tableName = "BookingsLogs";
-    const headers = { Authorization: `Bearer ${airtableKey}` };
-
-    const tableBody = document.querySelector("#logsTable tbody");
+    const bookingsTable = "BookingsLogs";
+    const headers = { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" };
+    let logsData = [];
 
     async function loadLogs() {
-      const url = `https://api.airtable.com/v0/${baseId}/${tableName}?sort[0][field]=Timestamp&sort[0][direction]=desc`;
-      const res = await fetch(url, { headers });
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}?maxRecords=500&sort[0][field]=Timestamp&sort[0][direction]=desc`, { headers });
       const data = await res.json();
-      tableBody.innerHTML = "";
+      logsData = data.records;
+      renderLogs(logsData);
+    }
 
-      data.records.forEach(record => {
-        const fields = record.fields;
-        const tr = document.createElement("tr");
-
-        const date = fields["Slot Time"]?.split(" ")[0] || "";
-        const name = fields["Patient Name"] || "";
-        const slot = fields["Slot Time"]?.split(" ")[1] || "";
-        const reason = fields["Reason"] || "";
-        const contact = fields["Contact"] || "";
-        const token = fields["Token"] || "";
-        const reminderSent = fields["Reminder Sent"] || "";
-
-        tr.innerHTML = `
-          <td>${date}</td>
-          <td>${name}</td>
-          <td>${slot}</td>
-          <td>${reason}</td>
-          <td><a href="tel:${contact}">${contact}</a></td>
-          <td>${token}</td>
+    function renderLogs(data) {
+      const tbody = document.querySelector("#logsTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(record => {
+        const f = record.fields;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${(f["Slot Time"] || "").split(" ")[0]}</td>
+          <td>${f["Patient Name"] || ""}</td>
+          <td>${(f["Slot Time"] || "").split(" ")[1]}</td>
+          <td>${f["Reason"] || ""}</td>
+          <td><a href="tel:${f["Contact"] || ""}">${f["Contact"] || ""}</a></td>
+          <td>${f["Token"] || ""}</td>
           <td>
-            ${reminderSent === "✔️" ? "✔️" : `<button class="btn-reminder" data-id="${record.id}" data-contact="${contact}" data-name="${name}" data-slot="${slot}" data-token="${token}" data-reason="${reason}">Send</button>`}
+            ${f["Reminder Sent"] === "✔️" ? "✔️" : `<button onclick="sendReminder('${record.id}', '${f["Contact"]}', '${f["Patient Name"]}', '${f["Slot Time"]}', '${f["Reason"]}', '${f["Token"]}')">Send</button>`}
           </td>
         `;
-        tableBody.appendChild(tr);
-      });
-
-      document.querySelectorAll(".btn-reminder").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.dataset.id;
-          const contact = btn.dataset.contact.replace(/\D/g, "");
-          const msg = `Reminder: Your appointment is at ${btn.dataset.slot}. Token: ${btn.dataset.token}. Reason: ${btn.dataset.reason}`;
-          const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
-
-          window.open(link, "_blank");
-
-          // update Reminder Sent status
-          await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}/${id}`, {
-            method: "PATCH",
-            headers: {
-              ...headers,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ fields: { "Reminder Sent": "✔️" } })
-          });
-
-          loadLogs(); // refresh
-        });
+        tbody.appendChild(row);
       });
     }
 
-    document.getElementById("exportBtn").addEventListener("click", async () => {
-      const rows = [["Date", "Name", "Slot", "Reason", "Contact", "Token", "Reminder Sent"]];
-      document.querySelectorAll("#logsTable tbody tr").forEach(tr => {
-        const cols = Array.from(tr.children).map(td => td.textContent.trim());
-        rows.push(cols);
+    async function sendReminder(id, contact, name, slot, reason, token) {
+      const msg = `Hello ${name},\nThis is a reminder for your appointment on ${slot} for "${reason}".\nToken No: ${token}\n- Onestop Clinic`;
+      const url = `https://wa.me/91${contact}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+
+      await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ fields: { "Reminder Sent": "✔️" } })
       });
 
-      const csv = rows.map(r => r.join(",")).join("\n");
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
+      loadLogs();
+    }
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `BookingLogs_${new Date().toISOString().split("T")[0]}.csv`;
-      a.click();
+    function downloadCSV() {
+      let csv = "Date,Patient,Slot,Reason,Contact,Token,Reminder Sent\n";
+      logsData.forEach(record => {
+        const f = record.fields;
+        csv += [
+          (f["Slot Time"] || "").split(" ")[0],
+          `"${f["Patient Name"] || ""}"`,
+          (f["Slot Time"] || "").split(" ")[1],
+          `"${f["Reason"] || ""}"`,
+          f["Contact"] || "",
+          f["Token"] || "",
+          f["Reminder Sent"] || ""
+        ].join(",") + "\n";
+      });
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "booking-logs.csv";
+      link.click();
+    }
+
+    document.getElementById("search").addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = logsData.filter(r =>
+        (r.fields["Patient Name"] || "").toLowerCase().includes(term) ||
+        (r.fields["Reason"] || "").toLowerCase().includes(term) ||
+        (r.fields["Contact"] || "").toLowerCase().includes(term)
+      );
+      renderLogs(filtered);
     });
 
     loadLogs();
