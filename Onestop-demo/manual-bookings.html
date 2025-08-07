@@ -1,1 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manual Booking - Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="assets/logo.png" />
+</head>
+<body>
+  <header class="header">
+    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
+    <div class="clinic-name">Onestop C-Demo</div>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
+  </header>
 
+  <main class="dashboard">
+    <h2 style="text-align:center; margin-bottom: 20px;">Manual Patient Booking</h2>
+    <form class="card" onsubmit="submitForm(event)">
+      <label>Date:</label>
+      <select id="dateSelect" required></select>
+
+      <label>Time Slot:</label>
+      <select id="slotSelect" required>
+        <option value="">Select a time</option>
+        <option>09:00 AM</option>
+        <option>09:30 AM</option>
+        <option>10:00 AM</option>
+        <option>10:30 AM</option>
+        <option>11:00 AM</option>
+      </select>
+
+      <label>Patient Name:</label>
+      <input type="text" required placeholder="Full name" />
+
+      <label>Contact Number:</label>
+      <input type="tel" required placeholder="10-digit mobile" pattern="[0-9]{10}" />
+
+      <label>Reason for Visit:</label>
+      <input type="text" required placeholder="Reason (e.g. Fever, Consultation)" />
+
+      <button type="submit" class="card" style="margin-top: 15px;">✅ Confirm Booking</button>
+    </form>
+  </main>
+
+  <footer class="footer">
+    Powered by Onestop AI
+  </footer>
+
+  <script>
+    // Theme
+    const toggle = document.getElementById("themeToggle");
+    toggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    });
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    // Future Dates
+    const dateSelect = document.getElementById("dateSelect");
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const futureDate = new Date();
+      futureDate.setDate(today.getDate() + i);
+      const yyyy = futureDate.getFullYear();
+      const mm = String(futureDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(futureDate.getDate()).padStart(2, '0');
+      const option = document.createElement("option");
+      option.value = `${yyyy}-${mm}-${dd}`;
+      option.textContent = `${dd}-${mm}-${yyyy}`;
+      dateSelect.appendChild(option);
+    }
+
+    // Submit (Dummy Handler)
+    function submitForm(e) {
+      e.preventDefault();
+      alert("✅ Booking submitted successfully!");
+    }
+  </script>
+</body>
+</html>
