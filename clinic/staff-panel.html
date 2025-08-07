@@ -21,9 +21,20 @@
       background-color: #000;
       color: white;
       width: 100%;
-      padding: 10px 0;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header img {
+      height: 35px;
+    }
+
+    header .title {
+      flex: 1;
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       font-weight: bold;
     }
 
@@ -69,7 +80,11 @@
 </head>
 <body>
 
-  <header>👥 Staff Panel</header>
+  <header>
+    <img src="./assets/clinic-logo.png" alt="Logo">
+    <div class="title">👥 Staff Panel</div>
+    <div style="width:35px;"></div> <!-- Spacer for symmetry -->
+  </header>
 
   <img src="./assets/clinic-hero-banner.png" class="banner" alt="Staff Banner"/>
 
