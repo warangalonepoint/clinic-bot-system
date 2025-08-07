@@ -1,133 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Staff Attendance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #00796b;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-    table {
-      width: 95%;
-      margin: 10px auto;
-      border-collapse: collapse;
-      background-color: white;
-      color: black;
-    }
-    th, td {
-      border: 1px solid #999;
-      padding: 8px;
-      text-align: center;
-    }
-    img.banner {
-      max-width: 100%;
-      height: auto;
-    }
-    .export-button {
-      display: block;
-      width: 120px;
-      margin: 20px auto;
-      background: black;
-      color: white;
-      padding: 10px;
-      text-align: center;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="icon" href="favicon.png" />
 </head>
 <body>
-  <header>
-    <h2>🧑‍⚕️ Staff Attendance</h2>
+  <header class="header green">
+    <div class="left-icon">🏛️</div>
+    <div class="header-title">Staff Attendance</div>
+    <div class="right-icon">
+      <img id="themeToggle" src="moon.png" alt="Toggle Theme" />
+    </div>
   </header>
 
-  <img src="./banner.png" alt="Banner" class="banner" />
+  <main>
+    <img src="banner.png" alt="Banner" class="banner" />
+    
+    <h2 class="center-text">Onestop AI Clinic</h2>
+    
+    <div style="padding: 10px;">
+      <iframe class="airtable-embed"
+        src="https://airtable.com/embed/appgIT8WiqnZlR44Y/shrAa4pSN9jOm7EJ2?backgroundColor=gray"
+        frameborder="0"
+        onmousewheel=""
+        width="100%"
+        height="600"
+        style="background: transparent; border: 1px solid #ccc; border-radius: 10px;">
+      </iframe>
+    </div>
 
-  <h3 style="text-align:center;">Onestop AI Clinic</h3>
+    <div class="center-text">
+      <button class="black-btn" onclick="window.print()">🖨️ Export</button>
+    </div>
+  </main>
 
-  <table id="attendanceTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Staff Name</th>
-        <th>Status</th>
-        <th>Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="4">Loading data...</td></tr>
-    </tbody>
-  </table>
+  <footer class="footer">
+    Powered by Onestop AI
+  </footer>
 
-  <button class="export-button" onclick="exportTableToExcel()">⬇️ Export</button>
-
-  <footer style="text-align:center; margin-bottom: 20px;">Powered by Onestop AI</footer>
-
-  <script>
-    const API_KEY = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232eae6ebc644fa9073dfb3";
-    const BASE_ID = "appgIT8WiqnZlR44Y";
-    const TABLE_NAME = "StaffAttendance";
-
-    async function fetchAttendance() {
-      const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?sort[0][field]=Date&sort[0][direction]=desc`;
-
-      try {
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${API_KEY}`
-          }
-        });
-        const data = await response.json();
-        renderTable(data.records);
-      } catch (error) {
-        document.querySelector("#attendanceTable tbody").innerHTML =
-          `<tr><td colspan="4">Error loading data</td></tr>`;
-      }
-    }
-
-    function renderTable(records) {
-      const tbody = document.querySelector("#attendanceTable tbody");
-      if (!records.length) {
-        tbody.innerHTML = `<tr><td colspan="4">No records found</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = "";
-      records.forEach(record => {
-        const fields = record.fields;
-        const row = `
-          <tr>
-            <td>${fields.Date || ""}</td>
-            <td>${fields["Staff Name"] || ""}</td>
-            <td>${fields.Status || ""}</td>
-            <td>${fields.Notes || ""}</td>
-          </tr>
-        `;
-        tbody.insertAdjacentHTML("beforeend", row);
-      });
-    }
-
-    function exportTableToExcel() {
-      const table = document.getElementById("attendanceTable");
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Attendance" });
-      XLSX.writeFile(wb, "StaffAttendance.xlsx");
-    }
-
-    fetchAttendance();
-  </script>
+  <script src="./theme-toggle.js"></script>
 </body>
 </html>
