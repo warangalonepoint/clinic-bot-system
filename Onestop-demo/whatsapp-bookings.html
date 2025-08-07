@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WhatsApp Booking - Onestop C-Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="assets/logo.png" />
+</head>
+<body>
+  <header class="header">
+    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
+    <div class="clinic-name">Onestop C-Demo</div>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
+  </header>
 
+  <main class="dashboard">
+    <h2 style="text-align:center; margin-bottom: 20px;">Book via WhatsApp</h2>
+    <form class="card" onsubmit="sendWhatsApp(event)">
+      <label>Date:</label>
+      <select id="waDate" required></select>
+
+      <label>Time Slot:</label>
+      <select id="waSlot" required>
+        <option value="">Select a time</option>
+        <option>09:00 AM</option>
+        <option>09:30 AM</option>
+        <option>10:00 AM</option>
+        <option>10:30 AM</option>
+        <option>11:00 AM</option>
+      </select>
+
+      <label>Patient Name:</label>
+      <input type="text" id="waName" required placeholder="Full name" />
+
+      <label>Reason for Visit:</label>
+      <input type="text" id="waReason" required placeholder="e.g. Fever, Consultation" />
+
+      <button type="submit" class="card" style="margin-top: 15px;">💬 Book on WhatsApp</button>
+    </form>
+  </main>
+
+  <footer class="footer">
+    Powered by Onestop AI
+  </footer>
+
+  <script>
+    // Theme toggle
+    const toggle = document.getElementById("themeToggle");
+    toggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    });
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    // Date dropdown (next 7 days)
+    const waDate = document.getElementById("waDate");
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(today.getDate() + i);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const opt = document.createElement("option");
+      opt.value = `${dd}-${mm}-${yyyy}`;
+      opt.textContent = opt.value;
+      waDate.appendChild(opt);
+    }
+
+    // WhatsApp redirection logic
+    function sendWhatsApp(e) {
+      e.preventDefault();
+      const name = document.getElementById("waName").value.trim();
+      const reason = document.getElementById("waReason").value.trim();
+      const date = document.getElementById("waDate").value;
+      const slot = document.getElementById("waSlot").value;
+
+      const message = `Hello, I want to book an appointment.\n\n👤 Name: ${name}\n📅 Date: ${date}\n⏰ Time: ${slot}\n📝 Reason: ${reason}`;
+      const phone = "919390664577"; // Change this to your clinic number
+      const encodedMsg = encodeURIComponent(message);
+      const waUrl = `https://wa.me/${phone}?text=${encodedMsg}`;
+      window.open(waUrl, "_blank");
+    }
+  </script>
+</body>
+</html>
