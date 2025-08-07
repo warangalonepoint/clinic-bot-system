@@ -3,35 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Staff Panel - Onestop Clinic</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Staff Panel - Onestop AI Clinic</title>
+  <link rel="icon" href="./assets/clinic-logo.png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      background-color: #000;
+      color: white;
+      width: 100%;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header img {
+      height: 35px;
+    }
+
+    header .title {
+      flex: 1;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .banner {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .panel {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      padding: 0 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .btn {
+      background-color: #000;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    footer {
+      margin-top: 40px;
+      color: #999;
+      font-size: 0.9rem;
+      padding-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
-  <div class="header">
-    <img src="./assets/clinic-logo.png" alt="Clinic Logo" class="logo" />
-    <h1 class="title">👥 Staff Panel</h1>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-  </div>
 
-  <img src="./assets/clinic-hero-banner.png" alt="Banner" class="banner" />
+  <header>
+    <img src="./assets/clinic-logo.png" alt="Logo">
+    <div class="title">Onestop Ai clinic</div>
+    <div style="width:35px;"></div> <!-- Spacer for symmetry -->
+  </header>
 
-  <h2 class="clinic-name">Onestop Clinic</h2>
+  <img src="./assets/clinic-hero-banner.png" class="banner" alt="Staff Banner"/>
 
-  <div class="button-grid">
+  <div class="panel">
     <a href="staff-attendance.html" class="btn">📝 Staff Attendance</a>
-    <a href="staff-roster.html" class="btn">🗓️ Staff Roster</a>
+    <a href="staff-roster.html" class="btn">📅 Staff Roster</a>
     <a href="staff-monthly.html" class="btn">📊 Monthly Summary</a>
-    <a href="staff-leave.html" class="btn">🛏️ Leave Tracker</a>
+    <a href="staff-leave.html" class="btn">🛌 Leave Tracker</a>
   </div>
 
-  <footer>
-    <p>Powered by Onestop AI</p>
-  </footer>
+  <footer>Powered by Onestop AI</footer>
 
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle("dark-mode");
-    }
-  </script>
 </body>
 </html>
