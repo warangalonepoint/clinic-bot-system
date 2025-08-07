@@ -2,78 +2,137 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WhatsApp Booking - Onestop C-Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WhatsApp Booking</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    #slotSection, #bookingForm { max-width: 500px; margin: auto; }
-    #bookingForm input, #bookingForm select, #bookingForm button {
-      width: 100%; padding: 10px; margin: 10px 0; font-size: 1rem;
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 10px;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    select, input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: black;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    img.banner {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    h2, h4 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <img src="./assets/banner.png" alt="Banner" style="width:100%;max-height:150px;object-fit:cover" />
-  <h2 style="text-align:center;margin-top:10px;">Onestop C-Demo</h2>
-  <h3 style="text-align:center;color:gray;">Book via WhatsApp</h3>
+  <div class="container">
+    <img src="assets/banner.png" alt="Banner" class="banner" />
+    <h2>Onestop C-Demo</h2>
+    <h4>Book via WhatsApp</h4>
 
-  <div id="bookingForm">
     <input type="text" id="name" placeholder="Your Name" required />
     <input type="tel" id="contact" placeholder="Contact Number" required />
     <input type="text" id="reason" placeholder="Reason for Visit" required />
 
-    <select id="dateSelect"><option>Select Date</option></select>
-    <select id="timeSelect"><option>Select Slot</option></select>
+    <select id="dateSelect">
+      <option selected disabled>Select Date</option>
+    </select>
 
-    <button onclick="sendBooking()">Book on WhatsApp</button>
+    <select id="slotSelect">
+      <option selected disabled>Select Slot</option>
+    </select>
+
+    <button onclick="bookWhatsApp()">Book on WhatsApp</button>
+
+    <footer>Powered by Onestop AI</footer>
   </div>
 
-  <footer><p>Powered by Onestop AI</p></footer>
-
   <script>
-    const airtableAPI = 'https://api.airtable.com/v0/app1T8WiRqZIR4xY/AvailableSlots?api_key=YOUR_API_KEY';
+    const airtableAPI = 'https://api.airtable.com/v0/app1T8WiRqZIR4xY/AvailableSlots';
+    const headers = {
+      Authorization: 'Bearer patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3'
+    };
+
     let slotsData = [];
 
-    fetch(airtableAPI)
+    fetch(airtableAPI, { headers })
       .then(res => res.json())
       .then(data => {
         slotsData = data.records;
         const dates = [...new Set(slotsData.map(rec => rec.fields.Date))];
-        const dateDropdown = document.getElementById('dateSelect');
-        dates.forEach(d => {
-          const opt = document.createElement('option');
-          opt.value = d; opt.textContent = d;
-          dateDropdown.appendChild(opt);
+        const dateSelect = document.getElementById('dateSelect');
+        dates.forEach(date => {
+          const option = document.createElement('option');
+          option.value = date;
+          option.textContent = date;
+          dateSelect.appendChild(option);
         });
       });
 
     document.getElementById('dateSelect').addEventListener('change', function() {
       const selectedDate = this.value;
-      const timeSelect = document.getElementById('timeSelect');
-      timeSelect.innerHTML = '<option>Select Slot</option>';
-      const slots = slotsData.filter(rec => rec.fields.Date === selectedDate && rec.fields.Status !== 'Booked');
-      slots.forEach(slot => {
-        const opt = document.createElement('option');
-        opt.value = slot.fields['Time Slot'];
-        opt.textContent = slot.fields['Time Slot'];
-        timeSelect.appendChild(opt);
+      const slotSelect = document.getElementById('slotSelect');
+      slotSelect.innerHTML = '<option disabled selected>Select Slot</option>';
+
+      const availableSlots = slotsData.filter(
+        rec => rec.fields.Date === selectedDate && rec.fields.Status !== 'Booked'
+      );
+
+      availableSlots.forEach(rec => {
+        const option = document.createElement('option');
+        option.value = rec.fields.Slot;
+        option.textContent = rec.fields.Slot;
+        slotSelect.appendChild(option);
       });
     });
 
-    function sendBooking() {
+    function bookWhatsApp() {
       const name = document.getElementById('name').value.trim();
       const contact = document.getElementById('contact').value.trim();
       const reason = document.getElementById('reason').value.trim();
       const date = document.getElementById('dateSelect').value;
-      const slot = document.getElementById('timeSelect').value;
+      const slot = document.getElementById('slotSelect').value;
 
-      if (!name || !contact || !reason || date === "Select Date" || slot === "Select Slot") {
-        alert("Please fill in all details.");
+      if (!name || !contact || !reason || !date || !slot) {
+        alert('Please fill all fields');
         return;
       }
 
-      const msg = `Booking Request:%0AName: ${name}%0AContact: ${contact}%0AReason: ${reason}%0ADate: ${date}%0ATime: ${slot}`;
-      window.location.href = `https://wa.me/919390664577?text=${msg}`;
+      const msg = `Appointment Request:\n\nName: ${name}\nContact: ${contact}\nReason: ${reason}\nDate: ${date}\nSlot: ${slot}`;
+      const encoded = encodeURIComponent(msg);
+      window.open(`https://wa.me/919000000000?text=${encoded}`, '_blank');
     }
   </script>
 </body>
