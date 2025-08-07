@@ -2,111 +2,126 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>WhatsApp Bookings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WhatsApp Booking | Onestop C-Demo</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    #confirmation {
+      display: none;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #222;
+      color: #fff;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <img src="assets/banner.png" alt="Banner" class="banner" />
-    <div class="header">
-      <img src="assets/logo.png" alt="Logo" class="logo" />
-      <h1 class="title">Onestop C-Demo</h1>
-      <button id="toggleTheme" class="theme-toggle">🌓</button>
-    </div>
-
-    <div class="card">
-      <h2>WhatsApp Appointment</h2>
-      <label for="dateSelect">Select Date:</label>
-      <select id="dateSelect"></select>
-
-      <label for="slotSelect">Select Time Slot:</label>
-      <select id="slotSelect"></select>
-
-      <label for="nameInput">Patient Name:</label>
-      <input type="text" id="nameInput" placeholder="Enter patient name"/>
-
-      <label for="reasonInput">Reason for Visit:</label>
-      <input type="text" id="reasonInput" placeholder="Enter reason"/>
-
-      <button id="bookBtn">Book on WhatsApp</button>
-      <p id="tokenInfo" class="token-info"></p>
-    </div>
-
-    <footer>Powered by Onestop AI</footer>
+  <img src="./assets/banner.png" alt="Banner" style="width:100%; max-height:120px; object-fit:cover;"/>
+  <div class="form-container">
+    <h2>Onestop C-Demo</h2>
+    <p>WhatsApp Appointment</p>
+    <select id="date"></select>
+    <select id="slot"></select>
+    <input type="text" id="name" placeholder="Enter patient name" />
+    <input type="text" id="reason" placeholder="Enter reason" />
+    <button onclick="submitBooking()">Book on WhatsApp</button>
+    <div id="confirmation"></div>
   </div>
 
   <script>
-    const airtableApiKey = localStorage.getItem('airtableApiKey');
-    const baseId = 'app1T8WiRqZIR4xY';
-    const slotsTable = 'AvailableSlots';
+    const airtableApiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
+    const airtableBaseId = 'app1T8WiRqZIR4xY';
     const logsTable = 'BookingsLogs';
-    const today = new Date().toISOString().split('T')[0];
+    const slotsTable = 'AvailableSlots';
 
-    const dateSelect = document.getElementById('dateSelect');
-    const slotSelect = document.getElementById('slotSelect');
-    const nameInput = document.getElementById('nameInput');
-    const reasonInput = document.getElementById('reasonInput');
-    const bookBtn = document.getElementById('bookBtn');
-    const tokenInfo = document.getElementById('tokenInfo');
-
-    let allSlots = [];
-
-    async function fetchSlots() {
-      const url = `https://api.airtable.com/v0/${baseId}/${slotsTable}?pageSize=100&api_key=${airtableApiKey}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      allSlots = data.records.map(r => ({
-        date: r.fields['Date'],
-        time: r.fields['Time Slot'],
-        status: r.fields['Status']
-      })).filter(r => r.status !== 'Booked');
-
-      const futureDates = [...new Set(allSlots.map(s => s.date))].filter(d => d >= today);
-      dateSelect.innerHTML = `<option value="">Select</option>` + futureDates.map(d => `<option>${d}</option>`).join('');
+    async function loadDates() {
+      const response = await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${slotsTable}?api_key=${airtableApiKey}`);
+      const data = await response.json();
+      const dates = [...new Set(data.records.map(r => r.fields.Date))].sort();
+      const dateSelect = document.getElementById('date');
+      dates.forEach(date => {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        dateSelect.appendChild(option);
+      });
+      loadSlots(); // load slots on first date auto
     }
 
-    dateSelect.addEventListener('change', () => {
-      const selectedDate = dateSelect.value;
-      const filtered = allSlots.filter(s => s.date === selectedDate);
-      slotSelect.innerHTML = `<option value="">Select</option>` + filtered.map(s => `<option>${s.time}</option>`).join('');
-    });
-
-    async function getTokenNumber(date) {
-      const url = `https://api.airtable.com/v0/${baseId}/${logsTable}?filterByFormula=AND({Timestamp} >= '${date} 00:00:00', {Timestamp} <= '${date} 23:59:59')&api_key=${airtableApiKey}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      return data.records.length + 1;
+    async function loadSlots() {
+      const selectedDate = document.getElementById('date').value;
+      const response = await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${slotsTable}?filterByFormula={Date}='${selectedDate}'&api_key=${airtableApiKey}`);
+      const data = await response.json();
+      const slotSelect = document.getElementById('slot');
+      slotSelect.innerHTML = "";
+      data.records
+        .filter(r => r.fields.Status === 'Available')
+        .forEach(r => {
+          const option = document.createElement('option');
+          option.value = r.fields["Time Slot"];
+          option.textContent = r.fields["Time Slot"];
+          slotSelect.appendChild(option);
+        });
     }
 
-    bookBtn.addEventListener('click', async () => {
-      const name = nameInput.value.trim();
-      const reason = reasonInput.value.trim();
-      const date = dateSelect.value;
-      const slot = slotSelect.value;
+    document.getElementById('date').addEventListener('change', loadSlots);
 
-      if (!name || !reason || !date || !slot) return alert('Fill all fields.');
+    async function submitBooking() {
+      const date = document.getElementById('date').value;
+      const slot = document.getElementById('slot').value;
+      const name = document.getElementById('name').value;
+      const reason = document.getElementById('reason').value;
 
-      const token = await getTokenNumber(date);
-      tokenInfo.innerText = `Assigned Token No: ${token}`;
+      if (!date || !slot || !name || !reason) {
+        alert('Please fill all fields');
+        return;
+      }
 
-      const whatsappMsg = `Appointment Booking:%0aName: ${name}%0aReason: ${reason}%0aDate: ${date}%0aTime: ${slot}%0aToken: ${token}`;
-      const phone = '919390664577'; // Your clinic number here
-      const link = `https://wa.me/${phone}?text=${whatsappMsg}`;
-      window.open(link, '_blank');
-    });
+      const logsResponse = await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${logsTable}?filterByFormula=AND({Timestamp}='${date}', {Slot Time}='${slot}')&api_key=${airtableApiKey}`);
+      const logsData = await logsResponse.json();
+      if (logsData.records.length > 0) {
+        alert('This slot is already booked!');
+        return;
+      }
 
-    // Theme toggle
-    const toggleTheme = document.getElementById('toggleTheme');
-    toggleTheme.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-    });
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark');
+      const allBookingsResponse = await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${logsTable}?filterByFormula={Timestamp}='${date}'&api_key=${airtableApiKey}`);
+      const allBookings = await allBookingsResponse.json();
+      const token = allBookings.records.length + 1;
+
+      await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${logsTable}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${airtableApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fields: {
+            "Timestamp": date,
+            "Slot Time": slot,
+            "Patient Name": name,
+            "Reason": reason,
+            "Contact": "", // Optional
+            "Token": token,
+            "Reminder Sent": ""
+          }
+        })
+      });
+
+      const message = `Hello, I booked an appointment on ${date} at ${slot}. Name: ${name}, Reason: ${reason}, Token No: ${token}`;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+      document.getElementById('confirmation').innerHTML =
+        `<b>Booking Confirmed!</b><br>Token No: ${token}<br>Redirecting to WhatsApp...`;
+      document.getElementById('confirmation').style.display = 'block';
+
+      setTimeout(() => {
+        window.location.href = whatsappUrl;
+      }, 3000);
     }
 
-    fetchSlots();
+    loadDates();
   </script>
 </body>
 </html>
