@@ -3,33 +3,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Booking Logs</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="icon" href="assets/logo.png">
 </head>
 <body>
-  <img src="assets/banner.png" alt="Banner" class="banner">
-  <h1 class="title">Onestop C-Demo</h1>
-  <h2 class="subtitle">Booking Logs</h2>  <div class="table-container">
-    <table id="logsTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Patient</th>
-          <th>Contact</th>
-          <th>Reason</th>
-          <th>Token</th>
-          <th>Reminder</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr><td colspan="7">Loading...</td></tr>
-      </tbody>
-    </table>
-  </div>  <footer>
-    <p>Powered by Onestop AI</p>
+  <header class="header">
+    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
+    <div class="clinic-name">Onestop C-Demo</div>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
+  </header>  <main class="dashboard">
+    <h2 style="text-align:center; margin-bottom: 15px;">Booking Logs</h2>
+    <div class="card" style="overflow-x:auto;">
+      <table id="logsTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Contact</th>
+            <th>Reason</th>
+            <th>Token</th>
+            <th>Reminder</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="7">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div><div class="card" style="margin-top: 20px; text-align:center;">
+  <button onclick="downloadCSV()" class="card">⬇️ Export CSV</button>
+</div>
+
+  </main>  <footer class="footer">
+    Powered by Onestop AI
   </footer>  <script>
+    const toggle = document.getElementById("themeToggle");
+    toggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    });
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
     const apiKey = 'patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3';
-    const baseId = 'appgplT8WiQnZiR44';
+    const baseId = 'appgIT8WiqnZlR44Y';
     const tableName = 'BookingsLogs';
 
     fetch(`https://api.airtable.com/v0/${baseId}/${tableName}?sort[][field]=Timestamp&sort[][direction]=desc`, {
@@ -40,20 +58,22 @@
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
       data.records.forEach(record => {
-        const { Timestamp, PatientName, SlotTime, Reason, Contact, Token, ReminderSent } = record.fields;
-        const dateObj = new Date(SlotTime);
+        const f = record.fields;
+        const dateObj = new Date(f['Slot Time']);
         const date = dateObj.toLocaleDateString('en-GB');
         const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        const waLink = f.Contact ? `<a href="https://wa.me/91${f.Contact}?text=Hello ${f['Patient Name']}, this is a reminder for your appointment on ${date} at ${time}." target="_blank">Send</a>` : '';
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${date}</td>
           <td>${time}</td>
-          <td>${PatientName || ''}</td>
-          <td>${Contact || ''}</td>
-          <td>${Reason || ''}</td>
-          <td>${Token || ''}</td>
-          <td>${ReminderSent || ''}</td>
+          <td>${f['Patient Name'] || ''}</td>
+          <td>${f.Contact || ''}</td>
+          <td>${f.Reason || ''}</td>
+          <td>${f.Token || ''}</td>
+          <td>${waLink || f['Reminder Sent'] || ''}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -61,5 +81,19 @@
     .catch(err => {
       document.getElementById('tableBody').innerHTML = `<tr><td colspan="7">Error loading data</td></tr>`;
     });
+
+    function downloadCSV() {
+      const table = document.getElementById("logsTable");
+      let csv = "";
+      for (let row of table.rows) {
+        let cells = Array.from(row.cells).map(cell => `"${cell.innerText}"`);
+        csv += cells.join(",") + "\n";
+      }
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "booking-logs.csv";
+      link.click();
+    }
   </script></body>
 </html>
