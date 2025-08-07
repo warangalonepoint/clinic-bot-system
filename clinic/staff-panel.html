@@ -1,79 +1,86 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Panel - Onestop AI Clinic Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }.header {
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        padding: 10px;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staff Panel - Onestop AI Clinic</title>
+  <link rel="icon" href="./assets/clinic-logo.png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .header img {
-        height: 40px;
-        vertical-align: middle;
-    }
-
-    .header span {
-        vertical-align: middle;
-        font-size: 18px;
-        margin-left: 10px;
+    header {
+      background-color: #000;
+      color: white;
+      width: 100%;
+      padding: 10px 0;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
     }
 
     .banner {
-        text-align: center;
-        padding: 10px;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 8px;
+      margin-top: 10px;
     }
 
-    .banner img {
-        width: 100%;
-        max-width: 400px;
-        height: auto;
+    .panel {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      padding: 0 20px;
+      width: 100%;
+      max-width: 500px;
     }
 
-    .title {
-        text-align: center;
-        font-size: 24px;
-        margin: 10px 0;
+    .btn {
+      background-color: #000;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
     }
 
-    .airtable-embed {
-        width: 95%;
-        height: 600px;
-        border: 1px solid #ccc;
-        margin: 0 auto 20px auto;
-        display: block;
+    .btn:hover {
+      opacity: 0.85;
     }
 
-    .footer {
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        padding: 10px;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
+    footer {
+      margin-top: 40px;
+      color: #999;
+      font-size: 0.9rem;
+      padding-bottom: 20px;
     }
-</style>
+  </style>
+</head>
+<body>
 
-</head><body>
-    <div class="header">
-        <img src="./assets/clinic-logo.png" alt="Logo">
-        <span>Onestop AI Clinic Demo</span>
-    </div><div class="banner">
-    <img src="./assets/clinic-hero-banner.png" alt="Banner">
-</div>
+  <header>👥 Staff Panel</header>
 
-<div class="title">Manage Staff</div>
+  <img src="./assets/clinic-hero-banner.png" class="banner" alt="Staff Banner"/>
 
-<iframe class="airtable-embed" src="https://airtable.com/embed/appgIT8WiqnZlR44Y/shriTI45uOVNTvMWZ?viewControls=on" frameborder="0" onmousewheel=""></iframe>
+  <div class="panel">
+    <a href="staff-attendance.html" class="btn">📝 Staff Attendance</a>
+    <a href="staff-roster.html" class="btn">📅 Staff Roster</a>
+    <a href="staff-monthly.html" class="btn">📊 Monthly Summary</a>
+    <a href="staff-leave.html" class="btn">🛌 Leave Tracker</a>
+  </div>
 
-<div class="footer">Powered by Onestop AI</div>
+  <footer>Powered by Onestop AI</footer>
 
-</body></html>
+</body>
+</html>
