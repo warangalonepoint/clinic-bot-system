@@ -68,7 +68,7 @@
   <!-- Header with logo and clinic name -->
   <div class="header">
     <img src="./assets/logo.png" alt="Clinic Logo" />
-    <h2>Onestop AI Clinic Demo</h2>
+    <h2>Onestop C-Demo</h2>
   </div>
 
   <!-- Hero banner -->
@@ -85,7 +85,7 @@
       <a href="manual-bookings.html">
         <button class="btn">Manual Booking</button>
       </a>
-      <a href="bookings.html">
+      <a href="whatsapp-booking.html">
         <button class="btn">Book via WhatsApp</button>
       </a>
     </div>
@@ -96,22 +96,5 @@
     <p>Powered by Onestop AI Services</p>
   </div>
 
-</body>
-</html>
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const reason = document.getElementById("reason").value.trim();
-      const date = document.getElementById("date").value;
-      const slot = document.getElementById("slot").value;
-      const phone = document.getElementById("phone").value.trim();
-
-      const msg = `Hello, I would like to book an appointment.\nName: ${name}\nReason: ${reason}\nDate: ${date}\nTime: ${slot}\nPhone: ${phone}`;
-      const whatsappLink = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
-      window.open(whatsappLink, "_blank");
-    });
-
-    loadDatesAndSlots();
-  </script>
 </body>
 </html>
