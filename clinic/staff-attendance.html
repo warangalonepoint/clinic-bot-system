@@ -1,47 +1,152 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Staff Attendance Panel</title>
-  <link rel="icon" href="./assets/clinic-logo.png" />
+  <title>Staff Attendance</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 10px;
+      background-color: #fff;
+      color: #000;
     }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #fff;
+    }
+
     .banner {
       width: 100%;
-      height: auto;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
-    h1 {
-      background-color: black;
-      color: white;
-      padding: 10px;
-      margin: 0;
+
+    .logo {
+      height: 40px;
+      vertical-align: middle;
+      margin-right: 10px;
     }
-    .button {
-      display: block;
-      width: 80%;
-      margin: 20px auto;
-      padding: 15px;
-      font-size: 18px;
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toggle-btn {
+      background: none;
       border: none;
-      border-radius: 12px;
-      background-color: black;
-      color: white;
-      text-align: center;
-      text-decoration: none;
+      font-size: 1.2rem;
+      cursor: pointer;
     }
-    .button:hover {
-      opacity: 0.8;
+
+    table {
+      width: 100%;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      text-align: center;
+      color: gray;
+    }
+
+    .btn-export {
+      float: right;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <img src="./assets/clinic-hero-banner.png" alt="Clinic Banner" class="banner" />
-  <h1>Staff Attendance Panel</h1><a href="./staff-attendance.csv" class="button" download>📥 Export Attendance CSV</a>
+  <div class="header">
+    <div>
+      <img src="./assets/clinic-logo.png" class="logo" alt="Logo" />
+      <b>Staff Attendance</b>
+    </div>
+    <button class="toggle-btn" onclick="toggleTheme()">🌓</button>
+  </div>
 
+  <img src="./assets/clinic-hero-banner.png" class="banner" alt="Banner" />
+
+  <h6>Onestop AI Clinic</h6>
+
+  <button onclick="exportToExcel()" class="btn btn-sm btn-dark btn-export">⬇️ Export</button>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered" id="attendanceTable">
+      <thead class="table-light">
+        <tr>
+          <th>Date</th>
+          <th>Staff Name</th>
+          <th>Status</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="attendanceBody">
+        <tr><td colspan="4">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">Powered by Onestop AI</div>
+
+  <script>
+    const airtableApiKey = 'YOUR_API_KEY'; // 🔁 Replace with actual key
+    const baseId = 'appgqIT8WiqnZlR4Y'; // Already saved from your screenshot
+    const tableName = 'StaffAttendance';
+
+    async function fetchAttendance() {
+      const url = `https://api.airtable.com/v0/${baseId}/${tableName}?maxRecords=100&view=Grid%20view`;
+      const options = {
+        headers: {
+          Authorization: `Bearer ${airtableApiKey}`
+        }
+      };
+
+      try {
+        const res = await fetch(url, options);
+        const data = await res.json();
+        const rows = data.records.map(record => {
+          const fields = record.fields;
+          return `<tr>
+            <td>${fields.Date || ''}</td>
+            <td>${fields['Staff Name'] || ''}</td>
+            <td>${fields.Status || ''}</td>
+            <td>${fields.Notes || ''}</td>
+          </tr>`;
+        }).join('');
+        document.getElementById('attendanceBody').innerHTML = rows || '<tr><td colspan="4">No records</td></tr>';
+      } catch (err) {
+        console.error('Fetch error:', err);
+        document.getElementById('attendanceBody').innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function exportToExcel() {
+      let table = document.getElementById("attendanceTable");
+      let html = table.outerHTML;
+      let url = 'data:application/vnd.ms-excel,' + escape(html);
+      let link = document.createElement("a");
+      link.href = url;
+      link.download = 'staff_attendance.xls';
+      link.click();
+    }
+
+    fetchAttendance();
+  </script>
 </body>
 </html>
