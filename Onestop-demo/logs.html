@@ -3,111 +3,139 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Booking Logs</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <title>Booking Logs | Onestop C-Demo</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    table {
+      width: 100%;
+      font-size: 14px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 6px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+    #exportBtn {
+      margin: 10px 0;
+    }
+    .btn-reminder {
+      background: green;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <img src="assets/banner.png" alt="Banner" style="width:100%; border-radius: 12px;"/>
-  <h2 style="text-align:center; margin-top:10px;">Onestop C-Demo</h2>
-  <h3 style="text-align:center;">Booking Logs</h3>
+  <div class="container">
+    <img src="assets/banner.png" class="banner" />
+    <h2>Onestop C-Demo</h2>
 
-  <div class="card">
-    <input type="text" id="searchName" placeholder="Search by name" onkeyup="filterTable()" />
-    <input type="text" id="searchReason" placeholder="Search by reason" onkeyup="filterTable()" />
-  </div>
+    <button id="exportBtn">Export CSV</button>
 
-  <div class="table-container">
     <table id="logsTable">
       <thead>
         <tr>
           <th>Date</th>
-          <th>Time</th>
-          <th>Patient</th>
-          <th>Contact</th>
+          <th>Name</th>
+          <th>Slot</th>
           <th>Reason</th>
+          <th>Contact</th>
           <th>Token</th>
           <th>Reminder</th>
         </tr>
       </thead>
-      <tbody id="logsBody">
-        <tr><td colspan="7">Loading...</td></tr>
-      </tbody>
+      <tbody></tbody>
     </table>
-  </div>
 
-  <div style="text-align:center; margin-top:15px;">
-    <button onclick="exportToCSV()" class="btn-black">⬇️ Export CSV</button>
+    <p class="footer">Powered by Onestop AI</p>
   </div>
-
-  <footer>Powered by Onestop AI</footer>
 
   <script>
-    const airtableApiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
-    const baseId = "app1T8WiRqZIR4xY";
+    const airtableKey = "YOUR_API_KEY_HERE";
+    const baseId = "appgplT8WiqnZlR44Y";
     const tableName = "BookingsLogs";
+    const headers = { Authorization: `Bearer ${airtableKey}` };
 
-    async function fetchLogs() {
-      const proxyUrl = "https://corsproxy.io/?";
-      const apiUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?pageSize=100&sort[0][field]=Timestamp&sort[0][direction]=desc`;
+    const tableBody = document.querySelector("#logsTable tbody");
 
-      try {
-        const res = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
-          headers: { Authorization: `Bearer ${airtableApiKey}` }
+    async function loadLogs() {
+      const url = `https://api.airtable.com/v0/${baseId}/${tableName}?sort[0][field]=Timestamp&sort[0][direction]=desc`;
+      const res = await fetch(url, { headers });
+      const data = await res.json();
+      tableBody.innerHTML = "";
+
+      data.records.forEach(record => {
+        const fields = record.fields;
+        const tr = document.createElement("tr");
+
+        const date = fields["Slot Time"]?.split(" ")[0] || "";
+        const name = fields["Patient Name"] || "";
+        const slot = fields["Slot Time"]?.split(" ")[1] || "";
+        const reason = fields["Reason"] || "";
+        const contact = fields["Contact"] || "";
+        const token = fields["Token"] || "";
+        const reminderSent = fields["Reminder Sent"] || "";
+
+        tr.innerHTML = `
+          <td>${date}</td>
+          <td>${name}</td>
+          <td>${slot}</td>
+          <td>${reason}</td>
+          <td><a href="tel:${contact}">${contact}</a></td>
+          <td>${token}</td>
+          <td>
+            ${reminderSent === "✔️" ? "✔️" : `<button class="btn-reminder" data-id="${record.id}" data-contact="${contact}" data-name="${name}" data-slot="${slot}" data-token="${token}" data-reason="${reason}">Send</button>`}
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      document.querySelectorAll(".btn-reminder").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+          const contact = btn.dataset.contact.replace(/\D/g, "");
+          const msg = `Reminder: Your appointment is at ${btn.dataset.slot}. Token: ${btn.dataset.token}. Reason: ${btn.dataset.reason}`;
+          const link = `https://wa.me/${contact}?text=${encodeURIComponent(msg)}`;
+
+          window.open(link, "_blank");
+
+          // update Reminder Sent status
+          await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}/${id}`, {
+            method: "PATCH",
+            headers: {
+              ...headers,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ fields: { "Reminder Sent": "✔️" } })
+          });
+
+          loadLogs(); // refresh
         });
-
-        const data = await res.json();
-        const tbody = document.getElementById("logsBody");
-        tbody.innerHTML = "";
-
-        data.records.forEach((record) => {
-          const fields = record.fields;
-          const row = document.createElement("tr");
-
-          const dateTime = new Date(fields.Timestamp);
-          const date = dateTime.toLocaleDateString();
-          const time = fields["Slot Time"] || dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-          row.innerHTML = `
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${fields["Patient Name"] || ""}</td>
-            <td><a href="tel:${fields.Contact}">${fields.Contact || ""}</a></td>
-            <td>${fields.Reason || ""}</td>
-            <td>${fields.Token || ""}</td>
-            <td>${fields["Reminder Sent"] || ""}</td>
-          `;
-
-          tbody.appendChild(row);
-        });
-      } catch (err) {
-        document.getElementById("logsBody").innerHTML = "<tr><td colspan='7'>Error loading data</td></tr>";
-        console.error("Error fetching logs:", err);
-      }
-    }
-
-    function filterTable() {
-      const name = document.getElementById("searchName").value.toLowerCase();
-      const reason = document.getElementById("searchReason").value.toLowerCase();
-      const rows = document.querySelectorAll("#logsTable tbody tr");
-
-      rows.forEach(row => {
-        const nameText = row.cells[2].textContent.toLowerCase();
-        const reasonText = row.cells[4].textContent.toLowerCase();
-
-        row.style.display =
-          nameText.includes(name) && reasonText.includes(reason) ? "" : "none";
       });
     }
 
-    function exportToCSV() {
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.table_to_sheet(document.getElementById("logsTable"));
-      XLSX.utils.book_append_sheet(wb, ws, "Logs");
-      XLSX.writeFile(wb, "booking-logs.csv");
-    }
+    document.getElementById("exportBtn").addEventListener("click", async () => {
+      const rows = [["Date", "Name", "Slot", "Reason", "Contact", "Token", "Reminder Sent"]];
+      document.querySelectorAll("#logsTable tbody tr").forEach(tr => {
+        const cols = Array.from(tr.children).map(td => td.textContent.trim());
+        rows.push(cols);
+      });
 
-    fetchLogs();
+      const csv = rows.map(r => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `BookingLogs_${new Date().toISOString().split("T")[0]}.csv`;
+      a.click();
+    });
+
+    loadLogs();
   </script>
 </body>
 </html>
