@@ -5,13 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Manual Booking</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background: #fff;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      text-align: center;
+    }
+    .banner {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .clinic-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    label {
+      text-align: left;
+      display: block;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .btn {
+      background: black;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <img src="assets/banner.png" alt="Banner" class="banner" />
+    <img src="assets/banner.png" class="banner" alt="Banner">
     <div class="clinic-title">Manual Patient Booking</div>
 
-    <form id="bookingForm" class="form">
+    <form id="bookingForm">
       <label>Select Date:</label>
       <select id="dateDropdown" required></select>
 
@@ -30,22 +80,23 @@
       <button type="submit" class="btn">Confirm Booking</button>
     </form>
 
-    <p style="text-align:center; margin-top: 20px;">Powered by Onestop AI</p>
+    <div class="footer">Powered by Onestop AI</div>
   </div>
 
   <script>
-    const airtableApiKey = 'YOUR_API_KEY'; // Replace later
-    const baseId = 'appgPT8WiqnZlR44Y';
+    const airtableApiKey = 'YOUR_API_KEY'; // 🔁 Replace this
+    const baseId = 'app1T8WiRqZIR4xY';
     const availableTable = 'AvailableSlots';
     const logsTable = 'BookingsLogs';
 
     async function loadSlots() {
       const dateDropdown = document.getElementById('dateDropdown');
       const slotDropdown = document.getElementById('slotDropdown');
+
       dateDropdown.innerHTML = '';
       slotDropdown.innerHTML = '';
 
-      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${availableTable}`, {
+      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${availableTable}?maxRecords=100`, {
         headers: { Authorization: `Bearer ${airtableApiKey}` }
       });
       const data = await res.json();
@@ -57,42 +108,43 @@
         const status = record.fields['Status'];
         if (status === 'Available') {
           if (!grouped[date]) grouped[date] = [];
-          grouped[date].push(time);
+          grouped[date].push({ time, id: record.id });
         }
       });
 
       Object.keys(grouped).forEach(date => {
-        const option = document.createElement('option');
-        option.value = date;
-        option.textContent = date;
-        dateDropdown.appendChild(option);
+        const opt = document.createElement('option');
+        opt.value = date;
+        opt.textContent = date;
+        dateDropdown.appendChild(opt);
       });
 
       dateDropdown.addEventListener('change', () => {
         slotDropdown.innerHTML = '';
-        const selectedDate = dateDropdown.value;
-        if (grouped[selectedDate]) {
-          grouped[selectedDate].forEach(slot => {
-            const opt = document.createElement('option');
-            opt.value = slot;
-            opt.textContent = slot;
-            slotDropdown.appendChild(opt);
-          });
-        }
+        const selected = grouped[dateDropdown.value] || [];
+        selected.forEach(slot => {
+          const opt = document.createElement('option');
+          opt.value = slot.time;
+          opt.textContent = slot.time;
+          slotDropdown.appendChild(opt);
+        });
       });
 
-      dateDropdown.dispatchEvent(new Event('change'));
+      if (dateDropdown.options.length > 0) {
+        dateDropdown.dispatchEvent(new Event('change'));
+      }
     }
 
-    document.getElementById('bookingForm').addEventListener('submit', async function (e) {
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+
       const name = document.getElementById('name').value;
       const reason = document.getElementById('reason').value;
       const contact = document.getElementById('contact').value;
       const date = document.getElementById('dateDropdown').value;
       const slot = document.getElementById('slotDropdown').value;
 
-      // 1. Save to BookingsLogs
+      // 1. Add to Logs
       await fetch(`https://api.airtable.com/v0/${baseId}/${logsTable}`, {
         method: 'POST',
         headers: {
@@ -129,7 +181,7 @@
         });
       }
 
-      alert('Booking confirmed!');
+      alert('Booking Confirmed!');
       window.location.href = 'index.html';
     });
 
