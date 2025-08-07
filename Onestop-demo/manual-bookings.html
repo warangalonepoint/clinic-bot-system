@@ -2,135 +2,165 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manual Booking</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    body { font-family: Arial, sans-serif; padding: 10px; background: #fff; }
-    .container { max-width: 500px; margin: auto; text-align: center; }
-    img { width: 100%; border-radius: 12px; margin-bottom: 10px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #000;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .banner {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 15px;
+      margin-bottom: 4px;
+      display: block;
+    }
     select, input {
-      width: 100%; padding: 10px; margin: 8px 0;
-      border: 1px solid #ccc; border-radius: 6px; font-size: 16px;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
     button {
-      width: 100%; padding: 12px; font-size: 16px;
-      background-color: black; color: white;
-      border: none; border-radius: 8px; margin-top: 10px;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
     }
-    footer { margin-top: 20px; font-size: 14px; color: #666; }
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="assets/banner.png" alt="Doctor Banner" />
+    <img src="assets/banner.png" alt="Doctor Banner" class="banner" />
     <h2>Manual Patient Booking</h2>
 
-    <label>Select Date:</label>
-    <select id="dateDropdown"><option value="">Loading dates...</option></select>
+    <label for="dateDropdown">Select Date:</label>
+    <select id="dateDropdown">
+      <option>Loading dates...</option>
+    </select>
 
-    <label>Select Time Slot:</label>
-    <select id="slotDropdown"><option value="">Select a date first</option></select>
+    <label for="slotDropdown">Select Time Slot:</label>
+    <select id="slotDropdown">
+      <option>Select a date first</option>
+    </select>
 
-    <label>Patient Name:</label>
-    <input type="text" id="patientName" placeholder="Enter name" />
+    <label for="name">Patient Name:</label>
+    <input type="text" id="name" placeholder="Enter name" />
 
-    <label>Reason:</label>
+    <label for="reason">Reason:</label>
     <input type="text" id="reason" placeholder="Enter reason" />
 
-    <label>Contact:</label>
+    <label for="contact">Contact:</label>
     <input type="text" id="contact" placeholder="Enter phone number" />
 
-    <button onclick="submitBooking()">Confirm Booking</button>
+    <button id="confirmBtn">Confirm Booking</button>
 
     <footer>Powered by Onestop AI</footer>
   </div>
 
   <script>
-    const apiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
-    const slotsURL = "https://api.airtable.com/v0/appgPT8WiqnZlR44Y/AvailableSlots";
-    const logsURL = "https://api.airtable.com/v0/app1T8WiRqZIR4xY/BookingsLogs";
+    const airtableApiKey = "YOUR_SECRET_API_KEY"; // DO NOT SHARE PUBLICLY
+    const baseId = "appgPT8WiqnZlR44Y";
+    const table = "AvailableSlots";
+    const slotsURL = `https://api.airtable.com/v0/${baseId}/${table}`;
 
     const headers = {
-      Authorization: "Bearer " + apiKey,
-      "Content-Type": "application/json"
+      Authorization: "Bearer " + airtableApiKey,
     };
 
     const dateDropdown = document.getElementById("dateDropdown");
     const slotDropdown = document.getElementById("slotDropdown");
 
-    let allSlots = [];
+    async function loadDates() {
+      dateDropdown.innerHTML = '<option>Loading dates...</option>';
+      try {
+        const res = await fetch(`${slotsURL}?maxRecords=100&view=Grid%20view`, { headers });
+        const data = await res.json();
+        const dates = [...new Set(data.records
+          .filter(r => r.fields.Status === "Available")
+          .map(r => r.fields.Date)
+        )];
 
-    // Load all available dates
-    fetch(slotsURL, { headers })
-      .then(res => res.json())
-      .then(data => {
-        allSlots = data.records.filter(r => r.fields.Status === "Available");
-        const uniqueDates = [...new Set(allSlots.map(r => r.fields.Date))].sort();
-        dateDropdown.innerHTML = '<option value="">Select Date</option>';
-        uniqueDates.forEach(date => {
-          dateDropdown.innerHTML += `<option value="${date}">${date}</option>`;
+        if (dates.length === 0) {
+          dateDropdown.innerHTML = '<option>No dates available</option>';
+          return;
+        }
+
+        dateDropdown.innerHTML = '<option disabled selected>Select Date</option>';
+        dates.forEach(date => {
+          const option = document.createElement("option");
+          option.value = date;
+          option.textContent = date;
+          dateDropdown.appendChild(option);
         });
-      });
+      } catch (err) {
+        dateDropdown.innerHTML = '<option>Error loading dates</option>';
+        console.error("Date fetch error", err);
+      }
+    }
 
-    // On date change, load time slots
-    dateDropdown.addEventListener("change", () => {
+    dateDropdown.addEventListener("change", async () => {
       const selectedDate = dateDropdown.value;
-      const slots = allSlots.filter(r => r.fields.Date === selectedDate);
-      slotDropdown.innerHTML = '<option value="">Select Slot</option>';
-      slots.forEach(r => {
-        slotDropdown.innerHTML += `<option value="${r.fields['Time Slot']}" data-id="${r.id}">${r.fields['Time Slot']}</option>`;
-      });
+      slotDropdown.innerHTML = '<option>Loading slots...</option>';
+      try {
+        const res = await fetch(`${slotsURL}?maxRecords=100&view=Grid%20view`, { headers });
+        const data = await res.json();
+        const slots = data.records
+          .filter(r => r.fields.Date === selectedDate && r.fields.Status === "Available")
+          .map(r => r.fields["Time Slot"]);
+
+        slotDropdown.innerHTML = "";
+        if (slots.length === 0) {
+          slotDropdown.innerHTML = '<option>No slots available</option>';
+          return;
+        }
+
+        slotDropdown.innerHTML = '<option disabled selected>Select Slot</option>';
+        slots.forEach(slot => {
+          const option = document.createElement("option");
+          option.value = slot;
+          option.textContent = slot;
+          slotDropdown.appendChild(option);
+        });
+      } catch (err) {
+        slotDropdown.innerHTML = '<option>Error loading slots</option>';
+        console.error("Slot fetch error", err);
+      }
     });
 
-    function submitBooking() {
-      const date = dateDropdown.value;
-      const slot = slotDropdown.value;
-      const name = document.getElementById("patientName").value.trim();
-      const reason = document.getElementById("reason").value.trim();
-      const contact = document.getElementById("contact").value.trim();
-      const slotRecordId = slotDropdown.options[slotDropdown.selectedIndex]?.getAttribute("data-id");
+    document.getElementById("confirmBtn").addEventListener("click", () => {
+      alert("Booking logic not connected yet — coming in next sprint.");
+    });
 
-      if (!date || !slot || !name || !reason || !contact) {
-        alert("Please fill all fields.");
-        return;
-      }
-
-      // Get token number for the selected date
-      fetch(`${logsURL}?filterByFormula=AND({Timestamp}="${date}")`, { headers })
-        .then(res => res.json())
-        .then(data => {
-          const token = (data.records.length || 0) + 1;
-
-          // Save to BookingsLogs table
-          fetch(logsURL, {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
-              fields: {
-                "Timestamp": date,
-                "Slot Time": slot,
-                "Patient Name": name,
-                "Reason": reason,
-                "Contact": contact,
-                "Token": token,
-                "Reminder Sent": ""
-              }
-            })
-          })
-          .then(() => {
-            // Mark the slot as Booked
-            if (slotRecordId) {
-              fetch(`${slotsURL}/${slotRecordId}`, {
-                method: "PATCH",
-                headers,
-                body: JSON.stringify({ fields: { "Status": "Booked" } })
-              });
-            }
-            alert(`✅ Booking confirmed! Token No: ${token}`);
-          });
-        });
-    }
+    loadDates();
   </script>
 </body>
 </html>
