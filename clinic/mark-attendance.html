@@ -2,77 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mark Staff Attendance</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Mark Attendance – Onestop AI Clinic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-    }
-    .header {
-      background-color: black;
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #fff; color: #000; }
+    header, footer {
+      background: black;
       color: white;
-      padding: 0.8rem 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      text-align: center;
+      padding: 10px;
     }
-    .header img {
-      height: 36px;
-      margin-right: 10px;
-    }
-    .header-title {
-      flex-grow: 1;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-    .theme-toggle {
-      cursor: pointer;
-      font-size: 1.2rem;
-    }
-    iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      margin: 1rem 0;
-      border-radius: 10px;
-    }
-    footer {
-      background-color: black;
-      color: white;
+    .container {
       padding: 1rem;
       text-align: center;
-      font-size: 0.9rem;
-      margin-top: 40px;
+    }
+    .btn {
+      background: black;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background: #444;
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <img src="banner.png" alt="Clinic Logo">
-    <div class="header-title">Onestop AI Clinic – Mark Attendance</div>
-    <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
-  </div>
+<header>
+  <h2>🩺 Onestop AI Clinic – Mark Attendance</h2>
+</header>
 
-  <main style="padding: 1rem;">
-    <iframe
-      src="https://airtable.com/embed/shrkrP7Bk4Gxco65O?backgroundColor=gray"
-      allowfullscreen
-      title="Staff Attendance Form">
-    </iframe>
-  </main>
+<div class="container">
+  <p>Click below to open the secure attendance form.</p>
+  <a href="https://airtable.com/shrkrP7Bk4Gxco65O" target="_blank">
+    <button class="btn">📝 Mark Attendance</button>
+  </a>
+</div>
 
-  <footer>
-    Powered by Onestop AI Services
-  </footer>
-
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-    }
-  </script>
+<footer>
+  Powered by Onestop AI Services
+</footer>
 
 </body>
 </html>
