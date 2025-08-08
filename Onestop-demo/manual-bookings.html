@@ -2,110 +2,228 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Manual Booking</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="styles.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manual Patient Booking — v3</title>
+  <style>
+    :root{
+      --bg:#f7f7f8;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --brand:#111111;
+      --brand-ink:#ffffff;
+      --ok:#16a34a;
+      --error:#ef4444;
+      --shadow:0 8px 24px rgba(0,0,0,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      background:var(--bg); color:var(--text);
+    }
+    .wrap{max-width:720px;margin:24px auto;padding:16px}
+    .hero{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden; margin-bottom:18px;
+    }
+    .hero img{display:block;width:100%;height:auto}
+    h1{
+      text-align:center;margin:8px 0 0;font-size:28px;letter-spacing:.2px
+    }
+    .subtitle{color:var(--muted);text-align:center;margin:6px 0 20px}
+    .card{
+      background:var(--card); box-shadow:var(--shadow);
+      border-radius:var(--radius); padding:18px;
+    }
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .field{flex:1 1 100%}
+    label{display:block;font-size:14px;color:var(--muted);margin:8px 0 6px}
+    input,select{
+      width:100%; appearance:none; -webkit-appearance:none;
+      border:1px solid #e5e7eb; border-radius:12px;
+      padding:12px 14px; font-size:16px; background:#fff;
+    }
+    button{
+      width:100%; margin-top:12px; border:0;
+      background:var(--brand); color:var(--brand-ink);
+      padding:14px 16px; border-radius:14px; font-size:16px; font-weight:600;
+      box-shadow:var(--shadow); cursor:pointer;
+    }
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .hint{font-size:13px;color:var(--muted);margin-top:8px}
+    .note{margin-top:12px;font-size:14px;color:var(--muted);text-align:center}
+    .toast{
+      margin-top:12px;padding:12px 14px;border-radius:12px;font-size:14px;
+    }
+    .toast.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+    .toast.err{background:#fef2f2;color:#7f1d1d;border:1px solid #fecaca}
+    .footer{margin:22px 0;text-align:center;color:var(--muted);font-size:13px}
+  </style>
 </head>
 <body>
-  <div class="container">
-    <img src="assets/banner.png" class="banner" />
-    <h2>Onestop C-Demo</h2>
-    <h3>Manual Booking</h3>
+  <div class="wrap">
+    <div class="hero">
+      <img alt="Doctor banner" src="https://images.unsplash.com/photo-1584982751601-97dcc096659c?q=80&w=1480&auto=format&fit=crop" />
+    </div>
 
-    <form id="bookingForm">
-      <label>Patient Name:</label>
-      <input type="text" id="name" required />
+    <h1>Manual Patient Booking</h1>
+    <p class="subtitle">v3 — local demo (swappable to Airtable later)</p>
 
-      <label>Contact:</label>
-      <input type="tel" id="contact" required />
+    <div class="card" id="card">
+      <div class="row">
+        <div class="field">
+          <label for="patientName">Patient Name</label>
+          <input id="patientName" type="text" placeholder="Enter full name" autocomplete="name" />
+        </div>
+      </div>
 
-      <label>Select Date:</label>
-      <input type="date" id="date" required />
+      <div class="row">
+        <div class="field">
+          <label for="contact">Contact Number</label>
+          <input id="contact" type="tel" placeholder="10‑digit mobile" inputmode="numeric" />
+        </div>
+      </div>
 
-      <label>Select Time Slot:</label>
-      <select id="slot" required>
-        <option value="">Loading...</option>
-      </select>
+      <div class="row">
+        <div class="field">
+          <label for="date">Select Date</label>
+          <select id="date" ></select>
+        </div>
+        <div class="field">
+          <label for="slot">Select Time Slot</label>
+          <select id="slot"><option>Loading…</option></select>
+        </div>
+      </div>
 
-      <button type="submit">Book Appointment</button>
-    </form>
+      <button id="submitBtn">Confirm Booking</button>
+      <div id="toast" class="toast" style="display:none"></div>
+      <p class="note">Booked slots on this device will be hidden automatically.</p>
+    </div>
 
-    <p id="statusMsg"></p>
+    <div class="footer">Powered by Onestop AI</div>
   </div>
 
-  <script>
-    const apiKey = "patLNwoJQKE3Tjb8J.c2a0db129111c610fae64a2c01e0a626f37bdb5992232ea6ebc644fa9073dfb3";
-    const baseId = "app1T8WiRqZIR4xY";
-    const slotsTable = "AvailableSlots";
-    const bookingsTable = "BookingsLogs";
+<script>
+/* -------------------- CONFIG (easy to change later) -------------------- */
+const SLOT_TIMES = [
+  "10:00 AM","10:10 AM","10:20 AM","10:30 AM","10:40 AM","10:50 AM",
+  "11:00 AM","11:10 AM","11:20 AM","11:30 AM","11:40 AM","11:50 AM"
+];
+const DAYS_AHEAD = 6;  // today + 6 = 7 days visible
 
-    // Load available slots from Airtable
-    async function loadSlots() {
-      const date = document.getElementById("date").value;
-      const slotSelect = document.getElementById("slot");
-      slotSelect.innerHTML = `<option value="">Loading...</option>`;
+/* -------------------- UTIL -------------------- */
+const pad = n => (n<10 ? "0"+n : ""+n);
+const toISO = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const pretty = d => d.toLocaleDateString(undefined,{day:'2-digit',month:'2-digit',year:'numeric'});
 
-      if (!date) return;
+function storageKey(dateISO){ return `v3_bookings_${dateISO}`; }
+function loadDay(dateISO){
+  try{ return JSON.parse(localStorage.getItem(storageKey(dateISO))||'{"token":0,"slots":{}}'); }
+  catch{ return {token:0,slots:{}}; }
+}
+function saveDay(dateISO, data){
+  localStorage.setItem(storageKey(dateISO), JSON.stringify(data));
+}
 
-      const url = `https://api.airtable.com/v0/${baseId}/${slotsTable}?filterByFormula=AND({Date}='${date}', {Status}='Available')`;
+/* -------------------- DOM refs -------------------- */
+const dateEl = document.getElementById('date');
+const slotEl = document.getElementById('slot');
+const nameEl = document.getElementById('patientName');
+const contactEl = document.getElementById('contact');
+const btn = document.getElementById('submitBtn');
+const toast = document.getElementById('toast');
 
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${apiKey}` }
-      });
+/* -------------------- Init -------------------- */
+initDates();
+refreshSlots();
 
-      const data = await response.json();
-      slotSelect.innerHTML = `<option value="">Select Slot</option>`;
+dateEl.addEventListener('change', refreshSlots);
+btn.addEventListener('click', onSubmit);
 
-      data.records.forEach(record => {
-        const option = document.createElement("option");
-        option.value = record.fields["Time Slot"];
-        option.textContent = record.fields["Time Slot"];
-        slotSelect.appendChild(option);
-      });
+function initDates(){
+  const today = new Date();
+  dateEl.innerHTML = "";
+  for(let i=0;i<=DAYS_AHEAD;i++){
+    const d = new Date(today);
+    d.setDate(d.getDate()+i);
+    const opt = document.createElement('option');
+    opt.value = toISO(d);
+    opt.textContent = pretty(d);
+    dateEl.appendChild(opt);
+  }
+}
+
+function refreshSlots(){
+  const dateISO = dateEl.value;
+  const day = loadDay(dateISO);
+  slotEl.innerHTML = "";
+  let added = 0;
+  SLOT_TIMES.forEach(t=>{
+    if(!day.slots[t]){ // not booked -> show
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t;
+      slotEl.appendChild(o);
+      added++;
     }
+  });
+  if(added===0){
+    const o = document.createElement('option');
+    o.value=""; o.textContent="No slots available";
+    slotEl.appendChild(o);
+  }
+}
 
-    document.getElementById("date").addEventListener("change", loadSlots);
+/* -------------------- Validation -------------------- */
+function showToast(kind,msg){
+  toast.className = `toast ${kind==='ok'?'ok':'err'}`;
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(()=>toast.style.display='none', 3500);
+}
+function validPhone(p){ return /^[0-9]{10}$/.test((p||"").trim()); }
 
-    // Save booking to Airtable
-    document.getElementById("bookingForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+/* -------------------- Submit -------------------- */
+function onSubmit(){
+  const dateISO = dateEl.value;
+  const slot = slotEl.value;
+  const name = nameEl.value.trim();
+  const phone = contactEl.value.trim();
 
-      const name = document.getElementById("name").value;
-      const contact = document.getElementById("contact").value;
-      const slotTime = document.getElementById("slot").value;
+  if(!name){ showToast('err','Please enter patient name.'); return; }
+  if(!validPhone(phone)){ showToast('err','Enter a valid 10‑digit phone number.'); return; }
+  if(!slot || slot==="No slots available"){ showToast('err','Please select a time slot.'); return; }
 
-      const timestamp = new Date().toLocaleString("en-IN", {
-        timeZone: "Asia/Kolkata"
-      });
+  // Save locally (this is the single function we'll swap to Airtable later)
+  const result = saveBookingLocal({dateISO, slot, name, phone});
+  if(result.ok){
+    showToast('ok', `Booking confirmed! Token #${result.token}.`);
+    // clear name/phone; refresh slots to hide the chosen one
+    // (keep date as-is)
+    nameEl.value = "";
+    contactEl.value = "";
+    refreshSlots();
+    alert(`Booking confirmed!\n\nDate: ${pretty(new Date(dateISO))}\nSlot: ${slot}\nToken: ${result.token}\n\n(Stored locally in this demo)`);
+  }else{
+    showToast('err', result.message || 'Slot is no longer available.');
+  }
+}
 
-      const payload = {
-        fields: {
-          "Timestamp": timestamp,
-          "Patient Name": name,
-          "Contact": contact,
-          "Slot Time": slotTime
-        }
-      };
+function saveBookingLocal({dateISO, slot, name, phone}){
+  const day = loadDay(dateISO);
+  if(day.slots[slot]) return {ok:false, message:'Already booked.'};
+  day.token = (day.token||0) + 1;
+  day.slots[slot] = { name, phone, token: day.token, ts: Date.now() };
+  saveDay(dateISO, day);
+  return {ok:true, token: day.token};
+}
 
-      const response = await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const result = await response.json();
-
-      if (result.id) {
-        document.getElementById("statusMsg").innerText = "✅ Booking Saved Successfully!";
-        document.getElementById("bookingForm").reset();
-        document.getElementById("slot").innerHTML = "";
-      } else {
-        document.getElementById("statusMsg").innerText = "❌ Failed to save booking.";
-      }
-    });
-  </script>
+/* -------------------- (Future) Swap to Airtable --------------------
+   Replace saveBookingLocal() with an async function that POSTs to your
+   webhook / Airtable API. Everything else stays the same.
+------------------------------------------------------------------- */
+</script>
 </body>
 </html>
