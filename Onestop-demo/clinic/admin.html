@@ -1,22 +1,32 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Clinic • Admin</title>
-<link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
 <style>
-main{max-width:1000px;margin:16px auto;padding:16px}
-.logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:860px){.grid{grid-template-columns:1fr}}
-table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
-.iconbtn{display:inline-flex;align-items:center;gap:8px}
-.iconbtn img{width:18px;height:18px;border-radius:4px}
-.muted{color:#666}
-</style></head><body>
+  main{max-width:1000px;margin:16px auto;padding:16px}
+  .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
+  .iconbtn{display:inline-flex;align-items:center;gap:8px}
+  .iconbtn img{width:18px;height:18px;border-radius:4px}
+  .muted{color:#666}
+  /* Banner aligned with cards */
+  .hero{padding:0;overflow:hidden}
+  .banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+</style>
+</head><body>
 <script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();</script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main>
-  <img class="banner" src="./assets/clinic_banner.png" alt="Clinic"/>
+  <!-- Banner -->
+  <div class="card hero">
+    <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
+  </div>
 
   <!-- Quick Links -->
   <div class="card" style="margin-top:12px">
@@ -107,7 +117,7 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
-// ---------- helpers ----------
+// helpers
 const $=id=>document.getElementById(id);
 const K={services:"cl_s",appts:"cl_a",queue:"cl_q"};
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
@@ -121,7 +131,7 @@ const csv=(rows,heads,name)=>{
 };
 const today=()=>new Date().toISOString().slice(0,10);
 
-// ---------- Walk-ins ----------
+// Walk-ins
 function renderQ(){
   const rows=jget(K.queue);
   const tb=$("q_tbody"); tb.innerHTML="";
@@ -139,7 +149,7 @@ $("q_export").onclick=()=>csv(jget(K.queue),["name","phone","age","comp","ts"],"
 $("q_clear").onclick=()=>{if(confirm("Clear queue on this device?")){localStorage.removeItem(K.queue);renderQ();}};
 renderQ();
 
-// ---------- Appointments ----------
+// Appointments
 const aDate=$("a_date"); if(aDate) aDate.value=today();
 function renderA(){
   const rows=jget(K.appts);
@@ -159,7 +169,7 @@ $("a_add").onclick=()=>{const date=$("a_date").value,time=$("a_time").value,name
 $("a_export").onclick=()=>csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");
 renderA();
 
-// ---------- Services ----------
+// Services
 function renderS(){
   const rows=jget(K.services);
   const tb=$("s_tbody"); tb.innerHTML="";
@@ -174,7 +184,7 @@ $("s_export").onclick=()=>csv(jget(K.services),["name","price"],"Services.csv");
 $("s_clear").onclick=()=>{if(confirm("Clear local services?")){localStorage.removeItem(K.services);renderS();}};
 renderS();
 
-// ---------- Reports ----------
+// Reports
 $("r_day").onclick=()=>{
   const d=today();
   const ap=jget(K.appts).filter(a=>a.date===d).length;
@@ -187,7 +197,7 @@ $("r_exportAll").onclick=()=>{
   csv(jget(K.services),["name","price"],"Services.csv");
 };
 
-// ---------- PINs ----------
+// PINs
 fetch("./pins.json",{cache:"no-store"})
   .then(r=>r.json())
   .then(p=>{$("pinsBox").textContent=JSON.stringify(p,null,2)})
