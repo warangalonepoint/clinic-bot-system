@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Clinic • Staff</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+<style>
+  main{max-width:1000px;margin:16px auto;padding:16px}
+  .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
+  .hero{padding:0;overflow:hidden}.banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer}
+  .rowbtn{display:inline-flex;gap:8px;flex-wrap:wrap}
+  .muted{color:#666}
+  .pill{background:#eee;border-radius:999px;padding:4px 10px}
+  input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+</style>
+</head><body>
+<script>
+  // Lock to admin only
+  (function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();
+</script>
+<button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
+
+<main>
+  <div class="card hero"><img class="banner" src="./assets/clinic_banner.png" alt="Clinic"></div>
+
+  <!-- Staff Roster -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Staff Roster</h2>
+    <div class="grid">
+      <label>Full Name <input id="st_name" placeholder="e.g., Priya Sharma"></label>
+      <label>Phone <input id="st_phone" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
+      <label>Role
+        <select id="st_role">
+          <option>Doctor</option><option>Manager</option><option>Front Desk</option>
+          <option>Nurse</option><option>Pharmacist</option><option>Support</option>
+        </select>
+      </label>
+      <label>Note <input id="st_note" placeholder="e.g., evening shift"></label>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="st_add">Add / Update</button>
+      <button class="btn" id="st_export">Export Staff CSV</button>
+      <button class="btn" id="st_clear">Clear Local Staff</button>
+    </div>
+    <div style="margin-top:10px;overflow:auto">
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Role</th><th>Note</th><th>Actions</th></tr></thead>
+        <tbody id="st_tbody"></tbody>
+      </table>
+      <div id="st_empty" class="muted">No staff yet.</div>
+    </div>
+  </div>
+
+  <!-- Attendance -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Attendance (Today)</h2>
+    <div class="grid">
+      <label>Choose Staff
+        <select id="at_staff"></select>
+      </label>
+      <label>Action
+        <select id="at_action">
+          <option value="in">Check-in</option>
+          <option value="out">Check-out</option>
+        </select>
+      </label>
+      <label>Note <input id="at_note" placeholder="optional"></label>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="at_mark">Mark</button>
+      <button class="btn" id="at_export">Export Attendance CSV</button>
+      <button class="btn" id="at_clear">Clear Today</button>
+    </div>
+    <div style="margin-top:10px;overflow:auto">
+      <table>
+        <thead><tr><th>#</th><th>Time</th><th>Name</th><th>Phone</th><th>Role</th><th>Action</th><th>Note</th></tr></thead>
+        <tbody id="at_tbody"></tbody>
+      </table>
+      <div id="at_empty" class="muted">No entries today.</div>
+    </div>
+  </div>
+
+  <!-- Tools -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Tools</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn" href="./admin.html">Open Admin</a>
+      <a class="btn" href="./doctor.html">Open Doctor</a>
+      <a class="btn" href="./index.html">Back to PIN</a>
+    </div>
+  </div>
+</main>
+
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+
+const $=id=>document.getElementById(id);
+const K={staff:"cl_staff",att:"cl_att"}; // att is per-day
+const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const today=()=>new Date().toISOString().slice(0,10);
+const csv=(rows,heads,name)=>{
+  const out=[heads.join(",")];
+  rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));
+  a.download=name;a.click();
+};
+
+// ---- Staff Roster ----
+function renderStaff(){
+  const rows=jget(K.staff);
+  const tb=$("st_tbody"); tb.innerHTML="";
+  $("st_empty").style.display = rows.length? "none":"block";
+  $("at_staff").innerHTML = `<option value="">Select</option>` + rows.map(r=>`<option value="${r.phone}">${r.name} (${r.role})</option>`).join("");
+  rows.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.role}</td><td>${r.note||""}</td>
+      <td class="rowbtn">
+        <button class="btn" data-ph="${r.phone}" onclick="editStaff('${r.phone}')">Edit</button>
+        <button class="btn" data-ph="${r.phone}" onclick="delStaff('${r.phone}')">Delete</button>
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+window.editStaff=(phone)=>{
+  const rows=jget(K.staff); const r=rows.find(x=>x.phone===phone); if(!r) return;
+  $("st_name").value=r.name; $("st_phone").value=r.phone; $("st_role").value=r.role; $("st_note").value=r.note||"";
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+window.delStaff=(phone)=>{
+  if(!confirm("Delete this staff?"))return;
+  let rows=jget(K.staff); rows=rows.filter(x=>x.phone!==phone); jset(K.staff,rows); renderStaff();
+};
+$("st_add").onclick=()=>{
+  const name=$("st_name").value.trim(), phone=$("st_phone").value.trim(), role=$("st_role").value, note=$("st_note").value.trim();
+  if(!name||phone.length!==10){alert("Enter name & 10-digit phone");return}
+  let rows=jget(K.staff);
+  const i=rows.findIndex(x=>x.phone===phone);
+  const obj={name,phone,role,note};
+  if(i>-1) rows[i]=obj; else rows.push(obj);
+  jset(K.staff,rows);
+  renderStaff();
+  $("st_name").value=$("st_phone").value=$("st_note").value="";
+};
+$("st_export").onclick=()=>csv(jget(K.staff),["name","phone","role","note"],"Staff.csv");
+$("st_clear").onclick=()=>{ if(confirm("Clear local staff list?")){localStorage.removeItem(K.staff);renderStaff();} };
+renderStaff();
+
+// ---- Attendance (per day) ----
+function keyAtt(){return `${K.att}_${today()}`;}
+function renderAtt(){
+  const rows=jget(keyAtt());
+  const tb=$("at_tbody"); tb.innerHTML="";
+  $("at_empty").style.display = rows.length? "none":"block";
+  rows.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+    const st = r.action==="in"?"IN":"OUT";
+    const staff = jget(K.staff).find(x=>x.phone===r.phone)||{name:r.phone,role:"—"};
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${t}</td><td>${staff.name}</td><td>${r.phone}</td><td>${staff.role}</td><td>${st}</td><td>${r.note||""}</td>`;
+    tb.appendChild(tr);
+  });
+}
+$("at_mark").onclick=()=>{
+  const phone=$("at_staff").value; if(!phone){alert("Select staff");return}
+  const action=$("at_action").value, note=$("at_note").value.trim();
+  const rows=jget(keyAtt()); rows.push({phone,action,note,ts:Date.now()}); jset(keyAtt(),rows); renderAtt(); $("at_note").value="";
+};
+$("at_export").onclick=()=>{
+  const rows=jget(keyAtt());
+  csv(rows,["ts","phone","action","note"],`Attendance_${today()}.csv`);
+};
+$("at_clear").onclick=()=>{
+  if(confirm("Clear today’s attendance on this device?")){ localStorage.removeItem(keyAtt()); renderAtt(); }
+};
+renderAtt();
+</script>
+</body></html>
