@@ -1,48 +1,173 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Committee • Onestop Apartments</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="stylesheet" href="./styles.css" />
-  <meta name="theme-color" content="#111" />
-  <style>
-    main{max-width:900px;margin:12px auto;padding:12px}
-    .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-    .banner{width:100%;border-radius:22px;display:block}
-    .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
-  </style>
-</head>
-<body>
-  <!-- PIN LOCK -->
-  <script>
-    (function(){
-      const REQUIRED_ROLE="committee";
-      const role=sessionStorage.getItem("apts_role");
-      if(role!==REQUIRED_ROLE){ location.replace("./index.html"); }
-      // TTL optional:
-      // const at=Number(sessionStorage.getItem("apts_login_at")||0);
-      // if(!at || Date.now()-at>12*60*60*1000){ sessionStorage.clear(); location.replace("./index.html"); }
-    })();
-  </script>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Committee • Onestop Apartments</title>
+<link rel="manifest" href="./manifest.webmanifest"/><link rel="stylesheet" href="./styles.css"/>
+<meta name="theme-color" content="#111"/>
+<style>
+  main{max-width:960px;margin:12px auto;padding:12px}
+  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+  .banner{width:100%;border-radius:22px;display:block}
+  .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+  input,textarea,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px}
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
+  .btn-dark{background:#111;color:#fff}
+  .btn-soft{background:#f3f3f3}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eee;font-size:12px;margin-right:6px}
+  table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
+</style>
+</head><body>
+<script>(function(){const r=sessionStorage.getItem("apts_role");if(r!=="committee")location.replace("./index.html");})();</script>
+<button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
-  <!-- LOGOUT -->
-  <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
+<main>
+  <img class="banner" src="./assets/banner.png" alt="Onestop Apartments"/>
 
-  <main>
-    <img class="banner" src="./assets/banner.png" alt="Onestop Apartments" />
-    <div class="card" style="margin-top:14px">
-      <h2 style="margin:0 0 6px">Committee</h2>
-      <p style="margin:0;color:#666">Announcements, polls, approvals.</p>
-      <div id="app" style="margin-top:12px">
-        <p style="margin:0">Coming soon…</p>
-      </div>
+  <!-- New Notice -->
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin:0 0 10px">Post Announcement</h2>
+    <div class="grid">
+      <label>Title <input id="n_title" placeholder="e.g., Water Tank Cleaning"/></label>
+      <label>Audience
+        <select id="n_aud"><option>All Residents</option><option>Block A</option><option>Block B</option></select>
+      </label>
     </div>
-  </main>
+    <label style="display:block;margin-top:10px">Body
+      <textarea id="n_body" rows="3" placeholder="Details, timings, instructions…"></textarea>
+    </label>
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn btn-dark" id="n_post">Publish</button>
+      <button class="btn btn-soft" id="n_export">Export Notices CSV</button>
+      <button class="btn btn-soft" id="n_clear">Clear Local Notices</button>
+    </div>
+  </div>
 
-  <script>
-    if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
-  </script>
-</body>
-</html>
+  <!-- Notice Feed -->
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin:0 0 10px">Notices</h2>
+    <div id="n_feed" style="display:grid;gap:12px"></div>
+    <div id="n_empty" style="color:#666">No notices yet.</div>
+  </div>
+
+  <!-- New Poll -->
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin:0 0 10px">Create Poll</h2>
+    <div class="grid">
+      <label>Question <input id="p_q" placeholder="Approve painting budget?"/></label>
+      <label>Type
+        <select id="p_type"><option value="yn">Yes / No</option><option value="mc">Multiple Choice</option></select>
+      </label>
+    </div>
+    <div id="p_opts_wrap" class="grid" style="margin-top:10px">
+      <label>Option A <input id="p_o1" placeholder="Yes"/></label>
+      <label>Option B <input id="p_o2" placeholder="No"/></label>
+      <label>Option C <input id="p_o3" placeholder="(optional)"/></label>
+      <label>Option D <input id="p_o4" placeholder="(optional)"/></label>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn btn-dark" id="p_post">Publish Poll</button>
+      <button class="btn btn-soft" id="p_export">Export Polls CSV</button>
+      <button class="btn btn-soft" id="p_clear">Clear Local Polls</button>
+    </div>
+  </div>
+
+  <!-- Polls list -->
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin:0 0 10px">Polls</h2>
+    <div id="p_list" style="display:grid;gap:12px"></div>
+    <div id="p_empty" style="color:#666">No polls yet.</div>
+  </div>
+</main>
+
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+
+const K = { notices:"apts_committee_notices", polls:"apts_committee_polls" };
+const $=id=>document.getElementById(id);
+const read=k=>{try{return JSON.parse(localStorage.getItem(k)||"[]")}catch{return[]}};
+const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+/* ----- Notices ----- */
+function renderNotices(){
+  const items=read(K.notices);
+  const feed=$('n_feed'); feed.innerHTML="";
+  if(!items.length){$('n_empty').style.display='block';return}else{$('n_empty').style.display='none'}
+  items.slice().reverse().forEach((n,i)=>{
+    const box=document.createElement('div'); box.className='card'; box.style.padding='12px';
+    box.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+      <div><div style="font-weight:700">${n.title}</div><div style="color:#555;margin-top:4px">${n.body}</div></div>
+      <div style="text-align:right">
+        <div class="pill">${n.aud}</div>
+        <div class="pill">${new Date(n.ts).toLocaleString()}</div><br/>
+        <button class="btn btn-soft del" data-i="${i}">Delete</button>
+      </div>
+    </div>`;
+    feed.appendChild(box);
+  });
+  feed.querySelectorAll('.del').forEach(btn=>btn.onclick=()=>{const arr=read(K.notices);arr.splice(btn.dataset.i,1);write(K.notices,arr);renderNotices();});
+}
+renderNotices();
+
+$('n_post').onclick=()=>{
+  const title=$('n_title').value.trim(), body=$('n_body').value.trim(), aud=$('n_aud').value;
+  if(!title||!body){alert("Enter title & body");return;}
+  const arr=read(K.notices); arr.push({title,body,aud,ts:Date.now()}); write(K.notices,arr);
+  $('n_title').value='';$('n_body').value=''; renderNotices(); alert("Notice published ✅");
+};
+$('n_export').onclick=()=>{
+  const rows=read(K.notices); if(!rows.length){alert("No notices");return;}
+  const csv=["Title,Body,Audience,Time"]; rows.forEach(n=>csv.push([n.title,n.body,n.aud,new Date(n.ts).toLocaleString()].map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")));
+  const blob=new Blob([csv.join("\n")],{type:"text/csv"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="Notices.csv"; a.click();
+};
+$('n_clear').onclick=()=>{ if(confirm("Clear local notices?")){ localStorage.removeItem(K.notices); renderNotices(); } };
+
+/* ----- Polls ----- */
+function renderPolls(){
+  const items=read(K.polls);
+  const list=$('p_list'); list.innerHTML="";
+  if(!items.length){$('p_empty').style.display='block';return}else{$('p_empty').style.display='none'}
+  items.slice().reverse().forEach((p,idx)=>{
+    const totals=p.votes.reduce((a,c)=>a+c,0);
+    const box=document.createElement('div'); box.className='card'; box.style.padding='12px';
+    const optionsHTML=p.options.map((opt,i)=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0">
+        <div>${opt}</div>
+        <div><span class="pill">${p.votes[i]} votes</span> <button class="btn btn-soft vote" data-x="${idx}" data-i="${i}">Vote</button></div>
+      </div>`).join("");
+    box.innerHTML=`<div style="font-weight:700;margin-bottom:6px">${p.q}</div>${optionsHTML}
+      <div style="margin-top:6px">
+        <span class="pill">Total: ${totals}</span>
+        <button class="btn btn-soft del" data-x="${idx}" style="float:right">Delete</button>
+      </div>`;
+    list.appendChild(box);
+  });
+  list.querySelectorAll('.vote').forEach(b=>b.onclick=()=>{const arr=read(K.polls);arr[b.dataset.x].votes[b.dataset.i]++;write(K.polls,arr);renderPolls();});
+  list.querySelectorAll('.del').forEach(b=>b.onclick=()=>{const arr=read(K.polls);arr.splice(b.dataset.x,1);write(K.polls,arr);renderPolls();});
+}
+renderPolls();
+
+$('p_post').onclick=()=>{
+  const q=$('p_q').value.trim(); if(!q){alert("Enter a question");return;}
+  const type=$('p_type').value;
+  const opts=(type==='yn')?['Yes','No']:[ $('p_o1').value||'Option A', $('p_o2').value||'Option B', $('p_o3').value||'', $('p_o4').value||'' ].filter(Boolean);
+  const poll={ q, options:opts, votes: new Array(opts.length).fill(0), ts:Date.now() };
+  const arr=read(K.polls); arr.push(poll); write(K.polls,arr); renderPolls(); alert("Poll published ✅");
+  $('p_q').value=''; ['p_o1','p_o2','p_o3','p_o4'].forEach(id=>$(id).value='');
+};
+$('p_type').onchange=()=>{document.getElementById('p_opts_wrap').style.display = ($('p_type').value==='yn')?'none':'grid';};
+$('p_export').onclick=()=>{
+  const rows=read(K.polls); if(!rows.length){alert("No polls");return;}
+  const csv=["Question,Options,Votes,Time"];
+  rows.forEach(p=>csv.push([
+    p.q,
+    p.options.join(" | "),
+    p.votes.join(" | "),
+    new Date(p.ts).toLocaleString()
+  ].map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")));
+  const blob=new Blob([csv.join("\n")],{type:"text/csv"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="Polls.csv"; a.click();
+};
+$('p_clear').onclick=()=>{ if(confirm("Clear local polls?")){ localStorage.removeItem(K.polls); renderPolls(); } };
+</script>
+</body></html>
