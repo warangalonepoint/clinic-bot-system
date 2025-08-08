@@ -5,50 +5,61 @@
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
 <style>
-  /* Layout */
   main{max-width:820px;margin:16px auto;padding:16px}
   .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-  /* Cards & banner */
+
+  /* Polished banner/header */
   .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .hero{padding:0;overflow:hidden}
-  .banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
-  /* Quick links (2 per row) */
-  .ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:520px){.ql-grid{grid-template-columns:1fr}}
+  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+  .banner{width:100%;height:180px;object-fit:cover;display:block}
+  @media(max-width:560px){.banner{height:140px}}
+  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* Quick links: 2 per row */
+  .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.ql-2{grid-template-columns:1fr 1fr}}
   .iconbtn{display:flex;align-items:center;gap:10px;justify-content:center;padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-decoration:none}
   .iconbtn img{width:22px;height:22px;border-radius:6px}
-  /* Summary pills */
+
+  /* Summary / table */
   .kv{display:flex;gap:10px;flex-wrap:wrap}
   .kv span{background:#f5f5f5;border-radius:10px;padding:6px 10px}
   .muted{color:#666}
-  /* Now Serving */
-  .now-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  .now-token{font-size:42px;font-weight:900;letter-spacing:1px}
-  .now-ctrls{display:flex;gap:8px;flex-wrap:wrap}
-  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer}
-  /* Grid */
   .grid2{display:grid;grid-template-columns:2.1fr 1fr;gap:14px}
   @media(max-width:980px){.grid2{grid-template-columns:1fr}}
-  /* Inputs/table */
   input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
   table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
   .badge{display:inline-block;background:#111;color:#fff;border-radius:999px;padding:3px 8px;font-size:12px}
   .pill{background:#eee;border-radius:999px;padding:4px 10px}
   .rowbtn{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer}
+
+  /* Now Serving */
+  .now-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .now-token{font-size:42px;font-weight:900;letter-spacing:1px}
+  .now-ctrls{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head><body>
 <script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="doctor")location.replace("./index.html");})();</script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main>
-  <!-- Banner -->
+  <!-- Polished banner -->
   <div class="card hero">
     <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/doctor.png'">
+      <div class="hero-title">Doctor Console</div>
+    </div>
   </div>
 
-  <!-- Quick Links (2 per row) -->
+  <!-- Quick Links -->
   <div class="card" style="margin-top:12px">
-    <div class="ql-grid">
+    <div class="ql-2">
       <a class="iconbtn" href="./admin.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Admin / Front Desk</a>
       <a class="iconbtn" href="./booking.html"><img src="./assets/booking.png" onerror="this.style.display='none'">Booking Bot</a>
     </div>
@@ -101,7 +112,7 @@
       </div>
     </section>
 
-    <!-- RIGHT: Patient pane (notes beside patient) -->
+    <!-- RIGHT: Patient pane -->
     <section class="card">
       <h2 style="margin:0 0 8px">Patient</h2>
       <div id="p_none" class="muted">Select a patient to view details and write a note.</div>
@@ -134,7 +145,7 @@ const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
 const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const today=()=>new Date().toISOString().slice(0,10);
 
-// Token engine: sequential per-day across appointments + walk-ins
+// Tokens (per-day)
 function ensureTokens(rows){
   const d=today();
   const key=`${K.tokens}_${d}`;
@@ -146,8 +157,7 @@ function ensureTokens(rows){
       const found = map.find(x=>x.id===uid);
       if(found){ r.token = found.token; }
       else{
-        counter += 1;
-        const tok = String(counter).padStart(3,"0");
+        counter += 1; const tok = String(counter).padStart(3,"0");
         r.token = tok; map.push({id:uid,token:tok});
       }
       r.uid = uid;
@@ -204,7 +214,7 @@ function render(){
   tb.querySelectorAll(".b-note").forEach(b=>b.onclick=()=>openNote(b.dataset.tok));
   tb.querySelectorAll(".b-seen").forEach(b=>b.onclick=()=>markSeen(b.dataset.tok));
 
-  updateNowServing(); // refresh Now Serving display
+  updateNowServing();
 }
 
 function openNote(token){
@@ -212,12 +222,9 @@ function openNote(token){
   const r=buildToday().find(x=>x.token===token); if(!r) return;
   current=r;
   p_none.style.display="none"; pane.style.display="block";
-  p_token.textContent="Token "+r.token;
-  p_name.textContent=r.name;
-  p_phone.textContent=r.phone||"—";
-  p_type.textContent=r.source==="appt"?"Appointment":"Walk-in";
-  p_note.value = (notes.find(n=>n.token===token)?.note)||"";
-  p_msg.textContent="";
+  p_token.textContent="Token "+r.token; p_name.textContent=r.name;
+  p_phone.textContent=r.phone||"—"; p_type.textContent=r.source==="appt"?"Appointment":"Walk-in";
+  p_note.value = (notes.find(n=>n.token===token)?.note)||""; p_msg.textContent="";
 }
 
 function saveNote(){
@@ -227,8 +234,7 @@ function saveNote(){
   const idx=arr.findIndex(n=>n.token===current.token);
   if(idx>-1) arr[idx].note=note; else arr.push({token:current.token,note});
   jset(key,arr);
-  p_msg.textContent="Note saved ✅";
-  setTimeout(()=>p_msg.textContent="",1200);
+  p_msg.textContent="Note saved ✅"; setTimeout(()=>p_msg.textContent="",1200);
 }
 
 function markSeen(token){
@@ -237,19 +243,16 @@ function markSeen(token){
   render();
 }
 
-// ---- Now Serving ----
-function getPendingList(){
-  return buildToday().filter(r=>r.status!=="Seen").sort((a,b)=>(a.time||"").localeCompare(b.time||"")||a.token.localeCompare(b.token));
-}
+// Now Serving
+function getPendingList(){return buildToday().filter(r=>r.status!=="Seen").sort((a,b)=>(a.time||"").localeCompare(b.time||"")||a.token.localeCompare(b.token));}
 function nowKey(){return `${K.now}_${today()}`;}
 function getNow(){return localStorage.getItem(nowKey())||"";}
 function setNow(tok){ if(tok) localStorage.setItem(nowKey(),tok); else localStorage.removeItem(nowKey()); updateNowServing(); }
 function updateNowServing(){
   const tok=getNow(), list=getPendingList(), display = document.getElementById("now_token");
-  if(tok){ display.textContent=tok; }
-  else { display.textContent = list[0]?.token || "—"; if(list[0]) setNow(list[0].token); }
+  if(tok){ display.textContent=tok; } else { display.textContent = list[0]?.token || "—"; if(list[0]) setNow(list[0].token); }
 }
-function moveNow(dir){ // dir = +1 next, -1 prev
+function moveNow(dir){
   const list=getPendingList(); if(!list.length){ setNow(""); return; }
   const tok=getNow(); let i=list.findIndex(x=>x.token===tok);
   if(i<0) i=0; else i=i+dir;
