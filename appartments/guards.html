@@ -1,191 +1,316 @@
 <!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Guards • Onestop Apartments</title>
-<link rel="manifest" href="./manifest.webmanifest"/><link rel="stylesheet" href="./styles.css"/>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Apartments • Guards</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
 <style>
-  main{max-width:960px;margin:12px auto;padding:12px}
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .banner{width:100%;border-radius:22px;display:block}
-  .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
-  input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:740px){.row{grid-template-columns:1fr}}
-  table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
-  .thumb{width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid #eee;cursor:pointer}
-  #preview{width:100%;max-height:260px;border-radius:14px;background:#000}
-  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eee;font-size:12px;margin-right:6px}
-  dialog::backdrop{background:rgba(0,0,0,.5)} dialog{border:0;border-radius:16px;padding:0;overflow:hidden}
+  :root{--max:1000px}
+  body{background:#f8f9fa}
+  main{max-width:var(--max);margin:16px auto;padding:16px}
+  .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
 
-  /* Clickable black buttons */
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s;box-shadow:0 2px 5px rgba(0,0,0,.2);-webkit-tap-highlight-color:transparent}
-  .btn:hover:not([disabled]),.btn:active:not([disabled]){background:#000;transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,.25)}
-  .btn[disabled]{background:#ccc!important;color:#666!important;cursor:not-allowed!important;box-shadow:none!important;transform:none!important}
-  .btn-green{background:#0d7c66;color:#fff}.btn-red{background:#b30021;color:#fff}
+  /* Polished banner/header */
+  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+  .banner{width:100%;height:180px;object-fit:cover;display:block}
+  @media(max-width:560px){.banner{height:140px}}
+  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* Layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .muted{color:#666}
+
+  /* Inputs & tables */
+  input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
+  .pill{background:#eee;border-radius:999px;padding:4px 10px;display:inline-block}
+
+  /* Buttons */
+  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-decoration:none;text-align:center}
+  .iconbtn{display:inline-flex;align-items:center;gap:10px;justify-content:center}
+  .iconbtn img{width:18px;height:18px;border-radius:4px}
+
+  /* Camera */
+  .cam{display:grid;grid-template-columns:1fr 160px;gap:10px}
+  @media(max-width:520px){.cam{grid-template-columns:1fr}}
+  video,canvas,img.snap{width:100%;border-radius:12px;background:#000;max-height:240px;object-fit:cover}
 </style>
 </head><body>
-<script>(function(){const r=sessionStorage.getItem("apts_role");if(r!=="guards")location.replace("./index.html");})();</script>
+<script>
+// Optional: lock to guard role if you use PIN routing for apartments
+// (function(){const r=sessionStorage.getItem("apt_role");if(r!=="guard")location.replace("./index.html");})();
+</script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main>
-  <img class="banner" src="./assets/banner.png" alt="Onestop Apartments"/>
-
-  <div class="card" style="margin-top:14px">
-    <h2 style="margin:0 0 10px">Visitor / Courier Check-in</h2>
-    <div class="row">
-      <label>Type
-        <select id="vtype"><option>Visitor</option><option>Courier</option></select>
-      </label>
-      <label>Flat / Block
-        <input id="flat" placeholder="e.g., A-302"/>
-      </label>
-      <label>Name
-        <input id="vname" placeholder="Full name"/>
-      </label>
-      <label>Phone
-        <input id="vphone" inputmode="numeric" maxlength="10" placeholder="10-digit"/>
-      </label>
+  <!-- Header -->
+  <div class="card hero">
+    <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/admin.png'">
+      <div class="hero-title">Guard Console</div>
     </div>
-
-    <div class="card" style="margin-top:14px;background:#fafafa">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
-        <span class="pill">ID Photo & QR (beta)</span>
-        <button id="camOpen" class="btn">📷 Open Camera</button>
-        <button id="camShot" class="btn" disabled>📸 Capture Photo</button>
-        <button id="scanQR" class="btn">🔎 Scan QR</button>
-        <span id="scanSupport" class="pill" style="display:none"></span>
-      </div>
-      <video id="preview" playsinline muted style="display:none"></video>
-      <canvas id="canvas" style="display:none"></canvas>
-      <div id="photoNote" style="color:#666;font-size:12px;display:none;margin-top:6px">Photo captured ✔️</div>
-      <div id="qrResult" style="color:#0d7c66;font-size:13px;display:none;margin-top:6px"></div>
-    </div>
-
-    <button class="btn" style="margin-top:12px;width:100%" id="checkin">✅ Check-in</button>
   </div>
 
-  <div class="card" style="margin-top:14px">
-    <h2 style="margin:0 0 10px">Log</h2>
-    <div id="empty" style="color:#666">No entries yet.</div>
-    <div id="listWrap" style="overflow:auto;display:none">
-      <table id="list"><thead>
-        <tr><th>Time</th><th>Type</th><th>Flat</th><th>Name</th><th>Phone</th><th>QR</th><th>Photo</th></tr>
-      </thead><tbody></tbody></table>
+  <!-- Quick actions: Pre-Approvals & Walk-in -->
+  <div class="grid" style="margin-top:12px">
+    <!-- Pre-Approvals -->
+    <section class="card">
+      <div class="row" style="align-items:center;justify-content:space-between">
+        <h2 style="margin:0">Pre-Approved Visitors</h2>
+        <input id="pa_search" placeholder="Search name/flat/purpose" style="max-width:260px">
+      </div>
+      <p class="muted" style="margin:6px 0 8px">Pulled from residents’ pre-approvals. Check ID → tap **Check-In**. (Today & upcoming.)</p>
+      <div style="overflow:auto">
+        <table>
+          <thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Date</th><th>Purpose</th><th>Action</th></tr></thead>
+          <tbody id="pa_tbody"></tbody>
+        </table>
+        <div id="pa_empty" class="muted">No pre-approvals found.</div>
+      </div>
+    </section>
+
+    <!-- Walk-in Visitor -->
+    <section class="card">
+      <h2 style="margin:0 0 6px">Walk-in Visitor</h2>
+      <div class="grid">
+        <label>Flat / Unit <input id="w_flat" placeholder="e.g., A-302"></label>
+        <label>Name <input id="w_name" placeholder="Visitor name"></label>
+        <label>Phone <input id="w_phone" inputmode="numeric" maxlength="10" placeholder="optional"></label>
+        <label>Purpose <input id="w_purpose" placeholder="guest/maintenance"></label>
+      </div>
+      <div class="cam" style="margin-top:8px">
+        <div>
+          <video id="cam" playsinline autoplay muted></video>
+          <canvas id="snap" style="display:none"></canvas>
+        </div>
+        <div>
+          <button class="btn" id="cam_start">Open Camera</button>
+          <button class="btn" id="cam_capture" style="margin-top:8px">Capture Photo</button>
+          <img id="preview" class="snap" alt="Snapshot preview" style="margin-top:8px;display:none"/>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="w_checkin">Check-In</button>
+        <button class="btn" id="w_clear">Clear</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Deliveries -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 6px">Couriers / Deliveries</h2>
+    <div class="grid">
+      <label>Flat / Unit <input id="d_flat" placeholder="A-302"></label>
+      <label>From / Courier <input id="d_from" placeholder="e.g., Amazon / Swiggy"></label>
     </div>
-    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-      <button class="btn btn-green" id="export">Export CSV</button>
-      <button class="btn btn-red" id="clear">Clear All</button>
+    <div class="cam" style="margin-top:8px">
+      <div>
+        <video id="cam2" playsinline autoplay muted></video>
+        <canvas id="snap2" style="display:none"></canvas>
+      </div>
+      <div>
+        <button class="btn" id="cam2_start">Open Camera</button>
+        <button class="btn" id="cam2_capture" style="margin-top:8px">Capture Parcel</button>
+        <img id="preview2" class="snap" alt="Parcel photo" style="margin-top:8px;display:none"/>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="d_add">Add Delivery</button>
+      <button class="btn" id="d_export">Export Deliveries CSV</button>
+    </div>
+
+    <div style="margin-top:10px;overflow:auto">
+      <table>
+        <thead><tr><th>#</th><th>Flat</th><th>From</th><th>Time</th><th>Photo</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="d_tbody"></tbody>
+      </table>
+      <div id="d_empty" class="muted">No deliveries yet.</div>
+    </div>
+  </div>
+
+  <!-- Visitor History -->
+  <div class="card" style="margin-top:12px">
+    <div class="row" style="align-items:center;justify-content:space-between">
+      <h2 style="margin:0">Visitor History (Today)</h2>
+      <div class="row">
+        <input id="vh_search" placeholder="Search name/flat/purpose" style="max-width:260px">
+        <button class="btn" id="vh_export">Export Visitors CSV</button>
+      </div>
+    </div>
+    <div style="margin-top:10px;overflow:auto">
+      <table>
+        <thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead>
+        <tbody id="vh_tbody"></tbody>
+      </table>
+      <div id="vh_empty" class="muted">No visitors checked in today.</div>
+    </div>
+  </div>
+
+  <!-- Tools -->
+  <div class="card" style="margin-top:12px">
+    <div class="grid">
+      <a class="btn iconbtn" href="./index.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Back to PIN</a>
+      <a class="btn iconbtn" href="./reset.html"><img src="./assets/reset.png" onerror="this.style.display='none'">Reset / Cache Tools</a>
     </div>
   </div>
 </main>
 
-<dialog id="lightbox"><img id="big" alt="Photo" style="max-width:90vw;max-height:80vh;display:block"/><div style="padding:10px;text-align:right"><button class="btn" onclick="document.getElementById('lightbox').close()">Close</button></div></dialog>
-
 <script>
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-
-const key="apts_visitors_v2";
+// ===== Keys / utils (shared with Residents page expectations) =====
+const K={
+  preapprove:"apt_preapprove",     // [{id,flat,name,phone,date,purpose,status,ts}]
+  visits:"apt_visits",             // [{id,flat,name,phone,purpose,ts,photo}]
+  deliveries:"apt_deliveries"      // [{id,flat,from,ts,status,photo}]
+};
 const $=id=>document.getElementById(id);
-const read=()=>{try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return[]}};
-const write=v=>localStorage.setItem(key,JSON.stringify(v));
+const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const todayYMD=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Math.random().toString(36).slice(2,9);
+const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 
-function render(){
-  const rows=read(); const tb=$('#list tbody'); tb.innerHTML="";
-  if(!rows.length){$('empty').style.display="block";$('listWrap').style.display="none";return;}
-  $('empty').style.display="none";$('listWrap').style.display="block";
-  rows.forEach((r,i)=>{const tr=document.createElement('tr');
-    const photoCell = r.photo ? `<img class="thumb" src="${r.photo}" alt="photo" data-idx="${i}"/>` : `<span class="pill">—</span>`;
-    tr.innerHTML=`<td>${new Date(r.ts).toLocaleString()}</td><td>${r.type}</td><td>${r.flat}</td><td>${r.name}</td>
-                  <td><a href="tel:${r.phone}">${r.phone}</a></td><td>${r.qr?('<code>'+String(r.qr).replace(/</g,'&lt;')+'</code>'):'—'}</td><td>${photoCell}</td>`;
+// ===== Camera helpers =====
+async function openCam(videoEl){
+  if(!navigator.mediaDevices?.getUserMedia){ alert("Camera not supported"); return null; }
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
+  videoEl.srcObject = stream;
+  return stream;
+}
+function capture(videoEl, canvasEl){
+  const vw=videoEl.videoWidth||640, vh=videoEl.videoHeight||480;
+  canvasEl.width=vw; canvasEl.height=vh;
+  const ctx=canvasEl.getContext("2d"); ctx.drawImage(videoEl,0,0,vw,vh);
+  return canvasEl.toDataURL("image/jpeg", 0.7);
+}
+function stopStream(stream){ try{stream.getTracks().forEach(t=>t.stop());}catch{} }
+
+// ===== Pre-Approvals =====
+function renderPreApprovals(){
+  const q=($.pa_search?.value||"").toLowerCase();
+  const rows = jget(K.preapprove)
+    .filter(x=>String(x.date||"").slice(0,10) >= todayYMD()) // today & future
+    .sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const filtered = rows.filter(r =>
+    (r.flat||"").toLowerCase().includes(q) ||
+    (r.name||"").toLowerCase().includes(q) ||
+    (r.purpose||"").toLowerCase().includes(q)
+  );
+  const tb=$("pa_tbody"); tb.innerHTML="";
+  $("pa_empty").style.display = filtered.length? "none":"block";
+  filtered.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.name}</td><td>${r.date||"—"}</td><td>${r.purpose||"—"}</td>
+    <td><button class="btn" onclick="checkIn('${r.flat}','${r.name}','${r.phone||""}','${(r.purpose||"guest").replace(/"/g,'&quot;')}')">Check-In</button></td>`;
     tb.appendChild(tr);
   });
-  tb.querySelectorAll('img.thumb').forEach(img=>{
-    img.onclick=()=>{ $('#big').src = read()[img.dataset.idx].photo; $('#lightbox').showModal(); };
+}
+$("pa_search").addEventListener("input",renderPreApprovals);
+
+// ===== Walk-in & Check-in =====
+let cam1=null, cam2=null;
+$("cam_start").onclick=async ()=>{ cam1 = await openCam(cam); };
+$("cam_capture").onclick=()=>{ if(!cam1){alert("Open camera first");return} const data=capture(cam,snap); preview.src=data; preview.style.display="block"; };
+$("w_clear").onclick=()=>{ w_flat.value=w_name.value=w_phone.value=w_purpose.value=""; preview.src=""; preview.style.display="none"; if(cam1) stopStream(cam1); cam1=null; };
+
+window.checkIn=(flat,name,phone,purpose)=>{
+  w_flat.value=flat; w_name.value=name; w_phone.value=phone||""; w_purpose.value=purpose||"guest";
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+$("w_checkin").onclick=()=>{
+  const flat=w_flat.value.trim(), name=w_name.value.trim(), phone=w_phone.value.trim(), purpose=w_purpose.value.trim()||"guest";
+  if(!flat||!name){ alert("Flat and Name required"); return; }
+  const photo = preview.src && preview.style.display!=="none" ? preview.src : "";
+  const arr=jget(K.visits); arr.unshift({id:uid(),flat,name,phone,purpose,ts:Date.now(),photo});
+  jset(K.visits,arr);
+  // Mark pre-approval as used (optional: set status)
+  let pre=jget(K.preapprove);
+  pre = pre.map(p=> (p.flat===flat && p.name===name && p.date===todayYMD()) ? {...p, status:"Checked-In"} : p);
+  jset(K.preapprove,pre);
+  // Reset form
+  w_name.value=w_phone.value=w_purpose.value=""; preview.src=""; preview.style.display="none";
+  renderPreApprovals(); renderVisitorsHistory();
+};
+
+// ===== Deliveries =====
+$("cam2_start").onclick=async ()=>{ cam2 = await openCam(cam2); };
+$("cam2_capture").onclick=()=>{ if(!cam2){alert("Open camera first");return} const data=capture(cam2,snap2); preview2.src=data; preview2.style.display="block"; };
+
+$("d_add").onclick=()=>{
+  const flat=d_flat.value.trim(), from=d_from.value.trim();
+  if(!flat||!from){ alert("Flat and From required"); return; }
+  const photo = preview2.src && preview2.style.display!=="none" ? preview2.src : "";
+  const arr=jget(K.deliveries); arr.unshift({id:uid(),flat,from,ts:Date.now(),status:"At Gate",photo});
+  jset(K.deliveries,arr);
+  d_from.value=""; preview2.src=""; preview2.style.display="none";
+  renderDeliveries();
+};
+
+function renderDeliveries(){
+  const rows=jget(K.deliveries).sort((a,b)=>b.ts-a.ts);
+  const tb=$("d_tbody"); tb.innerHTML="";
+  $("d_empty").style.display = rows.length? "none":"block";
+  rows.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+    const img = r.photo ? `<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">` : "";
+    const next = r.status==="At Gate" ? "Dispatch" : (r.status==="Dispatched" ? "—" : "—");
+    const btn = r.status==="At Gate" ? `<button class="btn" onclick="dispatchDel('${r.id}')">Dispatch</button>` : `<span class="pill">${r.status}</span>`;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.from}</td><td>${t}</td><td>${img||"—"}</td><td>${r.status}</td><td>${btn}</td>`;
+    tb.appendChild(tr);
   });
 }
-render();
+window.dispatchDel=(id)=>{
+  const arr=jget(K.deliveries); const i=arr.findIndex(x=>x.id===id);
+  if(i>-1){ arr[i].status="Dispatched"; jset(K.deliveries,arr); renderDeliveries(); }
+};
+$("d_export").onclick=()=>{
+  const rows=jget(K.deliveries).map(({photo,...x})=>x); // exclude images from CSV
+  csv(rows,["id","flat","from","ts","status"],"Deliveries.csv");
+};
 
-/* Pre-approval hash autofill */
-(function(){
-  if(location.hash.startsWith("#pre=")){
-    try{
-      const data = JSON.parse(decodeURIComponent(location.hash.slice(5)));
-      $('#flat').value = data.flat || '';
-      $('#vname').value = data.name || '';
-      $('#vphone').value = (data.phone||'').slice(-10);
-      $('#vtype').value = "Visitor";
-      $('#qrResult').style.display='block'; $('#qrResult').textContent = 'Pre-approval token: '+(data.token||'');
-      history.replaceState(null,'',location.pathname);
-    }catch{}
-  }
-})();
-
-/* ---- Camera (strong) ---- */
-let stream=null, lastPhotoData=null;
-const video=$('preview'), canvas=$('canvas'), openBtn=$('camOpen'), shotBtn=$('camShot');
-
-async function openCamera(){
-  try{
-    const constraints={video:{facingMode:{ideal:'environment'}},audio:false};
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
-  }catch(e1){
-    try{ stream = await navigator.mediaDevices.getUserMedia({video:true,audio:false}); }
-    catch(e2){ alert("Camera blocked. Tap lock icon → Site settings → Allow Camera, then reload."); return; }
-  }
-  try{ video.srcObject=stream; video.style.display='block'; shotBtn.disabled=false; await video.play(); }
-  catch(e){ alert("Couldn’t start camera. Reload and try again."); }
+// ===== Visitors history (today) =====
+function renderVisitorsHistory(){
+  const q=($.vh_search?.value||"").toLowerCase();
+  const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD());
+  const filtered=rows.filter(r=>
+    (r.flat||"").toLowerCase().includes(q) ||
+    (r.name||"").toLowerCase().includes(q) ||
+    (r.purpose||"").toLowerCase().includes(q)
+  );
+  const tb=$("vh_tbody"); tb.innerHTML="";
+  $("vh_empty").style.display = filtered.length? "none":"block";
+  filtered.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+    const img = r.photo ? `<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">` : "";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.name}</td><td>${r.purpose}</td><td>${t}</td><td>${img||"—"}</td>`;
+    tb.appendChild(tr);
+  });
 }
-openBtn.onclick=openCamera;
-
-shotBtn.onclick=()=>{
-  if(!video.srcObject){alert("Open camera first");return;}
-  const w=video.videoWidth||1280,h=video.videoHeight||720;
-  canvas.width=w; canvas.height=h;
-  canvas.getContext('2d').drawImage(video,0,0,w,h);
-  lastPhotoData=canvas.toDataURL('image/jpeg',0.8);
-  $('#photoNote').style.display='block';
+$("vh_search").addEventListener("input",renderVisitorsHistory);
+$("vh_export").onclick=()=>{
+  const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD()).map(({photo,...x})=>x);
+  csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_Today.csv");
 };
 
-/* ---- QR / Barcode (beta) ---- */
-(async()=>{const supported='BarcodeDetector' in window;$('#scanSupport').style.display='inline-block';$('#scanSupport').textContent=supported?'BarcodeDetector ready':'No BarcodeDetector (beta off)';})();
-$('#scanQR').onclick=async()=>{
-  if(!('BarcodeDetector' in window)){ alert("Scanner not supported on this browser. Use latest Chrome on Android."); return; }
-  try{
-    if(!stream){ await openCamera(); if(!stream) return; }
-    const det=new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8']});
-    const loop=async()=>{
-      const w=video.videoWidth,h=video.videoHeight;
-      if(!w||!h){ requestAnimationFrame(loop); return; }
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(video,0,0,w,h);
-      const bits=await det.detect(canvas);
-      if(bits && bits.length){
-        const raw=bits[0].rawValue||'';
-        $('#qrResult').style.display='block'; $('#qrResult').textContent='Scanned: '+raw;
-        const flat=raw.match(/[A-Z]-?\d{1,4}/i); if(flat) $('#flat').value=flat[0].toUpperCase();
-        const phone=raw.replace(/\D/g,'').match(/\d{10}$/); if(phone) $('#vphone').value=phone[0];
-      }else{ requestAnimationFrame(loop); }
-    };
-    loop();
-  }catch(e){ alert("Scan failed: "+e.message); }
-};
+// ===== Init =====
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
-/* ---- Save / Export ---- */
-$('#checkin').onclick=()=>{
-  const type=$('#vtype').value, flat=$('#flat').value.trim(), name=$('#vname').value.trim(), phone=$('#vphone').value.trim();
-  const qr = ($('#qrResult').textContent||'').replace(/^Scanned:\s*/,'').trim();
-  if(!flat||!name||phone.length!==10){alert("Enter Flat, Name, 10-digit Phone");return;}
-  const rows=read(); rows.unshift({type,flat,name,phone,qr:qr||null,photo:lastPhotoData||null,ts:Date.now()});
-  write(rows); render(); alert("Checked-in ✅");
-  lastPhotoData=null; $('#photoNote').style.display='none'; $('#qrResult').style.display='none'; $('#qrResult').textContent='';
-};
-$('#export').onclick=()=>{
-  const rows=read(); if(!rows.length){alert("Nothing to export");return;}
-  const csv=["Time,Type,Flat,Name,Phone,QR,HasPhoto"];
-  rows.forEach(r=>csv.push([new Date(r.ts).toLocaleString(),r.type,r.flat,r.name,r.phone,(r.qr||""),(r.photo?'YES':'NO')].map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")));
-  const blob=new Blob([csv.join("\n")],{type:"text/csv"}); const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="Visitor-Log.csv"; a.click();
-};
-$('#clear').onclick=()=>{ if(confirm("Clear all entries on this device?")){ localStorage.removeItem(key); render(); } };
-window.addEventListener('pagehide',()=>{ try{ if(stream){stream.getTracks().forEach(t=>t.stop());} }catch{} });
+renderPreApprovals();
+renderDeliveries();
+renderVisitorsHistory();
+
+// Cleanup camera streams on unload
+window.addEventListener("beforeunload", ()=>{ if(cam1) stopStream(cam1); if(cam2) stopStream(cam2); });
 </script>
 </body></html>
