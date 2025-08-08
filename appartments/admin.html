@@ -10,9 +10,8 @@
   .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:740px){.grid{grid-template-columns:1fr}}
   code{background:#f5f5f5;padding:2px 6px;border-radius:8px}
-  table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
-
-  /* Clickable black buttons */
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eee;font-size:12px;margin-left:6px}
+  /* Buttons */
   .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s;box-shadow:0 2px 5px rgba(0,0,0,.2);-webkit-tap-highlight-color:transparent}
   .btn:hover:not([disabled]),.btn:active:not([disabled]){background:#000;transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,.25)}
   .btn[disabled]{background:#ccc!important;color:#666!important;cursor:not-allowed!important;box-shadow:none!important;transform:none!important}
@@ -26,7 +25,7 @@
 
   <div class="card" style="margin-top:14px">
     <h2 style="margin:0 0 10px">Admin Panel</h2>
-    <p style="margin:0 0 8px;color:#666">Current PINs from <code>pins.json</code>:</p>
+    <p style="margin:0 0 8px;color:#666">PINs (from <code>pins.json</code>):</p>
     <div id="pins" style="font-family:ui-monospace,monospace"></div>
     <div class="grid" style="margin-top:12px">
       <a class="btn" href="./residents.html">Open Residents</a>
@@ -36,9 +35,15 @@
     </div>
   </div>
 
+  <!-- NEW: Approve Flat Change Requests -->
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin:0 0 10px">Flat Change Requests</h2>
+    <div id="reqWrap" style="color:#666">Loading…</div>
+  </div>
+
   <div class="card" style="margin-top:14px">
     <h2 style="margin:0 0 10px">Local Backup & Export</h2>
-    <p style="color:#666;margin:0 0 10px">Exports data saved on this device (demo/offline). Live version will export from Airtable.</p>
+    <p style="color:#666;margin:0 0 10px">Exports data saved on this device (demo/offline). Live version will export from the backend.</p>
     <div class="grid">
       <button class="btn" id="expVisitors">Export Visitor Log CSV</button>
       <button class="btn" id="expBookings">Export Bookings CSV</button>
@@ -63,7 +68,7 @@
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
-/* Load PINs */
+/* Show PINs */
 fetch("./pins.json",{cache:"no-store"}).then(r=>r.json()).then(p=>{
   const row=k=>`<div>${k.padEnd(10,' ')} : <strong>${p[k]}</strong></div>`;
   document.getElementById("pins").innerHTML=row("residents")+row("guards")+row("committee")+row("admin");
@@ -72,14 +77,44 @@ fetch("./pins.json",{cache:"no-store"}).then(r=>r.json()).then(p=>{
 /* Export helpers */
 function dlCSV(rows,headers,f){const out=[headers.join(",")];rows.forEach(r=>out.push(headers.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const blob=new Blob([out.join("\n")],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=f;a.click();}
 const get=k=>{try{return JSON.parse(localStorage.getItem(k)||"[]")}catch{return[]}};
-const K={visitors:"apts_visitors_v2",bookings:"apts_bookings",complaints:"apts_complaints",pre:"apts_pre",notices:"apts_committee_notices",polls:"apts_committee_polls"};
+const K={visitors:"apts_visitors_v2",bookings:"apts_bookings",complaints:"apts_complaints",pre:"apts_pre",notices:"apts_committee_notices",polls:"apts_committee_polls",flatChangeReq:"apts_flat_change_requests"};
 
 document.getElementById('expVisitors').onclick=()=>{const rows=get(K.visitors);if(!rows.length){alert("No visitor data");return;}dlCSV(rows.map(r=>({Time:new Date(r.ts).toLocaleString(),Type:r.type,Flat:r.flat,Name:r.name,Phone:r.phone,QR:r.qr||"",HasPhoto:r.photo?"YES":"NO"})),["Time","Type","Flat","Name","Phone","QR","HasPhoto"],"Visitor-Log.csv");};
 document.getElementById('expBookings').onclick=()=>{const rows=get(K.bookings);if(!rows.length){alert("No bookings");return;}dlCSV(rows,["date","slot","amenity","name","phone"],"Bookings.csv");};
 document.getElementById('expComplaints').onclick=()=>{const rows=get(K.complaints);if(!rows.length){alert("No complaints");return;}dlCSV(rows.map(r=>({Time:new Date(r.ts).toLocaleString(),Cat:r.cat,Pri:r.pri,Subject:r.sub,Status:r.status,Name:r.name})),["Time","Cat","Pri","Subject","Status","Name"],"Complaints.csv");};
 document.getElementById('expPre').onclick=()=>{const rows=get(K.pre);if(!rows.length){alert("No pre-approvals");return;}dlCSV(rows,["type","flat","name","phone","date","time","token","ts"],"PreApprovals.csv");};
 document.getElementById('expNotices').onclick=()=>{const rows=get(K.notices);if(!rows.length){alert("No notices");return;}dlCSV(rows.map(r=>({Title:r.title,Body:r.body,Audience:r.aud,Time:new Date(r.ts).toLocaleString()})),["Title","Body","Audience","Time"],"Notices.csv");};
-document.getElementById('clearAll').onclick=()=>{if(confirm("Clear ALL local demo data on this device?")){[K.visitors,K.bookings,K.complaints,K.pre,K.notices,K.polls].forEach(k=>localStorage.removeItem(k));alert("Cleared.");}};
+document.getElementById('clearAll').onclick=()=>{if(confirm("Clear ALL local demo data on this device?")){Object.values(K).forEach(k=>localStorage.removeItem(k));alert("Cleared.");}};
+
+/* Approve Flat Change Requests (local scope) */
+(function(){
+  const wrap=()=>document.getElementById('reqWrap');
+  function render(){
+    const reqs=get(K.flatChangeReq);
+    if(!reqs.length){ wrap().textContent="No pending requests."; return; }
+    wrap().innerHTML="";
+    reqs.forEach((r,i)=>{
+      const row=document.createElement('div');
+      row.style.cssText="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #eee;border-radius:12px;margin:6px 0";
+      row.innerHTML=`<div><strong>${r.wanted}</strong><span class="pill">${new Date(r.ts).toLocaleString()}</span></div>
+        <div>
+          <button class="btn" data-i="${i}">Approve</button>
+          <button class="btn" data-del="${i}" style="margin-left:8px">Reject</button>
+        </div>`;
+      wrap().appendChild(row);
+    });
+    wrap().querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>{
+      const idx=+b.dataset.i; const arr=get(K.flatChangeReq); const v=arr[idx]?.wanted; if(!v) return;
+      localStorage.setItem("apts_flat", v); localStorage.setItem("apts_flat_lock","1");
+      arr.splice(idx,1); localStorage.setItem(K.flatChangeReq, JSON.stringify(arr));
+      alert("Approved on this device (demo). Live will sync to server."); render();
+    });
+    wrap().querySelectorAll('button[data-del]').forEach(b=>b.onclick=()=>{
+      const idx=+b.dataset.del; const arr=get(K.flatChangeReq); arr.splice(idx,1); localStorage.setItem(K.flatChangeReq, JSON.stringify(arr)); render();
+    });
+  }
+  render();
+})();
 
 /* PWA helpers */
 let deferred=null; window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;});
