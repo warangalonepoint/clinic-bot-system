@@ -1,84 +1,68 @@
-/* Onestop Clinic Service Worker
- * Cache-first for app shell + SWR for same-origin GETs.
- */
-const VERSION = "clinic-v1.0.0";
-const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./doctor.html",
-  "./admin.html",
-  "./booking.html",
-  "./styles.css",
-  "./manifest.webmanifest",
-  "./assets/clinic_banner.png",
-  "./pins.json"
+/* sw.js — Clinic PWA */
+const SW_VERSION = 'v7';                 // bump this to invalidate old caches
+const STATIC_CACHE = `static-${SW_VERSION}`;
+const STATIC_ASSETS = [
+  './',
+  './index.html',
+  './admin.html',
+  './doctor.html',
+  './booking.html',
+  './reset.html',
+  './staff.html',
+  './styles.css',
+  './manifest.webmanifest',
+  './assets/clinic_banner.png',
+  './assets/admin.png',
+  './assets/doctor.png',
+  './assets/booking.png',
+  './assets/reset.png',
+  './assets/logo.png'
+  // NOTE: intentionally NOT including pins.json
 ];
 
-self.addEventListener("install", (evt) => {
-  evt.waitUntil(
-    caches.open(VERSION).then((cache) => cache.addAll(APP_SHELL))
-  );
+self.addEventListener('install', (e) => {
   self.skipWaiting();
+  e.waitUntil(caches.open(STATIC_CACHE).then(c => c.addAll(STATIC_ASSETS)));
 });
 
-self.addEventListener("activate", (evt) => {
-  evt.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k === VERSION ? null : caches.delete(k))))
-    )
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter(k => k !== STATIC_CACHE).map(k => caches.delete(k)));
+      await self.clients.claim();
+    })()
   );
-  self.clients.claim();
 });
 
-// Helper: serve from cache first, then update in background
-async function staleWhileRevalidate(req) {
-  const cache = await caches.open(VERSION);
-  const cached = await cache.match(req);
-  const fetchPromise = fetch(req)
-    .then((resp) => {
-      // Cache only successful, basic/opaque GETs
-      if (resp && resp.status === 200 && req.method === "GET") {
-        cache.put(req, resp.clone());
-      }
-      return resp;
+// Network-first for pins.json (never cache), cache-first for everything else
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+
+  // Always bypass cache for pins.json
+  if (url.pathname.endsWith('/pins.json')) {
+    e.respondWith(
+      fetch(new Request(e.request, { cache: 'no-store' }))
+        .catch(() => new Response('{"error":"offline"}', { status: 503, headers: { 'Content-Type': 'application/json' } }))
+    );
+    return;
+  }
+
+  // Normal: cache-first for app shell/assets
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
+        // only cache GET success, skip opaque/cross-origin if you want
+        const copy = res.clone();
+        if (e.request.method === 'GET' && res.ok && url.origin === location.origin) {
+          caches.open(STATIC_CACHE).then(c => c.put(e.request, copy)).catch(()=>{});
+        }
+        return res;
+      }).catch(() => {
+        // Optional: offline fallback
+        if (e.request.destination === 'document') return caches.match('./index.html');
+      });
     })
-    .catch(() => null);
-  return cached || fetchPromise;
-}
-
-self.addEventListener("fetch", (evt) => {
-  const { request } = evt;
-
-  // Only handle GET
-  if (request.method !== "GET") return;
-
-  const url = new URL(request.url);
-  const sameOrigin = url.origin === self.location.origin;
-
-  // HTML navigations: App Shell fallback (offline)
-  if (request.mode === "navigate") {
-    evt.respondWith(
-      fetch(request).catch(() => caches.match("./index.html"))
-    );
-    return;
-  }
-
-  // Static shell: cache-first
-  if (sameOrigin && APP_SHELL.some((p) => url.pathname.endsWith(p.replace("./", "/")))) {
-    evt.respondWith(
-      caches.match(request).then((cached) => cached || fetch(request))
-    );
-    return;
-  }
-
-  // Everything else same-origin: SWR
-  if (sameOrigin) {
-    evt.respondWith(staleWhileRevalidate(request));
-    return;
-  }
-
-  // Cross-origin: try network, then cache if available
-  evt.respondWith(
-    fetch(request).catch(() => caches.match(request))
   );
 });
