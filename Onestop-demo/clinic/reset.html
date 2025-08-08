@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Reset Cache • Clinic</title>
+<link rel="stylesheet" href="./styles.css">
+</head><body>
+<main style="max-width:720px;margin:16px auto;padding:16px">
+  <div class="card">
+    <h2 style="margin:0 0 8px">Reset Cache / Service Worker</h2>
+    <p class="muted">Use this if updates aren’t showing.</p>
+    <button class="btn" id="reset">Reset Now</button>
+    <pre id="log" style="margin-top:12px;background:#f7f7f7;padding:12px;border-radius:12px;white-space:pre-wrap"></pre>
+  </div>
+</main>
+<script>
+(async function(){
+  const log = (m)=>{document.getElementById('log').textContent += m + "\n";};
+  document.getElementById('reset').onclick = async ()=>{
+    try{
+      // Unregister SW
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const r of regs) { await r.unregister(); }
+        log("Service worker unregistered.");
+      }
+      // Clear caches
+      const keys = await caches.keys();
+      for (const k of keys) { await caches.delete(k); }
+      log("Caches cleared: " + keys.join(", "));
+      // Clear local/session storage (optional)
+      // localStorage.clear(); sessionStorage.clear();
+      log("Done. Reloading…");
+      setTimeout(()=>location.reload(true), 500);
+    }catch(e){ log("Error: " + e.message); }
+  };
+})();
+</script>
+</body></html>
