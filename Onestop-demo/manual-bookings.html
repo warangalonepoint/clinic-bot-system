@@ -116,7 +116,7 @@
     async function loadAvailableSlots() {
       try {
         if (!window.AIRTABLE_API_KEY) {
-          throw new Error("Missing API key: ensure api-key.js is reachable and defines window.AIRTABLE_API_KEY");
+          throw new Error("Missing API key: ensure config.js is reachable and defines window.AIRTABLE_API_KEY");
         }
 
         const url = new URL(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_SLOTS)}`);
