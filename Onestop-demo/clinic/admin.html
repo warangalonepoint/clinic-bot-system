@@ -12,11 +12,19 @@
   table{width:100%;border-collapse:collapse}
   th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
   .muted{color:#666}
-  .hero{padding:0;overflow:hidden}
-  .banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
   .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-decoration:none;text-align:center}
   input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  /* Quick links: force two per row even on mobile */
+  /* Polished banner/header */
+  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+  .banner{width:100%;height:180px;object-fit:cover;display:block}
+  @media(max-width:560px){.banner{height:140px}}
+  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* Quick links two-per-row */
   .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:360px){.ql-2{grid-template-columns:1fr 1fr}}
   .iconbtn{display:inline-flex;align-items:center;gap:10px;justify-content:center}
@@ -27,12 +35,16 @@
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main>
-  <!-- Banner -->
+  <!-- Polished banner -->
   <div class="card hero">
     <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/admin.png'">
+      <div class="hero-title">Admin Console</div>
+    </div>
   </div>
 
-  <!-- Quick Links (2 per row, black buttons) -->
+  <!-- Quick Links -->
   <div class="card" style="margin-top:12px">
     <div class="ql-2">
       <a class="btn iconbtn" href="./doctor.html"><img src="./assets/doctor.png" onerror="this.style.display='none'">Doctor/Manager</a>
@@ -149,11 +161,7 @@ const $=id=>document.getElementById(id);
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
 const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const today=()=>new Date().toISOString().slice(0,10);
-const csv=(rows,heads,name)=>{
-  const out=[heads.join(",")];
-  rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));
-  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"})); a.download=name; a.click();
-};
+const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 
 // STORAGE KEYS
 const K={services:"cl_s",appts:"cl_a",queue:"cl_q",slots:"cl_slots"}; // slots is per-day with suffix
@@ -248,7 +256,6 @@ $("a_date").addEventListener("change", e=> fillTimeOptions(e.target.value));
 $("a_add").onclick=()=>{
   const date=$("a_date").value, time=$("a_time").value, name=$("a_name").value.trim(), phone=$("a_phone").value.trim();
   if(!date||!time||!name||phone.length!==10){alert("Fill all fields");return}
-  // capacity check
   let slots=loadSlots(date);
   const idx=slots.findIndex(s=>s.time===time);
   if(idx>-1){
@@ -262,22 +269,6 @@ $("a_add").onclick=()=>{
 $("a_export").onclick=()=>csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");
 renderA();
 
-// ---------- SERVICES ----------
-function renderS(){
-  const rows=jget(K.services);
-  const tb=$("s_tbody"); tb.innerHTML="";
-  if(!rows.length){$("s_empty").style.display="block"} else {$("s_empty").style.display="none"}
-  rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.name}</td><td>₹${r.price}</td>`;tb.appendChild(tr);});
-}
-$("s_add").onclick=()=>{
-  const name=$("s_name").value.trim(), price=+($("s_price").value||0);
-  if(!name||price<=0){alert("Enter service & price");return}
-  const rows=jget(K.services); rows.push({name,price}); jset(K.services,rows); renderS();
-};
-$("s_export").onclick=()=>csv(jget(K.services),["name","price"],"Services.csv");
-$("s_clear").onclick=()=>{if(confirm("Clear local services?")){localStorage.removeItem(K.services);renderS();}};
-renderS();
-
 // ---------- REPORTS ----------
 $("r_day").onclick=()=>{
   const d=today();
@@ -289,7 +280,6 @@ $("r_exportAll").onclick=()=>{
   csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");
   csv(jget(K.queue),["name","phone","age","comp","ts"],"Queue.csv");
   csv(jget(K.services),["name","price"],"Services.csv");
-  // export all days' slots
   const allKeys=Object.keys(localStorage).filter(k=>k.startsWith(K.slots+"_"));
   let rows=[]; allKeys.forEach(k=>{const d=k.split("_").slice(-1)[0]; jget(k).forEach(s=>rows.push({date:d,...s}));});
   if(rows.length) csv(rows,["date","time","cap","booked","status"],"Slots_All.csv");
