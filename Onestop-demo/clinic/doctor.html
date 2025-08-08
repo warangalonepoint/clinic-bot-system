@@ -4,21 +4,18 @@
 <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
 <style>
-body{font-family:system-ui,Roboto,Arial,sans-serif}
 main{max-width:1100px;margin:16px auto;padding:16px}
-.card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-.banner{width:100%;border-radius:22px;display:block}
 .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:900px){.grid{grid-template-columns:1fr}}
 input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-.btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s;background:#111;box-shadow:0 2px 5px rgba(0,0,0,.2)}
-.btn:hover{transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,.25)}
 table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
 .pill{display:inline-block;background:#eee;border-radius:999px;padding:4px 10px;font-size:12px;margin-left:6px}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .tab{padding:10px 14px;border-radius:999px;background:#f5f5f5;cursor:pointer}
 .tab.active{background:#111;color:#fff}
 .hide{display:none!important}
+.iconbtn{display:inline-flex;align-items:center;gap:8px}
+.iconbtn img{width:18px;height:18px;border-radius:4px}
 </style></head><body>
 <script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="doctor")location.replace("./index.html");})();</script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
@@ -34,7 +31,6 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
     <div class="tab" data-tab="patients">Search Patients</div>
   </div>
 
-  <!-- Queue -->
   <section id="queue" class="card" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Walk-in Register</h2>
     <div class="grid">
@@ -44,17 +40,16 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
       <label>Complaint <input id="q_comp" placeholder="Reason for visit"></label>
     </div>
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="q_add">Add to Queue</button>
-      <button class="btn" id="q_export">Export CSV</button>
-      <button class="btn" id="q_clear">Clear Local</button>
+      <button class="btn iconbtn" id="q_add"><img src="./assets/icons/add.png" onerror="this.style.display='none'">Add to Queue</button>
+      <button class="btn iconbtn" id="q_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export CSV</button>
+      <button class="btn iconbtn" id="q_clear"><img src="./assets/icons/clear.png" onerror="this.style.display='none'">Clear Local</button>
     </div>
     <div style="margin-top:10px;overflow:auto">
       <table><thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Age</th><th>Complaint</th><th>Token</th><th>Actions</th></tr></thead><tbody id="q_tbody"></tbody></table>
-      <div id="q_empty" style="color:#666">No patients in queue.</div>
+      <div id="q_empty" class="muted">No patients in queue.</div>
     </div>
   </section>
 
-  <!-- Appointments -->
   <section id="appts" class="card hide" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Appointments</h2>
     <div class="grid">
@@ -64,16 +59,15 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
       <label>Phone <input id="a_phone" inputmode="numeric" maxlength="10"></label>
     </div>
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="a_add">Create Appointment</button>
-      <button class="btn" id="a_export">Export CSV</button>
+      <button class="btn iconbtn" id="a_add"><img src="./assets/icons/add.png" onerror="this.style.display='none'">Create Appointment</button>
+      <button class="btn iconbtn" id="a_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export CSV</button>
     </div>
     <div style="margin-top:10px;overflow:auto">
       <table><thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody id="a_tbody"></tbody></table>
-      <div id="a_empty" style="color:#666">No appointments.</div>
+      <div id="a_empty" class="muted">No appointments.</div>
     </div>
   </section>
 
-  <!-- Visit Sheet -->
   <section id="visit" class="card hide" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Visit Sheet</h2>
     <div class="grid">
@@ -85,13 +79,12 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
       <label>Rx Notes <textarea id="v_rx" rows="2" placeholder="Prescription notes"></textarea></label>
     </div>
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="v_save">Save Visit</button>
-      <button class="btn" id="v_export">Export Visits CSV</button>
+      <button class="btn iconbtn" id="v_save"><img src="./assets/icons/save.png" onerror="this.style.display='none'">Save Visit</button>
+      <button class="btn iconbtn" id="v_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export Visits CSV</button>
     </div>
     <div id="v_msg" style="margin-top:8px;color:#0d7c66"></div>
   </section>
 
-  <!-- Billing -->
   <section id="bill" class="card hide" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Billing</h2>
     <div class="grid">
@@ -101,22 +94,21 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
       <label>Amount (₹) <input id="b_amt" inputmode="numeric" placeholder="0"></label>
     </div>
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="b_add">Add Line</button>
-      <button class="btn" id="b_export">Export Bills CSV</button>
+      <button class="btn iconbtn" id="b_add"><img src="./assets/icons/add.png" onerror="this.style.display='none'">Add Line</button>
+      <button class="btn iconbtn" id="b_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export Bills CSV</button>
     </div>
     <div style="margin-top:10px;overflow:auto">
       <table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Service</th><th>Amount</th></tr></thead><tbody id="b_tbody"></tbody></table>
-      <div id="b_empty" style="color:#666">No bills yet.</div>
+      <div id="b_empty" class="muted">No bills yet.</div>
     </div>
   </section>
 
-  <!-- Patients -->
   <section id="patients" class="card hide" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Search Patients</h2>
     <input id="p_q" placeholder="Search by name/phone" style="margin-bottom:10px">
     <div style="overflow:auto">
       <table><thead><tr><th>Name</th><th>Phone</th><th>Last Visit</th></tr></thead><tbody id="p_tbody"></tbody></table>
-      <div id="p_empty" style="color:#666">No data yet.</div>
+      <div id="p_empty" class="muted">No data yet.</div>
     </div>
   </section>
 </main>
@@ -132,11 +124,11 @@ const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.pu
 
 // Queue
 function renderQ(){const rows=jget(K.queue);const tb=$("q_tbody");tb.innerHTML="";if(!rows.length){$("q_empty").style.display="block";return}$("q_empty").style.display="none";rows.forEach((r,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.age}</td><td>${r.comp}</td><td>${r.token}</td><td><button class="btn" data-i="${i}">Done</button></td>`;tb.appendChild(tr);});tb.querySelectorAll("button").forEach(b=>b.onclick=()=>{const rows=jget(K.queue);rows.splice(+b.dataset.i,1);jset(K.queue,rows);renderQ();});}
-$("q_add").onclick=()=>{const name=$("q_name").value.trim(), phone=$("q_phone").value.trim(), age=$("q_age").value.trim(), comp=$("q_comp").value.trim(); if(!name||phone.length!==10){alert("Enter name & 10-digit phone");return} const token=String((jget(K.queue)[0]?.token||0)+1||1).padStart(3,"0"); const rows=jget(K.queue); rows.push({name,phone,age,comp,token,ts:Date.now()}); jset(K.queue,rows); renderQ();};
+$("q_add").onclick=()=>{const name=$("q_name").value.trim(), phone=$("q_phone").value.trim(), age=$("q_age").value.trim(), comp=$("q_comp").value.trim(); if(!name||phone.length!==10){alert("Enter name & 10-digit phone");return} const token=String((jget(K.queue).slice(-1)[0]?.token||0)+1||1).padStart(3,"0"); const rows=jget(K.queue); rows.push({name,phone,age,comp,token,ts:Date.now()}); jset(K.queue,rows); renderQ();};
 $("q_export").onclick=()=>csv(jget(K.queue),["name","phone","age","comp","token","ts"],"Queue.csv");
 $("q_clear").onclick=()=>{if(confirm("Clear queue on this device?")){localStorage.removeItem(K.queue);renderQ();}}; renderQ();
 
-// Appointments (Booking Bot writes into same storage key)
+// Appointments
 $("a_date").value=today();
 function renderA(){const rows=jget(K.appts);const tb=$("a_tbody");tb.innerHTML="";if(!rows.length){$("a_empty").style.display="block";return}$("a_empty").style.display="none";rows.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));rows.forEach((r,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.date}</td><td>${r.time}</td><td>${r.name}</td><td>${r.phone}</td><td><span class="pill">${r.status||"Booked"}</span></td><td><button class="btn done" data-i="${i}">Done</button> <button class="btn" data-c="${i}">Cancel</button></td>`;tb.appendChild(tr);});tb.querySelectorAll(".done").forEach(b=>b.onclick=()=>{const rows=jget(K.appts);rows[b.dataset.i].status="Done";jset(K.appts,rows);renderA();});tb.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const rows=jget(K.appts);rows[b.dataset.c].status="Cancelled";jset(K.appts,rows);renderA();});}
 $("a_add").onclick=()=>{const date=$("a_date").value,time=$("a_time").value,name=$("a_name").value.trim(),phone=$("a_phone").value.trim(); if(!date||!time||!name||phone.length!==10){alert("Fill all fields (10-digit phone)");return} const rows=jget(K.appts);rows.push({date,time,name,phone,status:"Booked",ts:Date.now()});jset(K.appts,rows);renderA();}
@@ -151,9 +143,9 @@ function renderB(){const rows=jget(K.bills);const tb=$("b_tbody");tb.innerHTML="
 $("b_add").onclick=()=>{const name=$("b_name").value.trim(),phone=$("b_phone").value.trim(),service=$("b_service").value.trim(),amt=+($("b_amt").value||0); if(!name||phone.length!==10||!service||amt<=0){alert("Fill all billing fields");return} const rows=jget(K.bills);rows.push({name,phone,service,amt,ts:Date.now()});jset(K.bills,rows);renderB();}
 $("b_export").onclick=()=>csv(jget(K.bills),["ts","name","phone","service","amt"],"Bills.csv"); renderB();
 
-// Patients (built from visits + appointments)
-function rebuildPatients(){const map=new Map(); jget(K.visits).forEach(v=>map.set(v.phone,{name:v.name,phone:v.phone,last:new Date(v.ts).toLocaleDateString()})); jget(K.appts).forEach(a=>{const m=map.get(a.phone)||{name:a.name,phone:a.phone,last:"—"}; map.set(a.phone,{...m,name:a.name});}); const arr=[...map.values()]; jset(K.patients,arr); }
-function renderPatients(){rebuildPatients(); const q=($("p_q").value||"").toLowerCase(); const rows=jget(K.patients).filter(r=>r.name.toLowerCase().includes(q)||r.phone.includes(q)); const tb=$("p_tbody");tb.innerHTML="";if(!rows.length){$("p_empty").style.display="block";return}$("p_empty").style.display="none";rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.name}</td><td>${r.phone}</td><td>${r.last||"—"}</td>`;tb.appendChild(tr);});}
+// Patients
+function rebuildPatients(){const map=new Map(); jget(K.visits).forEach(v=>map.set(v.phone,{name:v.name,phone:v.phone,last:new Date(v.ts).toLocaleDateString()})); jget(K.appts).forEach(a=>{const m=map.get(a.phone)||{name:a.name,phone:a.phone,last:"—"}; map.set(a.phone,{...m,name:a.name});}); const arr=[...map.values()]; localStorage.setItem(K.patients,JSON.stringify(arr)); }
+function renderPatients(){rebuildPatients(); const q=($("p_q").value||"").toLowerCase(); const rows=JSON.parse(localStorage.getItem(K.patients)||"[]").filter(r=>r.name.toLowerCase().includes(q)||r.phone.includes(q)); const tb=$("p_tbody");tb.innerHTML="";if(!rows.length){$("p_empty").style.display="block";return}$("p_empty").style.display="none";rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.name}</td><td>${r.phone}</td><td>${r.last||"—"}</td>`;tb.appendChild(tr);});}
 $("p_q").addEventListener("input",renderPatients); renderPatients();
 </script>
 </body></html>
