@@ -5,7 +5,8 @@
 </head><body>
 <div class="wrap">
   <div class="hero space">
-    <div>
+    <div style="flex:1">
+      <img src="./assets/banner.png" alt="" class="banner">
       <span class="pill">Residents</span>
       <h1>Notices & Complaints</h1>
       <div class="sub">View notices, file a complaint</div>
@@ -13,7 +14,6 @@
     <a class="btn secondary" href="./index.html">← Back</a>
   </div>
 
-  <!-- Notices -->
   <div class="card">
     <div class="space"><h3 style="margin:0">Notices</h3>
       <button id="refreshNotices" class="btn ghost">Refresh</button></div>
@@ -21,7 +21,6 @@
     <div class="sub" id="noticeEmpty">No notices yet.</div>
   </div>
 
-  <!-- Complaint -->
   <div class="card">
     <h3 style="margin:0 0 8px">New Complaint</h3>
     <div class="row">
@@ -43,7 +42,6 @@
 </div>
 <div id="toast" class="toast"></div>
 
-<!-- storage -->
 <script src="storage.js"></script>
 <script>
 function renderNotices(){
@@ -60,7 +58,7 @@ function renderNotices(){
 }
 document.getElementById('refreshNotices').onclick=renderNotices;
 
-document.getElementById('cSubmit').onclick=()=>{
+cSubmit.onclick=()=>{
   const flat=cFlat.value.trim(), cat=cCat.value, details=cDetails.value.trim();
   if(!flat||!details){ toast('Fill flat and details'); return; }
   put(DB.complaints, {id:crypto.randomUUID(), flat, cat, details, status:'open', ts:new Date().toISOString()});
