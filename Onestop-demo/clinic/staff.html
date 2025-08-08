@@ -7,73 +7,123 @@
 <style>
   main{max-width:1000px;margin:16px auto;padding:16px}
   .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:860px){.grid{grid-template-columns:1fr}}
-  table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
-  .hero{padding:0;overflow:hidden}.banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
-  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer}
-  .rowbtn{display:inline-flex;gap:8px;flex-wrap:wrap}
-  .muted{color:#666}
-  .pill{background:#eee;border-radius:999px;padding:4px 10px}
+
+  /* Polished banner/header */
+  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+  .banner{width:100%;height:180px;object-fit:cover;display:block}
+  @media(max-width:560px){.banner{height:140px}}
+  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* Workspace layout */
+  .work{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+  @media(max-width:980px){.work{grid-template-columns:1fr}}
+
+  /* Tables & inputs */
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
   input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+  .muted{color:#666}
+
+  /* Buttons */
+  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-decoration:none;text-align:center}
+  .rowbtn{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{background:#eee;border-radius:999px;padding:4px 10px;display:inline-block}
+  .kv{display:flex;gap:8px;flex-wrap:wrap}
+  .kv span{background:#f5f5f5;border-radius:10px;padding:6px 10px}
 </style>
 </head><body>
 <script>
-  // Lock to admin only
-  (function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();
+// Admin-only lock
+(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();
 </script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main>
-  <div class="card hero"><img class="banner" src="./assets/clinic_banner.png" alt="Clinic"></div>
-
-  <!-- Staff Roster -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Staff Roster</h2>
-    <div class="grid">
-      <label>Full Name <input id="st_name" placeholder="e.g., Priya Sharma"></label>
-      <label>Phone <input id="st_phone" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
-      <label>Role
-        <select id="st_role">
-          <option>Doctor</option><option>Manager</option><option>Front Desk</option>
-          <option>Nurse</option><option>Pharmacist</option><option>Support</option>
-        </select>
-      </label>
-      <label>Note <input id="st_note" placeholder="e.g., evening shift"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="st_add">Add / Update</button>
-      <button class="btn" id="st_export">Export Staff CSV</button>
-      <button class="btn" id="st_clear">Clear Local Staff</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Role</th><th>Note</th><th>Actions</th></tr></thead>
-        <tbody id="st_tbody"></tbody>
-      </table>
-      <div id="st_empty" class="muted">No staff yet.</div>
+  <!-- Header -->
+  <div class="card hero">
+    <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/admin.png'">
+      <div class="hero-title">Staff & Attendance</div>
     </div>
   </div>
 
-  <!-- Attendance -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Attendance (Today)</h2>
-    <div class="grid">
-      <label>Choose Staff
-        <select id="at_staff"></select>
-      </label>
-      <label>Action
-        <select id="at_action">
-          <option value="in">Check-in</option>
-          <option value="out">Check-out</option>
-        </select>
-      </label>
-      <label>Note <input id="at_note" placeholder="optional"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="at_mark">Mark</button>
-      <button class="btn" id="at_export">Export Attendance CSV</button>
-      <button class="btn" id="at_clear">Clear Today</button>
+  <!-- Workspace -->
+  <div class="work" style="margin-top:12px">
+    <!-- LEFT: Staff table + search -->
+    <section class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <h2 style="margin:0">Staff Roster</h2>
+        <input id="st_search" placeholder="Search name/phone/role" style="max-width:260px">
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="st_export">Export Staff CSV</button>
+        <button class="btn" id="st_clear">Clear Local Staff</button>
+      </div>
+      <div style="margin-top:10px;overflow:auto">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Name</th><th>Phone</th><th>Role</th><th>Note</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="st_tbody"></tbody>
+        </table>
+        <div id="st_empty" class="muted">No staff yet.</div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Add/Update + Quick Attendance -->
+    <aside class="card">
+      <h2 style="margin:0 0 8px">Add / Update Staff</h2>
+      <div class="kv" style="margin-bottom:8px">
+        <span class="pill">Tip: Editing? Select a row → “Edit”</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label>Full Name <input id="st_name" placeholder="e.g., Priya Sharma"></label>
+        <label>Phone <input id="st_phone" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
+        <label>Role
+          <select id="st_role">
+            <option>Doctor</option><option>Manager</option><option>Front Desk</option>
+            <option>Nurse</option><option>Pharmacist</option><option>Support</option>
+          </select>
+        </label>
+        <label>Note <input id="st_note" placeholder="e.g., evening shift"></label>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="st_add">Save Staff</button>
+        <button class="btn" id="st_reset">Reset Form</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #eee;margin:14px 0">
+
+      <h2 style="margin:0 0 8px">Quick Attendance</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label>Choose Staff <select id="at_staff"></select></label>
+        <label>Action
+          <select id="at_action">
+            <option value="in">Check-in</option>
+            <option value="out">Check-out</option>
+          </select>
+        </label>
+        <label style="grid-column:1/-1">Note <input id="at_note" placeholder="optional"></label>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="at_mark">Mark</button>
+        <button class="btn" id="at_export">Export Today CSV</button>
+        <button class="btn" id="at_clear">Clear Today</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Attendance log full width -->
+  <section class="card" style="margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <h2 style="margin:0">Attendance Log (Today)</h2>
+      <span class="pill" id="at_count">0 entries</span>
     </div>
     <div style="margin-top:10px;overflow:auto">
       <table>
@@ -82,24 +132,14 @@
       </table>
       <div id="at_empty" class="muted">No entries today.</div>
     </div>
-  </div>
-
-  <!-- Tools -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Tools</h2>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <a class="btn" href="./admin.html">Open Admin</a>
-      <a class="btn" href="./doctor.html">Open Doctor</a>
-      <a class="btn" href="./index.html">Back to PIN</a>
-    </div>
-  </div>
+  </section>
 </main>
 
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
 const $=id=>document.getElementById(id);
-const K={staff:"cl_staff",att:"cl_att"}; // att is per-day
+const K={staff:"cl_staff",att:"cl_att"};
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
 const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const today=()=>new Date().toISOString().slice(0,10);
@@ -111,18 +151,23 @@ const csv=(rows,heads,name)=>{
   a.download=name;a.click();
 };
 
-// ---- Staff Roster ----
+// ------- Staff -------
 function renderStaff(){
+  const q=($("st_search").value||"").toLowerCase();
   const rows=jget(K.staff);
   const tb=$("st_tbody"); tb.innerHTML="";
-  $("st_empty").style.display = rows.length? "none":"block";
+  const filtered = rows.filter(r =>
+    r.name.toLowerCase().includes(q) || (r.phone||"").includes(q) || (r.role||"").toLowerCase().includes(q)
+  );
+  $("st_empty").style.display = filtered.length? "none":"block";
+  // fill attendance dropdown
   $("at_staff").innerHTML = `<option value="">Select</option>` + rows.map(r=>`<option value="${r.phone}">${r.name} (${r.role})</option>`).join("");
-  rows.forEach((r,i)=>{
+  filtered.forEach((r,i)=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.role}</td><td>${r.note||""}</td>
       <td class="rowbtn">
-        <button class="btn" data-ph="${r.phone}" onclick="editStaff('${r.phone}')">Edit</button>
-        <button class="btn" data-ph="${r.phone}" onclick="delStaff('${r.phone}')">Delete</button>
+        <button class="btn" onclick="editStaff('${r.phone}')">Edit</button>
+        <button class="btn" onclick="delStaff('${r.phone}')">Delete</button>
       </td>`;
     tb.appendChild(tr);
   });
@@ -139,24 +184,23 @@ window.delStaff=(phone)=>{
 $("st_add").onclick=()=>{
   const name=$("st_name").value.trim(), phone=$("st_phone").value.trim(), role=$("st_role").value, note=$("st_note").value.trim();
   if(!name||phone.length!==10){alert("Enter name & 10-digit phone");return}
-  let rows=jget(K.staff);
-  const i=rows.findIndex(x=>x.phone===phone);
+  let rows=jget(K.staff); const i=rows.findIndex(x=>x.phone===phone);
   const obj={name,phone,role,note};
   if(i>-1) rows[i]=obj; else rows.push(obj);
-  jset(K.staff,rows);
-  renderStaff();
-  $("st_name").value=$("st_phone").value=$("st_note").value="";
+  jset(K.staff,rows); renderStaff();
 };
+$("st_reset").onclick=()=>{$("st_name").value=$("st_phone").value=$("st_note").value=""; $("st_role").value="Doctor";}
 $("st_export").onclick=()=>csv(jget(K.staff),["name","phone","role","note"],"Staff.csv");
-$("st_clear").onclick=()=>{ if(confirm("Clear local staff list?")){localStorage.removeItem(K.staff);renderStaff();} };
-renderStaff();
+$("st_clear").onclick=()=>{ if(confirm("Clear local staff list on this device?")){localStorage.removeItem(K.staff);renderStaff();} };
+$("st_search").addEventListener("input",renderStaff);
 
-// ---- Attendance (per day) ----
+// ------- Attendance -------
 function keyAtt(){return `${K.att}_${today()}`;}
 function renderAtt(){
   const rows=jget(keyAtt());
   const tb=$("at_tbody"); tb.innerHTML="";
   $("at_empty").style.display = rows.length? "none":"block";
+  $("at_count").textContent = `${rows.length} entr${rows.length===1?"y":"ies"}`;
   rows.forEach((r,i)=>{
     const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
     const st = r.action==="in"?"IN":"OUT";
@@ -178,6 +222,9 @@ $("at_export").onclick=()=>{
 $("at_clear").onclick=()=>{
   if(confirm("Clear today’s attendance on this device?")){ localStorage.removeItem(keyAtt()); renderAtt(); }
 };
-renderAtt();
+
+// Init
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+renderStaff(); renderAtt();
 </script>
 </body></html>
