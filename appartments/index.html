@@ -1,107 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Onestop Apartments</title>
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
-      margin: 0;
-      background: #f5f7fa;
-    }
-    .container {
-      max-width: 420px;
-      margin: auto;
-      padding: 15px;
-    }
-    .card {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 15px;
-    }
-    .banner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border-radius: 15px;
-      height: 160px;
-      position: relative;
-    }
-    .banner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .banner h1 {
-      position: absolute;
-      bottom: 10px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      color: white;
-      font-size: 1.3rem;
-      background: rgba(0,0,0,0.4);
-      padding: 5px 0;
-      margin: 0;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-top: 8px;
-      margin-bottom: 15px;
-      font-size: 1rem;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      background: black;
-      color: white;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- Banner -->
-    <div class="card banner">
-      <img src="banner.png" alt="Banner" />
-      <h1>Onestop Apartments</h1>
-    </div>
-
-    <!-- PIN Card -->
-    <div class="card">
-      <h2>Enter PIN</h2>
-      <p>You’ll be routed to your role.</p>
-      <input type="password" id="pin" placeholder="4–8 digit PIN" maxlength="8" />
-      <button onclick="checkPIN()">Continue</button>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Apartments • PIN</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+<style>
+  :root{--max:720px}
+  body{background:#f5f7fa}
+  main{max-width:var(--max);margin:16px auto;padding:16px}
+  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+  .muted{color:#666}
+  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+  .banner{width:100%;height:180px;object-fit:cover;display:block}
+  @media(max-width:560px){.banner{height:140px}}
+  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;text-align:center;text-decoration:none;cursor:pointer;width:100%}
+</style>
+</head><body>
+<main>
+  <div class="card hero">
+    <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+      <div class="hero-title">Onestop Apartments</div>
     </div>
   </div>
 
-  <script>
-    function checkPIN() {
-      const pin = document.getElementById('pin').value.trim();
-      if(pin === '1111') {
-        window.location.href = 'residents.html';
-      } else if(pin === '2222') {
-        window.location.href = 'guards.html';
-      } else if(pin === '3333') {
-        window.location.href = 'committee.html';
-      } else if(pin === '4444') {
-        window.location.href = 'admin.html';
-      } else {
-        alert('Invalid PIN');
-      }
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 6px">Enter PIN</h2>
+    <p class="muted" style="margin-bottom:8px">You’ll be routed to your role.</p>
+    <form id="pinForm">
+      <input id="pin" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="4–8 digit PIN">
+      <button class="btn" style="margin-top:10px">Continue</button>
+    </form>
+    <div id="msg" class="muted" style="margin-top:8px"></div>
+  </div>
+</main>
+
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+
+const rolePage = {
+  residents : "./residents.html",
+  guards    : "./guards.html",
+  committee : "./committee.html",
+  admin     : "./admin.html"
+};
+
+async function loadPins(){
+  const r = await fetch("./pins.json",{cache:"no-store"});
+  if(!r.ok) throw new Error("pins.json missing");
+  return r.json(); // { residents:"1111", guards:"2222", committee:"3333", admin:"4444" }
+}
+
+document.getElementById("pinForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const pin = document.getElementById("pin").value.trim();
+  const msg = document.getElementById("msg");
+  msg.textContent = "Checking…";
+  try{
+    const pins = await loadPins();
+    let matched = null;
+    for(const [role,val] of Object.entries(pins)){
+      if(String(val)===pin){ matched = role; break; }
     }
-  </script>
-</body>
-</html>
+    if(!matched){ msg.textContent = "Invalid PIN."; return; }
+    sessionStorage.setItem("apt_role", matched);
+    sessionStorage.setItem("apt_login_at", String(Date.now()));
+    location.replace(rolePage[matched] || "./index.html");
+  }catch(err){
+    msg.textContent = "Error loading PINs.";
+    console.error(err);
+  }
+});
+</script>
+</body></html>
