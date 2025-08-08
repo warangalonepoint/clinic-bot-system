@@ -21,6 +21,15 @@
   /* Banner aligned with cards */
   .hero{padding:0;overflow:hidden}
   .banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+  /* Now Serving */
+  .now-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .now-token{font-size:42px;font-weight:900;letter-spacing:1px}
+  .now-ctrls{display:flex;gap:8px;flex-wrap:wrap}
+  /* Quick links: 2 per row */
+  .ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.ql-grid{grid-template-columns:1fr}}
+  .iconbtn{display:flex;align-items:center;gap:10px;justify-content:center}
+  .iconbtn img{width:22px;height:22px;border-radius:6px}
 </style>
 </head><body>
 <script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="doctor")location.replace("./index.html");})();</script>
@@ -32,6 +41,14 @@
     <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
   </div>
 
+  <!-- Quick Links (2 per row) -->
+  <div class="card" style="margin-top:12px">
+    <div class="ql-grid">
+      <a class="btn iconbtn" href="./admin.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Admin / Front Desk</a>
+      <a class="btn iconbtn" href="./booking.html"><img src="./assets/booking.png" onerror="this.style.display='none'">Booking Bot</a>
+    </div>
+  </div>
+
   <!-- Summary -->
   <div class="card" style="margin-top:12px">
     <h2 style="margin:0 0 10px">Today</h2>
@@ -40,6 +57,24 @@
       <span>Walk-ins: <b id="sum_q">0</b></span>
       <span>Seen: <b id="sum_done">0</b></span>
       <span>Pending: <b id="sum_pending">0</b></span>
+    </div>
+  </div>
+
+  <!-- Now Serving -->
+  <div class="card" style="margin-top:12px">
+    <div class="now-wrap">
+      <div>
+        <div class="muted" style="margin-bottom:4px">Now Serving</div>
+        <div class="now-token"><span id="now_token">—</span></div>
+      </div>
+      <div class="now-ctrls">
+        <button class="btn" id="prev_btn">Prev</button>
+        <button class="btn" id="next_btn">Next</button>
+        <button class="btn" id="seen_btn">Mark Seen</button>
+        <label class="pill" style="display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="chime" style="transform:scale(1.2)"> Chime
+        </label>
+      </div>
     </div>
   </div>
 
@@ -89,7 +124,7 @@
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
 // Storage keys
-const K={appts:"cl_a",queue:"cl_q",notes:"cl_notes",tokens:"cl_tok",seen:"cl_seen"};
+const K={appts:"cl_a",queue:"cl_q",notes:"cl_notes",tokens:"cl_tok",seen:"cl_seen",now:"cl_now"};
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
 const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const today=()=>new Date().toISOString().slice(0,10);
@@ -98,10 +133,8 @@ const today=()=>new Date().toISOString().slice(0,10);
 function ensureTokens(rows){
   const d=today();
   const key=`${K.tokens}_${d}`;
-  let map=jget(key); // array of {id,token}
-  if(!Array.isArray(map)) map=[];
+  let map=jget(key); if(!Array.isArray(map)) map=[];
   let counter = map.reduce((m,o)=>Math.max(m, Number(o.token)), 0);
-
   rows.forEach(r=>{
     if(!r.token){
       const uid = r.uid || (r.source+"|"+(r.date||d)+"|"+(r.time||"")+"|"+r.phone);
@@ -110,29 +143,20 @@ function ensureTokens(rows){
       else{
         counter += 1;
         const tok = String(counter).padStart(3,"0");
-        r.token = tok;
-        map.push({id:uid,token:tok});
+        r.token = tok; map.push({id:uid,token:tok});
       }
       r.uid = uid;
     }
   });
-  jset(key,map);
-  return rows;
+  jset(key,map); return rows;
 }
 
-// Build today's list
 function buildToday(){
   const d=today();
-  const ap = jget(K.appts).filter(a=>a.date===d).map(a=>({
-    source:"appt", date:a.date,time:a.time,name:a.name,phone:a.phone,status:a.status||"Booked"
-  }));
-  const q = jget(K.queue)
-    .filter(x=>new Date(x.ts).toISOString().slice(0,10)===d)
-    .map(x=>({source:"walkin", time:x.time||"", name:x.name, phone:x.phone, status:"Queued"}));
-  let rows = ap.concat(q);
-  rows = ensureTokens(rows);
-  const seen = new Set(jget(`${K.seen}_${d}`));
-  rows.forEach(r=>{ if(seen.has(r.token)) r.status="Seen"; });
+  const ap = jget(K.appts).filter(a=>a.date===d).map(a=>({source:"appt", date:a.date,time:a.time,name:a.name,phone:a.phone,status:a.status||"Booked"}));
+  const q  = jget(K.queue).filter(x=>new Date(x.ts).toISOString().slice(0,10)===d).map(x=>({source:"walkin", time:x.time||"", name:x.name, phone:x.phone, status:"Queued"}));
+  let rows = ensureTokens(ap.concat(q));
+  const seen = new Set(jget(`${K.seen}_${d}`)); rows.forEach(r=>{ if(seen.has(r.token)) r.status="Seen"; });
   rows.sort((a,b)=>(a.time||"").localeCompare(b.time||"")||a.token.localeCompare(b.token));
   return rows;
 }
@@ -141,19 +165,11 @@ let current=null;
 
 function render(){
   const rows = buildToday();
-  const tb = document.getElementById("list");
-  tb.innerHTML="";
+  const tb = document.getElementById("list"); tb.innerHTML="";
   const q = (document.getElementById("search").value||"").toLowerCase();
-
-  const filtered = rows.filter(r =>
-    r.name.toLowerCase().includes(q) || (r.phone||"").includes(q) || (r.token||"").includes(q)
-  );
-
+  const filtered = rows.filter(r => r.name.toLowerCase().includes(q) || (r.phone||"").includes(q) || (r.token||"").includes(q));
   document.getElementById("empty").style.display = filtered.length? "none":"block";
-
-  let seenCount=0;
   filtered.forEach((r,i)=>{
-    if(r.status==="Seen") seenCount++;
     const tr=document.createElement("tr");
     tr.innerHTML=`
       <td>${i+1}</td>
@@ -170,22 +186,23 @@ function render(){
     tb.appendChild(tr);
   });
 
+  // summary
   const all = buildToday();
-  document.getElementById("sum_ap").textContent = all.filter(r=>r.source==="appt").length;
-  document.getElementById("sum_q").textContent  = all.filter(r=>r.source!=="appt").length;
-  document.getElementById("sum_done").textContent = all.filter(r=>r.status==="Seen").length;
-  document.getElementById("sum_pending").textContent = all.filter(r=>r.status!=="Seen").length;
+  document.getElementById("sum_ap").textContent     = all.filter(r=>r.source==="appt").length;
+  document.getElementById("sum_q").textContent      = all.filter(r=>r.source!=="appt").length;
+  document.getElementById("sum_done").textContent   = all.filter(r=>r.status==="Seen").length;
+  document.getElementById("sum_pending").textContent= all.filter(r=>r.status!=="Seen").length;
 
+  // handlers
   tb.querySelectorAll(".b-note").forEach(b=>b.onclick=()=>openNote(b.dataset.tok));
   tb.querySelectorAll(".b-seen").forEach(b=>b.onclick=()=>markSeen(b.dataset.tok));
+
+  updateNowServing(); // refresh now-serving display
 }
 
 function openNote(token){
-  const d=today();
-  const key=`${K.notes}_${d}`;
-  const notes=jget(key);
-  const rows=buildToday();
-  const r=rows.find(x=>x.token===token); if(!r) return;
+  const d=today(); const key=`${K.notes}_${d}`; const notes=jget(key);
+  const rows=buildToday(); const r=rows.find(x=>x.token===token); if(!r) return;
   current=r;
   document.getElementById("p_none").style.display="none";
   document.getElementById("pane").style.display="block";
@@ -199,9 +216,7 @@ function openNote(token){
 
 function saveNote(){
   if(!current) return;
-  const d=today();
-  const key=`${K.notes}_${d}`;
-  const arr=jget(key);
+  const d=today(); const key=`${K.notes}_${d}`; const arr=jget(key);
   const note=document.getElementById("p_note").value;
   const idx=arr.findIndex(n=>n.token===current.token);
   if(idx>-1) arr[idx].note=note; else arr.push({token:current.token,note});
@@ -211,17 +226,38 @@ function saveNote(){
 }
 
 function markSeen(token){
-  const d=today();
-  const key=`${K.seen}_${d}`;
-  const arr=new Set(jget(key));
-  arr.add(token);
-  jset(key,[...arr]);
-  if(current && current.token===token){
-    document.getElementById("p_msg").textContent="Marked seen ✅";
-    setTimeout(()=>document.getElementById("p_msg").textContent="",1200);
-  }
+  const d=today(); const key=`${K.seen}_${d}`; const arr=new Set(jget(key)); arr.add(token); jset(key,[...arr]);
+  if(current && current.token===token){ document.getElementById("p_msg").textContent="Marked seen ✅"; setTimeout(()=>document.getElementById("p_msg").textContent="",1200); }
   render();
 }
+
+// ---- Now Serving ----
+function getPendingList(){
+  return buildToday().filter(r=>r.status!=="Seen").sort((a,b)=>(a.time||"").localeCompare(b.time||"")||a.token.localeCompare(b.token));
+}
+function getNowKey(){return `${K.now}_${today()}`;}
+function getNow(){return localStorage.getItem(getNowKey())||"";}
+function setNow(tok){ if(tok) localStorage.setItem(getNowKey(),tok); else localStorage.removeItem(getNowKey()); updateNowServing(); }
+function updateNowServing(){
+  const tok=getNow();
+  const list=getPendingList();
+  const display = document.getElementById("now_token");
+  if(tok){ display.textContent=tok; }
+  else { display.textContent = list[0]?.token || "—"; if(list[0]) setNow(list[0].token); }
+}
+function moveNow(dir){ // dir = +1 next, -1 prev
+  const list=getPendingList();
+  if(!list.length){ setNow(""); return; }
+  const tok=getNow(); let i=list.findIndex(x=>x.token===tok);
+  if(i<0) i=0; else i=i+dir;
+  if(i<0) i=0;
+  if(i>=list.length) i=list.length-1;
+  const nextTok=list[i]?.token;
+  if(nextTok){ setNow(nextTok); if(document.getElementById("chime").checked) try{new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAAACAAACAAAA").play().catch(()=>{});}catch{} }
+}
+document.getElementById("prev_btn").onclick=()=>moveNow(-1);
+document.getElementById("next_btn").onclick=()=>moveNow(1);
+document.getElementById("seen_btn").onclick=()=>{ const tok=getNow(); if(tok) markSeen(tok); };
 
 // Bindings
 document.getElementById("search").addEventListener("input",render);
