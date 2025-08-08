@@ -1,0 +1,72 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Residents — Onestop Apts</title>
+<link rel="stylesheet" href="styles.css">
+</head><body>
+<div class="wrap">
+  <div class="hero space">
+    <div>
+      <span class="pill">Residents</span>
+      <h1>Notices & Complaints</h1>
+      <div class="sub">View notices, file a complaint</div>
+    </div>
+    <a class="btn secondary" href="./index.html">← Back</a>
+  </div>
+
+  <!-- Notices -->
+  <div class="card">
+    <div class="space"><h3 style="margin:0">Notices</h3>
+      <button id="refreshNotices" class="btn ghost">Refresh</button></div>
+    <div id="noticeList" class="list"></div>
+    <div class="sub" id="noticeEmpty">No notices yet.</div>
+  </div>
+
+  <!-- Complaint -->
+  <div class="card">
+    <h3 style="margin:0 0 8px">New Complaint</h3>
+    <div class="row">
+      <div>
+        <label>Flat / Block</label>
+        <input id="cFlat" placeholder="e.g., A-504"/>
+      </div>
+      <div>
+        <label>Category</label>
+        <select id="cCat">
+          <option>Plumbing</option><option>Electrical</option><option>Security</option><option>Cleanliness</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <label>Details</label>
+    <textarea id="cDetails" placeholder="Describe the issue"></textarea>
+    <button id="cSubmit" class="btn">Submit Complaint</button>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<!-- storage -->
+<script src="storage.js"></script>
+<script>
+function renderNotices(){
+  const list=_get(DB.notices); const box=document.getElementById('noticeList'); const empty=document.getElementById('noticeEmpty');
+  box.innerHTML=''; if(!list.length){ empty.style.display='block'; return } empty.style.display='none';
+  list.sort((a,b)=> (b.ts||'').localeCompare(a.ts||''));
+  list.forEach(n=>{
+    const div=document.createElement('div'); div.className='item';
+    div.innerHTML=`<div style="font-weight:700">${n.title||'Notice'}</div>
+    <div class="meta">${new Date(n.ts||Date.now()).toLocaleString()}</div>
+    <div>${(n.body||'').replace(/\n/g,'<br>')}</div>`;
+    box.appendChild(div);
+  });
+}
+document.getElementById('refreshNotices').onclick=renderNotices;
+
+document.getElementById('cSubmit').onclick=()=>{
+  const flat=cFlat.value.trim(), cat=cCat.value, details=cDetails.value.trim();
+  if(!flat||!details){ toast('Fill flat and details'); return; }
+  put(DB.complaints, {id:crypto.randomUUID(), flat, cat, details, status:'open', ts:new Date().toISOString()});
+  cDetails.value=''; toast('Complaint submitted');
+};
+
+renderNotices();
+</script>
+</body></html>
