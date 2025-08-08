@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Onestop Apts</title>
+<link rel="stylesheet" href="styles.css">
+</head><body>
+<div class="wrap">
+  <div class="hero space">
+    <div>
+      <span class="pill">Admin</span>
+      <h1>Settings</h1>
+      <div class="sub">Update files, reset PIN (local demo)</div>
+    </div>
+    <a class="btn secondary" href="./index.html">← Back</a>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Set/Reset PIN</h3>
+    <div class="row">
+      <div><label>New PIN</label><input id="pin" placeholder="4 digits" maxlength="4" inputmode="numeric"></div>
+      <div><label>&nbsp;</label><button id="savePin" class="btn">Save PIN</button></div>
+    </div>
+    <div class="sub">This PIN can be used later to protect pages (e.g., Committee/Guard).</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Data Tools (local)</h3>
+    <div class="flex">
+      <button id="exportAll" class="btn ghost">Export All (JSON)</button>
+      <button id="clearAll" class="btn danger">Clear All</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="storage.js"></script>
+<script>
+savePin.onclick=()=>{
+  const p=pin.value.trim(); if(!/^\d{4}$/.test(p)){ toast('Enter 4 digits'); return; }
+  const cfg=getAdmin(); cfg.pin=p; setAdmin(cfg); toast('PIN saved');
+};
+exportAll.onclick=()=>{
+  const dump = {};
+  for(const k of Object.values(DB)){ dump[k] = localStorage.getItem(k) || '[]'; }
+  const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='apartment_dump.json'; a.click();
+};
+clearAll.onclick=()=>{
+  if(confirm('Clear ALL local data on this device?')){
+    for(const k of Object.values(DB)) localStorage.removeItem(k);
+    toast('Cleared local data');
+  }
+};
+</script>
+</body></html>
