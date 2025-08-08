@@ -25,11 +25,11 @@
   </style>
 
   <!-- Force-load KEY file from the exact repo path; bump v when you change it -->
-  <script src="/clinic-bot-system/Onestop-demo/api-key.js?v=7"></script>
+  <script src="/clinic-bot-system/Onestop-demo/config.js?v=7"></script>
   <script>
     // Tiny guard so we fail loudly if key didn't load
     if (!window.AIRTABLE_API_KEY) {
-      console.error("AIRTABLE_API_KEY missing – check api-key.js path");
+      console.error("AIRTABLE_API_KEY missing – check config.js path");
     }
   </script>
 </head>
