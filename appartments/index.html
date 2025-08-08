@@ -1,97 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Apartments • PIN</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="stylesheet" href="./styles.css" />
-  <meta name="theme-color" content="#111" />
-  <style>
-    .card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-    .input{width:100%;padding:14px 16px;border:1px solid #ddd;border-radius:12px;font-size:16px}
-    .btn{width:100%;padding:14px 16px;border:none;border-radius:12px;font-weight:700}
-    .btn-primary{background:#111;color:#fff}
-    .muted{color:#666;font-size:12px;margin-top:10px;text-align:center}
-    img.banner{width:100%;border-radius:22px;display:block}
-    main{max-width:640px;margin:18px auto;padding:14px}
-  </style>
-</head>
-<body>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Apartments • PIN</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+<style>
+  :root{--max:720px}
+  body{background:#f8f9fa}
+  main{max-width:var(--max);margin:16px auto;padding:16px}
+  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+  .muted{color:#666}
 
-  <!-- Auto-route if already logged in (fixes Back button showing index) -->
-  <script>
-    (function(){
-      const role = sessionStorage.getItem("apts_role");
-      if(!role) return;
-      const rolePage = {
-        residents:"./residents.html",
-        guards:"./guards.html",
-        committee:"./committee.html",
-        admin:"./admin.html",
-      };
-      location.replace(rolePage[role] || "./index.html");
-    })();
-  </script>
+  /* Polished header */
+  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+  .banner{width:100%;height:180px;object-fit:cover;display:block}
+  @media(max-width:560px){.banner{height:140px}}
+  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-  <main>
-    <img class="banner" src="./assets/banner.png" alt="Onestop Apartments" />
-    <div class="card" style="margin-top:16px">
-      <h2 style="margin:0 0 6px">Enter PIN</h2>
-      <p style="margin:0 0 14px;color:#666">Access is role-based. You’ll be routed automatically.</p>
-      <form id="pinForm">
-        <input id="pin" class="input" type="password" placeholder="4–8 digit PIN"
-               autocomplete="one-time-code" inputmode="numeric" required />
-        <button class="btn btn-primary" type="submit" style="margin-top:12px">Continue</button>
-      </form>
-      <div id="msg" class="muted"></div>
+  /* Inputs + buttons */
+  input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;text-align:center;text-decoration:none;cursor:pointer}
+  .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:360px){.ql-2{grid-template-columns:1fr 1fr}}
+  .iconbtn{display:flex;align-items:center;justify-content:center;gap:10px}
+  .iconbtn img{width:22px;height:22px;border-radius:6px}
+</style>
+</head><body>
+<main>
+  <!-- Header -->
+  <div class="card hero">
+    <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/admin.png'">
+      <div class="hero-title">Onestop Apartments</div>
     </div>
-  </main>
+  </div>
 
-  <script>
-    // Map role -> page
-    const rolePage = {
-      residents: "./residents.html",
-      guards: "./guards.html",
-      committee: "./committee.html",
-      admin: "./admin.html",
-    };
+  <!-- PIN -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 6px">Enter PIN</h2>
+    <p class="muted" style="margin-bottom:8px">You’ll be routed to your role.</p>
+    <form id="pinForm">
+      <input id="pin" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="4–8 digit PIN">
+      <button class="btn" style="margin-top:10px;width:100%">Continue</button>
+    </form>
+    <div id="msg" class="muted" style="margin-top:8px"></div>
+  </div>
 
-    async function loadPins(){
-      const r = await fetch("./pins.json", { cache: "no-store" });
-      if(!r.ok) throw new Error("pins.json not found");
-      return r.json();
+  <!-- Quick Access -->
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin:0 0 8px">Quick Access</h3>
+    <div class="ql-2">
+      <a class="btn iconbtn" href="./residents.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Residents</a>
+      <a class="btn iconbtn" href="./guards.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Guards</a>
+      <a class="btn iconbtn" href="./committee.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Committee</a>
+      <a class="btn iconbtn" href="./admin.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Admin</a>
+    </div>
+  </div>
+</main>
+
+<script>
+// PWA
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+
+// Role → page map
+const rolePage = {
+  resident : "./residents.html",
+  guard    : "./guards.html",
+  committee: "./committee.html",
+  admin    : "./admin.html"
+};
+
+// Load pins.json (no cache)
+async function loadPins(){
+  const r = await fetch("./pins.json",{cache:"no-store"});
+  if(!r.ok) throw new Error("pins.json missing");
+  return r.json(); // e.g., { resident:"1111", guard:"2222", committee:"3333", admin:"4444" }
+}
+
+document.getElementById("pinForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const pin = document.getElementById("pin").value.trim();
+  const msg = document.getElementById("msg");
+  msg.textContent = "Checking…";
+  try{
+    const pins = await loadPins();
+    let matched = null;
+    for(const [role,val] of Object.entries(pins)){
+      if(String(val)===pin){ matched = role; break; }
     }
-
-    document.getElementById("pinForm").addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      const pin = document.getElementById("pin").value.trim();
-      const msg = document.getElementById("msg");
-      msg.textContent = "Checking…";
-      try{
-        const pins = await loadPins(); // {residents:"1111", guards:"2222", committee:"3333", admin:"4444"}
-        // find matching role
-        let matchedRole = null;
-        for (const [role, value] of Object.entries(pins)){
-          if (String(value) === pin){ matchedRole = role; break; }
-        }
-        if (!matchedRole){
-          msg.textContent = "Invalid PIN.";
-          return;
-        }
-        // Save session + timestamp
-        sessionStorage.setItem("apts_role", matchedRole);
-        sessionStorage.setItem("apts_login_at", String(Date.now()));
-        // Go without adding index to history (so Back won’t show this)
-        location.replace(rolePage[matchedRole] || "./index.html");
-      }catch(err){
-        msg.textContent = "Error loading PINs.";
-        console.error(err);
-      }
-    });
-
-    // Optional SW register (harmless)
-    if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
-  </script>
-</body>
-</html>
+    if(!matched){ msg.textContent = "Invalid PIN."; return; }
+    sessionStorage.setItem("apt_role", matched);
+    sessionStorage.setItem("apt_login_at", String(Date.now()));
+    location.replace(rolePage[matched] || "./index.html");
+  }catch(err){
+    msg.textContent = "Error loading PINs.";
+  }
+});
+</script>
+</body></html>
