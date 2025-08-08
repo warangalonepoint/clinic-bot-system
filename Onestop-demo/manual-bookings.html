@@ -1,294 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Manual Patient Booking – v3 (Airtable)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Manual Patient Booking — Local Demo</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:#f6f7f9;color:#111}
-    .wrap{max-width:760px;margin:24px auto;padding:16px}
-    .card{background:#fff;border-radius:16px;box-shadow:0 6px 28px rgba(0,0,0,.08);padding:18px 18px 22px}
-    h1{font-size:28px;margin:18px 0 6px}
-    .sub{color:#666;margin:0 0 14px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .row-1{grid-template-columns:1fr}
-    label{font-size:14px;color:#333;margin:10px 0 6px;display:block}
-    input,select,button{width:100%;padding:14px 12px;border:1px solid #dde1e6;border-radius:12px;font-size:16px;background:#fff}
-    select:disabled, input:disabled{background:#f1f3f5;color:#8a8f98}
-    button.primary{background:#000;color:#fff;border:none;font-weight:600}
-    button.primary:disabled{opacity:.5}
-    .hint{color:#6b7280;margin-top:10px}
-    .hero{width:100%;border-radius:14px;object-fit:cover;margin-bottom:14px}
-    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111;color:#fff;padding:12px 14px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:none;z-index:9}
-    .badge{display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;padding:2px 8px;border-radius:999px;font-size:12px;margin-left:6px}
-  </style>
-
-  <!-- Force-load KEY file from the exact repo path; bump v when you change it -->
-  <script src="/clinic-bot-system/Onestop-demo/config.js?v=7"></script>
-  <script>
-    // Tiny guard so we fail loudly if key didn't load
-    if (!window.AIRTABLE_API_KEY) {
-      console.error("AIRTABLE_API_KEY missing – check config.js path");
+    :root { --bg:#f6f7fb; --card:#fff; --text:#0f1222; --muted:#6b7280; --brand:#111; --radius:18px; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif}
+    .wrap{max-width:720px;margin:24px auto;padding:16px}
+    .hero{background:#eaf4f6;border-radius:22px;padding:16px}
+    .title{font-weight:800;font-size:32px;margin:20px 0 6px}
+    .badge{display:inline-block;background:#eef;border:1px solid #ccd; color:#334; padding:4px 10px;border-radius:999px;font-size:12px}
+    .card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 10px 25px rgba(10,12,33,.06)}
+    label{display:block;font-weight:700;margin:14px 0 6px}
+    input,select,button{
+      width:100%;padding:14px 14px;border:1px solid #e5e7eb;border-radius:14px;
+      font-size:16px;background:#fff;outline:none
     }
-  </script>
+    input:focus,select:focus{border-color:#111; box-shadow:0 0 0 3px rgba(17,17,17,.08)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .muted{color:var(--muted);font-size:14px;margin-top:12px}
+    .cta{margin-top:18px;background:#000;color:#fff;border:none;cursor:pointer;font-weight:800}
+    .cta:disabled{opacity:.55;cursor:not-allowed}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#111;color:#fff;
+           padding:12px 16px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.2);display:none}
+  </style>
 </head>
 <body>
   <div class="wrap">
-    <img class="hero" src="assets/banner.png" alt="Clinic" />
-    <h1>Manual Patient Booking <span class="badge">v3 — Airtable</span></h1>
-    <p class="sub">Booked slots are hidden automatically.</p>
+    <div class="hero"><img src="./assets/banner.png" alt="" style="width:100%;border-radius:16px"/></div>
+    <div class="title">Manual Patient Booking</div>
+    <span class="badge">v3 — local demo</span>
+    <p class="muted">Booked slots on this device will be hidden automatically.</p>
 
     <div class="card">
-      <div class="row row-1">
-        <div>
-          <label>Patient Name</label>
-          <input id="name" placeholder="Enter full name" />
-        </div>
-      </div>
+      <label for="name">Patient Name</label>
+      <input id="name" placeholder="Enter full name" autocomplete="name"/>
 
-      <div class="row row-1">
-        <div>
-          <label>Contact Number</label>
-          <input id="phone" placeholder="10-digit number" inputmode="numeric" />
-        </div>
-      </div>
+      <label for="phone">Contact Number</label>
+      <input id="phone" placeholder="10-digit number" inputmode="numeric" maxlength="10"/>
 
       <div class="row">
         <div>
-          <label>Select Date</label>
-          <select id="dateSelect" disabled>
-            <option>Loading dates...</option>
-          </select>
+          <label for="dateSelect">Select Date</label>
+          <select id="dateSelect"><option>Loading dates…</option></select>
         </div>
         <div>
-          <label>Select Time Slot</label>
-          <select id="slotSelect" disabled>
-            <option>Select a date first</option>
-          </select>
+          <label for="slotSelect">Select Time Slot</label>
+          <select id="slotSelect" disabled><option>Select a date first</option></select>
         </div>
       </div>
 
-      <div style="margin-top:14px">
-        <button id="confirmBtn" class="primary" disabled>Confirm Booking</button>
-        <p class="hint">Booked slots will be hidden automatically.</p>
-      </div>
+      <button id="confirmBtn" class="cta" disabled>Confirm Booking</button>
+      <p class="muted">Booked slots on this device will be hidden.</p>
+      <p class="muted"><a href="./logs.html">Admin: view local bookings →</a></p>
     </div>
   </div>
 
   <div id="toast" class="toast"></div>
 
   <script>
-    // ---------- Config (edit these if your base/table names differ) ----------
-    const BASE_ID         = "appgIT8WiqnZlR44Y";
-    const TABLE_SLOTS     = "AvailableSlots";
-    const TABLE_BOOKINGS  = "BookingsLogs";
-
-    // ---------- Airtable helpers ----------
-    function atHeaders() {
-      const key = (window && window.AIRTABLE_API_KEY) || "";
-      return {
-        Authorization: "Bearer " + key,
-        "Content-Type": "application/json"
-      };
-    }
-    function showToast(msg) {
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.style.display = 'block';
-      setTimeout(() => el.style.display = 'none', 3000);
-    }
-
-    // ---------- State & elements ----------
-    let allSlots = [];               // [{id, dateStr, timeStr, fields}]
-    let slotsByDate = {};            // { '2025-08-08': [records...] }
-    let selectedSlotRecord = null;
+    // ---------- Local demo store ----------
+    const STORE_KEY = 'onestop_bookings_v3';
+    const SLOTS = [
+      '10:00 AM','10:10 AM','10:20 AM','10:30 AM','10:40 AM','10:50 AM',
+      '11:00 AM','11:10 AM','11:20 AM'
+    ];
 
     const els = {
-      name:        document.getElementById('name'),
-      phone:       document.getElementById('phone'),
-      dateSelect:  document.getElementById('dateSelect'),
-      slotSelect:  document.getElementById('slotSelect'),
-      confirmBtn:  document.getElementById('confirmBtn')
+      name: document.getElementById('name'),
+      phone: document.getElementById('phone'),
+      date: document.getElementById('dateSelect'),
+      slot: document.getElementById('slotSelect'),
+      btn:  document.getElementById('confirmBtn'),
+      toast:document.getElementById('toast'),
     };
 
-    // ---------- Load AvailableSlots (Status = "Available") ----------
-    async function loadAvailableSlots() {
-      try {
-        if (!window.AIRTABLE_API_KEY) {
-          throw new Error("Missing API key: ensure config.js is reachable and defines window.AIRTABLE_API_KEY");
-        }
+    const fmtISO = (d)=>[
+      d.getFullYear(),
+      String(d.getMonth()+1).padStart(2,'0'),
+      String(d.getDate()).padStart(2,'0')
+    ].join('-');
 
-        const url = new URL(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_SLOTS)}`);
-        url.searchParams.set("filterByFormula", `Status='Available'`);
-        url.searchParams.set("sort[0][field]", "Date");
-        url.searchParams.set("sort[0][direction]", "asc");
-        url.searchParams.set("sort[1][field]", "Time Slot");
-        url.searchParams.set("sort[1][direction]", "asc");
-        url.searchParams.set("pageSize", "100");
+    const fmtPretty = (iso)=>{
+      const [y,m,dd]=iso.split('-').map(Number);
+      const d=new Date(y,m-1,dd);
+      return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+    };
 
-        const res = await fetch(url.toString(), { headers: atHeaders() });
-        if (!res.ok) {
-          const j = await res.json().catch(()=> ({}));
-          throw new Error(`Airtable GET ${TABLE_SLOTS} failed: ${res.status} ${JSON.stringify(j)}`);
-        }
-        const data = await res.json();
+    function loadStore(){
+      try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'[]'); }
+      catch{ return []; }
+    }
+    function saveStore(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
 
-        // Flatten + normalize
-        allSlots = (data.records || []).map(r => {
-          const f = r.fields || {};
-          let dateStr;
-          // If Airtable Date field is treated as string already (yyyy-mm-dd) keep it,
-          // else convert to yyyy-mm-dd safely.
-          try {
-            const d = new Date(f.Date);
-            const y = d.getFullYear();
-            const m = String(d.getMonth()+1).padStart(2,'0');
-            const dd= String(d.getDate()).padStart(2,'0');
-            dateStr = `${y}-${m}-${dd}`;
-          } catch {
-            dateStr = String(f.Date || "");
-          }
-          const timeStr = String(f["Time Slot"] || "").trim();
-          return { id: r.id, fields: f, dateStr, timeStr };
-        });
-
-        // Group by date
-        slotsByDate = {};
-        for (const rec of allSlots) {
-          if (!slotsByDate[rec.dateStr]) slotsByDate[rec.dateStr] = [];
-          slotsByDate[rec.dateStr].push(rec);
-        }
-
-        // Populate dates
-        const dates = Object.keys(slotsByDate).sort();
-        els.dateSelect.innerHTML = "";
-        if (dates.length === 0) {
-          els.dateSelect.innerHTML = `<option>No available dates</option>`;
-          els.dateSelect.disabled = true;
-          els.slotSelect.innerHTML = `<option>No slots</option>`;
-          els.slotSelect.disabled = true;
-          return;
-        }
-        for (const d of dates) {
-          const opt = new Option(d, d);
-          els.dateSelect.add(opt);
-        }
-        els.dateSelect.disabled = false;
-        onDateChange(); // fill initial slots
-
-      } catch (err) {
-        console.error(err);
-        els.dateSelect.innerHTML = `<option>Error loading dates</option>`;
-        els.dateSelect.disabled = true;
-        els.slotSelect.innerHTML = `<option>Select a date first</option>`;
-        els.slotSelect.disabled = true;
-        showToast(err.message || "Error loading Airtable data");
-      }
+    function showToast(msg){
+      els.toast.textContent = msg;
+      els.toast.style.display='block';
+      setTimeout(()=> els.toast.style.display='none', 2600);
     }
 
-    // ---------- When date changes, populate that day’s slots ----------
-    function onDateChange() {
-      const d = els.dateSelect.value;
-      const list = slotsByDate[d] || [];
-      els.slotSelect.innerHTML = "";
-      if (list.length === 0) {
-        els.slotSelect.innerHTML = `<option>No slots</option>`;
-        els.slotSelect.disabled = true;
-        selectedSlotRecord = null;
-      } else {
-        for (const rec of list) {
-          const label = rec.timeStr || rec.fields["Time Slot"] || "(time)";
-          const opt = new Option(label, rec.id);
-          els.slotSelect.add(opt);
-        }
-        els.slotSelect.disabled = false;
-        selectedSlotRecord = list[0];
+    // ---------- UI population ----------
+    function buildDateOptions(days=7){
+      const out=[];
+      const today=new Date();
+      for(let i=0;i<days;i++){
+        const d=new Date(today); d.setDate(today.getDate()+i);
+        out.push(fmtISO(d));
       }
+      els.date.innerHTML = out.map(iso=>`<option value="${iso}">${fmtPretty(iso)}</option>`).join('');
+      els.date.disabled = false;
+      onDateChange();
+    }
+
+    function onDateChange(){
+      const iso = els.date.value;
+      const bookings = loadStore().filter(b=>b.date===iso).map(b=>b.time);
+      const avail = SLOTS.filter(t=>!bookings.includes(t));
+      els.slot.innerHTML = avail.length
+        ? `<option value="">Select time slot</option>` + avail.map(t=>`<option>${t}</option>`).join('')
+        : `<option>No slots available</option>`;
+      els.slot.disabled = avail.length === 0;
       validateForm();
     }
 
-    // ---------- Select slot handler ----------
-    function onSlotChange() {
-      const id = els.slotSelect.value;
-      selectedSlotRecord = allSlots.find(r => r.id === id) || null;
-      validateForm();
+    function validateForm(){
+      const ok = els.name.value.trim().length>=2 &&
+                 /^\d{10}$/.test(els.phone.value.trim()) &&
+                 !!els.date.value &&
+                 !!els.slot.value;
+      els.btn.disabled = !ok;
     }
 
-    // ---------- Simple validation ----------
-    function validateForm() {
-      const ok = !!(els.name.value.trim() && els.phone.value.trim() && selectedSlotRecord);
-      els.confirmBtn.disabled = !ok;
+    // ---------- Booking ----------
+    function nextTokenForDate(iso){
+      const sameDay = loadStore().filter(b=>b.date===iso);
+      return sameDay.length + 1;
     }
 
-    // ---------- Confirm booking ----------
-    async function confirmBooking() {
-      try {
-        const name  = els.name.value.trim();
-        const phone = els.phone.value.trim();
-        const rec   = selectedSlotRecord;
-        if (!name || !phone || !rec) return;
+    function confirmBooking(){
+      const name = els.name.value.trim();
+      const phone = els.phone.value.trim();
+      const dateISO = els.date.value;
+      const time = els.slot.value;
 
-        // 1) Create a booking
-        const bookURL = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_BOOKINGS)}`;
-        const payload = {
-          records: [{
-            fields: {
-              "Timestamp": new Date().toISOString(),
-              "Patient Name": name,
-              "Slot Time": `${rec.dateStr} ${rec.timeStr}`,
-              "Reason": "",               // optional field
-              "Contact": phone
-            }
-          }]
-        };
-        let res = await fetch(bookURL, {
-          method: "POST",
-          headers: atHeaders(),
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) {
-          const j = await res.json().catch(()=> ({}));
-          throw new Error(`Create booking failed: ${res.status} ${JSON.stringify(j)}`);
-        }
+      if(!/^\d{10}$/.test(phone)) return showToast('Enter a valid 10-digit number');
+      if(!time) return;
 
-        // 2) Mark slot as Booked
-        const upURL = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_SLOTS)}`;
-        const upBody = {
-          records: [{ id: rec.id, fields: { Status: "Booked" } }]
-        };
-        res = await fetch(upURL, {
-          method: "PATCH",
-          headers: atHeaders(),
-          body: JSON.stringify(upBody)
-        });
-        if (!res.ok) {
-          const j = await res.json().catch(()=> ({}));
-          throw new Error(`Update slot failed: ${res.status} ${JSON.stringify(j)}`);
-        }
-
-        alert(`Booking confirmed!\n\nDate: ${rec.dateStr}\nSlot: ${rec.timeStr}`);
-        // Refresh lists to hide the booked slot
-        await loadAvailableSlots();
-        els.slotSelect.value = "";
-        selectedSlotRecord = null;
-        validateForm();
-
-      } catch (err) {
-        console.error(err);
-        showToast(err.message || "Booking failed");
+      // check slot still free
+      const store = loadStore();
+      if (store.some(b=>b.date===dateISO && b.time===time)) {
+        showToast('That slot just got booked. Pick another.');
+        onDateChange(); // refresh
+        return;
       }
+
+      const token = nextTokenForDate(dateISO);
+      store.push({ name, phone, date: dateISO, time, token, ts: Date.now() });
+      saveStore(store);
+
+      alert(
+        `Booking confirmed!\n\n`+
+        `Date: ${fmtPretty(dateISO)}\n`+
+        `Slot: ${time}\n`+
+        `Token: ${token}\n\n`+
+        `(Stored locally in this demo)`
+      );
+
+      // reset & repopulate
+      els.name.value=''; els.phone.value='';
+      els.slot.selectedIndex = 0;
+      onDateChange();
+      validateForm();
     }
 
     // ---------- Wire up ----------
+    els.date.addEventListener('change', onDateChange);
+    els.slot.addEventListener('change', validateForm);
     els.name.addEventListener('input', validateForm);
     els.phone.addEventListener('input', validateForm);
-    els.dateSelect.addEventListener('change', onDateChange);
-    els.slotSelect.addEventListener('change', onSlotChange);
-    els.confirmBtn.addEventListener('click', confirmBooking);
+    els.btn.addEventListener('click', confirmBooking);
 
-    // ---------- Boot ----------
-    loadAvailableSlots();
+    // init
+    buildDateOptions(7);
   </script>
 </body>
 </html>
