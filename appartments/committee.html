@@ -1,0 +1,95 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Committee — Onestop Apts</title>
+<link rel="stylesheet" href="styles.css">
+</head><body>
+<div class="wrap">
+  <div class="hero space">
+    <div>
+      <span class="pill">Committee</span>
+      <h1>Announcements & Polls</h1>
+      <div class="sub">Post notices, run opinion polls</div>
+    </div>
+    <a class="btn secondary" href="./index.html">← Back</a>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">New Announcement</h3>
+    <label>Title</label><input id="nTitle" />
+    <label>Message</label><textarea id="nBody"></textarea>
+    <button id="nPost" class="btn">Post Notice</button>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Notices</h3>
+    <div id="nList" class="list"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Create Poll</h3>
+    <label>Question</label><input id="pQ" />
+    <div class="row">
+      <div><label>Option A</label><input id="pA" /></div>
+      <div><label>Option B</label><input id="pB" /></div>
+    </div>
+    <button id="pCreate" class="btn">Create Poll</button>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Polls</h3>
+    <div id="pList" class="list"></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="storage.js"></script>
+<script>
+function renderNotices(){
+  const list=_get(DB.notices).sort((a,b)=>(b.ts||'').localeCompare(a.ts||'')); const box=nList; box.innerHTML='';
+  if(!list.length){ box.innerHTML='<div class="meta">No notices.</div>'; return; }
+  list.forEach(n=>{
+    const div=document.createElement('div'); div.className='item';
+    div.innerHTML=`<div style="font-weight:700">${n.title||'Notice'}</div>
+    <div class="meta">${new Date(n.ts).toLocaleString()}</div><div>${(n.body||'').replace(/\n/g,'<br>')}</div>`;
+    box.appendChild(div);
+  });
+}
+nPost.onclick=()=>{
+  const title=nTitle.value.trim(), body=nBody.value.trim();
+  if(!title||!body){ toast('Fill title & message'); return; }
+  put(DB.notices, {id:crypto.randomUUID(), title, body, ts:new Date().toISOString()});
+  nTitle.value=''; nBody.value=''; renderNotices(); toast('Posted');
+};
+
+function renderPolls(){
+  const polls=_get(DB.polls).sort((a,b)=>(b.ts||'').localeCompare(a.ts||'')); const box=pList; box.innerHTML='';
+  if(!polls.length){ box.innerHTML='<div class="meta">No polls.</div>'; return; }
+  const votes=_get(DB.pollVotes);
+  polls.forEach(p=>{
+    const countA=votes.filter(v=>v.pollId===p.id && v.choice==='A').length;
+    const countB=votes.filter(v=>v.pollId===p.id && v.choice==='B').length;
+    const div=document.createElement('div'); div.className='item';
+    div.innerHTML=`<div style="font-weight:700">${p.q}</div>
+    <div class="meta">A: ${p.a} (${countA}) • B: ${p.b} (${countB})</div>
+    <div class="flex"><button class="btn" data-votea="${p.id}">Vote A</button>
+    <button class="btn ghost" data-voteb="${p.id}">Vote B</button>
+    <button class="btn danger" data-del="${p.id}">Delete</button></div>`;
+    box.appendChild(div);
+  });
+}
+pCreate.onclick=()=>{
+  const q=pQ.value.trim(), a=pA.value.trim(), b=pB.value.trim();
+  if(!q||!a||!b){ toast('Fill question and both options'); return; }
+  put(DB.polls,{id:crypto.randomUUID(), q,a,b,ts:new Date().toISOString()}); pQ.value='';pA.value='';pB.value=''; renderPolls(); toast('Poll created');
+};
+pList.addEventListener('click',(e)=>{
+  const id=e.target.getAttribute('data-votea')||e.target.getAttribute('data-voteb')||e.target.getAttribute('data-del');
+  if(!id) return;
+  if(e.target.hasAttribute('data-del')){ del(DB.polls,x=>x.id===id); del(DB.pollVotes,x=>x.pollId===id); renderPolls(); toast('Deleted'); return; }
+  const choice = e.target.hasAttribute('data-votea') ? 'A' : 'B';
+  put(DB.pollVotes,{id:crypto.randomUUID(), pollId:id, choice, ts:new Date().toISOString()});
+  renderPolls(); toast('Voted');
+});
+renderNotices(); renderPolls();
+</script>
+</body></html>
