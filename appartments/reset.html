@@ -1,6 +1,5 @@
-<!doctype html><html><body style="font-family:sans-serif;padding:20px">
+<!doctype html><html><body style="font-family:system-ui;padding:20px">
 <h3>SW Reset</h3>
-<button onclick="(async()=>{const regs=await navigator.serviceWorker.getRegistrations();for(const r of regs) await r.unregister(); caches && caches.keys().then(keys=>keys.forEach(k=>caches.delete(k))); alert('Cleared. Reload index.'); location.href='./index.html?v='+(Date.now());})()">Unregister SW + Clear Cache</button>
-<p>If button is disabled, your browser doesn’t support SW here.</p>
-<script>if(!('serviceWorker'in navigator))document.querySelector('button').disabled=true;</script>
+<button style="padding:10px 14px;border-radius:10px;font-weight:700"
+onclick="(async()=>{try{const regs=await navigator.serviceWorker.getRegistrations();for(const r of regs)await r.unregister();if(window.caches){for(const k of await caches.keys())await caches.delete(k);}alert('Cleared. Reloading…');location.href='./index.html?v='+Date.now();}catch(e){alert('Reset failed');console.error(e);}})()">Unregister SW + Clear Caches</button>
 </body></html>
