@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <title>Manual Patient Booking — Local</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Manual Patient Booking — Local Demo</title>
   <style>
     :root { --bg:#f6f7fb; --card:#fff; --text:#0f1222; --muted:#6b7280; --brand:#111; --radius:18px; }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif}
     .wrap{max-width:720px;margin:24px auto;padding:16px}
     .hero{background:#eaf4f6;border-radius:22px;padding:16px}
-    .title{font-weight:800;font-size:32px;margin:20px 0 6px}
-    .badge{display:inline-block;background:#eef;border:1px solid #ccd; color:#334; padding:4px 10px;border-radius:999px;font-size:12px}
+    .title{font-weight:800;font-size:28px;margin:18px 0 6px}
+    .muted{color:var(--muted);font-size:14px;margin:6px 0 14px}
     .card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 10px 25px rgba(10,12,33,.06)}
     label{display:block;font-weight:700;margin:14px 0 6px}
     input,select,button{
@@ -20,26 +20,28 @@
     }
     input:focus,select:focus{border-color:#111; box-shadow:0 0 0 3px rgba(17,17,17,.08)}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .muted{color:var(--muted);font-size:14px;margin-top:12px}
-    .cta{margin-top:18px;background:#000;color:#fff;border:none;cursor:pointer;font-weight:800}
+    .cta{margin-top:18px;background:#000;color:#fff;border:none;font-weight:800;cursor:pointer}
     .cta:disabled{opacity:.55;cursor:not-allowed}
     .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#111;color:#fff;
            padding:12px 16px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.2);display:none}
+    a.link{color:#6c3ad6;text-decoration:none;font-weight:600}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="hero"><img src="./assets/banner.png" alt="" style="width:100%;border-radius:16px"/></div>
     <div class="title">Manual Patient Booking</div>
-    <span class="badge">v3 — local demo</span>
-    <p class="muted">Booked slots on this device will be hidden automatically.</p>
+    <p class="muted">Local demo — booked slots (this device) are hidden automatically.</p>
 
     <div class="card">
       <label for="name">Patient Name</label>
       <input id="name" placeholder="Enter full name" autocomplete="name"/>
 
-      <label for="phone">Contact Number</label>
-      <input id="phone" placeholder="10-digit number" inputmode="numeric" maxlength="10"/>
+      <label for="reason">Reason</label>
+      <input id="reason" placeholder="e.g., Fever, Check-up"/>
+
+      <label for="contact">Contact Number</label>
+      <input id="contact" placeholder="10-digit number" inputmode="numeric" maxlength="10"/>
 
       <div class="row">
         <div>
@@ -53,137 +55,137 @@
       </div>
 
       <button id="confirmBtn" class="cta" disabled>Confirm Booking</button>
-      <p class="muted">Booked slots on this device will be hidden.</p>
-      <p class="muted"><a href="./logs.html">Admin: view local bookings →</a></p>
+      <p class="muted" style="margin-top:10px">
+        Admin view: <a class="link" href="./local-bookings.html">Local bookings →</a>
+      </p>
     </div>
   </div>
 
   <div id="toast" class="toast"></div>
 
   <script>
-    // ---------- Local demo store ----------
-    const STORE_KEY = 'onestop_bookings_v3';
-    const SLOTS = [
+    // ---------- Config (local mode) ----------
+    const LS_KEY = 'localBookings'; // <- matches local-bookings.html
+    const SLOT_TIMES = [
       '10:00 AM','10:10 AM','10:20 AM','10:30 AM','10:40 AM','10:50 AM',
-      '11:00 AM','11:10 AM','11:20 AM'
+      '11:00 AM','11:10 AM','11:20 AM','11:30 AM','11:40 AM','11:50 AM'
     ];
+    const DAYS_AHEAD = 7; // today + next 6 days
 
-    const els = {
-      name: document.getElementById('name'),
-      phone: document.getElementById('phone'),
-      date: document.getElementById('dateSelect'),
-      slot: document.getElementById('slotSelect'),
-      btn:  document.getElementById('confirmBtn'),
-      toast:document.getElementById('toast'),
+    // ---------- Utils ----------
+    const $ = q => document.querySelector(q);
+    const toast = (msg, ms=1600)=>{
+      const el = $('#toast');
+      el.textContent = msg; el.style.display='block';
+      clearTimeout(window.__t); window.__t = setTimeout(()=> el.style.display='none', ms);
+    };
+    const toISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const pretty = iso => {
+      const [y,m,d]=iso.split('-').map(Number);
+      return new Date(y, m-1, d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
     };
 
-    const fmtISO = (d)=>[
-      d.getFullYear(),
-      String(d.getMonth()+1).padStart(2,'0'),
-      String(d.getDate()).padStart(2,'0')
-    ].join('-');
-
-    const fmtPretty = (iso)=>{
-      const [y,m,dd]=iso.split('-').map(Number);
-      const d=new Date(y,m-1,dd);
-      return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
-    };
-
-    function loadStore(){
-      try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'[]'); }
-      catch{ return []; }
+    function readAll(){
+      try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+      catch { return []; }
     }
-    function saveStore(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+    function writeAll(rows){ localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
 
-    function showToast(msg){
-      els.toast.textContent = msg;
-      els.toast.style.display='block';
-      setTimeout(()=> els.toast.style.display='none', 2600);
-    }
+    // ---------- DOM refs ----------
+    const nameEl = $('#name');
+    const reasonEl = $('#reason');
+    const contactEl = $('#contact');
+    const dateEl = $('#dateSelect');
+    const slotEl = $('#slotSelect');
+    const btn = $('#confirmBtn');
 
-    // ---------- UI population ----------
-    function buildDateOptions(days=7){
-      const out=[];
-      const today=new Date();
-      for(let i=0;i<days;i++){
-        const d=new Date(today); d.setDate(today.getDate()+i);
-        out.push(fmtISO(d));
+    // ---------- Init ----------
+    initDates();
+    dateEl.addEventListener('change', refreshSlots);
+    [nameEl, reasonEl, contactEl, slotEl].forEach(el => el.addEventListener('input', validate));
+    btn.addEventListener('click', confirmBooking);
+
+    function initDates(){
+      const today = new Date();
+      dateEl.innerHTML = '';
+      for(let i=0;i<DAYS_AHEAD;i++){
+        const d = new Date(today);
+        d.setDate(today.getDate()+i);
+        const iso = toISO(d);
+        const opt = new Option(pretty(iso), iso);
+        dateEl.add(opt);
       }
-      els.date.innerHTML = out.map(iso=>`<option value="${iso}">${fmtPretty(iso)}</option>`).join('');
-      els.date.disabled = false;
-      onDateChange();
+      refreshSlots();
     }
 
-    function onDateChange(){
-      const iso = els.date.value;
-      const bookings = loadStore().filter(b=>b.date===iso).map(b=>b.time);
-      const avail = SLOTS.filter(t=>!bookings.includes(t));
-      els.slot.innerHTML = avail.length
-        ? `<option value="">Select time slot</option>` + avail.map(t=>`<option>${t}</option>`).join('')
-        : `<option>No slots available</option>`;
-      els.slot.disabled = avail.length === 0;
-      validateForm();
+    function refreshSlots(){
+      const iso = dateEl.value;
+      const taken = new Set(readAll().filter(b => b.date === iso).map(b => b.slot));
+      slotEl.innerHTML = '';
+      let count = 0;
+      for(const t of SLOT_TIMES){
+        if(!taken.has(t)){
+          slotEl.add(new Option(t, t));
+          count++;
+        }
+      }
+      if(count === 0){
+        slotEl.add(new Option('No slots available', ''));
+        slotEl.disabled = true;
+      } else {
+        slotEl.disabled = false;
+      }
+      validate();
     }
 
-    function validateForm(){
-      const ok = els.name.value.trim().length>=2 &&
-                 /^\d{10}$/.test(els.phone.value.trim()) &&
-                 !!els.date.value &&
-                 !!els.slot.value;
-      els.btn.disabled = !ok;
+    function validate(){
+      const ok =
+        nameEl.value.trim().length >= 2 &&
+        contactEl.value.trim().match(/^\d{10}$/) &&
+        !!dateEl.value &&
+        !!slotEl.value;
+      btn.disabled = !ok;
     }
 
-    // ---------- Booking ----------
     function nextTokenForDate(iso){
-      const sameDay = loadStore().filter(b=>b.date===iso);
+      const sameDay = readAll().filter(b => b.date === iso);
       return sameDay.length + 1;
     }
 
     function confirmBooking(){
-      const name = els.name.value.trim();
-      const phone = els.phone.value.trim();
-      const dateISO = els.date.value;
-      const time = els.slot.value;
+      const rec = {
+        date: dateEl.value,
+        slot: slotEl.value,
+        name: nameEl.value.trim(),
+        reason: reasonEl.value.trim(),
+        contact: contactEl.value.trim(),
+        token: nextTokenForDate(dateEl.value)
+      };
 
-      if(!/^\d{10}$/.test(phone)) return showToast('Enter a valid 10-digit number');
-      if(!time) return;
-
-      // check slot still free
-      const store = loadStore();
-      if (store.some(b=>b.date===dateISO && b.time===time)) {
-        showToast('That slot just got booked. Pick another.');
-        onDateChange(); // refresh
-        return;
+      // double-check slot is still free
+      const rows = readAll();
+      if(rows.some(r => r.date === rec.date && r.slot === rec.slot)){
+        toast('That slot just got booked. Pick another.'); refreshSlots(); return;
       }
 
-      const token = nextTokenForDate(dateISO);
-      store.push({ name, phone, date: dateISO, time, token, ts: Date.now() });
-      saveStore(store);
+      rows.push(rec);
+      writeAll(rows);
 
       alert(
         `Booking confirmed!\n\n`+
-        `Date: ${fmtPretty(dateISO)}\n`+
-        `Slot: ${time}\n`+
-        `Token: ${token}\n\n`+
-        `(Stored locally in this demo)`
+        `Date: ${pretty(rec.date)}\n`+
+        `Slot: ${rec.slot}\n`+
+        `Token: ${rec.token}\n\n`+
+        `(Saved locally on this device)`
       );
 
-      // reset & repopulate
-      els.name.value=''; els.phone.value='';
-      els.slot.selectedIndex = 0;
-      onDateChange();
-      validateForm();
+      // reset + refresh
+      nameEl.value = '';
+      reasonEl.value = '';
+      contactEl.value = '';
+      refreshSlots();
+      validate();
     }
-
-    // ---------- Wire up ----------
-    els.date.addEventListener('change', onDateChange);
-    els.slot.addEventListener('change', validateForm);
-    els.name.addEventListener('input', validateForm);
-    els.phone.addEventListener('input', validateForm);
-    els.btn.addEventListener('click', confirmBooking);
-
-    // init
-    buildDateOptions(7);
   </script>
 </body>
 </html>
