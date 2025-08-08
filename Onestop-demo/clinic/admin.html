@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Clinic • Admin</title>
+<link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+<style>
+body{font-family:system-ui,Roboto,Arial,sans-serif}
+main{max-width:1000px;margin:16px auto;padding:16px}
+.card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.banner{width:100%;border-radius:22px;display:block}
+.logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:860px){.grid{grid-template-columns:1fr}}
+input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px}
+.btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s;background:#111;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+.btn:hover{transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,.25)}
+table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
+code{background:#f5f5f5;padding:2px 6px;border-radius:8px}
+</style></head><body>
+<script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();</script>
+<button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
+
+<main>
+  <img class="banner" src="./assets/clinic_banner.png" alt="Clinic"/>
+
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Quick Links</h2>
+    <div class="grid">
+      <a class="btn" href="./doctor.html">Open Doctor/Manager</a>
+      <a class="btn" href="./booking.html">Open Booking Bot</a>
+      <a class="btn" href="./index.html">Back to PIN</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Services Master</h2>
+    <div class="grid">
+      <label>Service <input id="s_name" placeholder="Consultation"></label>
+      <label>Price (₹) <input id="s_price" inputmode="numeric" placeholder="500"></label>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="s_add">Add Service</button>
+      <button class="btn" id="s_export">Export CSV</button>
+      <button class="btn" id="s_clear">Clear Local</button>
+    </div>
+    <div style="margin-top:10px;overflow:auto">
+      <table><thead><tr><th>Name</th><th>Price</th></tr></thead><tbody id="s_tbody"></tbody></table>
+      <div id="s_empty" style="color:#666">No services yet.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Reports (Local)</h2>
+    <div class="grid">
+      <button class="btn" id="r_day">Today’s Summary</button>
+      <button class="btn" id="r_exportAll">Export ALL CSV (zip soon)</button>
+    </div>
+    <div id="r_out" style="margin-top:8px;color:#333"></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">PINs</h2>
+    <p>Current PINs loaded from <code>pins.json</code>.</p>
+    <pre id="pinsBox" style="background:#f7f7f7;padding:10px;border-radius:12px;overflow:auto"></pre>
+  </div>
+</main>
+
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+const $=id=>document.getElementById(id); const K={services:"cl_s",appts:"cl_a",queue:"cl_q",visits:"cl_v",bills:"cl_b"};
+const jget=k=>JSON.parse(localStorage.getItem(k)||"[]"); const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
+
+// Services
+function renderS(){const rows=jget(K.services);const tb=$("s_tbody");tb.innerHTML="";if(!rows.length){$("s_empty").style.display="block";return}$("s_empty").style.display="none";rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.name}</td><td>₹${r.price}</td>`;tb.appendChild(tr);});}
+$("s_add").onclick=()=>{const name=$("s_name").value.trim(), price=+($("s_price").value||0); if(!name||price<=0){alert("Enter service & price");return} const rows=jget(K.services);rows.push({name,price});jset(K.services,rows);renderS();}
+$("s_export").onclick=()=>csv(jget(K.services),["name","price"],"Services.csv");
+$("s_clear").onclick=()=>{if(confirm("Clear local services?")){localStorage.removeItem(K.services);renderS();}}; renderS();
+
+// Reports
+$("r_day").onclick=()=>{const today=(new Date).toISOString().slice(0,10); const ap=jget(K.appts).filter(a=>a.date===today).length; const q=jget(K.queue).length; const rev=jget(K.bills).filter(b=>new Date(b.ts).toISOString().slice(0,10)===today).reduce((s,b)=>s+Number(b.amt||0),0); $("r_out").textContent=`Today: Appointments ${ap}, Walk-ins in queue ${q}, Revenue ₹${rev}`; };
+$("r_exportAll").onclick=()=>{csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");csv(jget(K.queue),["name","phone","age","comp","token","ts"],"Queue.csv");csv(jget(K.visits),["name","phone","bp","pulse","dx","rx","ts"],"Visits.csv");csv(jget(K.bills),["ts","name","phone","service","amt"],"Bills.csv");};
+
+// PINs
+fetch("./pins.json",{cache:"no-store"}).then(r=>r.json()).then(p=>{$("pinsBox").textContent=JSON.stringify(p,null,2)}).catch(()=>{$("pinsBox").textContent="Could not load pins.json";});
+</script>
+</body></html>
