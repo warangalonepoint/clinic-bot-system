@@ -1,21 +1,21 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Clinic • Doctor/Manager</title>
+<title>Clinic • Doctor</title>
 <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
 <style>
 main{max-width:1100px;margin:16px auto;padding:16px}
 .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:900px){.grid{grid-template-columns:1fr}}
-input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+.grid2{display:grid;grid-template-columns:2.1fr 1fr;gap:14px}@media(max-width:980px){.grid2{grid-template-columns:1fr}}
+input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
 table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
-.pill{display:inline-block;background:#eee;border-radius:999px;padding:4px 10px;font-size:12px;margin-left:6px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.tab{padding:10px 14px;border-radius:999px;background:#f5f5f5;cursor:pointer}
-.tab.active{background:#111;color:#fff}
-.hide{display:none!important}
-.iconbtn{display:inline-flex;align-items:center;gap:8px}
-.iconbtn img{width:18px;height:18px;border-radius:4px}
+.badge{display:inline-block;background:#111;color:#fff;border-radius:999px;padding:3px 8px;font-size:12px}
+.pill{background:#eee;border-radius:999px;padding:4px 10px}
+.btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer}
+.rowbtn{display:inline-flex;gap:8px;flex-wrap:wrap}
+.kv{display:flex;gap:10px;flex-wrap:wrap}
+.kv span{background:#f5f5f5;border-radius:10px;padding:6px 10px}
+.muted{color:#666}
 </style></head><body>
 <script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="doctor")location.replace("./index.html");})();</script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
@@ -23,129 +23,209 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
 <main>
   <img class="banner" src="./assets/clinic_banner.png" alt="Clinic"/>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="queue">Walk-ins / Queue</div>
-    <div class="tab" data-tab="appts">Appointments</div>
-    <div class="tab" data-tab="visit">Visit Sheet</div>
-    <div class="tab" data-tab="bill">Billing</div>
-    <div class="tab" data-tab="patients">Search Patients</div>
+  <!-- Summary cards -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 10px">Today</h2>
+    <div class="kv" id="summary">
+      <span>Appointments: <b id="sum_ap">0</b></span>
+      <span>Walk-ins: <b id="sum_q">0</b></span>
+      <span>Seen: <b id="sum_done">0</b></span>
+      <span>Pending: <b id="sum_pending">0</b></span>
+    </div>
   </div>
 
-  <section id="queue" class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Walk-in Register</h2>
-    <div class="grid">
-      <label>Name <input id="q_name" placeholder="Full name"></label>
-      <label>Phone <input id="q_phone" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
-      <label>Age <input id="q_age" inputmode="numeric" maxlength="3" placeholder="Years"></label>
-      <label>Complaint <input id="q_comp" placeholder="Reason for visit"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn iconbtn" id="q_add"><img src="./assets/icons/add.png" onerror="this.style.display='none'">Add to Queue</button>
-      <button class="btn iconbtn" id="q_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export CSV</button>
-      <button class="btn iconbtn" id="q_clear"><img src="./assets/icons/clear.png" onerror="this.style.display='none'">Clear Local</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table><thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Age</th><th>Complaint</th><th>Token</th><th>Actions</th></tr></thead><tbody id="q_tbody"></tbody></table>
-      <div id="q_empty" class="muted">No patients in queue.</div>
-    </div>
-  </section>
+  <div class="grid2">
+    <!-- LEFT: Today’s list (appointments + walk-ins) -->
+    <section class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <h2 style="margin:0">Today’s Patients</h2>
+        <input id="search" placeholder="Search name/phone" style="max-width:260px">
+      </div>
+      <div style="margin-top:10px;overflow:auto">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Time</th><th>Token</th><th>Name</th><th>Phone</th><th>Type</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="list"></tbody>
+        </table>
+        <div id="empty" class="muted">No patients for today yet.</div>
+      </div>
+    </section>
 
-  <section id="appts" class="card hide" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Appointments</h2>
-    <div class="grid">
-      <label>Date <input id="a_date" type="date"></label>
-      <label>Time <input id="a_time" type="time"></label>
-      <label>Patient Name <input id="a_name"></label>
-      <label>Phone <input id="a_phone" inputmode="numeric" maxlength="10"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn iconbtn" id="a_add"><img src="./assets/icons/add.png" onerror="this.style.display='none'">Create Appointment</button>
-      <button class="btn iconbtn" id="a_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export CSV</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table><thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody id="a_tbody"></tbody></table>
-      <div id="a_empty" class="muted">No appointments.</div>
-    </div>
-  </section>
-
-  <section id="visit" class="card hide" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Visit Sheet</h2>
-    <div class="grid">
-      <label>Patient <input id="v_name" placeholder="Name"></label>
-      <label>Phone <input id="v_phone" inputmode="numeric" maxlength="10"></label>
-      <label>BP <input id="v_bp" placeholder="e.g., 120/80"></label>
-      <label>Pulse <input id="v_pulse" inputmode="numeric"></label>
-      <label>Diagnosis <input id="v_dx" placeholder="Provisional Dx"></label>
-      <label>Rx Notes <textarea id="v_rx" rows="2" placeholder="Prescription notes"></textarea></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn iconbtn" id="v_save"><img src="./assets/icons/save.png" onerror="this.style.display='none'">Save Visit</button>
-      <button class="btn iconbtn" id="v_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export Visits CSV</button>
-    </div>
-    <div id="v_msg" style="margin-top:8px;color:#0d7c66"></div>
-  </section>
-
-  <section id="bill" class="card hide" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Billing</h2>
-    <div class="grid">
-      <label>Patient <input id="b_name" placeholder="Name"></label>
-      <label>Phone <input id="b_phone" inputmode="numeric" maxlength="10"></label>
-      <label>Service <input id="b_service" placeholder="Consultation / Procedure"></label>
-      <label>Amount (₹) <input id="b_amt" inputmode="numeric" placeholder="0"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn iconbtn" id="b_add"><img src="./assets/icons/add.png" onerror="this.style.display='none'">Add Line</button>
-      <button class="btn iconbtn" id="b_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export Bills CSV</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Service</th><th>Amount</th></tr></thead><tbody id="b_tbody"></tbody></table>
-      <div id="b_empty" class="muted">No bills yet.</div>
-    </div>
-  </section>
-
-  <section id="patients" class="card hide" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Search Patients</h2>
-    <input id="p_q" placeholder="Search by name/phone" style="margin-bottom:10px">
-    <div style="overflow:auto">
-      <table><thead><tr><th>Name</th><th>Phone</th><th>Last Visit</th></tr></thead><tbody id="p_tbody"></tbody></table>
-      <div id="p_empty" class="muted">No data yet.</div>
-    </div>
-  </section>
+    <!-- RIGHT: Patient pane (details + notes) -->
+    <section class="card">
+      <h2 style="margin:0 0 8px">Patient</h2>
+      <div id="p_none" class="muted">Select a patient to view details and write a note.</div>
+      <div id="pane" style="display:none">
+        <div class="pill" id="p_token">Token —</div>
+        <h3 id="p_name" style="margin:8px 0 4px">—</h3>
+        <div class="muted" id="p_phone">—</div>
+        <div class="muted" id="p_type" style="margin-top:6px">—</div>
+        <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
+        <label>Quick Note (doctor only)
+          <textarea id="p_note" rows="6" placeholder="e.g., ‘URTI, start amox 500 bd x5d’"></textarea>
+        </label>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <button class="btn" id="save_note">Save Note</button>
+          <button class="btn" id="mark_seen">Mark Seen</button>
+        </div>
+        <div id="p_msg" style="margin-top:8px;color:#0d7c66"></div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <script>
+// PWA
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-const $=id=>document.getElementById(id);
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["queue","appts","visit","bill","patients"].forEach(i=>$(i).classList.add("hide"));$(t.dataset.tab).classList.remove("hide");});
 
-const K={queue:"cl_q",appts:"cl_a",visits:"cl_v",bills:"cl_b",patients:"cl_p"}; const jget=k=>JSON.parse(localStorage.getItem(k)||"[]"); const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+// Storage keys
+const K={appts:"cl_a",queue:"cl_q",notes:"cl_notes",tokens:"cl_tok",seen:"cl_seen"};
+const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const today=()=>new Date().toISOString().slice(0,10);
-const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 
-// Queue
-function renderQ(){const rows=jget(K.queue);const tb=$("q_tbody");tb.innerHTML="";if(!rows.length){$("q_empty").style.display="block";return}$("q_empty").style.display="none";rows.forEach((r,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.age}</td><td>${r.comp}</td><td>${r.token}</td><td><button class="btn" data-i="${i}">Done</button></td>`;tb.appendChild(tr);});tb.querySelectorAll("button").forEach(b=>b.onclick=()=>{const rows=jget(K.queue);rows.splice(+b.dataset.i,1);jset(K.queue,rows);renderQ();});}
-$("q_add").onclick=()=>{const name=$("q_name").value.trim(), phone=$("q_phone").value.trim(), age=$("q_age").value.trim(), comp=$("q_comp").value.trim(); if(!name||phone.length!==10){alert("Enter name & 10-digit phone");return} const token=String((jget(K.queue).slice(-1)[0]?.token||0)+1||1).padStart(3,"0"); const rows=jget(K.queue); rows.push({name,phone,age,comp,token,ts:Date.now()}); jset(K.queue,rows); renderQ();};
-$("q_export").onclick=()=>csv(jget(K.queue),["name","phone","age","comp","token","ts"],"Queue.csv");
-$("q_clear").onclick=()=>{if(confirm("Clear queue on this device?")){localStorage.removeItem(K.queue);renderQ();}}; renderQ();
+// Token engine: assigns sequential tokens per day across both sources
+function ensureTokens(rows){
+  const d=today();
+  const key=`${K.tokens}_${d}`;
+  let map=jget(key); // array of [{id,token}]
+  if(!Array.isArray(map)) map=[];
+  let counter = map.reduce((m,o)=>Math.max(m, Number(o.token)), 0);
 
-// Appointments
-$("a_date").value=today();
-function renderA(){const rows=jget(K.appts);const tb=$("a_tbody");tb.innerHTML="";if(!rows.length){$("a_empty").style.display="block";return}$("a_empty").style.display="none";rows.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));rows.forEach((r,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.date}</td><td>${r.time}</td><td>${r.name}</td><td>${r.phone}</td><td><span class="pill">${r.status||"Booked"}</span></td><td><button class="btn done" data-i="${i}">Done</button> <button class="btn" data-c="${i}">Cancel</button></td>`;tb.appendChild(tr);});tb.querySelectorAll(".done").forEach(b=>b.onclick=()=>{const rows=jget(K.appts);rows[b.dataset.i].status="Done";jset(K.appts,rows);renderA();});tb.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const rows=jget(K.appts);rows[b.dataset.c].status="Cancelled";jset(K.appts,rows);renderA();});}
-$("a_add").onclick=()=>{const date=$("a_date").value,time=$("a_time").value,name=$("a_name").value.trim(),phone=$("a_phone").value.trim(); if(!date||!time||!name||phone.length!==10){alert("Fill all fields (10-digit phone)");return} const rows=jget(K.appts);rows.push({date,time,name,phone,status:"Booked",ts:Date.now()});jset(K.appts,rows);renderA();}
-$("a_export").onclick=()=>csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv"); renderA();
+  rows.forEach(r=>{
+    if(!r.token){
+      // unique id per row for token map
+      const uid = r.uid || (r.source+"|"+(r.date||d)+"|"+(r.time||"")+"|"+r.phone);
+      const found = map.find(x=>x.id===uid);
+      if(found){ r.token = found.token; }
+      else{
+        counter += 1;
+        const tok = String(counter).padStart(3,"0");
+        r.token = tok;
+        map.push({id:uid,token:tok});
+      }
+      r.uid = uid;
+    }
+  });
+  jset(key,map);
+  return rows;
+}
 
-// Visit
-$("v_save").onclick=()=>{const row={name:$("v_name").value.trim(),phone:$("v_phone").value.trim(),bp:$("v_bp").value,pulse:$("v_pulse").value,dx:$("v_dx").value,rx:$("v_rx").value,ts:Date.now()}; if(!row.name||row.phone.length!==10){alert("Enter name & 10-digit phone");return} const rows=jget(K.visits);rows.push(row);jset(K.visits,rows);$("v_msg").textContent="Saved ✅"; setTimeout(()=>$("v_msg").textContent="",1200);}
-$("v_export").onclick=()=>csv(jget(K.visits),["name","phone","bp","pulse","dx","rx","ts"],"Visits.csv");
+// Build today's list
+function buildToday(){
+  const d=today();
+  const ap = jget(K.appts).filter(a=>a.date===d).map(a=>({
+    source:"appt", date:a.date,time:a.time,name:a.name,phone:a.phone,status:a.status||"Booked"
+  }));
+  const q = jget(K.queue)
+    .filter(x=>new Date(x.ts).toISOString().slice(0,10)===d)
+    .map(x=>({source:"walkin", time:x.time||"", name:x.name, phone:x.phone, status:"Queued"}));
+  let rows = ap.concat(q);
+  rows = ensureTokens(rows);
+  // seen map
+  const seen = new Set(jget(`${K.seen}_${d}`));
+  rows.forEach(r=>{ if(seen.has(r.token)) r.status="Seen"; });
+  // sort time then token
+  rows.sort((a,b)=>(a.time||"").localeCompare(b.time||"")||a.token.localeCompare(b.token));
+  return rows;
+}
 
-// Billing
-function renderB(){const rows=jget(K.bills);const tb=$("b_tbody");tb.innerHTML="";if(!rows.length){$("b_empty").style.display="block";return}$("b_empty").style.display="none";rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${new Date(r.ts).toLocaleString()}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.service}</td><td>₹${r.amt}</td>`;tb.appendChild(tr);});}
-$("b_add").onclick=()=>{const name=$("b_name").value.trim(),phone=$("b_phone").value.trim(),service=$("b_service").value.trim(),amt=+($("b_amt").value||0); if(!name||phone.length!==10||!service||amt<=0){alert("Fill all billing fields");return} const rows=jget(K.bills);rows.push({name,phone,service,amt,ts:Date.now()});jset(K.bills,rows);renderB();}
-$("b_export").onclick=()=>csv(jget(K.bills),["ts","name","phone","service","amt"],"Bills.csv"); renderB();
+let current=null; // currently selected row
 
-// Patients
-function rebuildPatients(){const map=new Map(); jget(K.visits).forEach(v=>map.set(v.phone,{name:v.name,phone:v.phone,last:new Date(v.ts).toLocaleDateString()})); jget(K.appts).forEach(a=>{const m=map.get(a.phone)||{name:a.name,phone:a.phone,last:"—"}; map.set(a.phone,{...m,name:a.name});}); const arr=[...map.values()]; localStorage.setItem(K.patients,JSON.stringify(arr)); }
-function renderPatients(){rebuildPatients(); const q=($("p_q").value||"").toLowerCase(); const rows=JSON.parse(localStorage.getItem(K.patients)||"[]").filter(r=>r.name.toLowerCase().includes(q)||r.phone.includes(q)); const tb=$("p_tbody");tb.innerHTML="";if(!rows.length){$("p_empty").style.display="block";return}$("p_empty").style.display="none";rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.name}</td><td>${r.phone}</td><td>${r.last||"—"}</td>`;tb.appendChild(tr);});}
-$("p_q").addEventListener("input",renderPatients); renderPatients();
+function render(){
+  const rows = buildToday();
+  const tb = document.getElementById("list");
+  tb.innerHTML="";
+  const q = (document.getElementById("search").value||"").toLowerCase();
+
+  const filtered = rows.filter(r =>
+    r.name.toLowerCase().includes(q) || (r.phone||"").includes(q) || (r.token||"").includes(q)
+  );
+
+  if(!filtered.length){ document.getElementById("empty").style.display="block"; }
+  else{ document.getElementById("empty").style.display="none"; }
+
+  let seenCount=0;
+  filtered.forEach((r,i)=>{
+    if(r.status==="Seen") seenCount++;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td>${r.time||"—"}</td>
+      <td><span class="badge">${r.token}</span></td>
+      <td>${r.name}</td>
+      <td>${r.phone||"—"}</td>
+      <td>${r.source==="appt"?"Appointment":"Walk-in"}</td>
+      <td>${r.status}</td>
+      <td class="rowbtn">
+        <button class="btn b-note" data-tok="${r.token}">Note</button>
+        <button class="btn b-seen" data-tok="${r.token}">Seen</button>
+      </td>`;
+    tb.appendChild(tr);
+  });
+
+  // summary
+  const all = buildToday();
+  document.getElementById("sum_ap").textContent = all.filter(r=>r.source==="appt").length;
+  document.getElementById("sum_q").textContent  = all.filter(r=>r.source!=="appt").length;
+  document.getElementById("sum_done").textContent = all.filter(r=>r.status==="Seen").length;
+  document.getElementById("sum_pending").textContent = all.filter(r=>r.status!=="Seen").length;
+
+  // handlers
+  tb.querySelectorAll(".b-note").forEach(b=>b.onclick=()=>openNote(b.dataset.tok));
+  tb.querySelectorAll(".b-seen").forEach(b=>b.onclick=()=>markSeen(b.dataset.tok));
+}
+
+function openNote(token){
+  const d=today();
+  const key=`${K.notes}_${d}`;
+  const notes=jget(key);
+  const rows=buildToday();
+  const r=rows.find(x=>x.token===token); if(!r) return;
+  current=r;
+  document.getElementById("p_none").style.display="none";
+  document.getElementById("pane").style.display="block";
+  document.getElementById("p_token").textContent="Token "+r.token;
+  document.getElementById("p_name").textContent=r.name;
+  document.getElementById("p_phone").textContent=r.phone||"—";
+  document.getElementById("p_type").textContent=r.source==="appt"?"Appointment":"Walk-in";
+  document.getElementById("p_note").value = (notes.find(n=>n.token===token)?.note)||"";
+  document.getElementById("p_msg").textContent="";
+}
+
+function saveNote(){
+  if(!current) return;
+  const d=today();
+  const key=`${K.notes}_${d}`;
+  const arr=jget(key);
+  const note=document.getElementById("p_note").value;
+  const idx=arr.findIndex(n=>n.token===current.token);
+  if(idx>-1) arr[idx].note=note; else arr.push({token:current.token,note});
+  jset(key,arr);
+  document.getElementById("p_msg").textContent="Note saved ✅";
+  setTimeout(()=>document.getElementById("p_msg").textContent="",1200);
+}
+
+function markSeen(token){
+  const d=today();
+  const key=`${K.seen}_${d}`;
+  const arr=new Set(jget(key));
+  arr.add(token);
+  jset(key,[...arr]);
+  if(current && current.token===token){
+    document.getElementById("p_msg").textContent="Marked seen ✅";
+    setTimeout(()=>document.getElementById("p_msg").textContent="",1200);
+  }
+  render();
+}
+
+// UI binds
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("save_note").onclick=saveNote;
+document.getElementById("mark_seen").onclick=()=>current&&markSeen(current.token);
+
+// first paint
+render();
 </script>
 </body></html>
