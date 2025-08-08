@@ -5,7 +5,8 @@
 </head><body>
 <div class="wrap">
   <div class="hero space">
-    <div>
+    <div style="flex:1">
+      <img src="./assets/banner.png" alt="" class="banner">
       <span class="pill">Committee</span>
       <h1>Announcements & Polls</h1>
       <div class="sub">Post notices, run opinion polls</div>
@@ -44,6 +45,9 @@
 
 <script src="storage.js"></script>
 <script>
+// ----- PIN gate -----
+if(!requirePinOrRedirect()) { /* blocked */ }
+
 function renderNotices(){
   const list=_get(DB.notices).sort((a,b)=>(b.ts||'').localeCompare(a.ts||'')); const box=nList; box.innerHTML='';
   if(!list.length){ box.innerHTML='<div class="meta">No notices.</div>'; return; }
