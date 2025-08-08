@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Clinic • PIN</title>
+<link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+<style>
+body{font-family:system-ui,Roboto,Arial,sans-serif}
+main{max-width:720px;margin:16px auto;padding:16px}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.banner{width:100%;border-radius:22px;display:block}
+input{width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:16px}
+.btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s;background:#111;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+.btn:hover{transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.muted{color:#666}
+</style></head><body>
+<main>
+  <img class="banner" src="./assets/clinic_banner.png" alt="Clinic"/>
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin:0 0 8px">Enter PIN</h2>
+    <p class="muted">You’ll be routed automatically.</p>
+    <form id="pinForm">
+      <input id="pin" type="password" placeholder="4–8 digit PIN" inputmode="numeric" autocomplete="one-time-code" required style="margin:10px 0">
+      <button class="btn" style="width:100%">Continue</button>
+    </form>
+    <div id="msg" class="muted" style="margin-top:8px"></div>
+    <div style="margin-top:14px"><a class="btn" href="./booking.html" style="display:inline-block">Open Booking Bot</a></div>
+  </div>
+</main>
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+const rolePage={ doctor:"./doctor.html", admin:"./admin.html" };
+async function loadPins(){ try{const r=await fetch("./pins.json",{cache:"no-store"});return await r.json()}catch{return{}} }
+document.getElementById("pinForm").addEventListener("submit", async (e)=>{
+  e.preventDefault(); const pin=document.getElementById("pin").value.trim(); const msg=document.getElementById("msg");
+  msg.textContent="Checking…"; try{
+    const p=await loadPins(); let matched=null; for(const [role,val] of Object.entries(p)){ if(String(val)===pin){matched=role;break;} }
+    if(!matched){ msg.textContent="Invalid PIN."; return; }
+    sessionStorage.setItem("clinic_role", matched); sessionStorage.setItem("clinic_login_at", String(Date.now()));
+    location.replace(rolePage[matched]||"./index.html");
+  }catch{ msg.textContent="Error loading pins.json"; }
+});
+</script></body></html>
