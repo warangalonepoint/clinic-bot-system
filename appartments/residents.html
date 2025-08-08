@@ -4,16 +4,12 @@
 <link rel="manifest" href="./manifest.webmanifest"/><link rel="stylesheet" href="./styles.css"/>
 <meta name="theme-color" content="#111"/>
 <style>
-  :root{--pad:12px} body{font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif}
   main{max-width:1000px;margin:12px auto;padding:12px}
   .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
   .banner{width:100%;border-radius:22px;display:block}
   .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:720px){.row{grid-template-columns:1fr}}
   input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
-  .btn-dark{background:#111;color:#fff} .btn-soft{background:#f3f3f3}
-  .btn-red{background:#b30021;color:#fff} .btn-green{background:#0d7c66;color:#fff}
   .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
   .tab{padding:10px 14px;border-radius:999px;background:#f5f5f5;cursor:pointer}
   .tab.active{background:#111;color:#fff}
@@ -22,16 +18,23 @@
   .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eee;font-size:12px;margin-right:6px}
   .thumb{width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid #eee;cursor:pointer}
   dialog::backdrop{background:rgba(0,0,0,.5)} dialog{border:0;border-radius:16px;padding:0;overflow:hidden}
+
+  /* --- Buttons unified (black by default) --- */
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;cursor:pointer;transition:filter .12s ease}
+  .btn-dark{background:#111;color:#fff}
+  .btn-green{background:#0d7c66;color:#fff}
+  .btn-red{background:#b30021;color:#fff}
+  .btn-soft{background:#111;color:#fff;border:0}
+  .btn-outline{background:#fff;color:#111;border:1px solid #ddd}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(.2)}
 </style>
 </head><body>
-<!-- PIN LOCK -->
 <script>(function(){const r=sessionStorage.getItem("apts_role");if(r!=="residents")location.replace("./index.html");})();</script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main>
   <img class="banner" src="./assets/banner.png" alt="Onestop Apartments"/>
 
-  <!-- Flat selector (for filtering Visitor Log) -->
   <div class="card" style="margin-top:14px">
     <div class="row">
       <div>
@@ -47,7 +50,6 @@
     <small style="color:#666">Saved locally to filter your Visitor Log & Pre-Approvals.</small>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" data-tab="bookings">Bookings</div>
     <div class="tab" data-tab="complaints">Complaints</div>
@@ -113,8 +115,8 @@
       <textarea id="c_body" rows="3" placeholder="Describe the issue…"></textarea>
     </label>
     <div style="margin-top:10px">
-      <button class="btn btn-soft" id="c_open">📷 Open Camera</button>
-      <button class="btn btn-soft" id="c_snap" disabled>📸 Capture Photo</button>
+      <button class="btn btn-dark" id="c_open">📷 Open Camera</button>
+      <button class="btn btn-dark" id="c_snap" disabled>📸 Capture Photo</button>
       <video id="c_preview" playsinline muted style="display:none;width:100%;max-height:260px;border-radius:14px;background:#000"></video>
       <canvas id="c_canvas" style="display:none"></canvas>
       <div id="c_photoNote" class="pill" style="display:none;margin-top:8px">Photo captured ✔️</div>
@@ -137,7 +139,7 @@
     <div id="n_empty" style="color:#666">No notices yet.</div>
   </section>
 
-  <!-- Visitor Log (resident view) -->
+  <!-- Visitor Log -->
   <section id="vlog" class="card hide" style="margin-top:14px">
     <h2 style="margin:0 0 10px">Visitor & Courier Log (for your flat)</h2>
     <div style="overflow:auto">
@@ -163,269 +165,71 @@
       <button class="btn btn-soft" id="p_clear">Clear Local</button>
     </div>
     <div id="p_result" style="margin-top:12px"></div>
-    <div style="margin-top:10px;color:#666;font-size:13px">
-      Tip: Share the QR or link with your guest. Guard can tap **Scan QR** on the Guards page.
-    </div>
   </section>
 </main>
 
-<!-- Lightbox -->
 <dialog id="lightbox"><img id="big" alt="Photo" style="max-width:90vw;max-height:80vh;display:block"/><div style="padding:10px;text-align:right"><button class="btn btn-soft" onclick="document.getElementById('lightbox').close()">Close</button></div></dialog>
 
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
-/* ========= CONFIG =========
-   - Works offline/local by default.
-   - To go LIVE, add your Airtable creds below (kept blank for now).
-*/
-const CONFIG = {
-  MODE: "local", // "local" or "airtable" (auto to airtable if apiKey+baseId are set)
-  AIR: {
-    apiKey: "",            // e.g., "patXXXXXXXX"
-    baseId: "",            // e.g., "appXXXXXXXX"
-    tables: {
-      bookings:    "Bookings",
-      complaints:  "Complaints",
-      notices:     "Notices",
-      visitors:    "Visitors",
-      preapprovals:"PreApprovals"
-    }
-  }
-};
-if (CONFIG.AIR.apiKey && CONFIG.AIR.baseId) CONFIG.MODE = "airtable";
+const CONFIG={MODE:"local"}; // live wiring later
+const $=id=>document.getElementById(id);
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const dlCSV=(rows,headers,f)=>{const out=[headers.join(",")];rows.forEach(r=>out.push(headers.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const blob=new Blob([out.join("\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=f;a.click();};
+const K={flat:"apts_flat",bookings:"apts_bookings",complaints:"apts_complaints",pre:"apts_pre",noticesRead:"apts_notices_read"};
+const read=k=>{try{return JSON.parse(localStorage.getItem(k)||"[]")}catch{return[]}};const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 
-// --- helpers ---
-const $ = id => document.getElementById(id);
-const todayISO = () => new Date().toISOString().slice(0,10);
-const dlCSV = (rows, headers, fname) => {
-  const out=[headers.join(",")];
-  rows.forEach(r => out.push(headers.map(h => `"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));
-  const blob=new Blob([out.join("\n")],{type:"text/csv"}), a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download=fname; a.click();
-};
+/* tabs */
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["bookings","complaints","notices","vlog","pre"].forEach(id=>$(id).classList.add("hide"));$(t.dataset.tab).classList.remove("hide");});
 
-// --- storage keys ---
-const K = {
-  flat: "apts_flat",
-  bookings: "apts_bookings",
-  complaints: "apts_complaints",
-  pre: "apts_pre",
-  noticesRead: "apts_notices_read" // ids marked read
-};
-const read = (k) => { try { return JSON.parse(localStorage.getItem(k)||"[]"); } catch { return []; } };
-const write = (k,v) => localStorage.setItem(k, JSON.stringify(v));
-
-// --- tab nav ---
-document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
-  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-  t.classList.add("active");
-  const name = t.dataset.tab;
-  ["bookings","complaints","notices","vlog","pre"].forEach(id => $(id).classList.add("hide"));
-  $(name).classList.remove("hide");
-});
-
-// --- Flat selector ---
+/* Flat save with active look */
 (function initFlat(){
-  const v = localStorage.getItem(K.flat)||"";
-  if(v) { $('flat').value=v; $('flatSaved').style.display='inline-block'; setTimeout(()=>$('flatSaved').style.display='none',1200); }
-  $('saveFlat').onclick = () => {
-    const x = $('flat').value.trim().toUpperCase();
-    if(!x){ alert("Enter your flat/block (e.g., A-302)"); return; }
-    localStorage.setItem(K.flat, x);
-    $('flatSaved').style.display='inline-block';
-    setTimeout(()=>$('flatSaved').style.display='none',1200);
-    loadVisitors(); // refresh filter
-  };
+  const input=$('flat'), btn=$('saveFlat');
+  const saved=(localStorage.getItem(K.flat)||"").toUpperCase();
+  if(saved){input.value=saved;$('flatSaved').style.display='inline-block';setTimeout(()=>$('flatSaved').style.display='none',1200);}
+  function sync(){const v=input.value.trim().toUpperCase();btn.className=(v&&v!==saved)?'btn btn-dark':'btn btn-soft';}
+  input.addEventListener('input',sync); sync();
+  btn.onclick=()=>{const v=input.value.trim().toUpperCase();if(!v){alert("Enter your flat/block (e.g., A-302)");return;}localStorage.setItem(K.flat,v);$('flatSaved').style.display='inline-block';setTimeout(()=>$('flatSaved').style.display='none',1200);loadVisitors();btn.className='btn btn-soft';};
 })();
 
-/* =======================
-   BOOKINGS (local now)
-======================= */
-const SLOTS = ["06:00 AM","06:30 AM","07:00 AM","07:30 AM","08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM"];
-(function initBooking(){
-  $('b_date').value = todayISO();
-  const s=$('slot'); s.innerHTML=""; SLOTS.forEach(t=>{const o=document.createElement('option');o.textContent=t;s.appendChild(o);});
-  renderBookings();
-})();
-function capOf(amenity){ const m=/cap\s*(\d+)/i.exec(amenity); return m?parseInt(m[1],10):999; }
-function bookings(){ return read(K.bookings); }
-function renderBookings(){
-  const rows=bookings(), tb=$('b_tbody'); tb.innerHTML="";
-  if(!rows.length){$('b_empty').style.display="block"; return;} else { $('b_empty').style.display="none"; }
-  rows.forEach(r=>{const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${r.date}</td><td>${r.slot}</td><td>${r.amenity}</td><td>${r.name}</td><td><a href="tel:${r.phone}">${r.phone}</a></td>`;
-    tb.appendChild(tr);
-  });
-}
-$('confirmBooking').onclick=()=>{
-  const amenity=$('amenity').value, date=$('b_date').value, slot=$('slot').value, name=$('b_name').value.trim(), phone=$('b_phone').value.trim();
-  if(!name || phone.length!==10){ alert("Enter valid name & 10-digit phone"); return; }
-  const rows=bookings();
-  if(rows.some(r=>r.date===date && r.slot===slot && r.amenity===amenity && r.phone===phone)) { alert("Already booked this slot."); return; }
-  const cap=capOf(amenity), taken=rows.filter(r=>r.date===date && r.slot===slot && r.amenity===amenity).length;
-  if(taken>=cap){ alert("Slot full. Pick another."); return; }
-  rows.push({amenity,date,slot,name,phone,ts:Date.now()});
-  write(K.bookings, rows); renderBookings(); alert("Booked ✅");
-};
-$('exportBookings').onclick=()=> dlCSV(bookings(), ["date","slot","amenity","name","phone"], "Apartment-Bookings.csv");
-$('clearBookings').onclick=()=>{ if(confirm("Clear all local bookings?")){ localStorage.removeItem(K.bookings); renderBookings(); } };
+/* Bookings */
+const SLOTS=["06:00 AM","06:30 AM","07:00 AM","07:30 AM","08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM"];
+$('b_date').value=todayISO(); const s=$('slot'); s.innerHTML=""; SLOTS.forEach(t=>{const o=document.createElement('option');o.textContent=t;s.appendChild(o);});
+function capOf(a){const m=/cap\s*(\d+)/i.exec(a);return m?parseInt(m[1],10):999;}
+function bookings(){return read(K.bookings);} function renderBookings(){const rows=bookings(),tb=$('b_tbody');tb.innerHTML="";if(!rows.length){$('b_empty').style.display="block";return;}$('b_empty').style.display="none";rows.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.date}</td><td>${r.slot}</td><td>${r.amenity}</td><td>${r.name}</td><td><a href="tel:${r.phone}">${r.phone}</a></td>`;tb.appendChild(tr);});}
+renderBookings();
+$('confirmBooking').onclick=()=>{const amenity=$('amenity').value,date=$('b_date').value,slot=$('slot').value,name=$('b_name').value.trim(),phone=$('b_phone').value.trim();if(!name||phone.length!==10){alert("Enter valid name & 10-digit phone");return;}const rows=bookings();if(rows.some(r=>r.date===date&&r.slot===slot&&r.amenity===amenity&&r.phone===phone)){alert("Already booked");return;}const cap=capOf(amenity),taken=rows.filter(r=>r.date===date&&r.slot===slot&&r.amenity===amenity).length;if(taken>=cap){alert("Slot full");return;}rows.push({amenity,date,slot,name,phone,ts:Date.now()});write(K.bookings,rows);renderBookings();alert("Booked ✅");};
+$('exportBookings').onclick=()=>dlCSV(bookings(),["date","slot","amenity","name","phone"],"Apartment-Bookings.csv");
+$('clearBookings').onclick=()=>{if(confirm("Clear local bookings?")){localStorage.removeItem(K.bookings);renderBookings();}};
 
-/* =======================
-   COMPLAINTS (local; photo)
-======================= */
-let c_stream=null, c_photo=null;
-$('c_open').onclick=async()=>{
-  try{ c_stream = await navigator.mediaDevices.getUserMedia({video:true}); $('c_preview').srcObject=c_stream; $('c_preview').style.display='block'; await $('c_preview').play(); $('c_snap').disabled=false; }
-  catch(e){ alert("Camera not available: "+e.message); }
-};
-$('c_snap').onclick=()=>{
-  const v=$('c_preview'), w=v.videoWidth, h=v.videoHeight;
-  $('c_canvas').width=w; $('c_canvas').height=h;
-  $('c_canvas').getContext('2d').drawImage(v,0,0,w,h);
-  c_photo = $('c_canvas').toDataURL('image/jpeg',0.8);
-  $('c_photoNote').style.display='inline-block';
-};
-function complaints(){ return read(K.complaints); }
-function renderComplaints(){
-  const rows=complaints(), tb=$('c_tbody'); tb.innerHTML="";
-  if(!rows.length){$('c_empty').style.display="block"; return;} else {$('c_empty').style.display="none";}
-  rows.slice().reverse().forEach((r,i)=>{
-    const img = r.photo ? `<img class="thumb" src="${r.photo}" data-i="${i}"/>` : '—';
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${new Date(r.ts).toLocaleString()}</td><td>${r.cat}</td><td>${r.pri}</td><td>${r.sub}</td><td><span class="pill">${r.status}</span></td><td>${img}</td>`;
-    tb.appendChild(tr);
-  });
-  tb.querySelectorAll('img.thumb').forEach(im=>im.onclick=()=>{ $('big').src=complaints().slice().reverse()[im.dataset.i].photo; $('lightbox').showModal(); });
-}
+/* Complaints (camera) */
+let c_stream=null,c_photo=null;
+$('c_open').onclick=async()=>{try{c_stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});}catch(e1){try{c_stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}catch(e2){alert("Camera blocked. Allow camera in Site settings and reload.");return;}}$('c_preview').srcObject=c_stream;$('c_preview').style.display='block';$('c_snap').disabled=false;await $('c_preview').play();};
+$('c_snap').onclick=()=>{const v=$('c_preview'),w=v.videoWidth||1280,h=v.videoHeight||720;$('c_canvas').width=w;$('c_canvas').height=h;$('c_canvas').getContext('2d').drawImage(v,0,0,w,h);c_photo=$('c_canvas').toDataURL('image/jpeg',0.8);$('c_photoNote').style.display='inline-block';};
+function complaints(){return read(K.complaints);} function renderComplaints(){const rows=complaints(),tb=$('c_tbody');tb.innerHTML="";if(!rows.length){$('c_empty').style.display="block";return}else{$('c_empty').style.display="none"}rows.slice().reverse().forEach((r,i)=>{const img=r.photo?`<img class="thumb" src="${r.photo}" data-i="${i}"/>`:'—';const tr=document.createElement('tr');tr.innerHTML=`<td>${new Date(r.ts).toLocaleString()}</td><td>${r.cat}</td><td>${r.pri}</td><td>${r.sub}</td><td><span class="pill">${r.status}</span></td><td>${img}</td>`;tb.appendChild(tr);});tb.querySelectorAll('img.thumb').forEach(im=>im.onclick=()=>{$('big').src=complaints().slice().reverse()[im.dataset.i].photo;$('lightbox').showModal();});}
 renderComplaints();
-$('c_submit').onclick=()=>{
-  const row={ cat:$('c_cat').value, pri:$('c_pri').value, sub:$('c_sub').value.trim(), name:$('c_name').value.trim(), body:$('c_body').value.trim(), status:"Pending", photo:c_photo, ts:Date.now() };
-  if(!row.sub || !row.name){ alert("Enter subject and your name"); return; }
-  const rows=complaints(); rows.push(row); write(K.complaints, rows); renderComplaints(); alert("Submitted ✅");
-  c_photo=null; $('c_photoNote').style.display='none';
-};
-$('c_export').onclick=()=> dlCSV(complaints(), ["ts","cat","pri","sub","status","name","body"], "Complaints.csv");
-$('c_clear').onclick=()=>{ if(confirm("Clear local complaints?")){ localStorage.removeItem(K.complaints); renderComplaints(); } };
-window.addEventListener('pagehide',()=>{ try{ if(c_stream){ c_stream.getTracks().forEach(t=>t.stop()); } }catch{} });
+$('c_submit').onclick=()=>{const row={cat:$('c_cat').value,pri:$('c_pri').value,sub:$('c_sub').value.trim(),name:$('c_name').value.trim(),body:$('c_body').value.trim(),status:"Pending",photo:c_photo,ts:Date.now()};if(!row.sub||!row.name){alert("Enter subject & name");return;}const rows=complaints();rows.push(row);write(K.complaints,rows);renderComplaints();alert("Submitted ✅");c_photo=null;$('c_photoNote').style.display='none';};
+$('c_export').onclick=()=>dlCSV(complaints(),["ts","cat","pri","sub","status","name","body"],"Complaints.csv");
+$('c_clear').onclick=()=>{if(confirm("Clear local complaints?")){localStorage.removeItem(K.complaints);renderComplaints();}}
+window.addEventListener('pagehide',()=>{try{if(c_stream){c_stream.getTracks().forEach(t=>t.stop());}}catch{}});
 
-/* =======================
-   NOTICES (local demo; Airtable-ready)
-======================= */
-const demoNotices = [
-  {id:"n1", title:"Water Tank Cleaning", body:"Water supply off 2–4 PM tomorrow.", ts: Date.now()-86400000},
-  {id:"n2", title:"Gym Maintenance", body:"Treadmill service on Saturday 10 AM.", ts: Date.now()-3600000}
-];
-function noticesLocal(){ return (JSON.parse(localStorage.getItem("apts_demo_notices")||"null")) || demoNotices; }
-function renderNotices(items){
-  const feed=$('n_feed'); feed.innerHTML=""; const readSet = new Set(read(K.noticesRead));
-  if(!items.length){ $('n_empty').style.display='block'; return; } else { $('n_empty').style.display='none'; }
-  items.slice().reverse().forEach(n=>{
-    const wrap=document.createElement("div"); wrap.className="card"; wrap.style.padding="12px";
-    const seen = readSet.has(n.id);
-    wrap.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
-      <div><div style="font-weight:700">${n.title}</div><div style="color:#555;margin-top:4px">${n.body}</div></div>
-      <div><span class="pill">${new Date(n.ts).toLocaleString()}</span><br/><button class="btn btn-soft markRead" data-id="${n.id}">${seen?"Read":"Mark Read"}</button></div>
-    </div>`;
-    feed.appendChild(wrap);
-  });
-  feed.querySelectorAll(".markRead").forEach(btn=>btn.onclick=()=>{
-    const set = new Set(read(K.noticesRead)); set.add(btn.dataset.id); write(K.noticesRead, Array.from(set)); renderNotices(items);
-  });
-}
-async function loadNotices(){
-  if(CONFIG.MODE!=="airtable"){ renderNotices(noticesLocal()); return; }
-  try{
-    const r = await fetch(`https://api.airtable.com/v0/${CONFIG.AIR.baseId}/${encodeURIComponent(CONFIG.AIR.tables.notices)}`,{
-      headers:{Authorization:`Bearer ${CONFIG.AIR.apiKey}`}
-    });
-    const j = await r.json();
-    const items = (j.records||[]).map(x=>({id:x.id, title:x.fields.Title||"Notice", body:x.fields.Body||"", ts: Date.parse(x.fields.Time)||Date.now()}));
-    renderNotices(items);
-  }catch{ renderNotices(noticesLocal()); }
-}
-loadNotices();
+/* Notices (demo) */
+const demoNotices=[{id:"n1",title:"Water Tank Cleaning",body:"Water supply off 2–4 PM tomorrow.",ts:Date.now()-86400000},{id:"n2",title:"Gym Maintenance",body:"Treadmill service on Saturday 10 AM.",ts:Date.now()-3600000}];
+function noticesLocal(){return (JSON.parse(localStorage.getItem("apts_demo_notices")||"null"))||demoNotices;}
+function renderNotices(items){const feed=$('n_feed');feed.innerHTML="";const readSet=new Set(read(K.noticesRead));if(!items.length){$('n_empty').style.display='block';return}else{$('n_empty').style.display='none'}items.slice().reverse().forEach(n=>{const wrap=document.createElement("div");wrap.className="card";wrap.style.padding="12px";const seen=readSet.has(n.id);wrap.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:700">${n.title}</div><div style="color:#555;margin-top:4px">${n.body}</div></div><div><span class="pill">${new Date(n.ts).toLocaleString()}</span><br/><button class="${seen?'btn btn-outline':'btn btn-dark'} markRead" data-id="${n.id}">${seen?'Read ✓':'Mark Read'}</button></div></div>`;feed.appendChild(wrap);});feed.querySelectorAll(".markRead").forEach(btn=>btn.onclick=()=>{const set=new Set(read(K.noticesRead));set.add(btn.dataset.id);write(K.noticesRead,Array.from(set));renderNotices(items);});}
+renderNotices(noticesLocal());
 
-/* =======================
-   VISITOR LOG (resident filter)
-======================= */
-function visitorsLocal(){ return (JSON.parse(localStorage.getItem("apts_visitors_v2")||"[]")); } // written by guards.html
-function renderVisitors(rows){
-  const tb=$('v_tbody'); tb.innerHTML="";
-  const myFlat = (localStorage.getItem(K.flat)||"").toUpperCase();
-  const filt = myFlat? rows.filter(r=>String(r.flat||"").toUpperCase()===myFlat) : [];
-  if(!filt.length){ $('v_empty').style.display='block'; return; } else { $('v_empty').style.display='none'; }
-  filt.forEach(r=>{
-    const img = r.photo ? `<img class="thumb" src="${r.photo}" alt="photo"/>` : '—';
-    const qr = r.qr ? `<code>${String(r.qr).slice(0,20)}${String(r.qr).length>20?'…':''}</code>` : '—';
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${new Date(r.ts).toLocaleString()}</td><td>${r.type||'—'}</td><td>${r.flat||'—'}</td>
-                  <td>${r.name||'—'}</td><td><a href="tel:${r.phone||''}">${r.phone||''}</a></td><td>${qr}</td><td>${img}</td>
-                  <td>
-                    <button class="btn btn-green btn-sm confirm">Confirm</button>
-                    <button class="btn btn-red btn-sm deny" style="margin-left:6px">Reject</button>
-                  </td>`;
-    tb.appendChild(tr);
-    const [confirmBtn, denyBtn] = tr.querySelectorAll('button');
-    confirmBtn.onclick=()=> { alert("Confirmed ✅ (demo: local only)"); };
-    denyBtn.onclick=()=> { const note=prompt("Reason/Note?"); alert("Rejected 🚫"+(note?` — ${note}`:"")); };
-    const thumb = tr.querySelector('img.thumb'); if(thumb){ thumb.onclick=()=>{ $('big').src=r.photo; $('lightbox').showModal(); }; }
-  });
-}
-async function loadVisitors(){
-  if(CONFIG.MODE!=="airtable"){ renderVisitors(visitorsLocal()); return; }
-  try{
-    const r = await fetch(`https://api.airtable.com/v0/${CONFIG.AIR.baseId}/${encodeURIComponent(CONFIG.AIR.tables.visitors)}?maxRecords=200&sort[0][field]=CreatedAt&sort[0][direction]=desc`,{
-      headers:{Authorization:`Bearer ${CONFIG.AIR.apiKey}`}
-    });
-    const j = await r.json();
-    const rows = (j.records||[]).map(x=>({
-      ts: Date.parse(x.fields.CreatedAt)||Date.now(),
-      type: x.fields.Type, flat: x.fields.Flat, name: x.fields.Name, phone: x.fields.Phone,
-      qr: x.fields.QR || "", photo: (x.fields.Photo && x.fields.Photo[0]?.url) || null, id: x.id
-    }));
-    renderVisitors(rows);
-  }catch{ renderVisitors(visitorsLocal()); }
-}
-loadVisitors();
+/* Visitor Log (local from guards) */
+function visitorsLocal(){return (JSON.parse(localStorage.getItem("apts_visitors_v2")||"[]")); }
+function renderVisitors(rows){const tb=$('v_tbody');tb.innerHTML="";const my=(localStorage.getItem(K.flat)||"").toUpperCase();const filt=my?rows.filter(r=>String(r.flat||"").toUpperCase()===my):[];if(!filt.length){$('v_empty').style.display='block';return}else{$('v_empty').style.display='none'}filt.forEach(r=>{const img=r.photo?`<img class="thumb" src="${r.photo}" alt="photo"/>`:'—';const qr=r.qr?`<code>${String(r.qr).slice(0,20)}${String(r.qr).length>20?'…':''}</code>`:'—';const tr=document.createElement('tr');tr.innerHTML=`<td>${new Date(r.ts).toLocaleString()}</td><td>${r.type||'—'}</td><td>${r.flat||'—'}</td><td>${r.name||'—'}</td><td><a href="tel:${r.phone||''}">${r.phone||''}</a></td><td>${qr}</td><td>${img}</td><td><button class="btn btn-green">Confirm</button> <button class="btn btn-red">Reject</button></td>`;tb.appendChild(tr);const thumb=tr.querySelector('img.thumb');if(thumb){thumb.onclick=()=>{$('big').src=r.photo;$('lightbox').showModal();};}});}
+function loadVisitors(){renderVisitors(visitorsLocal());} loadVisitors();
 
-/* =======================
-   PRE-APPROVAL (QR link)
-======================= */
-(function initPre(){
-  $('p_date').value = todayISO();
-})();
-function preLocal(){ return read(K.pre); }
-function renderPre(){ /* not listing here to keep UI compact */ }
-$('p_make').onclick=()=>{
-  const flat=(localStorage.getItem(K.flat)||"").toUpperCase();
-  const name=$('p_name').value.trim(), phone=$('p_phone').value.trim(), date=$('p_date').value, time=$('p_time').value.trim();
-  if(!flat){ alert("Save your Flat/Block at the top first."); return; }
-  if(!name||phone.length!==10){ alert("Enter visitor name & 10-digit phone"); return; }
-  const token = Math.random().toString(36).slice(2,8).toUpperCase();
-  const payload = {type:"PreApproval", flat, name, phone, date, time, token, ts:Date.now()};
-  const rows = preLocal(); rows.push(payload); write(K.pre, rows);
-  // Online QR (simple): uses qrserver.com; later we’ll move to offline QR lib
-  const data = encodeURIComponent(JSON.stringify(payload));
-  const link = location.origin + location.pathname.replace(/residents\.html.*/,'') + `guards.html#pre=${data}`;
-  const qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(link)}`;
-  $('p_result').innerHTML = `
-    <div class="row" style="align-items:center">
-      <div><img src="${qr}" alt="QR" style="width:220px;height:220px;border-radius:12px;border:1px solid #eee"/></div>
-      <div>
-        <div class="pill">Token: ${token}</div>
-        <div style="word-break:break-all"><small>${link}</small></div>
-        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn btn-soft" href="${qr}" download="PreApproval-QR.png">Download QR</a>
-          <button class="btn btn-soft" onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Link copied'))">Copy Link</button>
-        </div>
-      </div>
-    </div>`;
-};
-
-// (optional) export/clear pre-approvals
-$('p_export').onclick=()=> dlCSV(preLocal(), ["type","flat","name","phone","date","time","token","ts"], "PreApprovals.csv");
-$('p_clear').onclick=()=>{ if(confirm("Clear local pre-approvals?")){ localStorage.removeItem(K.pre); } };
-
+/* Pre-approval */
+$('p_date').value=todayISO();
+function preLocal(){return read(K.pre);}
+$('p_make').onclick=()=>{const flat=(localStorage.getItem(K.flat)||"").toUpperCase();const name=$('p_name').value.trim(),phone=$('p_phone').value.trim(),date=$('p_date').value,time=$('p_time').value.trim();if(!flat){alert("Save your Flat/Block first.");return;}if(!name||phone.length!==10){alert("Enter visitor name & 10-digit phone");return;}const token=Math.random().toString(36).slice(2,8).toUpperCase();const payload={type:"PreApproval",flat,name,phone,date,time,token,ts:Date.now()};const rows=preLocal();rows.push(payload);write(K.pre,rows);const data=encodeURIComponent(JSON.stringify(payload));const link=location.origin+location.pathname.replace(/residents\.html.*/,'')+`guards.html#pre=${data}`;const qr=`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(link)}`;$('p_result').innerHTML=`<div class="row" style="align-items:center"><div><img src="${qr}" alt="QR" style="width:220px;height:220px;border-radius:12px;border:1px solid #eee"/></div><div><div class="pill">Token: ${token}</div><div style="word-break:break-all"><small>${link}</small></div><div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-soft" href="${qr}" download="PreApproval-QR.png">Download QR</a><button class="btn btn-soft" onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Link copied'))">Copy Link</button></div></div></div>`;};
+$('p_export').onclick=()=>dlCSV(preLocal(),["type","flat","name","phone","date","time","token","ts"],"PreApprovals.csv");
+$('p_clear').onclick=()=>{if(confirm("Clear local pre-approvals?")){localStorage.removeItem(K.pre);}};
 </script>
 </body></html>
