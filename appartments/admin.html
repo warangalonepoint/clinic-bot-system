@@ -5,7 +5,8 @@
 </head><body>
 <div class="wrap">
   <div class="hero space">
-    <div>
+    <div style="flex:1">
+      <img src="./assets/banner.png" alt="" class="banner">
       <span class="pill">Admin</span>
       <h1>Settings</h1>
       <div class="sub">Update files, reset PIN (local demo)</div>
@@ -19,7 +20,7 @@
       <div><label>New PIN</label><input id="pin" placeholder="4 digits" maxlength="4" inputmode="numeric"></div>
       <div><label>&nbsp;</label><button id="savePin" class="btn">Save PIN</button></div>
     </div>
-    <div class="sub">This PIN can be used later to protect pages (e.g., Committee/Guard).</div>
+    <div class="sub">This PIN protects Guards/Committee/Admin pages.</div>
   </div>
 
   <div class="card">
@@ -34,16 +35,22 @@
 
 <script src="storage.js"></script>
 <script>
+// If a PIN already exists, ask for it to open Admin too:
+if(hasPin() && !promptPinOnce()){ history.back(); }
+
+// Save/reset PIN
 savePin.onclick=()=>{
   const p=pin.value.trim(); if(!/^\d{4}$/.test(p)){ toast('Enter 4 digits'); return; }
-  const cfg=getAdmin(); cfg.pin=p; setAdmin(cfg); toast('PIN saved');
+  const cfg=getAdmin(); cfg.pin=p; setAdmin(cfg); pin.value=''; toast('PIN saved');
 };
+
 exportAll.onclick=()=>{
   const dump = {};
   for(const k of Object.values(DB)){ dump[k] = localStorage.getItem(k) || '[]'; }
   const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='apartment_dump.json'; a.click();
 };
+
 clearAll.onclick=()=>{
   if(confirm('Clear ALL local data on this device?')){
     for(const k of Object.values(DB)) localStorage.removeItem(k);
