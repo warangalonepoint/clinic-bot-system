@@ -1,150 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Booking Logs | Onestop C-Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Local Bookings Log — Demo</title>
   <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 8px;
-      text-align: left;
-    }
-    .search-box {
-      margin: 10px 0;
-    }
-    .search-box input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-    }
-    button {
-      padding: 6px 12px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+    body{font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;margin:0;background:#f6f7fb;color:#0f1222}
+    .wrap{max-width:860px;margin:24px auto;padding:16px}
+    h1{font-size:24px;margin:10px 0}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.06)}
+    th,td{padding:10px 12px;border-bottom:1px solid #eee;text-align:left}
+    th{background:#f9fafb;font-weight:700}
+    tr:last-child td{border-bottom:0}
+    .row{display:flex;gap:10px;margin:12px 0 18px}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #ddd;background:#fff;cursor:pointer}
+    .danger{background:#111;color:#fff;border-color:#111}
+    .muted{color:#6b7280}
+    a{color:#5b4bff;text-decoration:none}
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="assets/banner.png" class="banner" />
-    <h2>Booking Logs</h2>
-
-    <div class="search-box">
-      <input type="text" id="search" placeholder="Search by name, reason or contact">
+  <div class="wrap">
+    <h1>Local Bookings (this device only)</h1>
+    <div class="row">
+      <a href="./manual-bookings.html">← Back to booking</a>
+      <button class="danger" id="clearAll">Clear All</button>
     </div>
-
-    <button onclick="downloadCSV()">Export CSV</button>
-    <div style="overflow-x:auto;">
-      <table id="logsTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Patient</th>
-            <th>Slot</th>
-            <th>Reason</th>
-            <th>Contact</th>
-            <th>Token</th>
-            <th>Reminder</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <p class="footer">Powered by Onestop AI</p>
+    <div class="muted">Key: <code>onestop_bookings_v3</code></div>
+    <table id="tbl">
+      <thead>
+        <tr><th>Patient</th><th>Phone</th><th>Date</th><th>Time</th><th>Token</th><th></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
   <script>
-    const apiKey = "YOUR_API_KEY_HERE";
-    const baseId = "appgplT8WiqnZlR44Y";
-    const bookingsTable = "BookingsLogs";
-    const headers = { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" };
-    let logsData = [];
+    const KEY='onestop_bookings_v3';
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch{return[]} }
+    function save(v){ localStorage.setItem(KEY, JSON.stringify(v)); }
+    function fmtPretty(iso){ const d=new Date(iso); return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }
 
-    async function loadLogs() {
-      const res = await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}?maxRecords=500&sort[0][field]=Timestamp&sort[0][direction]=desc`, { headers });
-      const data = await res.json();
-      logsData = data.records;
-      renderLogs(logsData);
-    }
-
-    function renderLogs(data) {
-      const tbody = document.querySelector("#logsTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(record => {
-        const f = record.fields;
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${(f["Slot Time"] || "").split(" ")[0]}</td>
-          <td>${f["Patient Name"] || ""}</td>
-          <td>${(f["Slot Time"] || "").split(" ")[1]}</td>
-          <td>${f["Reason"] || ""}</td>
-          <td><a href="tel:${f["Contact"] || ""}">${f["Contact"] || ""}</a></td>
-          <td>${f["Token"] || ""}</td>
-          <td>
-            ${f["Reminder Sent"] === "✔️" ? "✔️" : `<button onclick="sendReminder('${record.id}', '${f["Contact"]}', '${f["Patient Name"]}', '${f["Slot Time"]}', '${f["Reason"]}', '${f["Token"]}')">Send</button>`}
-          </td>
+    function render(){
+      const data = load().sort((a,b)=> (a.date+b.time).localeCompare(b.date+b.time));
+      const tb = document.querySelector('#tbl tbody');
+      tb.innerHTML = data.length ? '' : `<tr><td colspan="6" class="muted">No local bookings</td></tr>`;
+      data.forEach((r,i)=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.name||''}</td>
+          <td>${r.phone||''}</td>
+          <td>${fmtPretty(r.date)}</td>
+          <td>${r.time}</td>
+          <td>${r.token}</td>
+          <td><button data-i="${i}">Delete</button></td>
         `;
-        tbody.appendChild(row);
+        tb.appendChild(tr);
+      });
+      tb.querySelectorAll('button[data-i]').forEach(btn=>{
+        btn.onclick = ()=>{
+          const idx=+btn.dataset.i; const arr=load(); arr.splice(idx,1); save(arr); render();
+        };
       });
     }
-
-    async function sendReminder(id, contact, name, slot, reason, token) {
-      const msg = `Hello ${name},\nThis is a reminder for your appointment on ${slot} for "${reason}".\nToken No: ${token}\n- Onestop Clinic`;
-      const url = `https://wa.me/91${contact}?text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
-
-      await fetch(`https://api.airtable.com/v0/${baseId}/${bookingsTable}/${id}`, {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify({ fields: { "Reminder Sent": "✔️" } })
-      });
-
-      loadLogs();
-    }
-
-    function downloadCSV() {
-      let csv = "Date,Patient,Slot,Reason,Contact,Token,Reminder Sent\n";
-      logsData.forEach(record => {
-        const f = record.fields;
-        csv += [
-          (f["Slot Time"] || "").split(" ")[0],
-          `"${f["Patient Name"] || ""}"`,
-          (f["Slot Time"] || "").split(" ")[1],
-          `"${f["Reason"] || ""}"`,
-          f["Contact"] || "",
-          f["Token"] || "",
-          f["Reminder Sent"] || ""
-        ].join(",") + "\n";
-      });
-
-      const blob = new Blob([csv], { type: "text/csv" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "booking-logs.csv";
-      link.click();
-    }
-
-    document.getElementById("search").addEventListener("input", (e) => {
-      const term = e.target.value.toLowerCase();
-      const filtered = logsData.filter(r =>
-        (r.fields["Patient Name"] || "").toLowerCase().includes(term) ||
-        (r.fields["Reason"] || "").toLowerCase().includes(term) ||
-        (r.fields["Contact"] || "").toLowerCase().includes(term)
-      );
-      renderLogs(filtered);
-    });
-
-    loadLogs();
+    document.getElementById('clearAll').onclick = ()=>{
+      if(confirm('Clear ALL local demo bookings on this device?')){ localStorage.removeItem(KEY); render(); }
+    };
+    render();
   </script>
 </body>
 </html>
