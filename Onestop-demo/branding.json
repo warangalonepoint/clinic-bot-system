@@ -1,7 +1,12 @@
 {
-  "clinicName": "Onestop C-Demo",
-  "logoPath": "assets/logo.png",
-  "bannerPath": "assets/banner.png",
-  "primaryColor": "#000000",
-  "theme": "light"
+  "airtable": {
+    "apiKey": "patXXXXXXXXXXXX",
+    "baseId": "appXXXXXXXXXXXX",
+    "tables": { "slots": "AvailableSlots", "logs": "BookingsLogs" },
+    "views": { "slotsView": "AvailableSlots" },
+    "fields": {
+      "slots": { "Date": "Date", "Time": "Time Slot", "Status": "Status" },
+      "logs":  { "Name": "Patient Name", "Contact": "Contact", "SlotTime": "Slot Time", "Token": "Token" }
+    }
+  }
 }
