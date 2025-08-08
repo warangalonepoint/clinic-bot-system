@@ -11,13 +11,16 @@
   @media(max-width:860px){.grid{grid-template-columns:1fr}}
   table{width:100%;border-collapse:collapse}
   th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
-  .iconbtn{display:inline-flex;align-items:center;gap:8px;justify-content:center}
-  .iconbtn img{width:18px;height:18px;border-radius:4px}
   .muted{color:#666}
   .hero{padding:0;overflow:hidden}
   .banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
-  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer}
+  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-decoration:none;text-align:center}
   input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+  /* Quick links: force two per row even on mobile */
+  .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:360px){.ql-2{grid-template-columns:1fr 1fr}}
+  .iconbtn{display:inline-flex;align-items:center;gap:10px;justify-content:center}
+  .iconbtn img{width:18px;height:18px;border-radius:4px}
 </style>
 </head><body>
 <script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();</script>
@@ -29,9 +32,9 @@
     <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
   </div>
 
-  <!-- Quick Links (2 per row) -->
+  <!-- Quick Links (2 per row, black buttons) -->
   <div class="card" style="margin-top:12px">
-    <div class="grid">
+    <div class="ql-2">
       <a class="btn iconbtn" href="./doctor.html"><img src="./assets/doctor.png" onerror="this.style.display='none'">Doctor/Manager</a>
       <a class="btn iconbtn" href="./booking.html"><img src="./assets/booking.png" onerror="this.style.display='none'">Booking Bot</a>
       <a class="btn iconbtn" href="./staff.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Staff</a>
@@ -161,13 +164,8 @@ function parseBreaks(str){ return (str||"").split(",").map(s=>s.trim()).filter(B
 function mins(hhmm){const [h,m]=hhmm.split(":").map(Number);return h*60+m;}
 function hhmm(m){const h=String(Math.floor(m/60)).padStart(2,"0");const mm=String(m%60).padStart(2,"0");return `${h}:${mm}`;}
 
-function loadSlots(date){
-  const arr=jget(slKey(date));
-  return Array.isArray(arr)?arr:[];
-}
-function saveSlots(date,rows){
-  jset(slKey(date),rows);
-}
+function loadSlots(date){ const arr=jget(slKey(date)); return Array.isArray(arr)?arr:[]; }
+function saveSlots(date,rows){ jset(slKey(date),rows); }
 
 function renderSlots(){
   const d=$("sl_date").value||today();
