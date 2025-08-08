@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Onestop Apartments — Visitors</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<style>
+  :root{--bg:#f6f7fb;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--brand:#111827;--ok:#16a34a;--bad:#ef4444;}
+  *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;}
+  body{margin:0;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:720px;margin:24px auto;padding:0 16px}
+  .hero{background:linear-gradient(180deg,#f1f5ff,#fff);border:1px solid #e5e7eb;border-radius:16px;padding:18px 16px;margin-bottom:16px}
+  h1{margin:4px 0 8px;font-size:28px}
+  .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#eef2ff;border:1px solid #e5e7eb;color:#3730a3;font-weight:600;font-size:13px}
+  .card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;padding:16px;margin:16px 0}
+  label{display:block;font-size:13px;color:var(--muted);margin:8px 0 6px}
+  input,select,textarea{width:100%;padding:14px 12px;border:1px solid #e5e7eb;border-radius:12px;font-size:16px;background:#fff;outline:none}
+  textarea{min-height:84px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:14px 16px;border-radius:12px;border:1px solid #111827;background:var(--brand);color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+  .btn.secondary{background:#11182710;color:#111827;border-color:#cbd5e1}
+  .btn.danger{background:var(--bad);border-color:var(--bad)}
+  .list{display:flex;flex-direction:column;gap:12px}
+  .item{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px 12px;display:grid;grid-template-columns:1fr auto;gap:8px}
+  .meta{color:var(--muted);font-size:13px}
+  .tok{font-weight:700;letter-spacing:.4px}
+  .actions{display:flex;gap:8px}
+  .hint{color:var(--muted);font-size:13px}
+  .topbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  a{text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="topbar">
+      <a href="./index.html" class="btn secondary">← Back</a>
+      <span class="pill">Visitor Pass — offline demo</span>
+    </div>
+    <h1>Visitors</h1>
+    <div class="hint">Create a visitor pass. A short token is generated; you can copy/share the pass text to security.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Create Visitor</h3>
+    <div class="row">
+      <div>
+        <label>Resident / Flat</label>
+        <input id="resident" placeholder="e.g., A-504 • Ramesh" />
+      </div>
+      <div>
+        <label>Visitor Name</label>
+        <input id="visitor" placeholder="e.g., Suresh Kumar" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Phone</label>
+        <input id="phone" inputmode="numeric" maxlength="10" placeholder="10-digit number" />
+      </div>
+      <div>
+        <label>Date</label>
+        <input id="date" type="date" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Time</label>
+        <input id="time" type="time" />
+      </div>
+      <div>
+        <label>Vehicle (optional)</label>
+        <input id="vehicle" placeholder="e.g., TS09 AB 1234" />
+      </div>
+    </div>
+    <label>Purpose / Notes (optional)</label>
+    <textarea id="purpose" placeholder="Delivery, guest, maintenance…"></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn" id="createBtn">Create Pass</button>
+      <button class="btn secondary" id="clearBtn">Clear All</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">Upcoming Visitors</h3>
+    <div class="list" id="list"></div>
+    <div class="hint" id="emptyHint">No visitors yet.</div>
+  </div>
+</div>
+
+<script>
+  // ---------- storage ----------
+  const KEY = 'onestop_visitors_v1';
+  const nowISO = () => new Date().toISOString();
+
+  function loadAll(){
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+    catch { return []; }
+  }
+  function saveAll(arr){ localStorage.setItem(KEY, JSON.stringify(arr)); }
+
+  // ---------- helpers ----------
+  function shortToken(){
+    // 4-char base36 + last 2 of ms => easy to read, not security
+    const a = Math.random().toString(36).slice(2,6).toUpperCase();
+    const b = (Date.now()%100).toString().padStart(2,'0');
+    return a + b;
+  }
+  function fmtDate(d){ try{
+    const dt = new Date(d + 'T00:00:00'); 
+    return dt.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  }catch{return d}}
+  function fmtTime(t){ 
+    try{
+      const [h,m]=t.split(':').map(Number);
+      const d=new Date(); d.setHours(h,m,0,0);
+      return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }catch{return t}
+  }
+  function passText(v){
+    return `Onestop Visitor Pass
+Resident: ${v.resident}
+Visitor: ${v.visitor} (${v.phone})
+Date: ${fmtDate(v.date)}  Time: ${fmtTime(v.time)}
+Token: ${v.token}
+Vehicle: ${v.vehicle||'-'}
+Purpose: ${v.purpose||'-'}
+
+Show this token at the gate.`;
+  }
+
+  // ---------- UI ----------
+  const els = {
+    resident: document.getElementById('resident'),
+    visitor:  document.getElementById('visitor'),
+    phone:    document.getElementById('phone'),
+    date:     document.getElementById('date'),
+    time:     document.getElementById('time'),
+    vehicle:  document.getElementById('vehicle'),
+    purpose:  document.getElementById('purpose'),
+    list:     document.getElementById('list'),
+    empty:    document.getElementById('emptyHint'),
+    create:   document.getElementById('createBtn'),
+    clear:    document.getElementById('clearBtn'),
+  };
+
+  // defaults
+  const today = new Date(); 
+  els.date.value = today.toISOString().slice(0,10);
+  els.time.value = '10:00';
+
+  function render(){
+    const data = loadAll().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+    els.list.innerHTML = '';
+    els.empty.style.display = data.length ? 'none' : 'block';
+
+    for(const v of data){
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div>
+          <div style="font-weight:700">${v.visitor}</div>
+          <div class="meta">${fmtDate(v.date)} • ${fmtTime(v.time)}</div>
+          <div class="meta">Resident: ${v.resident} • Phone: ${v.phone}</div>
+          <div class="meta">Token: <span class="tok">${v.token}</span></div>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" data-copy="${v.id}">Copy Pass</button>
+          <button class="btn danger" data-del="${v.id}">Delete</button>
+        </div>`;
+      els.list.appendChild(div);
+    }
+  }
+
+  els.list.addEventListener('click', async (e)=>{
+    const idCopy = e.target.getAttribute('data-copy');
+    const idDel  = e.target.getAttribute('data-del');
+    if(idCopy){
+      const all = loadAll(); const v = all.find(x=>x.id===idCopy);
+      if(v){
+        try{ await navigator.clipboard.writeText(passText(v)); alert('Pass copied'); }
+        catch{ prompt('Copy this pass:', passText(v)); }
+      }
+    }
+    if(idDel){
+      const all = loadAll().filter(x=>x.id!==idDel);
+      saveAll(all); render();
+    }
+  });
+
+  els.create.addEventListener('click', ()=>{
+    const v = {
+      id: crypto.randomUUID(),
+      resident: els.resident.value.trim(),
+      visitor:  els.visitor.value.trim(),
+      phone:    els.phone.value.trim(),
+      date:     els.date.value,
+      time:     els.time.value,
+      vehicle:  els.vehicle.value.trim(),
+      purpose:  els.purpose.value.trim(),
+      token:    shortToken(),
+      createdAt: nowISO(),
+    };
+    if(!v.resident || !v.visitor || !v.phone || !v.date || !v.time){
+      alert('Please fill Resident, Visitor, Phone, Date and Time.'); return;
+    }
+    const all = loadAll(); all.push(v); saveAll(all);
+    // clear a few fields for next entry
+    els.visitor.value=''; els.phone.value=''; els.vehicle.value=''; els.purpose.value='';
+    render();
+    // show pass
+    alert(passText(v));
+  });
+
+  els.clear.addEventListener('click', ()=>{
+    if(confirm('Clear ALL visitors on this device?')){ localStorage.removeItem(KEY); render(); }
+  });
+
+  render();
+</script>
+</body>
+</html>
