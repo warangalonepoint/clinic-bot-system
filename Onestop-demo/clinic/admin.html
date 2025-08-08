@@ -10,6 +10,7 @@ main{max-width:1000px;margin:16px auto;padding:16px}
 table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
 .iconbtn{display:inline-flex;align-items:center;gap:8px}
 .iconbtn img{width:18px;height:18px;border-radius:4px}
+.muted{color:#666}
 </style></head><body>
 <script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();</script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
@@ -17,16 +18,57 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
 <main>
   <img class="banner" src="./assets/clinic_banner.png" alt="Clinic"/>
 
+  <!-- Quick Links -->
   <div class="card" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Quick Links</h2>
     <div class="grid">
-      <a class="btn iconbtn" href="./doctor.html"><img src="./assets/icons/doctor.png" onerror="this.style.display='none'">Doctor/Manager</a>
-      <a class="btn iconbtn" href="./booking.html"><img src="./assets/icons/book.png" onerror="this.style.display='none'">Booking Bot</a>
-      <a class="btn iconbtn" href="./index.html"><img src="./assets/icons/home.png" onerror="this.style.display='none'">Back to PIN</a>
-      <a class="btn iconbtn" href="./reset.html"><img src="./assets/icons/reset.png" onerror="this.style.display='none'">Reset Cache</a>
+      <a class="btn iconbtn" href="./doctor.html"><img src="./assets/doctor.png" onerror="this.style.display='none'">Doctor/Manager</a>
+      <a class="btn iconbtn" href="./booking.html"><img src="./assets/booking.png" onerror="this.style.display='none'">Booking Bot</a>
+      <a class="btn iconbtn" href="./index.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Back to PIN</a>
+      <a class="btn iconbtn" href="./reset.html"><img src="./assets/reset.png" onerror="this.style.display='none'">Reset Cache</a>
     </div>
   </div>
 
+  <!-- Walk-in Register (Front Desk) -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Walk-in Register (Front Desk)</h2>
+    <div class="grid">
+      <label>Name <input id="q_name" placeholder="Full name"></label>
+      <label>Phone <input id="q_phone" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
+      <label>Age <input id="q_age" inputmode="numeric" maxlength="3" placeholder="Years"></label>
+      <label>Complaint <input id="q_comp" placeholder="Reason for visit"></label>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn iconbtn" id="q_add"><img src="./assets/doctor.png" onerror="this.style.display='none'">Add to Queue</button>
+      <button class="btn iconbtn" id="q_export"><img src="./assets/booking.png" onerror="this.style.display='none'">Export Queue CSV</button>
+      <button class="btn iconbtn" id="q_clear"><img src="./assets/reset.png" onerror="this.style.display='none'">Clear Local Queue</button>
+    </div>
+    <div style="margin-top:10px;overflow:auto">
+      <table><thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Age</th><th>Complaint</th><th>Token*</th></tr></thead><tbody id="q_tbody"></tbody></table>
+      <div class="muted">* Token is assigned automatically by the Doctor view (per-day sequence).</div>
+    </div>
+  </div>
+
+  <!-- Appointments (Front Desk) -->
+  <div class="card" style="margin-top:12px">
+    <h2 style="margin:0 0 8px">Create Appointment (Front Desk)</h2>
+    <div class="grid">
+      <label>Date <input id="a_date" type="date"></label>
+      <label>Time <input id="a_time" type="time"></label>
+      <label>Patient Name <input id="a_name"></label>
+      <label>Phone <input id="a_phone" inputmode="numeric" maxlength="10"></label>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn iconbtn" id="a_add"><img src="./assets/booking.png" onerror="this.style.display='none'">Create Appointment</button>
+      <button class="btn iconbtn" id="a_export"><img src="./assets/booking.png" onerror="this.style.display='none'">Export Appointments CSV</button>
+    </div>
+    <div style="margin-top:10px;overflow:auto">
+      <table><thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Phone</th><th>Status</th></tr></thead><tbody id="a_tbody"></tbody></table>
+      <div id="a_empty" class="muted">No appointments.</div>
+    </div>
+  </div>
+
+  <!-- Services Master -->
   <div class="card" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Services Master</h2>
     <div class="grid">
@@ -34,9 +76,9 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
       <label>Price (₹) <input id="s_price" inputmode="numeric" placeholder="500"></label>
     </div>
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn iconbtn" id="s_add"><img src="./assets/icons/add.png" onerror="this.style.display='none'">Add Service</button>
-      <button class="btn iconbtn" id="s_export"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export CSV</button>
-      <button class="btn iconbtn" id="s_clear"><img src="./assets/icons/clear.png" onerror="this.style.display='none'">Clear Local</button>
+      <button class="btn iconbtn" id="s_add"><img src="./assets/admin.png" onerror="this.style.display='none'">Add Service</button>
+      <button class="btn iconbtn" id="s_export"><img src="./assets/booking.png" onerror="this.style.display='none'">Export CSV</button>
+      <button class="btn iconbtn" id="s_clear"><img src="./assets/reset.png" onerror="this.style.display='none'">Clear Local</button>
     </div>
     <div style="margin-top:10px;overflow:auto">
       <table><thead><tr><th>Name</th><th>Price</th></tr></thead><tbody id="s_tbody"></tbody></table>
@@ -44,39 +86,111 @@ table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px 
     </div>
   </div>
 
+  <!-- Reports -->
   <div class="card" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Reports (Local)</h2>
     <div class="grid">
-      <button class="btn iconbtn" id="r_day"><img src="./assets/icons/report.png" onerror="this.style.display='none'">Today’s Summary</button>
-      <button class="btn iconbtn" id="r_exportAll"><img src="./assets/icons/csv.png" onerror="this.style.display='none'">Export ALL CSV</button>
+      <button class="btn iconbtn" id="r_day"><img src="./assets/admin.png" onerror="this.style.display='none'">Today’s Summary</button>
+      <button class="btn iconbtn" id="r_exportAll"><img src="./assets/booking.png" onerror="this.style.display='none'">Export ALL CSV</button>
     </div>
     <div id="r_out" style="margin-top:8px;color:#333"></div>
   </div>
 
+  <!-- PINs -->
   <div class="card" style="margin-top:12px">
     <h2 style="margin:0 0 8px">PINs</h2>
-    <p>Current PINs from <code>pins.json</code>.</p>
+    <p>Loaded from <code>pins.json</code>.</p>
     <pre id="pinsBox" style="background:#f7f7f7;padding:10px;border-radius:12px;overflow:auto"></pre>
   </div>
 </main>
 
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-const $=id=>document.getElementById(id); const K={services:"cl_s",appts:"cl_a",queue:"cl_q",visits:"cl_v",bills:"cl_b"};
-const jget=k=>JSON.parse(localStorage.getItem(k)||"[]"); const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 
-// Services
-function renderS(){const rows=jget(K.services);const tb=$("s_tbody");tb.innerHTML="";if(!rows.length){$("s_empty").style.display="block";return}$("s_empty").style.display="none";rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.name}</td><td>₹${r.price}</td>`;tb.appendChild(tr);});}
-$("s_add").onclick=()=>{const name=$("s_name").value.trim(), price=+($("s_price").value||0); if(!name||price<=0){alert("Enter service & price");return} const rows=jget(K.services);rows.push({name,price});jset(K.services,rows);renderS();}
+// ---------- helpers ----------
+const $=id=>document.getElementById(id);
+const K={services:"cl_s",appts:"cl_a",queue:"cl_q"};
+const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const csv=(rows,heads,name)=>{
+  const out=[heads.join(",")];
+  rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));
+  a.download=name;a.click();
+};
+const today=()=>new Date().toISOString().slice(0,10);
+
+// ---------- Walk-ins ----------
+function renderQ(){
+  const rows=jget(K.queue);
+  const tb=$("q_tbody"); tb.innerHTML="";
+  rows.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.age}</td><td>${r.comp}</td><td>${r.token||"—"}</td>`;
+    tb.appendChild(tr);
+  });
+}
+$("q_add").onclick=()=>{const name=$("q_name").value.trim(),phone=$("q_phone").value.trim(),age=$("q_age").value.trim(),comp=$("q_comp").value.trim();
+  if(!name||phone.length!==10){alert("Enter name & 10-digit phone");return}
+  const rows=jget(K.queue); rows.push({name,phone,age,comp,ts:Date.now()}); jset(K.queue,rows); renderQ();
+};
+$("q_export").onclick=()=>csv(jget(K.queue),["name","phone","age","comp","ts"],"Queue.csv");
+$("q_clear").onclick=()=>{if(confirm("Clear queue on this device?")){localStorage.removeItem(K.queue);renderQ();}};
+renderQ();
+
+// ---------- Appointments ----------
+const aDate=$("a_date"); if(aDate) aDate.value=today();
+function renderA(){
+  const rows=jget(K.appts);
+  const tb=$("a_tbody"); tb.innerHTML="";
+  if(!rows.length){$("a_empty").style.display="block"} else {$("a_empty").style.display="none"}
+  rows.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  rows.forEach(r=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${r.date}</td><td>${r.time}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.status||"Booked"}</td>`;
+    tb.appendChild(tr);
+  });
+}
+$("a_add").onclick=()=>{const date=$("a_date").value,time=$("a_time").value,name=$("a_name").value.trim(),phone=$("a_phone").value.trim();
+  if(!date||!time||!name||phone.length!==10){alert("Fill all fields");return}
+  const rows=jget(K.appts); rows.push({date,time,name,phone,status:"Booked",ts:Date.now()}); jset(K.appts,rows); renderA();
+};
+$("a_export").onclick=()=>csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");
+renderA();
+
+// ---------- Services ----------
+function renderS(){
+  const rows=jget(K.services);
+  const tb=$("s_tbody"); tb.innerHTML="";
+  if(!rows.length){$("s_empty").style.display="block"} else {$("s_empty").style.display="none"}
+  rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${r.name}</td><td>₹${r.price}</td>`;tb.appendChild(tr);});
+}
+$("s_add").onclick=()=>{const name=$("s_name").value.trim(), price=+($("s_price").value||0);
+  if(!name||price<=0){alert("Enter service & price");return}
+  const rows=jget(K.services); rows.push({name,price}); jset(K.services,rows); renderS();
+};
 $("s_export").onclick=()=>csv(jget(K.services),["name","price"],"Services.csv");
-$("s_clear").onclick=()=>{if(confirm("Clear local services?")){localStorage.removeItem(K.services);renderS();}}; renderS();
+$("s_clear").onclick=()=>{if(confirm("Clear local services?")){localStorage.removeItem(K.services);renderS();}};
+renderS();
 
-// Reports
-$("r_day").onclick=()=>{const today=(new Date).toISOString().slice(0,10); const ap=jget(K.appts).filter(a=>a.date===today).length; const q=jget(K.queue).length; const rev=jget(K.bills).filter(b=>new Date(b.ts).toISOString().slice(0,10)===today).reduce((s,b)=>s+Number(b.amt||0),0); $("r_out").textContent=`Today: Appointments ${ap}, Walk-ins in queue ${q}, Revenue ₹${rev}`; };
-$("r_exportAll").onclick=()=>{csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");csv(jget(K.queue),["name","phone","age","comp","token","ts"],"Queue.csv");csv(jget(K.visits),["name","phone","bp","pulse","dx","rx","ts"],"Visits.csv");csv(jget(K.bills),["ts","name","phone","service","amt"],"Bills.csv");};
+// ---------- Reports ----------
+$("r_day").onclick=()=>{
+  const d=today();
+  const ap=jget(K.appts).filter(a=>a.date===d).length;
+  const q=jget(K.queue).filter(x=>new Date(x.ts).toISOString().slice(0,10)===d).length;
+  $("r_out").textContent=`Today — Appointments: ${ap}, Walk-ins in queue: ${q}`;
+};
+$("r_exportAll").onclick=()=>{
+  csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");
+  csv(jget(K.queue),["name","phone","age","comp","ts"],"Queue.csv");
+  csv(jget(K.services),["name","price"],"Services.csv");
+};
 
-// PINs
-fetch("./pins.json",{cache:"no-store"}).then(r=>r.json()).then(p=>{$("pinsBox").textContent=JSON.stringify(p,null,2)}).catch(()=>{$("pinsBox").textContent="Could not load pins.json";});
+// ---------- PINs ----------
+fetch("./pins.json",{cache:"no-store"})
+  .then(r=>r.json())
+  .then(p=>{$("pinsBox").textContent=JSON.stringify(p,null,2)})
+  .catch(()=>{$("pinsBox").textContent="Could not load pins.json";});
 </script>
 </body></html>
