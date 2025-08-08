@@ -6,33 +6,50 @@
 <meta name="theme-color" content="#111"/>
 <style>
   main{max-width:720px;margin:16px auto;padding:16px}
-  .hero{padding:0;overflow:hidden}.banner{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+  /* Polished banner/header */
   .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+  .banner{width:100%;height:180px;object-fit:cover;display:block}
+  @media(max-width:560px){.banner{height:140px}}
+  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* Form + buttons */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
   input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;width:100%}
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;width:100%;text-align:center;text-decoration:none}
   .row{display:flex;gap:10px;flex-wrap:wrap}
   .muted{color:#666}
   .ok{color:#0d7c66}
+
+  /* Quick links: black buttons, two per row */
+  .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:360px){.ql-2{grid-template-columns:1fr 1fr}}
   .iconbtn{display:flex;align-items:center;gap:10px;justify-content:center}
   .iconbtn img{width:22px;height:22px;border-radius:6px}
 </style>
 </head><body>
 <main>
-  <!-- Banner -->
+  <!-- Polished banner -->
   <div class="card hero">
     <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/booking.png'">
+      <div class="hero-title">Book an Appointment</div>
+    </div>
   </div>
 
   <!-- Booking form -->
   <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 6px">Book an Appointment</h2>
-    <p class="muted" style="margin-bottom:8px">Pick a date & time. Only free slots show up. You’ll get a WhatsApp confirmation.</p>
+    <h2 style="margin:0 0 6px">Choose slot & confirm</h2>
+    <p class="muted" style="margin-bottom:8px">Only free, open slots are shown. You’ll get a WhatsApp confirmation.</p>
     <div class="grid">
       <label>Date <input id="d" type="date"></label>
-      <label>Time Slot
-        <select id="t"></select>
-      </label>
+      <label>Time Slot <select id="t"></select></label>
       <label>Name <input id="n" placeholder="Full name"></label>
       <label>Phone <input id="p" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
     </div>
@@ -46,13 +63,13 @@
       </a>
     </div>
     <div id="hint" class="muted" style="margin-top:8px;display:none">
-      Tip: Save this page to your Home Screen (PWA) for faster booking next time.
+      Tip: Add this to Home Screen to book even faster next time.
     </div>
   </div>
 
   <!-- Tools -->
   <div class="card" style="margin-top:12px">
-    <div class="grid">
+    <div class="ql-2">
       <a class="btn iconbtn" href="./index.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Back to PIN</a>
       <a class="btn iconbtn" href="./doctor.html"><img src="./assets/doctor.png" onerror="this.style.display='none'">Doctor View</a>
     </div>
@@ -64,8 +81,7 @@
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
 // ------- CONFIG -------
-// Put your clinic WhatsApp number here in international format without + or spaces (e.g., 919876543210)
-const CLINIC_WA_NUMBER = ""; // TODO: set this (optional). If empty, we will not auto-open WhatsApp.
+const CLINIC_WA_NUMBER = "918686019709"; // your number baked in
 
 // ------- Storage & utils -------
 const K={slots:"cl_slots", appts:"cl_a"};
@@ -76,6 +92,7 @@ const today=()=>new Date().toISOString().slice(0,10);
 function slKey(date){return `${K.slots}_${date}`;}
 function loadSlots(date){const arr=jget(slKey(date)); return Array.isArray(arr)?arr:[];}
 function saveSlots(date,rows){jset(slKey(date),rows);}
+
 function fillTimeOptions(date){
   const sel=document.getElementById("t"); sel.innerHTML="";
   const slots=loadSlots(date).filter(s=>(s.status||"Open")!=="Closed");
@@ -122,7 +139,7 @@ document.getElementById("book").onclick=()=>{
   jset(K.appts, appts);
 
   // UI feedback
-  ok.textContent = `Booked ✅ ${date} @ ${time}. Show your phone at reception. Your token will be assigned when you arrive.`;
+  ok.textContent = `Booked ✅ ${date} @ ${time}. Show this at reception. Token will be assigned on arrival.`;
   hint.style.display = "block";
 
   // WhatsApp (optional)
