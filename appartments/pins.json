@@ -1,6 +1,6 @@
 {
-  "resident": "1111",
-  "guard": "2222",
-  "committee": "3333",
-  "admin": "4444"
+  "residents": "1111",
+  "guards":   "2222",
+  "committee":"3333",
+  "admin":    "9999"
 }
