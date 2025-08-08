@@ -4,14 +4,10 @@
 <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
 <style>
-body{font-family:system-ui,Roboto,Arial,sans-serif}
 main{max-width:720px;margin:16px auto;padding:16px}
-.card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-.banner{width:100%;border-radius:22px;display:block}
 input{width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:16px}
-.btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s;background:#111;box-shadow:0 2px 5px rgba(0,0,0,.2)}
-.btn:hover{transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,.25)}
-.muted{color:#666}
+.iconbtn{display:flex;align-items:center;gap:10px}
+.iconbtn img{width:22px;height:22px;border-radius:6px}
 </style></head><body>
 <main>
   <img class="banner" src="./assets/clinic_banner.png" alt="Clinic"/>
@@ -23,7 +19,16 @@ input{width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size
       <button class="btn" style="width:100%">Continue</button>
     </form>
     <div id="msg" class="muted" style="margin-top:8px"></div>
-    <div style="margin-top:14px"><a class="btn" href="./booking.html" style="display:inline-block">Open Booking Bot</a></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin:0 0 8px">Quick Access</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <a class="btn iconbtn" href="./booking.html"><img src="./assets/icons/book.png" onerror="this.style.display='none'">Booking Bot</a>
+      <a class="btn iconbtn" href="./admin.html"><img src="./assets/icons/admin.png" onerror="this.style.display='none'">Admin</a>
+      <a class="btn iconbtn" href="./doctor.html"><img src="./assets/icons/doctor.png" onerror="this.style.display='none'">Doctor/Manager</a>
+      <a class="btn iconbtn" href="./reset.html"><img src="./assets/icons/reset.png" onerror="this.style.display='none'">Reset Cache</a>
+    </div>
   </div>
 </main>
 <script>
