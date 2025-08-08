@@ -1,99 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Local Bookings - Onestop C-Demo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="styles.css">
-<style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
-    h1 { text-align: center; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 14px; }
-    th { background: #333; color: #fff; }
-    button { padding: 8px 12px; margin: 5px; border: none; cursor: pointer; border-radius: 4px; }
-    .btn-export { background: #28a745; color: white; }
-    .btn-clear { background: #dc3545; color: white; }
-    .btn-delete { background: #ff4444; color: white; font-size: 12px; padding: 4px 8px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Local Bookings — Onestop</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --accent:#7c3aed;
+      --accent-2:#06b6d4;
+      --danger:#ef4444;
+      --ok:#16a34a;
+      --radius:16px;
+      --shadow:0 8px 24px rgba(2,6,23,.08);
+      --shadow-soft:0 4px 14px rgba(2,6,23,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .wrap{max-width:920px; margin:0 auto; padding:20px 16px 40px;}
+    .hero{
+      position:relative;
+      margin:8px 0 18px;
+      padding:18px 18px 16px;
+      border-radius:20px;
+      background:linear-gradient(135deg, #eef2ff, #ecfeff);
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+    }
+    .badge{
+      display:inline-flex; gap:8px; align-items:center;
+      font-size:12px; font-weight:600; color:#4338ca;
+      background:#e0e7ff; border-radius:999px; padding:6px 10px;
+    }
+    h1{
+      margin:10px 0 6px; font-size:28px; line-height:1.2; letter-spacing:-0.02em;
+    }
+    .sub{color:var(--muted); margin:0 0 2px; font-size:14px}
+    .panel{
+      background:var(--card); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:14px;
+    }
+
+    .toolbar{
+      display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      margin:10px 0 14px;
+    }
+    .left-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .back{
+      color:#6b21a8; text-decoration:none; font-weight:600; display:inline-flex; gap:8px; align-items:center;
+    }
+
+    button, .btn{
+      border:0; border-radius:12px; padding:10px 14px; font-weight:600; cursor:pointer;
+      transition:.18s transform, .18s box-shadow, .18s opacity;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:active{transform:translateY(1px)}
+    .primary{ background:#111827; color:#fff; }
+    .ghost{ background:#eef2ff; color:#3730a3; }
+    .danger{ background: #fee2e2; color:#b91c1c; }
+    .csv{ background:#e0f2fe; color:#075985; }
+    .pill{ border-radius:999px; padding:8px 12px; }
+
+    .table{
+      width:100%; border-collapse:separate; border-spacing:0 10px;
+    }
+    .th{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; padding:6px 10px;}
+    .row{
+      background:var(--card);
+      box-shadow:var(--shadow-soft);
+      border-radius:14px; overflow:hidden;
+    }
+    .cell{padding:14px 12px; font-size:15px; vertical-align:middle;}
+    .token{font-weight:700;}
+    .chip{
+      font-size:12px; color:#065f46; background:#d1fae5; padding:6px 10px; border-radius:999px; display:inline-block;
+    }
+    .empty{
+      text-align:center; color:var(--muted); padding:34px 14px;
+    }
+
+    /* mobile stack for narrow view */
+    @media (max-width:720px){
+      .only-desktop{display:none}
+      .row{
+        display:grid; grid-template-columns: 1fr auto; grid-template-areas:
+          "name actions"
+          "phone actions"
+          "date actions"
+          "time actions"
+          "token actions";
+      }
+      .cell[data-k="name"]{grid-area:name; font-weight:600; font-size:16px}
+      .cell[data-k="phone"]{grid-area:phone; color:var(--muted)}
+      .cell[data-k="date"]{grid-area:date}
+      .cell[data-k="time"]{grid-area:time}
+      .cell[data-k="token"]{grid-area:token}
+      .cell[data-k="actions"]{grid-area:actions; display:flex; align-items:center; justify-content:flex-end; gap:8px}
+      .th-head{display:none}
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="hero">
+      <span class="badge">📒 Local mode</span>
+      <h1>Local Bookings</h1>
+      <p class="sub">This shows bookings saved on <b>this device</b>. Use Export to share.</p>
+    </div>
 
-<h1>📋 Local Bookings</h1>
-<div style="text-align:center;">
-    <button class="btn-export" onclick="exportCSV()">Export CSV</button>
-    <button class="btn-clear" onclick="clearBookings()">Clear All</button>
-</div>
+    <div class="toolbar">
+      <a class="back" href="manual-bookings.html">← Back to booking</a>
+      <div class="left-actions">
+        <button id="exportBtn" class="btn csv pill">⬇️ Export CSV</button>
+        <button id="clearBtn" class="btn danger pill">🗑️ Clear All</button>
+      </div>
+    </div>
 
-<table id="bookingsTable">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Date</th>
-            <th>Time Slot</th>
-            <th>Patient Name</th>
-            <th>Reason</th>
-            <th>Contact</th>
-            <th>Token</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+    <div class="panel">
+      <table class="table" aria-label="Local bookings">
+        <thead>
+          <tr class="th-head">
+            <th class="th only-desktop">#</th>
+            <th class="th">Patient</th>
+            <th class="th only-desktop">Phone</th>
+            <th class="th">Date</th>
+            <th class="th">Time</th>
+            <th class="th">Token</th>
+            <th class="th">Action</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty" class="empty" style="display:none">No bookings yet.</div>
+    </div>
+  </div>
 
-<script>
-function loadBookings() {
-    let bookings = JSON.parse(localStorage.getItem("localBookings") || "[]");
-    let tbody = document.querySelector("#bookingsTable tbody");
-    tbody.innerHTML = "";
-    bookings.forEach((b, index) => {
-        let row = `<tr>
-            <td>${index+1}</td>
-            <td>${b.date || ""}</td>
-            <td>${b.slot || ""}</td>
-            <td>${b.name || ""}</td>
-            <td>${b.reason || ""}</td>
-            <td>${b.contact || ""}</td>
-            <td>${b.token || ""}</td>
-            <td><button class="btn-delete" onclick="deleteBooking(${index})">Delete</button></td>
-        </tr>`;
-        tbody.innerHTML += row;
-    });
-}
+  <script>
+    const LS_KEY = 'onestop_bookings_v3';
 
-function deleteBooking(index) {
-    let bookings = JSON.parse(localStorage.getItem("localBookings") || "[]");
-    bookings.splice(index, 1);
-    localStorage.setItem("localBookings", JSON.stringify(bookings));
-    loadBookings();
-}
-
-function clearBookings() {
-    if(confirm("Are you sure you want to clear all bookings?")) {
-        localStorage.removeItem("localBookings");
-        loadBookings();
+    function readBookings(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return [];
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr)) return [];
+        // normalize shape
+        return arr.map((r,idx)=>{
+          // tolerate multiple field names across pages/versions
+          const name  = r.name ?? r.patient ?? r.patientName ?? '';
+          const phone = r.phone ?? r.contact ?? r.number ?? r.contactNumber ?? '';
+          const date  = r.dateStr ?? r.date ?? r.slotDate ?? '';
+          const time  = r.timeStr ?? r.time ?? r.slotTime ?? '';
+          const token = r.token ?? r.Token ?? (idx+1);
+          const reason = r.reason ?? r.purpose ?? '';
+          return { name, phone, date, time, token, reason, _raw:r };
+        });
+      }catch(e){
+        console.error('read error', e);
+        return [];
+      }
     }
-}
 
-function exportCSV() {
-    let bookings = JSON.parse(localStorage.getItem("localBookings") || "[]");
-    if(bookings.length === 0) {
-        alert("No bookings to export.");
+    function writeBookings(list){
+      localStorage.setItem(LS_KEY, JSON.stringify(list));
+    }
+
+    function render(){
+      const tbody = document.getElementById('tbody');
+      const empty = document.getElementById('empty');
+      tbody.innerHTML = '';
+      const data = readBookings();
+
+      if(data.length === 0){
+        empty.style.display = 'block';
         return;
+      }
+      empty.style.display = 'none';
+
+      data.forEach((b, i)=>{
+        const tr = document.createElement('tr');
+        tr.className = 'row';
+        tr.innerHTML = `
+          <td class="cell only-desktop">${i+1}</td>
+          <td class="cell" data-k="name">${escapeHtml(b.name || '—')}</td>
+          <td class="cell only-desktop" data-k="phone">${escapeHtml(b.phone || '—')}</td>
+          <td class="cell" data-k="date">${escapeHtml(humanDate(b.date) || '—')}</td>
+          <td class="cell" data-k="time">${escapeHtml(b.time || '—')}</td>
+          <td class="cell token" data-k="token">${escapeHtml(String(b.token ?? '—'))}</td>
+          <td class="cell" data-k="actions">
+            <button class="btn danger" data-del="${i}">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // bind deletes
+      tbody.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const idx = Number(btn.getAttribute('data-del'));
+          const list = readBookings();
+          list.splice(idx,1);
+          writeBookings(list);
+          render();
+        });
+      });
     }
-    let csv = "Date,Time Slot,Patient Name,Reason,Contact,Token\n";
-    bookings.forEach(b => {
-        csv += `${b.date || ""},${b.slot || ""},${b.name || ""},${b.reason || ""},${b.contact || ""},${b.token || ""}\n`;
+
+    function humanDate(d){
+      if(!d) return '';
+      // Accept already formatted date strings
+      // Try parse yyyy-mm-dd first
+      const iso = /^\d{4}-\d{2}-\d{2}$/;
+      try{
+        let dt;
+        if(iso.test(d)){
+          const [y,m,da] = d.split('-').map(Number);
+          dt = new Date(Date.UTC(y, m-1, da));
+        }else{
+          dt = new Date(d);
+        }
+        if(String(dt) === 'Invalid Date') return d;
+        return dt.toLocaleDateString(undefined, {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+      }catch{ return d; }
+    }
+
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+    }
+
+    function exportCSV(){
+      const rows = readBookings();
+      if(rows.length===0){ alert('Nothing to export.'); return; }
+      const headers = ['Patient Name','Phone','Date','Time','Token','Reason'];
+      const csv = [
+        headers.join(','),
+        ...rows.map(r=>[
+          q(r.name), q(r.phone), q(r.date), q(r.time), q(r.token), q(r.reason||'')
+        ].join(','))
+      ].join('\n');
+
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const ts = new Date().toISOString().slice(0,19).replaceAll(':','-');
+      a.download = `onestop_bookings_${ts}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      a.remove();
+
+      function q(v){
+        const s = String(v ?? '');
+        return /[,"\n]/.test(s) ? `"${s.replaceAll('"','""')}"` : s;
+      }
+    }
+
+    // buttons
+    document.getElementById('exportBtn').addEventListener('click', exportCSV);
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      if(confirm('Delete ALL local bookings on this device?')) {
+        localStorage.removeItem(LS_KEY);
+        render();
+      }
     });
-    let blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "local-bookings.csv";
-    link.click();
-}
 
-loadBookings();
-</script>
-
+    // initial render
+    render();
+  </script>
 </body>
 </html>
