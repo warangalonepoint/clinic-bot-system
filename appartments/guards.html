@@ -1,48 +1,194 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Guards • Onestop Apartments</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="stylesheet" href="./styles.css" />
-  <meta name="theme-color" content="#111" />
-  <style>
-    main{max-width:900px;margin:12px auto;padding:12px}
-    .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-    .banner{width:100%;border-radius:22px;display:block}
-    .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
-  </style>
-</head>
-<body>
-  <!-- PIN LOCK -->
-  <script>
-    (function(){
-      const REQUIRED_ROLE="guards";
-      const role=sessionStorage.getItem("apts_role");
-      if(role!==REQUIRED_ROLE){ location.replace("./index.html"); }
-      // TTL optional:
-      // const at=Number(sessionStorage.getItem("apts_login_at")||0);
-      // if(!at || Date.now()-at>12*60*60*1000){ sessionStorage.clear(); location.replace("./index.html"); }
-    })();
-  </script>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Guards • Onestop Apartments</title>
+<link rel="manifest" href="./manifest.webmanifest"/><link rel="stylesheet" href="./styles.css"/>
+<meta name="theme-color" content="#111"/>
+<style>
+  main{max-width:960px;margin:12px auto;padding:12px}
+  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+  .banner{width:100%;border-radius:22px;display:block}
+  .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+  input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:740px){.row{grid-template-columns:1fr}}
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
+  .btn-dark{background:#111;color:#fff}
+  .btn-soft{background:#f0f0f0}
+  .btn-green{background:#0d7c66;color:#fff}
+  .btn-red{background:#b30021;color:#fff}
+  table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
+  .thumb{width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid #eee;cursor:pointer}
+  #preview{width:100%;max-height:260px;border-radius:14px;background:#000}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eee;font-size:12px;margin-right:6px}
+  dialog::backdrop{background:rgba(0,0,0,.5)}
+  dialog{border:0;border-radius:16px;padding:0;overflow:hidden}
+</style>
+</head><body>
+<script>(function(){const r=sessionStorage.getItem("apts_role");if(r!=="guards")location.replace("./index.html");})();</script>
+<button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
-  <!-- LOGOUT -->
-  <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
+<main>
+  <img class="banner" src="./assets/banner.png" alt="Onestop Apartments"/>
 
-  <main>
-    <img class="banner" src="./assets/banner.png" alt="Onestop Apartments" />
-    <div class="card" style="margin-top:14px">
-      <h2 style="margin:0 0 6px">Guards</h2>
-      <p style="margin:0;color:#666">Visitor check-in, courier logs, emergency contacts.</p>
-      <div id="app" style="margin-top:12px">
-        <p style="margin:0">Coming soon…</p>
-      </div>
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin:0 0 10px">Visitor / Courier Check-in</h2>
+    <div class="row">
+      <label>Type
+        <select id="vtype"><option>Visitor</option><option>Courier</option></select>
+      </label>
+      <label>Flat / Block
+        <input id="flat" placeholder="e.g., A-302"/>
+      </label>
+      <label>Name
+        <input id="vname" placeholder="Full name"/>
+      </label>
+      <label>Phone
+        <input id="vphone" inputmode="numeric" maxlength="10" placeholder="10-digit"/>
+      </label>
     </div>
-  </main>
 
-  <script>
-    if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
-  </script>
-</body>
-</html>
+    <!-- Camera / Scan -->
+    <div class="card" style="margin-top:14px;background:#fafafa">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+        <span class="pill">ID Photo & QR (beta)</span>
+        <button id="camOpen" class="btn btn-soft">📷 Open Camera</button>
+        <button id="camShot" class="btn btn-soft" disabled>📸 Capture Photo</button>
+        <button id="scanQR" class="btn btn-soft">🔎 Scan QR</button>
+        <span id="scanSupport" class="pill" style="display:none"></span>
+      </div>
+      <video id="preview" playsinline muted style="display:none"></video>
+      <canvas id="canvas" style="display:none"></canvas>
+      <div id="photoNote" style="color:#666;font-size:12px;display:none;margin-top:6px">Photo captured ✔️</div>
+      <div id="qrResult" style="color:#0d7c66;font-size:13px;display:none;margin-top:6px"></div>
+    </div>
+
+    <button class="btn btn-dark" style="margin-top:12px;width:100%" id="checkin">✅ Check-in</button>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin:0 0 10px">Log</h2>
+    <div id="empty" style="color:#666">No entries yet.</div>
+    <div id="listWrap" style="overflow:auto;display:none">
+      <table id="list"><thead>
+        <tr><th>Time</th><th>Type</th><th>Flat</th><th>Name</th><th>Phone</th><th>QR</th><th>Photo</th></tr>
+      </thead><tbody></tbody></table>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-green" id="export">Export CSV</button>
+      <button class="btn btn-red" id="clear">Clear All</button>
+    </div>
+  </div>
+</main>
+
+<dialog id="lightbox"><img id="big" alt="Photo" style="max-width:90vw;max-height:80vh;display:block"/><div style="padding:10px;text-align:right"><button class="btn btn-soft" onclick="document.getElementById('lightbox').close()">Close</button></div></dialog>
+
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+
+const key="apts_visitors_v2";
+const $=id=>document.getElementById(id);
+const read=()=>{try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return[]}};
+const write=v=>localStorage.setItem(key,JSON.stringify(v));
+
+function render(){
+  const rows=read(); const tb=$('#list tbody'); tb.innerHTML="";
+  if(!rows.length){$('empty').style.display="block";$('listWrap').style.display="none";return;}
+  $('empty').style.display="none";$('listWrap').style.display="block";
+  rows.forEach((r,i)=>{const tr=document.createElement('tr');
+    const photoCell = r.photo ? `<img class="thumb" src="${r.photo}" alt="photo" data-idx="${i}"/>` : `<span class="pill">—</span>`;
+    tr.innerHTML=`<td>${new Date(r.ts).toLocaleString()}</td><td>${r.type}</td><td>${r.flat}</td><td>${r.name}</td>
+                  <td><a href="tel:${r.phone}">${r.phone}</a></td><td>${r.qr?('<code>'+String(r.qr).replace(/</g,'&lt;')+'</code>'):'—'}</td><td>${photoCell}</td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('img.thumb').forEach(img=>{
+    img.onclick=()=>{ $('#big').src = read()[img.dataset.idx].photo; $('#lightbox').showModal(); };
+  });
+}
+render();
+
+/* ---- Pre-approval hash autofill ---- */
+(function(){
+  if(location.hash.startsWith("#pre=")){
+    try{
+      const data = JSON.parse(decodeURIComponent(location.hash.slice(5)));
+      $('#flat').value = data.flat || '';
+      $('#vname').value = data.name || '';
+      $('#vphone').value = (data.phone||'').slice(-10);
+      $('#vtype').value = "Visitor";
+      $('#qrResult').style.display='block'; $('#qrResult').textContent = 'Pre-approval token: '+(data.token||'');
+      history.replaceState(null,'',location.pathname); // clean hash
+    }catch{}
+  }
+})();
+
+/* ---------- Camera ---------- */
+let stream=null, lastPhotoData=null;
+const video=$('preview'), canvas=$('canvas');
+$('camOpen').onclick=async()=>{
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject=stream; video.style.display='block'; $('camShot').disabled=false; await video.play();
+  }catch(e){ alert("Camera not available: "+e.message); }
+};
+$('camShot').onclick=()=>{
+  if(!video.srcObject){alert("Open camera first");return;}
+  const w=video.videoWidth, h=video.videoHeight;
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,w,h);
+  lastPhotoData=canvas.toDataURL('image/jpeg',0.8);
+  $('photoNote').style.display='block';
+};
+
+/* ---------- QR / Barcode (Beta) ---------- */
+(async()=>{
+  const supported = 'BarcodeDetector' in window;
+  $('scanSupport').style.display='inline-block';
+  $('scanSupport').textContent = supported ? 'BarcodeDetector ready' : 'No BarcodeDetector (beta off)';
+})();
+$('scanQR').onclick=async()=>{
+  if(!('BarcodeDetector' in window)){ alert("Scanner not supported on this browser. Use latest Chrome on Android."); return; }
+  try{
+    if(!stream){ stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); }
+    video.srcObject=stream; video.style.display='block'; await video.play();
+    const det = new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8']});
+    const loop = async ()=>{
+      const w=video.videoWidth, h=video.videoHeight;
+      if(!w||!h){ requestAnimationFrame(loop); return; }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(video,0,0,w,h);
+      const bits = await det.detect(canvas);
+      if(bits && bits.length){
+        const raw = bits[0].rawValue || '';
+        $('#qrResult').style.display='block';
+        $('#qrResult').textContent = 'Scanned: ' + raw;
+        const flat=raw.match(/[A-Z]-?\d{1,4}/i); if(flat) $('#flat').value = flat[0].toUpperCase();
+        const phone=raw.replace(/\D/g,'').match(/\d{10}$/); if(phone) $('#vphone').value = phone[0];
+      }else{
+        requestAnimationFrame(loop);
+      }
+    };
+    loop();
+  }catch(e){ alert("Scan failed: "+e.message); }
+};
+
+/* ---------- Save / Export ---------- */
+$('#checkin').onclick=()=>{
+  const type=$('#vtype').value, flat=$('#flat').value.trim(), name=$('#vname').value.trim(), phone=$('#vphone').value.trim();
+  const qr = ($('#qrResult').textContent||'').replace(/^Scanned:\s*/,'').trim();
+  if(!flat||!name||phone.length!==10){alert("Enter Flat, Name, 10-digit Phone");return;}
+  const rows=read();
+  rows.unshift({type,flat,name,phone,qr: qr||null, photo:lastPhotoData||null, ts:Date.now()});
+  write(rows); render(); alert("Checked-in ✅");
+  lastPhotoData=null; $('#photoNote').style.display='none'; $('#qrResult').style.display='none'; $('#qrResult').textContent='';
+};
+$('#export').onclick=()=>{
+  const rows=read(); if(!rows.length){alert("Nothing to export");return;}
+  const csv=["Time,Type,Flat,Name,Phone,QR,HasPhoto"];
+  rows.forEach(r=>csv.push([new Date(r.ts).toLocaleString(),r.type,r.flat,r.name,r.phone,(r.qr||""),(r.photo?'YES':'NO')]
+    .map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")));
+  const blob=new Blob([csv.join("\n")],{type:"text/csv"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="Visitor-Log.csv"; a.click();
+};
+$('#clear').onclick=()=>{ if(confirm("Clear all entries on this device?")){ localStorage.removeItem(key); render(); } };
+window.addEventListener('pagehide',()=>{ try{ if(stream){stream.getTracks().forEach(t=>t.stop());} }catch{} });
+</script>
+</body></html>
