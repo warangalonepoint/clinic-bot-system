@@ -5,7 +5,8 @@
 </head><body>
 <div class="wrap">
   <div class="hero space">
-    <div>
+    <div style="flex:1">
+      <img src="./assets/banner.png" alt="" class="banner">
       <span class="pill">Guards</span>
       <h1>Attendance & Visitors</h1>
       <div class="sub">Mark attendance, check-in/out visitors</div>
@@ -35,6 +36,10 @@
 
 <script src="storage.js"></script>
 <script>
+// ----- PIN gate -----
+if(!requirePinOrRedirect()) { /* blocked; storage.js handles redirect/back */ }
+
+// Attendance
 function renderAttendance(){
   const list=_get(DB.guardAttendance).sort((a,b)=> (b.ts||'').localeCompare(a.ts||''));
   const box=document.getElementById('attList'); box.innerHTML='';
@@ -48,6 +53,7 @@ function renderAttendance(){
 inBtn.onclick=()=>{ put(DB.guardAttendance,{id:crypto.randomUUID(),type:'in',ts:new Date().toISOString()}); renderAttendance(); toast('Checked in'); }
 outBtn.onclick=()=>{ put(DB.guardAttendance,{id:crypto.randomUUID(),type:'out',ts:new Date().toISOString()}); renderAttendance(); toast('Checked out'); }
 
+// Visitors search
 function searchVisitors(query){
   const list=_get(DB.visitors);
   const q=query.trim().toLowerCase();
