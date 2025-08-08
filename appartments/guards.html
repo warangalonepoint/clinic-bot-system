@@ -10,17 +10,17 @@
   .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
   input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:740px){.row{grid-template-columns:1fr}}
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
-  .btn-dark{background:#111;color:#fff}
-  .btn-soft{background:#f0f0f0}
-  .btn-green{background:#0d7c66;color:#fff}
-  .btn-red{background:#b30021;color:#fff}
   table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
   .thumb{width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid #eee;cursor:pointer}
   #preview{width:100%;max-height:260px;border-radius:14px;background:#000}
   .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eee;font-size:12px;margin-right:6px}
-  dialog::backdrop{background:rgba(0,0,0,.5)}
-  dialog{border:0;border-radius:16px;padding:0;overflow:hidden}
+  dialog::backdrop{background:rgba(0,0,0,.5)} dialog{border:0;border-radius:16px;padding:0;overflow:hidden}
+
+  /* Clickable black buttons */
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s;box-shadow:0 2px 5px rgba(0,0,0,.2);-webkit-tap-highlight-color:transparent}
+  .btn:hover:not([disabled]),.btn:active:not([disabled]){background:#000;transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,.25)}
+  .btn[disabled]{background:#ccc!important;color:#666!important;cursor:not-allowed!important;box-shadow:none!important;transform:none!important}
+  .btn-green{background:#0d7c66;color:#fff}.btn-red{background:#b30021;color:#fff}
 </style>
 </head><body>
 <script>(function(){const r=sessionStorage.getItem("apts_role");if(r!=="guards")location.replace("./index.html");})();</script>
@@ -46,13 +46,12 @@
       </label>
     </div>
 
-    <!-- Camera / Scan -->
     <div class="card" style="margin-top:14px;background:#fafafa">
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
         <span class="pill">ID Photo & QR (beta)</span>
-        <button id="camOpen" class="btn btn-soft">📷 Open Camera</button>
-        <button id="camShot" class="btn btn-soft" disabled>📸 Capture Photo</button>
-        <button id="scanQR" class="btn btn-soft">🔎 Scan QR</button>
+        <button id="camOpen" class="btn">📷 Open Camera</button>
+        <button id="camShot" class="btn" disabled>📸 Capture Photo</button>
+        <button id="scanQR" class="btn">🔎 Scan QR</button>
         <span id="scanSupport" class="pill" style="display:none"></span>
       </div>
       <video id="preview" playsinline muted style="display:none"></video>
@@ -61,7 +60,7 @@
       <div id="qrResult" style="color:#0d7c66;font-size:13px;display:none;margin-top:6px"></div>
     </div>
 
-    <button class="btn btn-dark" style="margin-top:12px;width:100%" id="checkin">✅ Check-in</button>
+    <button class="btn" style="margin-top:12px;width:100%" id="checkin">✅ Check-in</button>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -79,7 +78,7 @@
   </div>
 </main>
 
-<dialog id="lightbox"><img id="big" alt="Photo" style="max-width:90vw;max-height:80vh;display:block"/><div style="padding:10px;text-align:right"><button class="btn btn-soft" onclick="document.getElementById('lightbox').close()">Close</button></div></dialog>
+<dialog id="lightbox"><img id="big" alt="Photo" style="max-width:90vw;max-height:80vh;display:block"/><div style="padding:10px;text-align:right"><button class="btn" onclick="document.getElementById('lightbox').close()">Close</button></div></dialog>
 
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
@@ -105,7 +104,7 @@ function render(){
 }
 render();
 
-/* ---- Pre-approval hash autofill ---- */
+/* Pre-approval hash autofill */
 (function(){
   if(location.hash.startsWith("#pre=")){
     try{
@@ -115,76 +114,74 @@ render();
       $('#vphone').value = (data.phone||'').slice(-10);
       $('#vtype').value = "Visitor";
       $('#qrResult').style.display='block'; $('#qrResult').textContent = 'Pre-approval token: '+(data.token||'');
-      history.replaceState(null,'',location.pathname); // clean hash
+      history.replaceState(null,'',location.pathname);
     }catch{}
   }
 })();
 
-/* ---------- Camera ---------- */
+/* ---- Camera (strong) ---- */
 let stream=null, lastPhotoData=null;
-const video=$('preview'), canvas=$('canvas');
-$('camOpen').onclick=async()=>{
+const video=$('preview'), canvas=$('canvas'), openBtn=$('camOpen'), shotBtn=$('camShot');
+
+async function openCamera(){
   try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    video.srcObject=stream; video.style.display='block'; $('camShot').disabled=false; await video.play();
-  }catch(e){ alert("Camera not available: "+e.message); }
-};
-$('camShot').onclick=()=>{
+    const constraints={video:{facingMode:{ideal:'environment'}},audio:false};
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+  }catch(e1){
+    try{ stream = await navigator.mediaDevices.getUserMedia({video:true,audio:false}); }
+    catch(e2){ alert("Camera blocked. Tap lock icon → Site settings → Allow Camera, then reload."); return; }
+  }
+  try{ video.srcObject=stream; video.style.display='block'; shotBtn.disabled=false; await video.play(); }
+  catch(e){ alert("Couldn’t start camera. Reload and try again."); }
+}
+openBtn.onclick=openCamera;
+
+shotBtn.onclick=()=>{
   if(!video.srcObject){alert("Open camera first");return;}
-  const w=video.videoWidth, h=video.videoHeight;
+  const w=video.videoWidth||1280,h=video.videoHeight||720;
   canvas.width=w; canvas.height=h;
-  const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,w,h);
+  canvas.getContext('2d').drawImage(video,0,0,w,h);
   lastPhotoData=canvas.toDataURL('image/jpeg',0.8);
-  $('photoNote').style.display='block';
+  $('#photoNote').style.display='block';
 };
 
-/* ---------- QR / Barcode (Beta) ---------- */
-(async()=>{
-  const supported = 'BarcodeDetector' in window;
-  $('scanSupport').style.display='inline-block';
-  $('scanSupport').textContent = supported ? 'BarcodeDetector ready' : 'No BarcodeDetector (beta off)';
-})();
-$('scanQR').onclick=async()=>{
+/* ---- QR / Barcode (beta) ---- */
+(async()=>{const supported='BarcodeDetector' in window;$('#scanSupport').style.display='inline-block';$('#scanSupport').textContent=supported?'BarcodeDetector ready':'No BarcodeDetector (beta off)';})();
+$('#scanQR').onclick=async()=>{
   if(!('BarcodeDetector' in window)){ alert("Scanner not supported on this browser. Use latest Chrome on Android."); return; }
   try{
-    if(!stream){ stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); }
-    video.srcObject=stream; video.style.display='block'; await video.play();
-    const det = new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8']});
-    const loop = async ()=>{
-      const w=video.videoWidth, h=video.videoHeight;
+    if(!stream){ await openCamera(); if(!stream) return; }
+    const det=new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8']});
+    const loop=async()=>{
+      const w=video.videoWidth,h=video.videoHeight;
       if(!w||!h){ requestAnimationFrame(loop); return; }
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(video,0,0,w,h);
-      const bits = await det.detect(canvas);
+      const bits=await det.detect(canvas);
       if(bits && bits.length){
-        const raw = bits[0].rawValue || '';
-        $('#qrResult').style.display='block';
-        $('#qrResult').textContent = 'Scanned: ' + raw;
-        const flat=raw.match(/[A-Z]-?\d{1,4}/i); if(flat) $('#flat').value = flat[0].toUpperCase();
-        const phone=raw.replace(/\D/g,'').match(/\d{10}$/); if(phone) $('#vphone').value = phone[0];
-      }else{
-        requestAnimationFrame(loop);
-      }
+        const raw=bits[0].rawValue||'';
+        $('#qrResult').style.display='block'; $('#qrResult').textContent='Scanned: '+raw;
+        const flat=raw.match(/[A-Z]-?\d{1,4}/i); if(flat) $('#flat').value=flat[0].toUpperCase();
+        const phone=raw.replace(/\D/g,'').match(/\d{10}$/); if(phone) $('#vphone').value=phone[0];
+      }else{ requestAnimationFrame(loop); }
     };
     loop();
   }catch(e){ alert("Scan failed: "+e.message); }
 };
 
-/* ---------- Save / Export ---------- */
+/* ---- Save / Export ---- */
 $('#checkin').onclick=()=>{
   const type=$('#vtype').value, flat=$('#flat').value.trim(), name=$('#vname').value.trim(), phone=$('#vphone').value.trim();
   const qr = ($('#qrResult').textContent||'').replace(/^Scanned:\s*/,'').trim();
   if(!flat||!name||phone.length!==10){alert("Enter Flat, Name, 10-digit Phone");return;}
-  const rows=read();
-  rows.unshift({type,flat,name,phone,qr: qr||null, photo:lastPhotoData||null, ts:Date.now()});
+  const rows=read(); rows.unshift({type,flat,name,phone,qr:qr||null,photo:lastPhotoData||null,ts:Date.now()});
   write(rows); render(); alert("Checked-in ✅");
   lastPhotoData=null; $('#photoNote').style.display='none'; $('#qrResult').style.display='none'; $('#qrResult').textContent='';
 };
 $('#export').onclick=()=>{
   const rows=read(); if(!rows.length){alert("Nothing to export");return;}
   const csv=["Time,Type,Flat,Name,Phone,QR,HasPhoto"];
-  rows.forEach(r=>csv.push([new Date(r.ts).toLocaleString(),r.type,r.flat,r.name,r.phone,(r.qr||""),(r.photo?'YES':'NO')]
-    .map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")));
+  rows.forEach(r=>csv.push([new Date(r.ts).toLocaleString(),r.type,r.flat,r.name,r.phone,(r.qr||""),(r.photo?'YES':'NO')].map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")));
   const blob=new Blob([csv.join("\n")],{type:"text/csv"}); const a=document.createElement("a");
   a.href=URL.createObjectURL(blob); a.download="Visitor-Log.csv"; a.click();
 };
