@@ -1,92 +1,48 @@
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Guards — Onestop Apts</title>
-<link rel="stylesheet" href="styles.css">
-</head><body>
-<div class="wrap">
-  <div class="hero space">
-    <div style="flex:1">
-      <img src="./assets/banner.png" alt="" class="banner">
-      <span class="pill">Guards</span>
-      <h1>Attendance & Visitors</h1>
-      <div class="sub">Mark attendance, check-in/out visitors</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guards • Onestop Apartments</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+  <meta name="theme-color" content="#111" />
+  <style>
+    main{max-width:900px;margin:12px auto;padding:12px}
+    .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+    .banner{width:100%;border-radius:22px;display:block}
+    .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+  </style>
+</head>
+<body>
+  <!-- PIN LOCK -->
+  <script>
+    (function(){
+      const REQUIRED_ROLE="guards";
+      const role=sessionStorage.getItem("apts_role");
+      if(role!==REQUIRED_ROLE){ location.replace("./index.html"); }
+      // TTL optional:
+      // const at=Number(sessionStorage.getItem("apts_login_at")||0);
+      // if(!at || Date.now()-at>12*60*60*1000){ sessionStorage.clear(); location.replace("./index.html"); }
+    })();
+  </script>
+
+  <!-- LOGOUT -->
+  <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
+
+  <main>
+    <img class="banner" src="./assets/banner.png" alt="Onestop Apartments" />
+    <div class="card" style="margin-top:14px">
+      <h2 style="margin:0 0 6px">Guards</h2>
+      <p style="margin:0;color:#666">Visitor check-in, courier logs, emergency contacts.</p>
+      <div id="app" style="margin-top:12px">
+        <p style="margin:0">Coming soon…</p>
+      </div>
     </div>
-    <a class="btn secondary" href="./index.html">← Back</a>
-  </div>
+  </main>
 
-  <div class="card">
-    <h3 style="margin:0 0 8px">Attendance</h3>
-    <div class="flex">
-      <button id="inBtn" class="btn">Check In</button>
-      <button id="outBtn" class="btn ghost">Check Out</button>
-    </div>
-    <div class="list" id="attList"></div>
-  </div>
-
-  <div class="card">
-    <h3 style="margin:0 0 8px">Visitor Check-in</h3>
-    <div class="row">
-      <div><label>Pass/Phone</label><input id="q" placeholder="Token or 10-digit"/></div>
-      <div><label>&nbsp;</label><button id="findBtn" class="btn">Find</button></div>
-    </div>
-    <div id="vResult" class="list"></div>
-  </div>
-</div>
-<div id="toast" class="toast"></div>
-
-<script src="storage.js"></script>
-<script>
-// ----- PIN gate -----
-if(!requirePinOrRedirect()) { /* blocked; storage.js handles redirect/back */ }
-
-// Attendance
-function renderAttendance(){
-  const list=_get(DB.guardAttendance).sort((a,b)=> (b.ts||'').localeCompare(a.ts||''));
-  const box=document.getElementById('attList'); box.innerHTML='';
-  if(!list.length){ box.innerHTML='<div class="meta">No records.</div>'; return; }
-  list.forEach(r=>{
-    const div=document.createElement('div'); div.className='item';
-    div.innerHTML=`<div><b>${r.type.toUpperCase()}</b></div><div class="meta">${new Date(r.ts).toLocaleString()}</div>`;
-    box.appendChild(div);
-  });
-}
-inBtn.onclick=()=>{ put(DB.guardAttendance,{id:crypto.randomUUID(),type:'in',ts:new Date().toISOString()}); renderAttendance(); toast('Checked in'); }
-outBtn.onclick=()=>{ put(DB.guardAttendance,{id:crypto.randomUUID(),type:'out',ts:new Date().toISOString()}); renderAttendance(); toast('Checked out'); }
-
-// Visitors search
-function searchVisitors(query){
-  const list=_get(DB.visitors);
-  const q=query.trim().toLowerCase();
-  return list.filter(v=>{
-    return (v.token||'').toLowerCase().includes(q) ||
-           (v.phone||'').toLowerCase().includes(q) ||
-           (v.visitor||'').toLowerCase().includes(q);
-  });
-}
-findBtn.onclick=()=>{
-  const res=searchVisitors(q.value);
-  const box=vResult; box.innerHTML='';
-  if(!res.length){ box.innerHTML='<div class="meta">No match.</div>'; return; }
-  res.forEach(v=>{
-    const div=document.createElement('div'); div.className='item';
-    div.innerHTML=`<div><b>${v.visitor}</b><div class="meta">${v.resident} • ${v.phone}</div>
-    <div class="meta">Token: <span class="tok">${v.token||'-'}</span> • ${v.date} ${v.time||''}</div></div>
-    <div class="flex"><button class="btn" data-in="${v.id}">Arrived</button>
-    <button class="btn ghost" data-out="${v.id}">Left</button>
-    <button class="btn danger" data-del="${v.id}">Delete</button></div>`;
-    box.appendChild(div);
-  });
-};
-vResult.addEventListener('click',(e)=>{
-  const id=e.target.getAttribute('data-in')||e.target.getAttribute('data-out')||e.target.getAttribute('data-del');
-  if(!id) return;
-  const list=_get(DB.visitors);
-  const v=list.find(x=>x.id===id); if(!v) return;
-  if(e.target.hasAttribute('data-in')) v.status='in';
-  if(e.target.hasAttribute('data-out')) v.status='out';
-  if(e.target.hasAttribute('data-del')) { del(DB.visitors, x=>x.id===id); toast('Deleted'); findBtn.click(); return; }
-  _set(DB.visitors, list); toast('Updated'); findBtn.click();
-});
-renderAttendance();
-</script>
-</body></html>
+  <script>
+    if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
+  </script>
+</body>
+</html>
