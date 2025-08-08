@@ -1,12 +1,326 @@
-{
-  "airtable": {
-    "apiKey": "patXXXXXXXXXXXX",
-    "baseId": "appXXXXXXXXXXXX",
-    "tables": { "slots": "AvailableSlots", "logs": "BookingsLogs" },
-    "views": { "slotsView": "AvailableSlots" },
-    "fields": {
-      "slots": { "Date": "Date", "Time": "Time Slot", "Status": "Status" },
-      "logs":  { "Name": "Patient Name", "Contact": "Contact", "SlotTime": "Slot Time", "Token": "Token" }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, user-scalable=no"
+  />
+  <title>Manual Patient Booking — Airtable</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Page-scoped polish */
+    .card {
+      max-width: 720px;
+      margin: 24px auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+      padding: 18px;
     }
-  }
-}
+    .hero {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin: 0 auto 18px;
+      display: block;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin: 6px 0 2px;
+    }
+    .sub {
+      text-align: center;
+      color: #666;
+      margin: 0 0 18px;
+      font-size: 14px;
+    }
+    .field { margin: 10px 0; }
+    label {
+      display:block;
+      font-weight:600;
+      margin-bottom:6px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 14px 12px;
+      border: 1px solid #dcdcdc;
+      border-radius: 10px;
+      font-size: 16px;
+      background: #fff;
+      outline: none;
+    }
+    select:disabled, input:disabled { background:#f4f4f4; color:#888; }
+    button.primary {
+      background:#111; color:#fff; border:none; font-weight:700;
+      margin-top: 8px;
+    }
+    .hint { color:#777; font-size:13px; margin-top:8px; text-align:center; }
+    .toast {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: 24px; background: #111; color:#fff; padding: 12px 14px;
+      border-radius: 10px; font-size: 14px; max-width: 92%; z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    }
+    .row { display:flex; gap:10px; }
+    .row > .col { flex:1; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img class="hero" src="assets/banner.png" alt="Doctor" />
+    <h1>Manual Patient Booking</h1>
+    <p class="sub">v3 — Airtable-connected</p>
+
+    <div class="field">
+      <label for="name">Patient Name</label>
+      <input id="name" type="text" placeholder="Enter full name" autocomplete="name" />
+    </div>
+
+    <div class="field">
+      <label for="phone">Contact Number</label>
+      <input id="phone" type="tel" inputmode="numeric" maxlength="15" placeholder="10-digit number" />
+    </div>
+
+    <div class="row">
+      <div class="field col">
+        <label for="dateSelect">Select Date</label>
+        <select id="dateSelect" disabled>
+          <option>Loading dates…</option>
+        </select>
+      </div>
+      <div class="field col">
+        <label for="slotSelect">Select Time Slot</label>
+        <select id="slotSelect" disabled>
+          <option>Select a date first</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="confirmBtn" class="primary" disabled>Confirm Booking</button>
+    <p class="hint">Booked slots will be hidden automatically.</p>
+  </div>
+
+  <div id="toast" class="toast" style="display:none"></div>
+
+  <!-- API key file: must define window.AIRTABLE_API_KEY = "pat..." -->
+  <script src="api-key.js"></script>
+  <script>
+    // ---------- Config ----------
+    const BASE_ID = 'appg1T8WjqnZlR44Y';
+    const TABLE_SLOTS = 'AvailableSlots';
+    const TABLE_BOOKINGS = 'BookingsLogs';
+
+    // Airtable helper
+    function atHeaders() {
+      const key = (window && window.AIRTABLE_API_KEY) || '';
+      return {
+        Authorization: 'Bearer ' + key,
+        'Content-Type': 'application/json'
+      };
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => (t.style.display = 'none'), 3200);
+    }
+
+    // State
+    let allSlots = [];     // [{id, dateStr, timeStr, fields}]
+    let slotsByDate = {};  // { '2025-08-08': [records...] }
+    let selectedSlotRecord = null;
+
+    const els = {
+      name: document.getElementById('name'),
+      phone: document.getElementById('phone'),
+      dateSelect: document.getElementById('dateSelect'),
+      slotSelect: document.getElementById('slotSelect'),
+      confirmBtn: document.getElementById('confirmBtn')
+    };
+
+    // ---------- Load available dates/slots ----------
+    async function loadAvailableSlots() {
+      try {
+        // Only Status='Available'
+        const url = new URL(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_SLOTS)}`);
+        url.searchParams.set('filterByFormula', "Status='Available'");
+        url.searchParams.set('sort[0][field]', 'Date');
+        url.searchParams.set('sort[0][direction]', 'asc');
+        url.searchParams.set('sort[1][field]', 'Time Slot');
+        url.searchParams.set('sort[1][direction]', 'asc');
+        url.searchParams.set('pageSize', '100');
+
+        const res = await fetch(url.toString(), { headers: atHeaders() });
+        if (!res.ok) {
+          const j = await res.json().catch(()=> ({}));
+          throw new Error(`Airtable GET ${TABLE_SLOTS} failed: ${res.status} ${JSON.stringify(j)}`);
+        }
+        const data = await res.json();
+
+        allSlots = (data.records || []).map(r => {
+          const f = r.fields || {};
+          // Normalize date -> yyyy-mm-dd
+          let dateStr = '';
+          if (f.Date) {
+            // Airtable might return ISO date or local date string
+            try {
+              const d = new Date(f.Date);
+              const yyyy = d.getFullYear();
+              const mm = String(d.getMonth()+1).padStart(2,'0');
+              const dd = String(d.getDate()).padStart(2,'0');
+              dateStr = `${yyyy}-${mm}-${dd}`;
+            } catch {
+              dateStr = String(f.Date);
+            }
+          }
+          const timeStr = String(f['Time Slot'] || '').trim();
+          return { id: r.id, fields: f, dateStr, timeStr };
+        }).filter(r => r.dateStr && r.timeStr);
+
+        // Group by date
+        slotsByDate = {};
+        for (const rec of allSlots) {
+          if (!slotsByDate[rec.dateStr]) slotsByDate[rec.dateStr] = [];
+          slotsByDate[rec.dateStr].push(rec);
+        }
+
+        // Populate date select with sorted keys
+        const dates = Object.keys(slotsByDate).sort();
+        els.dateSelect.innerHTML = '';
+        if (dates.length === 0) {
+          els.dateSelect.innerHTML = '<option>No available dates</option>';
+          els.dateSelect.disabled = true;
+          els.slotSelect.innerHTML = '<option>No slots</option>';
+          els.slotSelect.disabled = true;
+          return;
+        }
+        for (const d of dates) {
+          const nice = toNiceDate(d);
+          const opt = new Option(nice, d);
+          els.dateSelect.add(opt);
+        }
+        els.dateSelect.disabled = false;
+        // Trigger initial slot population
+        onDateChange();
+      } catch (err) {
+        console.error(err);
+        els.dateSelect.innerHTML = '<option>Error loading dates</option>';
+        els.dateSelect.disabled = true;
+        els.slotSelect.innerHTML = '<option>Select a date first</option>';
+        els.slotSelect.disabled = true;
+        showToast(err.message || 'Error loading Airtable data');
+      }
+    }
+
+    function toNiceDate(yyyy_mm_dd) {
+      const [y,m,d] = yyyy_mm_dd.split('-').map(Number);
+      const dt = new Date(y, m-1, d);
+      return dt.toLocaleDateString(undefined, { day:'2-digit', month:'2-digit', year:'numeric' });
+    }
+
+    function onDateChange() {
+      selectedSlotRecord = null;
+      const dateKey = els.dateSelect.value;
+      els.slotSelect.innerHTML = '';
+      if (!dateKey || !slotsByDate[dateKey]) {
+        els.slotSelect.innerHTML = '<option>Select a date first</option>';
+        els.slotSelect.disabled = true;
+        els.confirmBtn.disabled = true;
+        return;
+      }
+      for (const rec of slotsByDate[dateKey]) {
+        const opt = new Option(rec.timeStr, rec.id); // value=recordId
+        els.slotSelect.add(opt);
+      }
+      els.slotSelect.disabled = false;
+      els.confirmBtn.disabled = false;
+    }
+
+    els.dateSelect.addEventListener('change', onDateChange);
+
+    // ---------- Confirm booking ----------
+    els.confirmBtn.addEventListener('click', async () => {
+      try {
+        const name = els.name.value.trim();
+        const phone = els.phone.value.trim();
+        const dateKey = els.dateSelect.value;
+        const slotRecordId = els.slotSelect.value;
+
+        if (!name) return showToast('Please enter patient name.');
+        if (!/^\d{7,15}$/.test(phone.replace(/\D/g,''))) return showToast('Enter a valid phone number.');
+        if (!dateKey) return showToast('Select a date.');
+        if (!slotRecordId) return showToast('Select a time slot.');
+
+        const slotRec = allSlots.find(r => r.id === slotRecordId);
+        if (!slotRec) return showToast('Selected slot not found.');
+
+        const slotNiceDate = toNiceDate(dateKey);
+        const slotTime = slotRec.timeStr;
+        const slotTimeStamp = `${slotNiceDate} ${slotTime}`;
+
+        els.confirmBtn.disabled = true;
+
+        // 1) Create booking row
+        const createRes = await fetch(
+          `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_BOOKINGS)}`,
+          {
+            method: 'POST',
+            headers: atHeaders(),
+            body: JSON.stringify({
+              fields: {
+                'Patient Name': name,
+                'Contact': phone,
+                'Slot Time': slotTimeStamp
+              }
+            })
+          }
+        );
+        if (!createRes.ok) {
+          const j = await createRes.json().catch(()=> ({}));
+          throw new Error(`Create booking failed: ${createRes.status} ${JSON.stringify(j)}`);
+        }
+
+        // 2) Mark slot as Booked
+        const patchRes = await fetch(
+          `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_SLOTS)}/${slotRecordId}`,
+          {
+            method: 'PATCH',
+            headers: atHeaders(),
+            body: JSON.stringify({ fields: { 'Status': 'Booked' } })
+          }
+        );
+        if (!patchRes.ok) {
+          const j = await patchRes.json().catch(()=> ({}));
+          throw new Error(`Update slot failed: ${patchRes.status} ${JSON.stringify(j)}`);
+        }
+
+        alert(
+          `Booking confirmed!\n\nDate: ${slotNiceDate}\nSlot: ${slotTime}\n\n(Logged to Airtable)`
+        );
+
+        // refresh lists so the slot disappears
+        els.confirmBtn.disabled = false;
+        await loadAvailableSlots();
+        els.slotSelect.value = '';
+      } catch (err) {
+        console.error(err);
+        els.confirmBtn.disabled = false;
+        showToast(err.message || 'Booking failed');
+      }
+    });
+
+    // boot
+    (function init() {
+      if (!window.AIRTABLE_API_KEY) {
+        showToast('Missing API key: put it in api-key.js as window.AIRTABLE_API_KEY');
+        return;
+      }
+      loadAvailableSlots();
+    })();
+  </script>
+</body>
+</html>
