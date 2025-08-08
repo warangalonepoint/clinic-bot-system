@@ -1,61 +1,48 @@
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Admin — Onestop Apts</title>
-<link rel="stylesheet" href="styles.css">
-</head><body>
-<div class="wrap">
-  <div class="hero space">
-    <div style="flex:1">
-      <img src="./assets/banner.png" alt="" class="banner">
-      <span class="pill">Admin</span>
-      <h1>Settings</h1>
-      <div class="sub">Update files, reset PIN (local demo)</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Onestop Apartments</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+  <meta name="theme-color" content="#111" />
+  <style>
+    main{max-width:900px;margin:12px auto;padding:12px}
+    .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+    .banner{width:100%;border-radius:22px;display:block}
+    .logout{position:fixed;right:14px;top:14px;z-index:9999;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+  </style>
+</head>
+<body>
+  <!-- PIN LOCK -->
+  <script>
+    (function(){
+      const REQUIRED_ROLE="admin";
+      const role=sessionStorage.getItem("apts_role");
+      if(role!==REQUIRED_ROLE){ location.replace("./index.html"); }
+      // TTL optional:
+      // const at=Number(sessionStorage.getItem("apts_login_at")||0);
+      // if(!at || Date.now()-at>12*60*60*1000){ sessionStorage.clear(); location.replace("./index.html"); }
+    })();
+  </script>
+
+  <!-- LOGOUT -->
+  <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
+
+  <main>
+    <img class="banner" src="./assets/banner.png" alt="Onestop Apartments" />
+    <div class="card" style="margin-top:14px">
+      <h2 style="margin:0 0 6px">Admin</h2>
+      <p style="margin:0;color:#666">Manage PINs, backups, and settings.</p>
+      <div id="app" style="margin-top:12px">
+        <p style="margin:0">Coming soon…</p>
+      </div>
     </div>
-    <a class="btn secondary" href="./index.html">← Back</a>
-  </div>
+  </main>
 
-  <div class="card">
-    <h3 style="margin:0 0 8px">Set/Reset PIN</h3>
-    <div class="row">
-      <div><label>New PIN</label><input id="pin" placeholder="4 digits" maxlength="4" inputmode="numeric"></div>
-      <div><label>&nbsp;</label><button id="savePin" class="btn">Save PIN</button></div>
-    </div>
-    <div class="sub">This PIN protects Guards/Committee/Admin pages.</div>
-  </div>
-
-  <div class="card">
-    <h3 style="margin:0 0 8px">Data Tools (local)</h3>
-    <div class="flex">
-      <button id="exportAll" class="btn ghost">Export All (JSON)</button>
-      <button id="clearAll" class="btn danger">Clear All</button>
-    </div>
-  </div>
-</div>
-<div id="toast" class="toast"></div>
-
-<script src="storage.js"></script>
-<script>
-// If a PIN already exists, ask for it to open Admin too:
-if(hasPin() && !promptPinOnce()){ history.back(); }
-
-// Save/reset PIN
-savePin.onclick=()=>{
-  const p=pin.value.trim(); if(!/^\d{4}$/.test(p)){ toast('Enter 4 digits'); return; }
-  const cfg=getAdmin(); cfg.pin=p; setAdmin(cfg); pin.value=''; toast('PIN saved');
-};
-
-exportAll.onclick=()=>{
-  const dump = {};
-  for(const k of Object.values(DB)){ dump[k] = localStorage.getItem(k) || '[]'; }
-  const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='apartment_dump.json'; a.click();
-};
-
-clearAll.onclick=()=>{
-  if(confirm('Clear ALL local data on this device?')){
-    for(const k of Object.values(DB)) localStorage.removeItem(k);
-    toast('Cleared local data');
-  }
-};
-</script>
-</body></html>
+  <script>
+    if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
+  </script>
+</body>
+</html>
