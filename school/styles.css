@@ -203,3 +203,120 @@ footer {
   border: none;
   font-size: 1.4rem;
 }
+/* ========= Glass Cards (multi-accent) ========= */
+/* Base token defaults */
+:root{
+  --glass-radius: 24px;           /* ~iOS */
+  --glass-blur: 14px;             /* backdrop blur */
+  --glass-shadow: 0 10px 25px rgba(0,0,0,.10);
+  --glass-head-height: 88px;      /* ribbon height inside card */
+  --glass-title: #ffffff;
+  --glass-subtitle: rgba(255,255,255,.85);
+}
+
+/* Card shell */
+.glass {
+  position: relative;
+  border-radius: var(--glass-radius);
+  padding: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+  border: 1px solid rgba(255,255,255,.35);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--accent, #ec4899) 12%, #ffffff) 0%,
+      color-mix(in srgb, var(--accent, #ec4899) 22%, #ffffff) 100%)
+    ;
+}
+
+/* Fallback if blur isn’t supported (older Android browsers) */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .glass{
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--accent, #ec4899) 7%, #ffffff) 0%,
+        color-mix(in srgb, var(--accent, #ec4899) 14%, #ffffff) 100%);
+  }
+}
+
+/* Soft “ribbon” slab for title/subtitle (like your Class Diary) */
+.glass-ribbon{
+  position: relative;
+  margin-top: 8px;
+  border-radius: calc(var(--glass-radius) - 8px);
+  height: var(--glass-head-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, #ffffff 60%, var(--accent, #ec4899)) 0%,
+      color-mix(in srgb, #ffffff 40%, var(--accent, #ec4899)) 100%);
+  border: 1px solid rgba(255,255,255,.55);
+  backdrop-filter: blur(calc(var(--glass-blur) * .7));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * .7));
+  box-shadow: 0 6px 18px rgba(0,0,0,.10) inset,
+              0 4px 10px rgba(0,0,0,.06);
+}
+
+/* Title + subtitle */
+.glass-title{
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--glass-title);
+  text-align: center;
+  line-height: 1.1;
+  font-size: clamp(20px, 3.2vw, 28px);
+}
+.glass-sub{
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--glass-subtitle);
+}
+
+/* Content area below ribbon */
+.glass-body{
+  padding: 12px 6px 4px;
+}
+
+/* Accent variants (set --accent per card) */
+.glass.rose   { --accent:#f43f5e; } /* red/pink */
+.glass.amber  { --accent:#f59e0b; }
+.glass.green  { --accent:#10b981; }
+.glass.blue   { --accent:#2563eb; }
+.glass.purple { --accent:#7c3aed; }
+.glass.slate  { --accent:#0f172a; }
+
+/* Optional: glass buttons to match */
+.btn-glass{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:44px;padding:0 16px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.5);
+  color:#fff;font-weight:700;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+.btn-glass.dark-text{ color:#0f172a } /* for lighter cards */
+
+/* Grid helper to place small glass tiles (homework/messages/leaves) */
+.glass-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+@media (min-width: 640px){
+  .glass-grid{ grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Small tile variant */
+.glass.tile{
+  padding:14px;border-radius:18px;
+}
+.tile .glass-title{ font-size:18px }
+.tile .glass-sub{ font-size:13px }
+
+/* Spacing utility */
+.stack > * + *{ margin-top:12px }
