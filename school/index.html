@@ -3,97 +3,83 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>School • PIN Login</title>
-  <meta name="theme-color" content="#111"/>
+  <title>School • PIN</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
   <style>
-    /* tiny page-only tweaks (global lives in styles.css) */
     .wrap{max-width:900px;margin:20px auto;padding:12px}
     .hero{position:relative;border-radius:22px;overflow:hidden}
     .banner{width:100%;height:210px;object-fit:cover;display:block}
     .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
       padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
     .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
-    .hero-title{color:#fff;font-weight:800;font-size:24px;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px 18px}
-    .mt{margin-top:16px}
-    .h2{font-size:28px;margin:6px 0 4px}
-    .muted{color:#6b7280}
-    .in{width:100%;height:48px;border:1px solid #d1d5db;border-radius:14px;padding:0 14px;font-size:16px}
-    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:50px;padding:0 18px;font-weight:700}
-    .btn:active{transform:translateY(1px)}
-    .w100{width:100%}
-    .mt8{margin-top:12px}
+    .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
   </style>
 </head>
 <body class="bg">
 <main class="wrap">
-  <!-- Banner / Brand -->
   <div class="card hero">
-    <!-- put your image at ./assets/banner.png -->
     <img class="banner" src="./assets/banner.png" alt="School Banner">
     <div class="hero-overlay">
       <img class="logo" src="./assets/logo.png" alt="Logo" onerror="this.style.display='none'">
-      <div class="hero-title">Onestop School</div>
+      <div class="hero-title">Welcome</div>
     </div>
   </div>
 
-  <!-- PIN gate -->
-  <div class="card mt">
+  <div class="card">
     <h2 class="h2">Enter PIN</h2>
     <p class="muted">You’ll be routed to your role.</p>
-    <form id="pinForm" autocomplete="one-time-code">
-      <input id="pin" class="in" type="password" inputmode="numeric" placeholder="4–8 digit PIN" required>
-      <button class="btn w100 mt8" type="submit">Continue</button>
+    <form id="pinForm">
+      <input id="pin" class="in" inputmode="numeric" autocomplete="one-time-code"
+             placeholder="4–8 digit PIN">
+      <button class="btn" style="width:100%;margin-top:12px">Continue</button>
+      <div id="msg" class="muted" style="margin-top:8px"></div>
     </form>
-    <div id="msg" class="muted mt8"></div>
   </div>
 </main>
 
 <script>
-  // Register SW (installable + offline)
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
-
-  // Role → page mapping
   const rolePage = {
-    coordinator : "./coordinator.html",
-    parents     : "./parents.html",
-    teacher     : "./teacher.html",
-    admin       : "./admin.html"
+    coordinator: "./coordinator.html",
+    parents: "./parents.html",
+    teacher: "./teacher.html",
+    admin: "./admin.html"
   };
 
-  // Load PINs from pins.json (no-cache)
   async function loadPins(){
-    const r = await fetch("./pins.json", { cache: "no-store" });
-    if(!r.ok) throw new Error("pins.json not found");
-    return r.json(); // {coordinator:'1111', parents:'2222', teacher:'3333', admin:'4444'}
+    try{
+      const base = await fetch("./pins.json",{cache:"no-store"}).then(r=>r.json());
+      const ov = JSON.parse(localStorage.getItem("pins_override")||"{}");
+      return {...base, ...ov};
+    }catch(e){
+      return {coordinator:"1111",parents:"2222",teacher:"3333",admin:"4444"};
+    }
   }
 
-  // Submit handler
   document.getElementById("pinForm").addEventListener("submit", async (e)=>{
     e.preventDefault();
-    const pin = document.getElementById("pin").value.trim();
+    const pin = (document.getElementById("pin").value||"").trim();
     const msg = document.getElementById("msg");
-    msg.textContent = "Checking…";
+    msg.textContent="Checking…";
     try{
       const pins = await loadPins();
-      let matched = null;
-      for(const [role, val] of Object.entries(pins)){
-        if(String(val) === pin){ matched = role; break; }
+      let matched=null;
+      for(const [role,val] of Object.entries(pins)){
+        if(String(val)===pin){ matched=role; break; }
       }
-      if(!matched){ msg.textContent = "Invalid PIN."; return; }
-      // persist session and route (no back to PIN)
+      if(!matched){ msg.textContent="Invalid PIN."; return; }
       sessionStorage.setItem("school_role", matched);
       sessionStorage.setItem("school_login_at", String(Date.now()));
       location.replace(rolePage[matched] || "./index.html");
-    }catch(err){
-      console.error(err);
-      msg.textContent = "Error loading PINs.";
+    }catch{
+      msg.textContent="Error loading PINs.";
     }
   });
+
+  // PWA SW
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
 </script>
 </body>
 </html>
