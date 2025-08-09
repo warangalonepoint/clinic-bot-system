@@ -6,21 +6,33 @@
   <title>Teacher • School</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
-    .wrap{max-width:900px;margin:20px auto;padding:12px}
+    /* Page polish (global styles live in styles.css) */
+    .wrap{max-width:980px;margin:20px auto;padding:12px}
     .hero{position:relative;border-radius:22px;overflow:hidden}
     .banner{width:100%;height:210px;object-fit:cover;display:block}
     .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
       padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
     .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
     .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px 18px;margin-top:16px}
-    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:50px;padding:0 18px;font-weight:700;text-align:center;display:inline-block;line-height:50px}
+    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px;margin-top:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .space{align-items:center;justify-content:space-between}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+    .in{width:100%;height:48px;border:1px solid #d1d5db;border-radius:14px;padding:0 14px;font-size:16px}
+    textarea.in{height:auto;min-height:90px;padding:10px}
+    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:46px;padding:0 18px;font-weight:700;text-align:center;display:inline-block;line-height:46px}
     .btn:active{transform:translateY(1px)}
-    .flex{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:left}
-    th{background:#f5f5f5}
-    textarea{width:100%;min-height:60px;border-radius:10px;border:1px solid #ccc;padding:8px;margin-top:6px}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .tab{padding:10px 14px;border-radius:999px;background:#eee;cursor:pointer;font-weight:700;border:0}
+    .tab.active{background:#111;color:#fff}
+    .hidden{display:none}
+    .tablewrap{margin-top:10px;overflow:auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:left;vertical-align:top}
+    th{background:#f7f7f7}
+    .muted{color:#6b7280}
+    .pill{background:#eee;border-radius:999px;padding:6px 12px;display:inline-block}
   </style>
 </head>
 <body class="bg">
@@ -34,51 +46,446 @@
     </div>
   </div>
 
-  <!-- Quick Links -->
+  <!-- Teacher Profile -->
   <div class="card">
-    <h2>Quick Links</h2>
-    <div class="flex">
-      <a class="btn" style="flex:1" href="./attendance.html">Mark Attendance</a>
-      <a class="btn" style="flex:1" href="./class-diary.html">Write Class Diary</a>
+    <h2 style="margin:0 0 6px">My Profile</h2>
+    <p class="muted" style="margin:0 0 10px">Set once. Your name/ID will tag diary, homework, notices, and leave approvals.</p>
+    <div class="grid2">
+      <label>Teacher Name <input id="t_name" class="in" placeholder="e.g., Ms. Priya"></label>
+      <label>Teacher ID <input id="t_id" class="in" placeholder="e.g., T-42"></label>
     </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="t_save">Save</button>
+      <button class="btn" id="t_clear">Clear</button>
+    </div>
+    <div id="t_msg" class="muted" style="margin-top:8px"></div>
   </div>
 
-  <!-- Today's Students -->
-  <div class="card">
-    <h2>Today's Students</h2>
-    <table>
-      <thead>
-        <tr><th>Name</th><th>Roll No</th><th>Note</th></tr>
-      </thead>
-      <tbody id="studentList">
-        <tr>
-          <td>John Doe</td>
-          <td>101</td>
-          <td><textarea placeholder="Write note..."></textarea></td>
-        </tr>
-        <tr>
-          <td>Jane Smith</td>
-          <td>102</td>
-          <td><textarea placeholder="Write note..."></textarea></td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-t="#t_diary">Class Diary</button>
+    <button class="tab" data-t="#t_hw">Homework</button>
+    <button class="tab" data-t="#t_notices">Notices</button>
+    <button class="tab" data-t="#t_leaves">Leave Approvals</button>
   </div>
 
-  <!-- Logout -->
+  <!-- Class Diary -->
+  <section class="card" id="t_diary">
+    <div class="row space">
+      <h2 style="margin:0">Post Class Diary</h2>
+      <div class="row">
+        <button class="btn" id="diary_export">Export CSV</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <label>Date <input id="d_date" type="date" class="in"></label>
+      <label>Class <input id="d_class" class="in" placeholder="e.g., 4"></label>
+      <label>Section <input id="d_section" class="in" placeholder="e.g., A"></label>
+      <label>Optional Link <input id="d_link" class="in" placeholder="https://…"></label>
+      <label class="span2">Diary Text <textarea id="d_text" class="in" maxlength="500" placeholder="Short update for parents (max 500 chars)…"></textarea></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="d_add">Publish</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Date</th><th>Class</th><th>Diary</th><th>Link</th><th>Author</th><th>Action</th></tr></thead>
+        <tbody id="d_tbody"></tbody>
+      </table>
+      <div id="d_empty" class="muted">No diary entries yet.</div>
+    </div>
+  </section>
+
+  <!-- Homework -->
+  <section class="card hidden" id="t_hw">
+    <div class="row space">
+      <h2 style="margin:0">Create Homework</h2>
+      <div class="row">
+        <input id="h_search" class="in" placeholder="Search subject/title" style="max-width:260px">
+        <button class="btn" id="h_export">Export CSV</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <label>Class <input id="h_class" class="in" placeholder="e.g., 4"></label>
+      <label>Section <input id="h_section" class="in" placeholder="e.g., A"></label>
+      <label>Subject <input id="h_subject" class="in" placeholder="e.g., Maths"></label>
+      <label>Due Date <input id="h_due" type="date" class="in"></label>
+      <label class="span2">Title <input id="h_title" class="in" placeholder="Short title"></label>
+      <label class="span2">Details <textarea id="h_details" class="in" placeholder="Instructions / links…"></textarea></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="h_add">Add Homework</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Class</th><th>Subject</th><th>Title</th><th>Due</th><th>Author</th><th>Action</th></tr></thead>
+        <tbody id="h_tbody"></tbody>
+      </table>
+      <div id="h_empty" class="muted">No homework yet.</div>
+    </div>
+  </section>
+
+  <!-- Notices -->
+  <section class="card hidden" id="t_notices">
+    <div class="row space">
+      <h2 style="margin:0">Post Notice</h2>
+      <div class="row">
+        <input id="n_search" class="in" placeholder="Search title/body" style="max-width:260px">
+        <button class="btn" id="n_export">Export CSV</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <label>Audience
+        <select id="n_aud" class="in">
+          <option value="All">All</option>
+          <option value="Class">Class</option>
+          <option value="Section">Section</option>
+        </select>
+      </label>
+      <label>Class <input id="n_class" class="in" placeholder="e.g., 4"></label>
+      <label>Section <input id="n_section" class="in" placeholder="e.g., A"></label>
+      <label class="span2">Title <input id="n_title" class="in" placeholder="Notice title"></label>
+      <label class="span2">Message <textarea id="n_body" class="in" placeholder="Write the message…"></textarea></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="n_add">Publish</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>When</th><th>Title</th><th>Message</th><th>Audience</th><th>Author</th><th>Action</th></tr></thead>
+        <tbody id="n_tbody"></tbody>
+      </table>
+      <div id="n_empty" class="muted">No notices yet.</div>
+    </div>
+  </section>
+
+  <!-- Leave Approvals -->
+  <section class="card hidden" id="t_leaves">
+    <div class="row space">
+      <h2 style="margin:0">Approve Leave Requests</h2>
+      <div class="row">
+        <input id="lv_search" class="in" placeholder="Search name/reason" style="max-width:260px">
+        <button class="btn" id="lv_export">Export CSV</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <label>Class <input id="lv_class" class="in" placeholder="e.g., 4"></label>
+      <label>Section <input id="lv_section" class="in" placeholder="e.g., A"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="lv_filter">Filter</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Child</th><th>Class</th><th>From</th><th>To</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="lv_tbody"></tbody>
+      </table>
+      <div id="lv_empty" class="muted">No leave requests found.</div>
+    </div>
+  </section>
+
+  <!-- Utilities -->
   <div class="card">
-    <button class="btn" onclick="logout()">Logout</button>
+    <div class="row">
+      <a class="btn" href="./index.html" style="flex:1">Back to PIN</a>
+      <button class="btn" style="flex:1" onclick="logout()">Logout</button>
+    </div>
   </div>
 </main>
 
 <script>
+  // ===== Role lock =====
   if(sessionStorage.getItem("school_role") !== "teacher"){
     location.replace("./index.html");
   }
-  function logout(){
-    sessionStorage.clear();
-    location.replace("./index.html");
+
+  // ===== Helpers =====
+  const $ = sel => document.querySelector(sel);
+  const jget = k => JSON.parse(localStorage.getItem(k) || "[]");
+  const jset = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+  const todayYMD = () => new Date().toISOString().slice(0,10);
+  const toTime = ts => new Date(ts).toLocaleString([], {month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const csv = (rows, heads, name) => {
+    const out=[heads.join(",")];
+    rows.forEach(r=>out.push(heads.map(h=>`"${String((r||{})[h] ?? "").replace(/"/g,'""')}"`).join(",")));
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));
+    a.download=name; a.click();
+  };
+
+  // Keys used globally:
+  // sch_class_diary: [{id,class,section,date,text,link?,teacherId,teacherName,ts}]
+  // sch_homework:    [{id,class,section,subject,title,details,due,teacherId,teacherName,ts}]
+  // sch_notices:     [{id,title,body,audience:{type:"All"|"Class"|"Section",class?,section?},ts,author}]
+  // sch_leaves:      [{id,studentId,childName,class,section,from,to,reason,status,approverId?,approverName?,ts,updatedAt?}]
+  const K = { profile: "sch_teacher_profile" };
+
+  // ===== Profile =====
+  function loadProfile(){
+    const p = JSON.parse(localStorage.getItem(K.profile) || "{}");
+    $("#t_name").value = p.name || "";
+    $("#t_id").value = p.id || "";
   }
+  function getProfile(){
+    const p = JSON.parse(localStorage.getItem(K.profile) || "{}");
+    return { name: (p.name||"Teacher"), id: (p.id||"T-NA") };
+  }
+  $("#t_save").addEventListener("click", ()=>{
+    const p = { name: $("#t_name").value.trim(), id: $("#t_id").value.trim() };
+    localStorage.setItem(K.profile, JSON.stringify(p));
+    $("#t_msg").textContent = "Saved.";
+    setTimeout(()=>$("#t_msg").textContent="",1200);
+    renderAll();
+  });
+  $("#t_clear").addEventListener("click", ()=>{
+    localStorage.removeItem(K.profile);
+    loadProfile();
+  });
+
+  // ===== Tabs =====
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      document.querySelectorAll("section.card").forEach(s=>{ if(["t_diary","t_hw","t_notices","t_leaves"].includes(s.id)) s.classList.add("hidden"); });
+      document.querySelector(t.getAttribute("data-t")).classList.remove("hidden");
+    });
+  });
+
+  // ===== Class Diary =====
+  function renderDiaryList(){
+    const rows = jget("sch_class_diary").sort((a,b)=>b.ts-a.ts);
+    const tb = $("#d_tbody"); tb.innerHTML="";
+    if(!rows.length){ $("#d_empty").style.display="block"; return; }
+    $("#d_empty").style.display="none";
+    rows.forEach((d,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td>
+        <td>${(d.date||"").slice(0,10)}</td>
+        <td>${d.class||""}-${d.section||""}</td>
+        <td>${d.text||""}</td>
+        <td>${d.link?`<a href="${d.link}" target="_blank" rel="noopener">Open</a>`:"—"}</td>
+        <td>${d.teacherName||d.teacherId||"Teacher"}</td>
+        <td><button class="btn" data-del-d="${d.id}">Delete</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("[data-del-d]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        let arr=jget("sch_class_diary");
+        arr=arr.filter(x=>x.id!==b.getAttribute("data-del-d"));
+        jset("sch_class_diary",arr);
+        renderDiaryList();
+      });
+    });
+  }
+  $("#d_add").addEventListener("click", ()=>{
+    const me=getProfile();
+    const row = {
+      id: uid(),
+      class: $("#d_class").value.trim(),
+      section: $("#d_section").value.trim(),
+      date: $("#d_date").value || todayYMD(),
+      text: $("#d_text").value.trim(),
+      link: $("#d_link").value.trim(),
+      teacherId: me.id, teacherName: me.name, ts: Date.now()
+    };
+    if(!row.class || !row.section || !row.text){ alert("Class, Section, and Diary Text are required."); return; }
+    const arr=jget("sch_class_diary"); arr.unshift(row); jset("sch_class_diary",arr);
+    $("#d_text").value=""; $("#d_link").value="";
+    renderDiaryList();
+    alert("Diary published.");
+  });
+  $("#diary_export").addEventListener("click", ()=>{
+    const rows=jget("sch_class_diary"); if(!rows.length){alert("No diary to export.");return;}
+    csv(rows,["id","class","section","date","text","link","teacherId","teacherName","ts"],"Class_Diary.csv");
+  });
+
+  // ===== Homework =====
+  function renderHomeworkList(){
+    const q=($("#h_search").value||"").toLowerCase();
+    const rows=jget("sch_homework")
+      .filter(h=>(h.subject||"").toLowerCase().includes(q) || (h.title||"").toLowerCase().includes(q))
+      .sort((a,b)=> (a.due||"").localeCompare(b.due||""));
+    const tb=$("#h_tbody"); tb.innerHTML="";
+    if(!rows.length){ $("#h_empty").style.display="block"; return; }
+    $("#h_empty").style.display="none";
+    rows.forEach((h,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td>
+        <td>${h.class||""}-${h.section||""}</td>
+        <td>${h.subject||"—"}</td>
+        <td>${h.title||"—"}</td>
+        <td>${(h.due||"").slice(0,10)}</td>
+        <td>${h.teacherName||h.teacherId||"Teacher"}</td>
+        <td><button class="btn" data-del-h="${h.id}">Delete</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("[data-del-h]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        let arr=jget("sch_homework");
+        arr=arr.filter(x=>x.id!==b.getAttribute("data-del-h"));
+        jset("sch_homework",arr);
+        renderHomeworkList();
+      });
+    });
+  }
+  $("#h_add").addEventListener("click", ()=>{
+    const me=getProfile();
+    const row={
+      id: uid(),
+      class: $("#h_class").value.trim(),
+      section: $("#h_section").value.trim(),
+      subject: $("#h_subject").value.trim(),
+      title: $("#h_title").value.trim(),
+      details: $("#h_details").value.trim(),
+      due: $("#h_due").value || todayYMD(),
+      teacherId: me.id, teacherName: me.name, ts: Date.now()
+    };
+    if(!row.class||!row.section||!row.subject||!row.title){ alert("Class, Section, Subject, Title are required."); return; }
+    const arr=jget("sch_homework"); arr.unshift(row); jset("sch_homework",arr);
+    $("#h_title").value=""; $("#h_details").value="";
+    renderHomeworkList();
+    alert("Homework added.");
+  });
+  $("#h_search").addEventListener("input", renderHomeworkList);
+  $("#h_export").addEventListener("click", ()=>{
+    const rows=jget("sch_homework"); if(!rows.length){alert("No homework to export.");return;}
+    csv(rows,["id","class","section","subject","title","details","due","teacherId","teacherName","ts"],"Homework.csv");
+  });
+
+  // ===== Notices =====
+  function audienceLabel(aud){
+    if(!aud) return "All";
+    if(aud.type==="All") return "All";
+    if(aud.type==="Class") return `Class ${aud.class}`;
+    if(aud.type==="Section") return `Class ${aud.class}-${aud.section}`;
+    return "—";
+  }
+  function renderNotices(){
+    const q=($("#n_search").value||"").toLowerCase();
+    const rows=jget("sch_notices")
+      .filter(n=>(n.title||"").toLowerCase().includes(q) || (n.body||"").toLowerCase().includes(q))
+      .sort((a,b)=>b.ts-a.ts);
+    const tb=$("#n_tbody"); tb.innerHTML="";
+    if(!rows.length){ $("#n_empty").style.display="block"; return; }
+    $("#n_empty").style.display="none";
+    rows.forEach((n,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td>
+        <td>${toTime(n.ts)}</td>
+        <td>${n.title||"—"}</td>
+        <td>${n.body||""}</td>
+        <td>${audienceLabel(n.audience)}</td>
+        <td>${n.author||"Teacher"}</td>
+        <td><button class="btn" data-del-n="${n.id}">Delete</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("[data-del-n]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        let arr=jget("sch_notices");
+        arr=arr.filter(x=>x.id!==b.getAttribute("data-del-n"));
+        jset("sch_notices",arr);
+        renderNotices();
+      });
+    });
+  }
+  $("#n_add").addEventListener("click", ()=>{
+    const me=getProfile();
+    const type=$("#n_aud").value;
+    const aud = (type==="All") ? {type}
+              : (type==="Class") ? {type,class:$("#n_class").value.trim()}
+              : {type,class:$("#n_class").value.trim(),section:$("#n_section").value.trim()};
+    const row={
+      id: uid(),
+      title: $("#n_title").value.trim(),
+      body: $("#n_body").value.trim(),
+      audience: aud,
+      ts: Date.now(),
+      author: `${me.name} (${me.id})`
+    };
+    if(!row.title||!row.body){ alert("Title and Message required."); return; }
+    if(type!=="All" && !aud.class){ alert("Provide Class (and Section if audience is Section)."); return; }
+    if(type==="Section" && !aud.section){ alert("Provide Section."); return; }
+    const arr=jget("sch_notices"); arr.unshift(row); jset("sch_notices",arr);
+    $("#n_title").value=""; $("#n_body").value="";
+    renderNotices();
+    alert("Notice published.");
+  });
+  $("#n_search").addEventListener("input", renderNotices);
+  $("#n_export").addEventListener("click", ()=>{
+    const rows=jget("sch_notices"); if(!rows.length){alert("No notices to export.");return;}
+    csv(rows,["id","title","body","ts","author"],"Notices.csv");
+  });
+
+  // ===== Leave Approvals =====
+  function renderLeaves(){
+    const cls=$("#lv_class").value.trim();
+    const sec=$("#lv_section").value.trim();
+    const q=($("#lv_search").value||"").toLowerCase();
+    let rows=jget("sch_leaves");
+    if(cls) rows=rows.filter(l=> (l.class||"")===cls);
+    if(sec) rows=rows.filter(l=> (l.section||"")===sec);
+    rows=rows.filter(l=> (l.childName||"").toLowerCase().includes(q) || (l.reason||"").toLowerCase().includes(q));
+    rows.sort((a,b)=> (b.updatedAt||b.ts||0)-(a.updatedAt||a.ts||0));
+    const tb=$("#lv_tbody"); tb.innerHTML="";
+    if(!rows.length){ $("#lv_empty").style.display="block"; return; }
+    $("#lv_empty").style.display="none";
+    rows.forEach((l,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td>
+        <td>${l.childName||"—"}</td>
+        <td>${l.class||""}-${l.section||""}</td>
+        <td>${l.from||"—"}</td><td>${l.to||"—"}</td>
+        <td>${l.reason||""}</td>
+        <td>${l.status||"Pending"}</td>
+        <td class="row">
+          <button class="btn" data-approve="${l.id}">Approve</button>
+          <button class="btn" data-reject="${l.id}">Reject</button>
+        </td>`;
+      tb.appendChild(tr);
+    });
+    const me=getProfile();
+    tb.querySelectorAll("[data-approve]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const id=b.getAttribute("data-approve");
+        const arr=jget("sch_leaves"); const i=arr.findIndex(x=>x.id===id);
+        if(i>-1){ arr[i].status="Approved"; arr[i].approverId=me.id; arr[i].approverName=me.name; arr[i].updatedAt=Date.now(); jset("sch_leaves",arr); renderLeaves(); }
+      });
+    });
+    tb.querySelectorAll("[data-reject]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const id=b.getAttribute("data-reject");
+        const arr=jget("sch_leaves"); const i=arr.findIndex(x=>x.id===id);
+        if(i>-1){ arr[i].status="Rejected"; arr[i].approverId=me.id; arr[i].approverName=me.name; arr[i].updatedAt=Date.now(); jset("sch_leaves",arr); renderLeaves(); }
+      });
+    });
+  }
+  $("#lv_filter").addEventListener("click", renderLeaves);
+  $("#lv_search").addEventListener("input", renderLeaves);
+  $("#lv_export").addEventListener("click", ()=>{
+    const rows=jget("sch_leaves"); if(!rows.length){alert("No leaves to export.");return;}
+    csv(rows,["id","studentId","childName","class","section","from","to","reason","status","approverId","approverName","ts","updatedAt"],"Leaves.csv");
+  });
+
+  // ===== Init =====
+  function renderAll(){
+    renderDiaryList();
+    renderHomeworkList();
+    renderNotices();
+    renderLeaves();
+  }
+  loadProfile();
+  if(!$("#d_date").value) $("#d_date").value = todayYMD();
+  renderAll();
+
+  // ===== Logout =====
+  function logout(){ sessionStorage.clear(); location.replace("./index.html"); }
+  window.logout = logout;
 </script>
 </body>
 </html>
