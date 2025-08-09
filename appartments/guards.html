@@ -1,47 +1,12 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Apartments • Guards</title>
-<link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
-<style>
-  :root{--max:1000px}
-  body{background:#f5f7fa}
-  main{max-width:var(--max);margin:16px auto;padding:16px}
-  .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-
-  /* polish-only */
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
-  .banner{width:100%;height:180px;object-fit:cover;display:block}
-  @media(max-width:560px){.banner{height:140px}}
-  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
-  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .muted{color:#666}
-
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:900px){.grid{grid-template-columns:1fr}}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-
-  input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
-
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-align:center}
-  .cam{display:grid;grid-template-columns:1fr 160px;gap:10px}
-  @media(max-width:520px){.cam{grid-template-columns:1fr}}
-  video,canvas,img.snap{width:100%;border-radius:12px;background:#000;max-height:240px;object-fit:cover}
-</style>
-</head><body>
-<script>
-// optional role lock
-// if(sessionStorage.getItem("apt_role")!=="guards") location.replace("./index.html");
-</script>
+</head><body class="bg">
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
-<main>
-  <!-- Header -->
+<main class="wrap">
   <div class="card hero">
     <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
     <div class="hero-overlay">
@@ -50,104 +15,82 @@
     </div>
   </div>
 
-  <!-- Pre-Approvals + Walk-in -->
-  <div class="grid" style="margin-top:12px">
-    <!-- Pre-Approvals -->
+  <div class="grid2 mt">
     <section class="card">
-      <div class="row" style="align-items:center;justify-content:space-between">
-        <h2 style="margin:0">Pre-Approved Visitors</h2>
-        <input id="pa_search" placeholder="Search name/flat/purpose" style="max-width:260px">
+      <div class="row space">
+        <h2 class="h2">Pre-Approved Visitors</h2>
+        <input id="pa_search" class="in" placeholder="Search name/flat/purpose" style="max-width:260px">
       </div>
-      <p class="muted" style="margin:6px 0 8px">From residents’ pre-approvals. Verify ID → tap <b>Check-In</b>.</p>
-      <div style="overflow:auto">
-        <table>
-          <thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Date</th><th>Purpose</th><th>Action</th></tr></thead>
-          <tbody id="pa_tbody"></tbody>
-        </table>
+      <p class="muted">From residents’ pre-approvals. Verify ID → tap <b>Check-In</b>.</p>
+      <div class="tablewrap">
+        <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Date</th><th>Purpose</th><th>Action</th></tr></thead><tbody id="pa_tbody"></tbody></table>
         <div id="pa_empty" class="muted">No pre-approvals found.</div>
       </div>
     </section>
 
-    <!-- Walk-in Visitor -->
     <section class="card">
-      <h2 style="margin:0 0 6px">Walk-in Visitor</h2>
-      <div class="grid">
-        <label>Flat / Unit <input id="w_flat" placeholder="e.g., A-302"></label>
-        <label>Name <input id="w_name" placeholder="Visitor name"></label>
-        <label>Phone <input id="w_phone" inputmode="numeric" maxlength="10" placeholder="optional"></label>
-        <label>Purpose <input id="w_purpose" placeholder="guest/maintenance"></label>
+      <h2 class="h2">Walk-in Visitor</h2>
+      <div class="grid2">
+        <label>Flat / Unit <input id="w_flat" class="in" placeholder="e.g., A-302"></label>
+        <label>Name <input id="w_name" class="in" placeholder="Visitor name"></label>
+        <label>Phone <input id="w_phone" class="in" inputmode="numeric" maxlength="10" placeholder="optional"></label>
+        <label>Purpose <input id="w_purpose" class="in" placeholder="guest/maintenance"></label>
       </div>
-      <div class="cam" style="margin-top:8px">
-        <div>
-          <video id="cam" playsinline autoplay muted></video>
-          <canvas id="snap" style="display:none"></canvas>
-        </div>
+      <div class="cam mt8">
+        <div><video id="cam" playsinline autoplay muted></video><canvas id="snap" style="display:none"></canvas></div>
         <div>
           <button class="btn" id="cam_start">Open Camera</button>
-          <button class="btn" id="cam_capture" style="margin-top:8px">Capture Photo</button>
-          <img id="preview" class="snap" alt="Snapshot" style="margin-top:8px;display:none"/>
+          <button class="btn mt8" id="cam_capture">Capture Photo</button>
+          <img id="preview" class="snap" alt="Snapshot" style="display:none"/>
         </div>
       </div>
-      <div class="row" style="margin-top:10px">
+      <div class="row mt8">
         <button class="btn" id="w_checkin">Check-In</button>
         <button class="btn" id="w_clear">Clear</button>
       </div>
     </section>
   </div>
 
-  <!-- Deliveries -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 6px">Couriers / Deliveries</h2>
-    <div class="grid">
-      <label>Flat / Unit <input id="d_flat" placeholder="A-302"></label>
-      <label>From / Courier <input id="d_from" placeholder="Amazon / Swiggy"></label>
+  <div class="card mt">
+    <h2 class="h2">Couriers / Deliveries</h2>
+    <div class="grid2">
+      <label>Flat / Unit <input id="d_flat" class="in" placeholder="A-302"></label>
+      <label>From / Courier <input id="d_from" class="in" placeholder="Amazon / Swiggy"></label>
     </div>
-    <div class="cam" style="margin-top:8px">
-      <div>
-        <video id="cam2" playsinline autoplay muted></video>
-        <canvas id="snap2" style="display:none"></canvas>
-      </div>
+    <div class="cam mt8">
+      <div><video id="cam2" playsinline autoplay muted></video><canvas id="snap2" style="display:none"></canvas></div>
       <div>
         <button class="btn" id="cam2_start">Open Camera</button>
-        <button class="btn" id="cam2_capture" style="margin-top:8px">Capture Parcel</button>
-        <img id="preview2" class="snap" alt="Parcel" style="margin-top:8px;display:none"/>
+        <button class="btn mt8" id="cam2_capture">Capture Parcel</button>
+        <img id="preview2" class="snap" alt="Parcel" style="display:none"/>
       </div>
     </div>
-    <div class="row" style="margin-top:10px">
+    <div class="row mt8">
       <button class="btn" id="d_add">Add Delivery</button>
       <button class="btn" id="d_export">Export Deliveries CSV</button>
     </div>
-
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Flat</th><th>From</th><th>Time</th><th>Photo</th><th>Status</th><th>Action</th></tr></thead>
-        <tbody id="d_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>From</th><th>Time</th><th>Photo</th><th>Status</th><th>Action</th></tr></thead><tbody id="d_tbody"></tbody></table>
       <div id="d_empty" class="muted">No deliveries yet.</div>
     </div>
   </div>
 
-  <!-- Visitor History -->
-  <div class="card" style="margin-top:12px">
-    <div class="row" style="align-items:center;justify-content:space-between">
-      <h2 style="margin:0">Visitor History (Today)</h2>
+  <div class="card mt">
+    <div class="row space">
+      <h2 class="h2">Visitor History (Today)</h2>
       <div class="row">
-        <input id="vh_search" placeholder="Search name/flat/purpose" style="max-width:260px">
+        <input id="vh_search" class="in" placeholder="Search name/flat/purpose" style="max-width:260px">
         <button class="btn" id="vh_export">Export Visitors CSV</button>
       </div>
     </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead>
-        <tbody id="vh_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead><tbody id="vh_tbody"></tbody></table>
       <div id="vh_empty" class="muted">No visitors checked in today.</div>
     </div>
   </div>
 
-  <!-- Tools -->
-  <div class="card" style="margin-top:12px">
-    <div class="grid">
+  <div class="card mt">
+    <div class="grid2">
       <a class="btn" href="./index.html">Back to PIN</a>
       <a class="btn" href="./reset.html">Reset / Cache Tools</a>
     </div>
@@ -155,7 +98,6 @@
 </main>
 
 <script>
-/* ===== Data keys & helpers ===== */
 const K={preapprove:"apt_preapprove", visits:"apt_visits", deliveries:"apt_deliveries"};
 const $=id=>document.getElementById(id);
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
@@ -164,52 +106,28 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const todayYMD=()=>new Date().toISOString().slice(0,10);
 const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 
-/* ===== Camera helpers ===== */
-async function openCam(videoEl){
-  if(!navigator.mediaDevices?.getUserMedia){ alert("Camera not supported"); return null; }
-  const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" }, audio:false });
-  videoEl.srcObject = stream;
-  return stream;
-}
-function capture(videoEl, canvasEl){
-  const vw=videoEl.videoWidth||640, vh=videoEl.videoHeight||480;
-  canvasEl.width=vw; canvasEl.height=vh;
-  const ctx=canvasEl.getContext("2d"); ctx.drawImage(videoEl,0,0,vw,vh);
-  return canvasEl.toDataURL("image/jpeg", 0.7);
-}
-function stopStream(stream){ try{stream.getTracks().forEach(t=>t.stop());}catch{} }
+// camera
+async function openCam(videoEl){ if(!navigator.mediaDevices?.getUserMedia){ alert("Camera not supported"); return null; } const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}); videoEl.srcObject=s; return s; }
+function capture(videoEl,canvasEl){ const vw=videoEl.videoWidth||640,vh=videoEl.videoHeight||480; canvasEl.width=vw; canvasEl.height=vh; const ctx=canvasEl.getContext("2d"); ctx.drawImage(videoEl,0,0,vw,vh); return canvasEl.toDataURL("image/jpeg",0.7); }
+function stopStream(s){ try{s.getTracks().forEach(t=>t.stop());}catch{} }
 
-/* ===== Pre-Approvals ===== */
+// pre-approvals
 function renderPreApprovals(){
   const q=(pa_search.value||"").toLowerCase();
-  const rows = jget(K.preapprove)
-    .filter(x=>String(x.date||"").slice(0,10) >= todayYMD()) // today & future
-    .sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-  const filtered = rows.filter(r =>
-    (r.flat||"").toLowerCase().includes(q) ||
-    (r.name||"").toLowerCase().includes(q) ||
-    (r.purpose||"").toLowerCase().includes(q)
-  );
-  pa_tbody.innerHTML=""; pa_empty.style.display = filtered.length? "none":"block";
-  filtered.forEach((r,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.name}</td><td>${r.date||"—"}</td><td>${r.purpose||"—"}</td>
-      <td><button class="btn" onclick="checkIn('${r.flat}','${r.name}','${r.phone||""}','${(r.purpose||"guest").replace(/"/g,'&quot;')}')">Check-In</button></td>`;
-    pa_tbody.appendChild(tr);
-  });
+  const rows=jget(K.preapprove).filter(x=>String(x.date||"").slice(0,10)>=todayYMD()).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const filtered=rows.filter(r=>(r.flat||"").toLowerCase().includes(q)||(r.name||"").toLowerCase().includes(q)||(r.purpose||"").toLowerCase().includes(q));
+  pa_tbody.innerHTML=""; pa_empty.style.display=filtered.length?"none":"block";
+  filtered.forEach((r,i)=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.name}</td><td>${r.date||"—"}</td><td>${r.purpose||"—"}</td><td><button class="btn" onclick="checkIn('${r.flat}','${r.name}','${r.phone||""}','${(r.purpose||"guest").replace(/"/g,'&quot;')}')">Check-In</button></td>`; pa_tbody.appendChild(tr); });
 }
 pa_search.addEventListener("input",renderPreApprovals);
 
-/* ===== Walk-in & Check-in ===== */
-let cam1=null, cam2=null;
-cam_start.onclick=async()=>{ cam1 = await openCam(cam); };
-cam_capture.onclick=()=>{ if(!cam1){alert("Open camera first");return} const data=capture(cam,snap); preview.src=data; preview.style.display="block"; };
+// walk-in
+let cam1=null,cam2=null;
+cam_start.onclick=async()=>{ cam1=await openCam(cam); };
+cam_capture.onclick=()=>{ if(!cam1){alert("Open camera first");return} const d=capture(cam,snap); preview.src=d; preview.style.display="block"; };
 w_clear.onclick=()=>{ w_flat.value=w_name.value=w_phone.value=w_purpose.value=""; preview.src=""; preview.style.display="none"; if(cam1) stopStream(cam1); cam1=null; };
 
-window.checkIn=(flat,name,phone,purpose)=>{
-  w_flat.value=flat; w_name.value=name; w_phone.value=phone||""; w_purpose.value=purpose||"guest";
-  window.scrollTo({top:0,behavior:"smooth"});
-};
+window.checkIn=(flat,name,phone,purpose)=>{ w_flat.value=flat; w_name.value=name; w_phone.value=phone||""; w_purpose.value=purpose||"guest"; window.scrollTo({top:0,behavior:"smooth"}); };
 
 w_checkin.onclick=()=>{
   const flat=w_flat.value.trim(), name=w_name.value.trim(), phone=w_phone.value.trim(), purpose=w_purpose.value.trim()||"guest";
@@ -217,18 +135,17 @@ w_checkin.onclick=()=>{
   const photo = preview.src && preview.style.display!=="none" ? preview.src : "";
   const arr=jget(K.visits); arr.unshift({id:uid(),flat,name,phone,purpose,ts:Date.now(),photo});
   jset(K.visits,arr);
-  // mark matching pre-approval as used (for today)
+  // mark PA used if matches (today)
   let pre=jget(K.preapprove);
   pre = pre.map(p=> (p.flat===flat && p.name===name && p.date===todayYMD()) ? {...p, status:"Checked-In"} : p);
   jset(K.preapprove,pre);
-  // reset form
   w_name.value=w_phone.value=w_purpose.value=""; preview.src=""; preview.style.display="none";
   renderPreApprovals(); renderVisitorsHistory();
 };
 
-/* ===== Deliveries ===== */
-cam2_start.onclick=async()=>{ cam2 = await openCam(cam2); };
-cam2_capture.onclick=()=>{ if(!cam2){alert("Open camera first");return} const data=capture(cam2,snap2); preview2.src=data; preview2.style.display="block"; };
+// deliveries
+cam2_start.onclick=async()=>{ cam2=await openCam(cam2); };
+cam2_capture.onclick=()=>{ if(!cam2){alert("Open camera first");return} const d=capture(cam2,snap2); preview2.src=d; preview2.style.display="block"; };
 
 d_add.onclick=()=>{
   const flat=d_flat.value.trim(), from=d_from.value.trim();
@@ -242,55 +159,38 @@ d_add.onclick=()=>{
 
 function renderDeliveries(){
   const rows=jget(K.deliveries).sort((a,b)=>b.ts-a.ts);
-  d_tbody.innerHTML=""; d_empty.style.display = rows.length? "none":"block";
+  d_tbody.innerHTML=""; d_empty.style.display=rows.length?"none":"block";
   rows.forEach((r,i)=>{
     const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
-    const img = r.photo ? `<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">` : "—";
-    const btn = r.status==="At Gate" ? `<button class="btn" onclick="dispatchDel('${r.id}')">Dispatch</button>` : `<span class="muted">${r.status}</span>`;
+    const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—";
+    const btn=r.status==="At Gate"?`<button class="btn" onclick="dispatchDel('${r.id}')">Dispatch</button>`:`<span class="muted">${r.status}</span>`;
     const tr=document.createElement("tr");
     tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.from}</td><td>${t}</td><td>${img}</td><td>${r.status}</td><td>${btn}</td>`;
     d_tbody.appendChild(tr);
   });
 }
-window.dispatchDel=(id)=>{
-  const arr=jget(K.deliveries); const i=arr.findIndex(x=>x.id===id);
-  if(i>-1){ arr[i].status="Dispatched"; jset(K.deliveries,arr); renderDeliveries(); }
-};
-d_export.onclick=()=>{
-  const rows=jget(K.deliveries).map(({photo,...x})=>x); // exclude images in CSV
-  csv(rows,["id","flat","from","ts","status"],"Deliveries.csv");
-};
+window.dispatchDel=(id)=>{ const arr=jget(K.deliveries); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status="Dispatched"; jset(K.deliveries,arr); renderDeliveries(); } };
+d_export.onclick=()=>{ const rows=jget(K.deliveries).map(({photo,...x})=>x); csv(rows,["id","flat","from","ts","status"],"Deliveries.csv"); };
 
-/* ===== Visitors history (today) ===== */
+// visitors history
 function renderVisitorsHistory(){
   const q=(vh_search.value||"").toLowerCase();
-  const rows=jget(K.visits)
-    .filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD())
-    .filter(r=>
-      (r.flat||"").toLowerCase().includes(q) ||
-      (r.name||"").toLowerCase().includes(q) ||
-      (r.purpose||"").toLowerCase().includes(q)
-    );
-  vh_tbody.innerHTML=""; vh_empty.style.display = rows.length? "none":"block";
+  const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD())
+    .filter(r=>(r.flat||"").toLowerCase().includes(q)||(r.name||"").toLowerCase().includes(q)||(r.purpose||"").toLowerCase().includes(q));
+  vh_tbody.innerHTML=""; vh_empty.style.display=rows.length?"none":"block";
   rows.forEach((r,i)=>{
     const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-    const img = r.photo ? `<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">` : "—";
+    const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—";
     const tr=document.createElement("tr");
     tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.name}</td><td>${r.purpose}</td><td>${t}</td><td>${img}</td>`;
     vh_tbody.appendChild(tr);
   });
 }
 vh_search.addEventListener("input",renderVisitorsHistory);
-vh_export.onclick=()=>{
-  const rows=jget(K.visits)
-    .filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD())
-    .map(({photo,...x})=>x);
-  csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_Today.csv");
-};
+vh_export.onclick=()=>{ const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD()).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_Today.csv"); };
 
-/* ===== Init ===== */
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 renderPreApprovals(); renderDeliveries(); renderVisitorsHistory();
-window.addEventListener("beforeunload", ()=>{ if(cam1) stopStream(cam1); if(cam2) stopStream(cam2); });
+window.addEventListener("beforeunload",()=>{ if(cam1) stopStream(cam1); if(cam2) stopStream(cam2); });
 </script>
 </body></html>
