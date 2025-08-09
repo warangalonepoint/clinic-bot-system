@@ -1,1 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Teacher • School</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .wrap{max-width:900px;margin:20px auto;padding:12px}
+    .hero{position:relative;border-radius:22px;overflow:hidden}
+    .banner{width:100%;height:210px;object-fit:cover;display:block}
+    .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
+      padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
+    .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+    .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px 18px;margin-top:16px}
+    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:50px;padding:0 18px;font-weight:700;text-align:center;display:inline-block;line-height:50px}
+    .btn:active{transform:translateY(1px)}
+    .flex{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:left}
+    th{background:#f5f5f5}
+    textarea{width:100%;min-height:60px;border-radius:10px;border:1px solid #ccc;padding:8px;margin-top:6px}
+  </style>
+</head>
+<body class="bg">
+<main class="wrap">
+  <!-- Banner -->
+  <div class="card hero">
+    <img class="banner" src="./assets/banner.png" alt="School Banner">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+      <div class="hero-title">Teacher Panel</div>
+    </div>
+  </div>
 
+  <!-- Quick Links -->
+  <div class="card">
+    <h2>Quick Links</h2>
+    <div class="flex">
+      <a class="btn" style="flex:1" href="./attendance.html">Mark Attendance</a>
+      <a class="btn" style="flex:1" href="./class-diary.html">Write Class Diary</a>
+    </div>
+  </div>
+
+  <!-- Today's Students -->
+  <div class="card">
+    <h2>Today's Students</h2>
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Roll No</th><th>Note</th></tr>
+      </thead>
+      <tbody id="studentList">
+        <tr>
+          <td>John Doe</td>
+          <td>101</td>
+          <td><textarea placeholder="Write note..."></textarea></td>
+        </tr>
+        <tr>
+          <td>Jane Smith</td>
+          <td>102</td>
+          <td><textarea placeholder="Write note..."></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Logout -->
+  <div class="card">
+    <button class="btn" onclick="logout()">Logout</button>
+  </div>
+</main>
+
+<script>
+  if(sessionStorage.getItem("school_role") !== "teacher"){
+    location.replace("./index.html");
+  }
+  function logout(){
+    sessionStorage.clear();
+    location.replace("./index.html");
+  }
+</script>
+</body>
+</html>
