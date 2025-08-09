@@ -6,22 +6,17 @@
   <title>Admin • School</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
-    /* Page-only tweaks (global lives in styles.css) */
     .wrap{max-width:1100px;margin:20px auto;padding:12px}
     .hero{position:relative;border-radius:22px;overflow:hidden}
     .banner{width:100%;height:210px;object-fit:cover;display:block}
     .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
       padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
-    .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
     .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     @media(max-width:900px){.grid2{grid-template-columns:1fr}}
     .muted{color:#6b7280}
     .in{width:100%;height:48px;border:1px solid #d1d5db;border-radius:14px;padding:0 14px;font-size:16px}
-    textarea.in{height:auto;min-height:110px;padding:10px}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:left}
-    th{background:#f7f7f7}
+    textarea.in{min-height:110px;padding:10px}
     .pill{background:#eee;border-radius:999px;padding:6px 12px;display:inline-block}
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .space{align-items:center;justify-content:space-between}
@@ -29,27 +24,12 @@
 </head>
 <body class="bg">
 <main class="wrap">
-  <!-- Banner -->
   <div class="card hero">
     <img class="banner" src="./assets/banner.png" alt="School Banner">
-    <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" alt="Logo" onerror="this.style.display='none'">
-      <div class="hero-title">Admin Panel</div>
-    </div>
+    <div class="hero-overlay"><div class="hero-title">Admin Panel</div></div>
   </div>
 
-  <!-- Quick Links -->
-  <div class="card">
-    <h2 class="h2">Quick Links</h2>
-    <div class="row">
-      <a class="btn" href="./parents.html" style="flex:1">Parents</a>
-      <a class="btn" href="./teacher.html" style="flex:1">Teacher</a>
-      <a class="btn" href="./coordinator.html" style="flex:1">Coordinator</a>
-      <a class="btn" href="./index.html" style="flex:1">Back to PIN</a>
-    </div>
-  </div>
-
-  <!-- Dashboard Overview -->
+  <!-- Overview -->
   <div class="card">
     <h2 class="h2">Overview</h2>
     <div class="row" style="gap:12px">
@@ -69,17 +49,16 @@
   <div class="card">
     <div class="row space">
       <h2 class="h2">CSV Import / Export</h2>
-      <p class="muted">Local-only MVP. Imports overwrite localStorage keys. Exports download current data.</p>
+      <p class="muted">Local-only MVP. Imports overwrite localStorage keys.</p>
     </div>
     <div class="grid2">
       <div>
         <h3 class="h2">Import CSV</h3>
         <select id="impKey" class="in">
-          <option value="sch_students">Students</option>
-          <option value="sch_teachers">Teachers</option>
-          <option value="sch_classes">Classes</option>
-          <option value="sch_fees">Fees</option>
-          <option value="sch_timetable">Timetable</option>
+          <option value="sch_students">students.csv</option>
+          <option value="sch_teachers">teachers.csv</option>
+          <option value="sch_classes">classes (local)</option>
+          <option value="sch_timetable">timetable (local)</option>
         </select>
         <input id="impFile" class="in" type="file" accept=".csv" style="margin-top:8px">
         <button class="btn" style="width:100%;margin-top:10px" id="btnImport">Import CSV</button>
@@ -88,27 +67,16 @@
       <div>
         <h3 class="h2">Export CSV</h3>
         <div class="row">
-          <button class="btn" style="flex:1" data-exp="sch_students">Students</button>
-          <button class="btn" style="flex:1" data-exp="sch_teachers">Teachers</button>
+          <button class="btn" style="flex:1" data-exp="sch_students">students.csv</button>
+          <button class="btn" style="flex:1" data-exp="sch_teachers">teachers.csv</button>
         </div>
         <div class="row" style="margin-top:8px">
-          <button class="btn" style="flex:1" data-exp="sch_classes">Classes</button>
-          <button class="btn" style="flex:1" data-exp="sch_fees">Fees</button>
+          <button class="btn" style="flex:1" data-exp="sch_class_diary">classdiary.csv</button>
+          <button class="btn" style="flex:1" data-exp="sch_homework">homework.csv</button>
         </div>
         <div class="row" style="margin-top:8px">
-          <button class="btn" style="flex:1" data-exp="sch_attendance">Attendance</button>
-          <button class="btn" style="flex:1" data-exp="sch_homework">Homework</button>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" style="flex:1" data-exp="sch_notices">Notices</button>
-          <button class="btn" style="flex:1" data-exp="sch_leaves">Leaves</button>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" style="flex:1" data-exp="sch_class_diary">Class Diary</button>
-          <button class="btn" style="flex:1" data-exp="sch_timetable">Timetable</button>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" style="flex:1" data-exp="sch_events">Events</button>
+          <button class="btn" style="flex:1" data-exp="sch_leaves">leaves.csv</button>
+          <button class="btn" style="flex:1" data-exp="sch_events">events.csv</button>
         </div>
       </div>
     </div>
@@ -127,7 +95,7 @@
       </div>
       <div>
         <h3 class="h2">Role PINs</h3>
-        <p class="muted" style="margin:0 0 6px">Saved locally as <code>pins_override</code> (we can’t write pins.json without a server).</p>
+        <p class="muted" style="margin:0 0 6px">Stored locally as <code>pins_override</code>.</p>
         <div class="grid2">
           <input id="pin_coord" class="in" placeholder="Coordinator PIN">
           <input id="pin_par" class="in" placeholder="Parents PIN">
@@ -145,162 +113,104 @@
     <h2 class="h2">Utilities</h2>
     <div class="row">
       <button class="btn" style="flex:1" id="seed_demo">Seed Demo Data</button>
-      <button class="btn" style="flex:1" id="wipe_local">Local Reset (Danger)</button>
-      <button class="btn" style="flex:1" id="reload_sw">Reload Service Worker</button>
+      <button class="btn" style="flex:1" id="wipe_local">Local Reset</button>
+      <button class="btn" style="flex:1" id="reload_sw">Reload SW</button>
       <button class="btn" style="flex:1" onclick="logout()">Logout</button>
     </div>
   </div>
 </main>
 
 <script>
-  // ===== Role lock =====
-  if(sessionStorage.getItem("school_role") !== "admin"){
-    location.replace("./index.html");
-  }
+  if(sessionStorage.getItem("school_role")!=="admin"){ location.replace("./index.html"); }
+  const $=s=>document.querySelector(s);
+  const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+  const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+  const csvExport=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String((r||{})[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 
-  // ===== Helpers =====
-  const $ = sel => document.querySelector(sel);
-  const jget = k => JSON.parse(localStorage.getItem(k) || "[]");
-  const jset = (k,v) => localStorage.setItem(k, JSON.stringify(v));
-  const csvExport = (rows, heads, name) => {
-    const out=[heads.join(",")];
-    rows.forEach(r=>out.push(heads.map(h=>`"${String((r||{})[h] ?? "").replace(/"/g,'""')}"`).join(",")));
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(new Blob([out.join("\\n")],{type:"text/csv"}));
-    a.download=name; a.click();
-  };
-
-  // ===== Overview counts =====
   function renderCounts(){
-    $("#count_students").textContent = jget("sch_students").length;
-    $("#count_teachers").textContent = jget("sch_teachers").length;
-    $("#count_classes").textContent  = jget("sch_classes").length;
-    $("#count_notices").textContent  = jget("sch_notices").length;
-    $("#count_homework").textContent = jget("sch_homework").length;
-    $("#count_leaves").textContent   = jget("sch_leaves").length;
-    $("#count_att").textContent      = jget("sch_attendance").length;
-    $("#count_diary").textContent    = jget("sch_class_diary").length;
-    $("#count_events").textContent   = jget("sch_events").length;
+    $("#count_students").textContent=jget("sch_students").length;
+    $("#count_teachers").textContent=jget("sch_teachers").length;
+    $("#count_classes").textContent=jget("sch_classes").length;
+    $("#count_notices").textContent=jget("sch_notices").length;
+    $("#count_homework").textContent=jget("sch_homework").length;
+    $("#count_leaves").textContent=jget("sch_leaves").length;
+    $("#count_att").textContent=jget("sch_attendance").length;
+    $("#count_diary").textContent=jget("sch_class_diary").length;
+    $("#count_events").textContent=jget("sch_events").length;
   }
 
-  // ===== CSV Import =====
+  // Import CSV -> localStorage array of objects
   $("#btnImport").addEventListener("click", async ()=>{
-    const key = $("#impKey").value;
-    const file = $("#impFile").files[0];
-    const msg = $("#impMsg");
+    const key=$("#impKey").value, file=$("#impFile").files[0], msg=$("#impMsg");
     if(!file){ msg.textContent="Choose a CSV file."; return; }
-    const text = await file.text();
-    const lines = text.trim().split(/\\r?\\n/);
-    if(lines.length < 2){ msg.textContent="CSV seems empty."; return; }
-    const headers = lines[0].split(",").map(h=>h.trim());
-    const rows = lines.slice(1).map(line=>{
-      const parts = line.match(/(".*?"|[^",\\s]+)(?=\\s*,|\\s*$)/g) || [];
-      const obj = {};
-      headers.forEach((h,i)=>{
-        let v = (parts[i]||"").replace(/^"(.*)"$/,'$1').replace(/""/g,'"');
-        obj[h] = v;
-      });
-      return obj;
+    const text=await file.text();
+    const lines=text.trim().split(/\r?\n/);
+    if(lines.length<2){ msg.textContent="CSV seems empty."; return; }
+    const headers=lines[0].split(",").map(h=>h.trim());
+    const rows=lines.slice(1).map(line=>{
+      const parts=line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)||[];
+      const o={}; headers.forEach((h,i)=>{ o[h]= (parts[i]||"").replace(/^"(.*)"$/,'$1').replace(/""/g,'"'); });
+      return o;
     });
-    jset(key, rows);
-    msg.textContent = `Imported ${rows.length} rows into ${key}.`;
-    renderCounts();
+    jset(key,rows); msg.textContent=`Imported ${rows.length} rows into ${key}.`; renderCounts();
   });
 
-  // ===== CSV Export buttons =====
-  document.querySelectorAll('[data-exp]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const key = btn.getAttribute('data-exp');
-      const rows = jget(key);
-      if(!rows.length){ alert("No data to export."); return; }
-      const heads = Object.keys(rows[0]);
-      csvExport(rows, heads, `${key}.csv`);
-    });
-  });
+  // Export buttons
+  document.querySelectorAll("[data-exp]").forEach(b=>b.addEventListener("click",()=>{
+    const key=b.getAttribute("data-exp"); const rows=jget(key);
+    if(!rows.length){ alert("No data."); return; }
+    csvExport(rows,Object.keys(rows[0]), key.replace("sch_","")+".csv");
+  }));
 
-  // ===== School identity =====
-  (function loadSettings(){
-    const s = JSON.parse(localStorage.getItem("sch_settings")||"{}");
-    $("#s_name").value = s.name || "";
-    $("#s_session").value = s.session || "";
-  })();
-  $("#s_save").addEventListener("click", ()=>{
-    const s = { name: $("#s_name").value.trim(), session: $("#s_session").value.trim() };
-    localStorage.setItem("sch_settings", JSON.stringify(s));
-    $("#s_msg").textContent = "Saved.";
-    setTimeout(()=>$("#s_msg").textContent="",1500);
-  });
+  // Settings
+  (function loadSettings(){ const s=JSON.parse(localStorage.getItem("sch_settings")||"{}");
+    $("#s_name").value=s.name||""; $("#s_session").value=s.session||"";})();
+  $("#s_save").addEventListener("click",()=>{const s={name:$("#s_name").value.trim(),session:$("#s_session").value.trim()};
+    localStorage.setItem("sch_settings",JSON.stringify(s)); $("#s_msg").textContent="Saved."; setTimeout(()=>$("#s_msg").textContent="",1500);});
 
-  // ===== PINs (local override since we can't write pins.json) =====
-  async function loadPinsBase(){
-    try{
-      const r = await fetch("./pins.json",{cache:"no-store"});
-      if(!r.ok) throw 0;
-      return await r.json();
-    }catch{ return { coordinator:"1111", parents:"2222", teacher:"3333", admin:"4444" }; }
-  }
+  // PINs override
   (async function initPins(){
-    const base = await loadPinsBase();
-    const ov = JSON.parse(localStorage.getItem("pins_override")||"{}");
-    const pins = {...base, ...ov};
-    $("#pin_coord").value = pins.coordinator || "";
-    $("#pin_par").value   = pins.parents || "";
-    $("#pin_teacher").value = pins.teacher || "";
-    $("#pin_admin").value = pins.admin || "";
+    try{
+      const base=await fetch("./pins.json",{cache:"no-store"}).then(r=>r.json());
+      const ov=JSON.parse(localStorage.getItem("pins_override")||"{}");
+      const p={...base,...ov};
+      $("#pin_coord").value=p.coordinator||""; $("#pin_par").value=p.parents||"";
+      $("#pin_teacher").value=p.teacher||""; $("#pin_admin").value=p.admin||"";
+    }catch{}
   })();
-  $("#pin_save").addEventListener("click", ()=>{
-    const ov = {
-      coordinator: $("#pin_coord").value.trim(),
-      parents: $("#pin_par").value.trim(),
-      teacher: $("#pin_teacher").value.trim(),
-      admin: $("#pin_admin").value.trim()
-    };
-    localStorage.setItem("pins_override", JSON.stringify(ov));
-    $("#pin_msg").textContent = "Saved locally (pins_override).";
-    setTimeout(()=>$("#pin_msg").textContent="",1500);
+  $("#pin_save").addEventListener("click",()=>{
+    const ov={coordinator:$("#pin_coord").value.trim(),parents:$("#pin_par").value.trim(),
+      teacher:$("#pin_teacher").value.trim(),admin:$("#pin_admin").value.trim()};
+    localStorage.setItem("pins_override",JSON.stringify(ov)); $("#pin_msg").textContent="Saved locally."; setTimeout(()=>$("#pin_msg").textContent="",1500);
   });
 
-  // ===== Utilities =====
+  // Utilities
   $("#wipe_local").addEventListener("click", ()=>{
-    if(!confirm("This will clear ALL local data (except SW cache). Continue?")) return;
-    const keep = ["pins_override","sch_settings"];
-    const saved = {};
-    keep.forEach(k=>{saved[k]=localStorage.getItem(k)});
-    localStorage.clear();
-    keep.forEach(k=>{ if(saved[k]!=null) localStorage.setItem(k,saved[k]); });
-    alert("Local data cleared.");
-    renderCounts();
+    if(!confirm("Clear ALL local data (keeps pins_override & sch_settings)?")) return;
+    const keep=["pins_override","sch_settings"]; const cache={}; keep.forEach(k=>cache[k]=localStorage.getItem(k));
+    localStorage.clear(); keep.forEach(k=>cache[k]!=null&&localStorage.setItem(k,cache[k])); renderCounts(); alert("Cleared.");
   });
-
   $("#reload_sw").addEventListener("click", async ()=>{
-    if('serviceWorker' in navigator){
-      const regs = await navigator.serviceWorker.getRegistrations();
-      for (const reg of regs){ await reg.update(); }
-      alert("Service worker reloaded. Hard refresh recommended.");
-    }
+    if('serviceWorker' in navigator){ const regs=await navigator.serviceWorker.getRegistrations(); for(const r of regs) await r.update(); alert("SW reloaded. Hard refresh to apply.");}
   });
-
-  // Seed a tiny demo so you can see pages working
   $("#seed_demo").addEventListener("click", ()=>{
     if(!confirm("Seed demo data?")) return;
-    const now = Date.now();
-    jset("sch_students", [
-      {id:"S-1",name:"Aarav Gupta",roll:"21",class:"4",section:"A",parentName:"Mr. Gupta",parentPhone:"9876543210"},
-      {id:"S-2",name:"Maya Iyer",roll:"22",class:"4",section:"A",parentName:"Ms. Iyer",parentPhone:"9876500000"}
+    const now=Date.now();
+    jset("sch_students",[
+      {id:"S-1",name:"Aarav Gupta",roll:"21",class:"5",section:"A",parentName:"Mr. Gupta",parentPhone:"9876543210"},
+      {id:"S-2",name:"Maya Iyer",roll:"22",class:"5",section:"A",parentName:"Ms. Iyer",parentPhone:"9876500000"}
     ]);
-    jset("sch_teachers", [{id:"T-42",name:"Ms. Priya"},{id:"T-11",name:"Mr. Sharma"}]);
-    jset("sch_classes", [{class:"4",section:"A",teacherId:"T-42"}]);
-    jset("sch_notices", [{id:"N1",title:"PTM Friday",body:"Parent meeting at 3 PM.",audience:{type:"Class",class:"4"},ts:now,author:"Admin"}]);
-    jset("sch_homework", [{id:"H1",class:"4",section:"A",subject:"Maths",title:"Exercise 4B",details:"Q1–10",due:new Date().toISOString().slice(0,10),teacherId:"T-11",teacherName:"Mr. Sharma",ts:now}]);
-    jset("sch_class_diary", [{id:"D1",class:"4",section:"A",date:new Date().toISOString().slice(0,10),text:"Photosynthesis intro + activity.",link:"",teacherId:"T-42",teacherName:"Ms. Priya",ts:now}]);
-    jset("sch_leaves", []);
-    jset("sch_events", [{id:"E1",type:"Event",title:"Sports Day",start:new Date().toISOString().slice(0,10),end:"",notes:"House-wise races",ts:now}]);
-    renderCounts();
-    alert("Demo data seeded.");
+    jset("sch_teachers",[{id:"T-42",name:"Ms. Priya"},{id:"T-11",name:"Mr. Sharma"}]);
+    jset("sch_classes",[{class:"5",section:"A",teacherId:"T-42"}]);
+    jset("sch_notices",[{id:"N1",title:"PTM Friday",body:"3 PM.",audience:{type:"Class",class:"5"},ts:now,author:"Admin"}]);
+    jset("sch_homework",[{id:"H1",class:"5",section:"A",subject:"Maths",title:"Exercise 5A",details:"Q1–10",due:new Date().toISOString().slice(0,10),teacherId:"T-11",teacherName:"Mr. Sharma",ts:now}]);
+    jset("sch_class_diary",[{id:"D1",class:"5",section:"A",date:new Date().toISOString().slice(0,10),subject:"Science",text:"Intro to Plants",link:"",teacherId:"T-42",teacherName:"Ms. Priya",ts:now}]);
+    jset("sch_leaves",[]);
+    jset("sch_events",[{id:"E1",type:"Event",title:"Sports Day",start:new Date().toISOString().slice(0,10),end:"",notes:"",ts:now}]);
+    renderCounts(); alert("Seeded.");
   });
 
   function logout(){ sessionStorage.clear(); location.replace("./index.html"); }
-
   renderCounts();
 </script>
 </body>
