@@ -6,18 +6,32 @@
   <title>Parents • School</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
-    .wrap{max-width:900px;margin:20px auto;padding:12px}
+    /* Page polish (global styles live in styles.css if you have it) */
+    .wrap{max-width:960px;margin:20px auto;padding:12px}
     .hero{position:relative;border-radius:22px;overflow:hidden}
     .banner{width:100%;height:210px;object-fit:cover;display:block}
     .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
       padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
     .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
     .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px 18px;margin-top:16px}
-    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:50px;padding:0 18px;font-weight:700;text-align:center;display:inline-block;line-height:50px}
+    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px;margin-top:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .space{align-items:center;justify-content:space-between}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:860px){.grid2{grid-template-columns:1fr}}
+    .in{width:100%;height:48px;border:1px solid #d1d5db;border-radius:14px;padding:0 14px;font-size:16px}
+    textarea.in{height:auto;min-height:90px;padding:10px}
+    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:46px;padding:0 18px;font-weight:700;text-align:center;display:inline-block;line-height:46px}
     .btn:active{transform:translateY(1px)}
-    .w50{width:48%}
-    .flex{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .tab{padding:10px 14px;border-radius:999px;background:#eee;cursor:pointer;font-weight:700;border:0}
+    .tab.active{background:#111;color:#fff}
+    .hidden{display:none}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:left;vertical-align:top}
+    th{background:#f7f7f7}
+    .muted{color:#6b7280}
+    .pill{background:#eee;border-radius:999px;padding:6px 12px;display:inline-block}
   </style>
 </head>
 <body class="bg">
@@ -31,32 +45,315 @@
     </div>
   </div>
 
-  <!-- Quick Links -->
+  <!-- Child Profile (filters all data) -->
   <div class="card">
-    <h2>Quick Links</h2>
-    <div class="flex">
-      <a class="btn w50" href="./notices.html">School Notices</a>
-      <a class="btn w50" href="./class-diary.html">Class Diary</a>
-      <a class="btn w50" href="./results.html">Results</a>
-      <a class="btn w50" href="./events.html">Events</a>
+    <h2 style="margin:0 0 6px">Child Profile</h2>
+    <p class="muted" style="margin:0 0 10px">Set once. Class Diary & Messages auto-filter to this class/section.</p>
+    <div class="grid2">
+      <label>Child Name <input id="p_name" class="in" placeholder="e.g., Aarav Gupta"></label>
+      <label>Roll No <input id="p_roll" class="in" placeholder="e.g., 21"></label>
+      <label>Class <input id="p_class" class="in" placeholder="e.g., 4"></label>
+      <label>Section <input id="p_section" class="in" placeholder="e.g., A"></label>
+      <label>Parent Phone <input id="p_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit (used for read receipts)"></label>
     </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="p_save">Save</button>
+      <button class="btn" id="p_clear">Clear</button>
+    </div>
+    <div id="p_msg" class="muted" style="margin-top:8px"></div>
   </div>
 
-  <!-- Logout -->
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-t="#t_dash">Dashboard</button>
+    <button class="tab" data-t="#t_diary">Class Diary</button>
+    <button class="tab" data-t="#t_msgs">Messages from Teachers</button>
+  </div>
+
+  <!-- Dashboard -->
+  <section class="card" id="t_dash">
+    <h2 style="margin:0 0 6px">Today</h2>
+    <div class="row" style="gap:12px;flex-wrap:wrap">
+      <span class="pill">Unread Messages: <b id="d_unread">0</b></span>
+      <span class="pill">Homework Due Today: <b id="d_hw">0</b></span>
+    </div>
+
+    <div style="margin-top:14px">
+      <h3 style="margin:0 0 6px">Class Diary (Today)</h3>
+      <div id="dash_diary_empty" class="muted">No diary posted yet for today.</div>
+      <div id="dash_diary" class="card" style="margin:8px 0 0;display:none;padding:14px;border:1px solid #eee;border-radius:16px">
+        <div class="muted" id="dash_diary_meta"></div>
+        <div id="dash_diary_text" style="margin-top:6px"></div>
+        <div id="dash_diary_link" style="margin-top:6px"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <h3 style="margin:0 0 6px">Homework Due Today</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>Subject</th><th>Title</th><th>Due</th></tr></thead>
+          <tbody id="dash_hw"></tbody>
+        </table>
+        <div id="dash_hw_empty" class="muted">No homework due today.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Class Diary -->
+  <section class="card hidden" id="t_diary">
+    <div class="row space">
+      <h2 style="margin:0">Class Diary</h2>
+      <div class="row">
+        <input id="diary_date" type="date" class="in">
+        <button class="btn" id="diary_today">Today</button>
+        <button class="btn" id="diary_export">Export CSV</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Date</th><th>Teacher</th><th>Diary</th><th>Link</th></tr></thead>
+        <tbody id="diary_tbody"></tbody>
+      </table>
+      <div id="diary_empty" class="muted">No diary entries for the selected date/class.</div>
+    </div>
+  </section>
+
+  <!-- Messages from Teachers (Notices filtered to class/section or All) -->
+  <section class="card hidden" id="t_msgs">
+    <div class="row space">
+      <h2 style="margin:0">Messages from Teachers</h2>
+      <div class="row">
+        <input id="msg_search" class="in" placeholder="Search title/text" style="max-width:260px">
+        <button class="btn" id="msg_export">Export CSV</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>When</th><th>Title</th><th>Message</th><th>Audience</th><th>Action</th></tr></thead>
+        <tbody id="msg_tbody"></tbody>
+      </table>
+      <div id="msg_empty" class="muted">No messages yet.</div>
+    </div>
+  </section>
+
+  <!-- Utilities -->
   <div class="card">
-    <button class="btn w50" onclick="logout()">Logout</button>
+    <div class="row">
+      <a class="btn" href="./index.html" style="flex:1">Back to PIN</a>
+      <button class="btn" style="flex:1" onclick="logout()">Logout</button>
+    </div>
   </div>
 </main>
 
 <script>
-  // session check
+  // ===== Role lock =====
   if(sessionStorage.getItem("school_role") !== "parents"){
     location.replace("./index.html");
   }
-  function logout(){
-    sessionStorage.clear();
-    location.replace("./index.html");
+
+  // ===== Helpers & Keys =====
+  const $ = sel => document.querySelector(sel);
+  const jget = k => JSON.parse(localStorage.getItem(k) || "[]");
+  const jset = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+  const todayYMD = () => new Date().toISOString().slice(0,10);
+  const toTime = ts => new Date(ts).toLocaleString([], {month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+  const csv = (rows, heads, name) => {
+    const out=[heads.join(",")];
+    rows.forEach(r=>out.push(heads.map(h=>`"${String((r||{})[h] ?? "").replace(/"/g,'""')}"`).join(",")));
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));
+    a.download=name; a.click();
+  };
+
+  // Local keys used by teacher/admin pages in this MVP:
+  // sch_class_diary: [{id,class,section,date,text,link?,teacherId,ts}]
+  // sch_notices: [{id,title,body,audience:{type:"All"|"Class"|"Section",class?,section?},ts,author?}]
+  // sch_homework: [{id,class,section,subject,title,details,due,teacherId,ts}]
+  // Parent profile (local to this device):
+  const K = { profile: "sch_parent_profile" };
+
+  // ===== Profile =====
+  function loadProfile(){
+    const p = JSON.parse(localStorage.getItem(K.profile) || "{}");
+    $("#p_name").value = p.name || "";
+    $("#p_roll").value = p.roll || "";
+    $("#p_class").value = p.class || "";
+    $("#p_section").value = p.section || "";
+    $("#p_phone").value = p.phone || "";
   }
+  function getProfile(){
+    const p = JSON.parse(localStorage.getItem(K.profile) || "{}");
+    const cls = (p.class||"").trim(); const sec = (p.section||"").trim();
+    return { ...p, class: cls, section: sec };
+  }
+  $("#p_save").addEventListener("click", ()=>{
+    const p = {
+      name: $("#p_name").value.trim(),
+      roll: $("#p_roll").value.trim(),
+      class: $("#p_class").value.trim(),
+      section: $("#p_section").value.trim(),
+      phone: $("#p_phone").value.trim()
+    };
+    localStorage.setItem(K.profile, JSON.stringify(p));
+    $("#p_msg").textContent = "Saved.";
+    setTimeout(()=>$("#p_msg").textContent="",1200);
+    renderAll();
+  });
+  $("#p_clear").addEventListener("click", ()=>{
+    localStorage.removeItem(K.profile);
+    loadProfile();
+    renderAll();
+  });
+
+  // ===== Tabs =====
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      document.querySelectorAll("section.card").forEach(s=>{ if(s.id.startsWith("t_")) s.classList.add("hidden"); });
+      document.querySelector(t.getAttribute("data-t")).classList.remove("hidden");
+    });
+  });
+
+  // ===== Dashboard: Today’s Diary + Homework due + Unread count =====
+  function renderDashboard(){
+    const p = getProfile(); if(!p.class || !p.section){ $("#dash_diary_empty").textContent="Set class/section above."; return; }
+    const diaries = jget("sch_class_diary")
+      .filter(d => d.class===p.class && d.section===p.section && (d.date||"").slice(0,10)===todayYMD())
+      .sort((a,b)=>b.ts-a.ts);
+    if(diaries.length){
+      const d = diaries[0];
+      $("#dash_diary_empty").style.display="none";
+      $("#dash_diary").style.display="block";
+      $("#dash_diary_meta").textContent = `By ${d.teacherId||"Teacher"} • ${toTime(d.ts)}`;
+      $("#dash_diary_text").textContent = d.text || "";
+      $("#dash_diary_link").innerHTML = d.link ? `<a href="${d.link}" target="_blank" rel="noopener">Open link</a>` : "";
+    } else {
+      $("#dash_diary").style.display="none";
+      $("#dash_diary_empty").style.display="block";
+    }
+
+    const hw = jget("sch_homework")
+      .filter(h => h.class===p.class && h.section===p.section && (h.due||"").slice(0,10)===todayYMD());
+    $("#d_hw").textContent = hw.length;
+    const tbody = $("#dash_hw"); tbody.innerHTML="";
+    if(hw.length===0){ $("#dash_hw_empty").style.display="block"; }
+    else {
+      $("#dash_hw_empty").style.display="none";
+      hw.forEach((h,i)=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`<td>${i+1}</td><td>${h.subject||"—"}</td><td>${h.title||"—"}</td><td>${(h.due||"").slice(0,10)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Unread messages
+    const unread = computeUnreadCount();
+    $("#d_unread").textContent = unread;
+  }
+
+  // ===== Class Diary Tab =====
+  function renderDiary(){
+    const p = getProfile(); const selDate = $("#diary_date").value || todayYMD();
+    const rows = jget("sch_class_diary")
+      .filter(d => d.class===p.class && d.section===p.section && (!selDate || (d.date||"").slice(0,10)===selDate))
+      .sort((a,b)=>b.ts-a.ts);
+    const tbody = $("#diary_tbody"); tbody.innerHTML="";
+    if(rows.length===0){ $("#diary_empty").style.display="block"; return; }
+    $("#diary_empty").style.display="none";
+    rows.forEach((d,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${i+1}</td>
+        <td>${(d.date||"").slice(0,10)}</td>
+        <td>${d.teacherId || "Teacher"}</td>
+        <td>${d.text||""}</td>
+        <td>${d.link ? `<a href="${d.link}" target="_blank" rel="noopener">Open</a>`:"—"}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  $("#diary_today").addEventListener("click", ()=>{ $("#diary_date").value=todayYMD(); renderDiary(); });
+  $("#diary_export").addEventListener("click", ()=>{
+    const p = getProfile();
+    const rows = jget("sch_class_diary").filter(d=>d.class===p.class && d.section===p.section);
+    if(!rows.length){ alert("No diary to export."); return; }
+    csv(rows, ["id","class","section","date","text","link","teacherId","ts"], "Class_Diary.csv");
+  });
+
+  // ===== Messages from Teachers (Notices filtered) =====
+  function matchesAudience(n,p){
+    const aud = n.audience || {type:"All"};
+    if(aud.type==="All") return true;
+    if(aud.type==="Class")  return aud.class===p.class;
+    if(aud.type==="Section")return aud.class===p.class && aud.section===p.section;
+    return false;
+  }
+  function readKey(){ const ph=(getProfile().phone||"").trim(); return `sch_read_notices_${ph||"unknown"}`; }
+  function getReadSet(){ try{ return JSON.parse(localStorage.getItem(readKey())||"[]"); }catch{ return []; } }
+  function setRead(id){ const arr=getReadSet(); if(!arr.includes(id)){ arr.push(id); localStorage.setItem(readKey(), JSON.stringify(arr)); } }
+  function computeUnreadCount(){
+    const p = getProfile(); const read = new Set(getReadSet());
+    return jget("sch_notices").filter(n=>matchesAudience(n,p) && !read.has(n.id)).length;
+  }
+
+  function renderMessages(){
+    const p = getProfile();
+    const q = ($("#msg_search").value||"").toLowerCase();
+    const read = new Set(getReadSet());
+    const rows = jget("sch_notices")
+      .filter(n=>matchesAudience(n,p))
+      .filter(n=>(n.title||"").toLowerCase().includes(q) || (n.body||"").toLowerCase().includes(q))
+      .sort((a,b)=>b.ts-a.ts);
+
+    const tbody=$("#msg_tbody"); tbody.innerHTML="";
+    if(rows.length===0){ $("#msg_empty").style.display="block"; return; }
+    $("#msg_empty").style.display="none";
+
+    rows.forEach((n,i)=>{
+      const aud = n.audience?.type==="All" ? "All"
+                : n.audience?.type==="Class" ? `Class ${n.audience.class}`
+                : n.audience?.type==="Section" ? `Class ${n.audience.class}-${n.audience.section}` : "—";
+      const isRead = read.has(n.id);
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${i+1}</td>
+        <td>${toTime(n.ts)}</td>
+        <td>${n.title||"—"}</td>
+        <td>${n.body||""}</td>
+        <td>${aud}</td>
+        <td>${isRead
+            ? '<span class="muted">Read</span>'
+            : `<button class="btn" data-read="${n.id}">Mark Read</button>`}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    // wire mark-read
+    tbody.querySelectorAll("[data-read]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        setRead(btn.getAttribute("data-read"));
+        renderMessages();
+        renderDashboard();
+      });
+    });
+  }
+  $("#msg_search").addEventListener("input", renderMessages);
+  $("#msg_export").addEventListener("click", ()=>{
+    const p = getProfile();
+    const rows = jget("sch_notices").filter(n=>matchesAudience(n,p));
+    if(!rows.length){ alert("No messages to export."); return; }
+    csv(rows, ["id","title","body","ts","author"], "Messages.csv");
+  });
+
+  // ===== Init / Render =====
+  function renderAll(){ renderDashboard(); renderDiary(); renderMessages(); }
+  loadProfile();
+  if(!$("#diary_date").value) $("#diary_date").value = todayYMD();
+  renderAll();
+
+  // ===== Logout =====
+  function logout(){ sessionStorage.clear(); location.replace("./index.html"); }
+  window.logout = logout;
 </script>
 </body>
 </html>
