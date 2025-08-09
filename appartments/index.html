@@ -1,62 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Onestop C-Demo - Dashboard</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" type="image/png" href="assets/logo.png" />
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Apartments • PIN</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
 </head>
-<body>
+<body class="bg">
+<main class="wrap">
   <!-- Header -->
-  <header class="app-header">
-    <img src="assets/logo.png" alt="Clinic Logo" class="logo" />
-    <h1 class="clinic-name">Onestop C-Demo</h1>
-    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
-    <button id="themeToggle" class="theme-toggle">🌙</button>
-  </header>
+  <div class="card hero">
+    <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+      <div class="hero-title">Onestop Apartments</div>
+    </div>
+  </div>
 
-  <!-- Main Navigation -->
-  <main class="dashboard">
-    <section class="nav-section">
-      <h2>Bookings</h2>
-      <a href="patient-bookings.html" class="nav-btn">Patient Bookings</a>
-      <a href="manual-bookings.html" class="nav-btn">Manual Bookings</a>
-      <a href="tokens.html" class="nav-btn">Token Summary</a>
-    </section>
+  <!-- PIN -->
+  <div class="card mt">
+    <h2 class="h2">Enter PIN</h2>
+    <p class="muted">You’ll be routed to your role.</p>
+    <form id="pinForm">
+      <input id="pin" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="4–8 digit PIN" class="in">
+      <button class="btn w100 mt8">Continue</button>
+    </form>
+    <div id="msg" class="muted mt8"></div>
+  </div>
+</main>
 
-    <section class="nav-section">
-      <h2>Logs & Records</h2>
-      <a href="logs.html" class="nav-btn">Booking Logs</a>
-      <a href="export-panel.html" class="nav-btn">Export Panel</a>
-    </section>
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 
-    <section class="nav-section">
-      <h2>Staff</h2>
-      <a href="staff-panel.html" class="nav-btn">Staff Dashboard</a>
-      <a href="staff-attendance.html" class="nav-btn">Staff Attendance</a>
-    </section>
+const rolePage = {
+  residents : "./residents.html",
+  guards    : "./guards.html",
+  committee : "./committee.html",
+  admin     : "./admin.html"
+};
 
-    <section class="nav-section">
-      <h2>Admin</h2>
-      <a href="admin-slots.html" class="nav-btn">Slots Manager</a>
-    </section>
-  </main>
+async function loadPins(){
+  const r = await fetch("./pins.json",{cache:"no-store"});
+  if(!r.ok) throw new Error("pins.json missing");
+  return r.json(); // { residents:"1111", guards:"2222", committee:"3333", admin:"4444" }
+}
 
-  <!-- Footer -->
-  <footer class="app-footer">
-    <p>Powered by Onestop AI</p>
-  </footer>
-
-  <script>
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-theme');
-      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    });
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark-theme');
+document.getElementById("pinForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const pin = document.getElementById("pin").value.trim();
+  const msg = document.getElementById("msg");
+  msg.textContent = "Checking…";
+  try{
+    const pins = await loadPins();
+    let matched = null;
+    for(const [role,val] of Object.entries(pins)){
+      if(String(val)===pin){ matched = role; break; }
     }
-  </script>
-</body>
-</html>
+    if(!matched){ msg.textContent = "Invalid PIN."; return; }
+    sessionStorage.setItem("apt_role", matched);
+    sessionStorage.setItem("apt_login_at", String(Date.now()));
+    location.replace(rolePage[matched] || "./index.html");
+  }catch(err){
+    msg.textContent = "Error loading PINs.";
+    console.error(err);
+  }
+});
+</script>
+</body></html>
