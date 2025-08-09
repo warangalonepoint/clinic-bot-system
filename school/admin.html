@@ -6,26 +6,25 @@
   <title>Admin • School</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
-    .wrap{max-width:1000px;margin:20px auto;padding:12px}
+    /* Page-only tweaks (global lives in styles.css) */
+    .wrap{max-width:1100px;margin:20px auto;padding:12px}
     .hero{position:relative;border-radius:22px;overflow:hidden}
     .banner{width:100%;height:210px;object-fit:cover;display:block}
     .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
       padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
     .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
     .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px 18px;margin-top:16px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:860px){.grid{grid-template-columns:1fr}}
-    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:50px;padding:0 18px;font-weight:700;text-align:center;display:inline-block;line-height:50px}
-    .btn:active{transform:translateY(1px)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+    .muted{color:#6b7280}
     .in{width:100%;height:48px;border:1px solid #d1d5db;border-radius:14px;padding:0 14px;font-size:16px}
     textarea.in{height:auto;min-height:110px;padding:10px}
     table{width:100%;border-collapse:collapse;margin-top:10px}
     th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:left}
-    th{background:#f5f5f5}
-    .row{display:flex;gap:8px;flex-wrap:wrap}
+    th{background:#f7f7f7}
     .pill{background:#eee;border-radius:999px;padding:6px 12px;display:inline-block}
-    .muted{color:#6b7280}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .space{align-items:center;justify-content:space-between}
   </style>
 </head>
 <body class="bg">
@@ -41,7 +40,7 @@
 
   <!-- Quick Links -->
   <div class="card">
-    <h2>Quick Links</h2>
+    <h2 class="h2">Quick Links</h2>
     <div class="row">
       <a class="btn" href="./parents.html" style="flex:1">Parents</a>
       <a class="btn" href="./teacher.html" style="flex:1">Teacher</a>
@@ -50,13 +49,31 @@
     </div>
   </div>
 
-  <!-- Import / Export -->
+  <!-- Dashboard Overview -->
   <div class="card">
-    <h2>CSV Import / Export</h2>
-    <p class="muted">MVP is local-only. Imports overwrite localStorage keys. Exports download current data as CSV.</p>
-    <div class="grid">
+    <h2 class="h2">Overview</h2>
+    <div class="row" style="gap:12px">
+      <span class="pill">Students: <b id="count_students">0</b></span>
+      <span class="pill">Teachers: <b id="count_teachers">0</b></span>
+      <span class="pill">Classes: <b id="count_classes">0</b></span>
+      <span class="pill">Notices: <b id="count_notices">0</b></span>
+      <span class="pill">Homework: <b id="count_homework">0</b></span>
+      <span class="pill">Leaves: <b id="count_leaves">0</b></span>
+      <span class="pill">Attendance: <b id="count_att">0</b></span>
+      <span class="pill">Class Diary: <b id="count_diary">0</b></span>
+      <span class="pill">Events/Exams: <b id="count_events">0</b></span>
+    </div>
+  </div>
+
+  <!-- CSV Import / Export -->
+  <div class="card">
+    <div class="row space">
+      <h2 class="h2">CSV Import / Export</h2>
+      <p class="muted">Local-only MVP. Imports overwrite localStorage keys. Exports download current data.</p>
+    </div>
+    <div class="grid2">
       <div>
-        <h3>Import CSV</h3>
+        <h3 class="h2">Import CSV</h3>
         <select id="impKey" class="in">
           <option value="sch_students">Students</option>
           <option value="sch_teachers">Teachers</option>
@@ -69,7 +86,7 @@
         <div id="impMsg" class="muted" style="margin-top:8px"></div>
       </div>
       <div>
-        <h3>Export CSV</h3>
+        <h3 class="h2">Export CSV</h3>
         <div class="row">
           <button class="btn" style="flex:1" data-exp="sch_students">Students</button>
           <button class="btn" style="flex:1" data-exp="sch_teachers">Teachers</button>
@@ -99,19 +116,19 @@
 
   <!-- Settings -->
   <div class="card">
-    <h2>Settings</h2>
-    <div class="grid">
+    <h2 class="h2">Settings</h2>
+    <div class="grid2">
       <div>
-        <h3>School Identity</h3>
+        <h3 class="h2">School Identity</h3>
         <input id="s_name" class="in" placeholder="School Name">
         <input id="s_session" class="in" style="margin-top:8px" placeholder="Academic Session (e.g., 2025-26)">
         <button class="btn" style="width:100%;margin-top:10px" id="s_save">Save</button>
         <div class="muted" id="s_msg" style="margin-top:8px"></div>
       </div>
       <div>
-        <h3>Role PINs</h3>
-        <p class="muted">Edits are stored locally as an override (`pins_override`).</p>
-        <div class="grid" style="grid-template-columns:1fr 1fr">
+        <h3 class="h2">Role PINs</h3>
+        <p class="muted" style="margin:0 0 6px">Saved locally as <code>pins_override</code> (we can’t write pins.json without a server).</p>
+        <div class="grid2">
           <input id="pin_coord" class="in" placeholder="Coordinator PIN">
           <input id="pin_par" class="in" placeholder="Parents PIN">
           <input id="pin_teacher" class="in" placeholder="Teacher PIN">
@@ -123,25 +140,11 @@
     </div>
   </div>
 
-  <!-- Overview -->
-  <div class="card">
-    <h2>Overview</h2>
-    <div class="row" style="gap:12px;flex-wrap:wrap">
-      <span class="pill">Students: <b id="count_students">0</b></span>
-      <span class="pill">Teachers: <b id="count_teachers">0</b></span>
-      <span class="pill">Classes: <b id="count_classes">0</b></span>
-      <span class="pill">Notices: <b id="count_notices">0</b></span>
-      <span class="pill">Homework: <b id="count_homework">0</b></span>
-      <span class="pill">Leaves: <b id="count_leaves">0</b></span>
-      <span class="pill">Attendance Entries: <b id="count_att">0</b></span>
-      <span class="pill">Class Diary: <b id="count_diary">0</b></span>
-    </div>
-  </div>
-
   <!-- Utilities -->
   <div class="card">
-    <h2>Utilities</h2>
+    <h2 class="h2">Utilities</h2>
     <div class="row">
+      <button class="btn" style="flex:1" id="seed_demo">Seed Demo Data</button>
       <button class="btn" style="flex:1" id="wipe_local">Local Reset (Danger)</button>
       <button class="btn" style="flex:1" id="reload_sw">Reload Service Worker</button>
       <button class="btn" style="flex:1" onclick="logout()">Logout</button>
@@ -150,12 +153,12 @@
 </main>
 
 <script>
-  // Role lock
+  // ===== Role lock =====
   if(sessionStorage.getItem("school_role") !== "admin"){
     location.replace("./index.html");
   }
 
-  // Helpers
+  // ===== Helpers =====
   const $ = sel => document.querySelector(sel);
   const jget = k => JSON.parse(localStorage.getItem(k) || "[]");
   const jset = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -163,11 +166,11 @@
     const out=[heads.join(",")];
     rows.forEach(r=>out.push(heads.map(h=>`"${String((r||{})[h] ?? "").replace(/"/g,'""')}"`).join(",")));
     const a=document.createElement("a");
-    a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));
+    a.href=URL.createObjectURL(new Blob([out.join("\\n")],{type:"text/csv"}));
     a.download=name; a.click();
   };
 
-  // Counts
+  // ===== Overview counts =====
   function renderCounts(){
     $("#count_students").textContent = jget("sch_students").length;
     $("#count_teachers").textContent = jget("sch_teachers").length;
@@ -177,21 +180,21 @@
     $("#count_leaves").textContent   = jget("sch_leaves").length;
     $("#count_att").textContent      = jget("sch_attendance").length;
     $("#count_diary").textContent    = jget("sch_class_diary").length;
+    $("#count_events").textContent   = jget("sch_events").length;
   }
 
-  // Import CSV (simple CSV → array of objects using first row as headers)
+  // ===== CSV Import =====
   $("#btnImport").addEventListener("click", async ()=>{
     const key = $("#impKey").value;
     const file = $("#impFile").files[0];
     const msg = $("#impMsg");
     if(!file){ msg.textContent="Choose a CSV file."; return; }
     const text = await file.text();
-    const lines = text.trim().split(/\r?\n/);
+    const lines = text.trim().split(/\\r?\\n/);
     if(lines.length < 2){ msg.textContent="CSV seems empty."; return; }
     const headers = lines[0].split(",").map(h=>h.trim());
     const rows = lines.slice(1).map(line=>{
-      // split by comma not inside quotes (MVP: naive split + dequote)
-      const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+      const parts = line.match(/(".*?"|[^",\\s]+)(?=\\s*,|\\s*$)/g) || [];
       const obj = {};
       headers.forEach((h,i)=>{
         let v = (parts[i]||"").replace(/^"(.*)"$/,'$1').replace(/""/g,'"');
@@ -204,7 +207,7 @@
     renderCounts();
   });
 
-  // Export buttons
+  // ===== CSV Export buttons =====
   document.querySelectorAll('[data-exp]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const key = btn.getAttribute('data-exp');
@@ -215,7 +218,7 @@
     });
   });
 
-  // School identity
+  // ===== School identity =====
   (function loadSettings(){
     const s = JSON.parse(localStorage.getItem("sch_settings")||"{}");
     $("#s_name").value = s.name || "";
@@ -228,7 +231,7 @@
     setTimeout(()=>$("#s_msg").textContent="",1500);
   });
 
-  // PINs (local override because we can’t write pins.json without a server)
+  // ===== PINs (local override since we can't write pins.json) =====
   async function loadPinsBase(){
     try{
       const r = await fetch("./pins.json",{cache:"no-store"});
@@ -257,10 +260,10 @@
     setTimeout(()=>$("#pin_msg").textContent="",1500);
   });
 
-  // Utilities
+  // ===== Utilities =====
   $("#wipe_local").addEventListener("click", ()=>{
-    if(!confirm("This will clear ALL local data (except service worker cache). Continue?")) return;
-    const keep = ["pins_override","sch_settings"]; // keep these
+    if(!confirm("This will clear ALL local data (except SW cache). Continue?")) return;
+    const keep = ["pins_override","sch_settings"];
     const saved = {};
     keep.forEach(k=>{saved[k]=localStorage.getItem(k)});
     localStorage.clear();
@@ -275,6 +278,25 @@
       for (const reg of regs){ await reg.update(); }
       alert("Service worker reloaded. Hard refresh recommended.");
     }
+  });
+
+  // Seed a tiny demo so you can see pages working
+  $("#seed_demo").addEventListener("click", ()=>{
+    if(!confirm("Seed demo data?")) return;
+    const now = Date.now();
+    jset("sch_students", [
+      {id:"S-1",name:"Aarav Gupta",roll:"21",class:"4",section:"A",parentName:"Mr. Gupta",parentPhone:"9876543210"},
+      {id:"S-2",name:"Maya Iyer",roll:"22",class:"4",section:"A",parentName:"Ms. Iyer",parentPhone:"9876500000"}
+    ]);
+    jset("sch_teachers", [{id:"T-42",name:"Ms. Priya"},{id:"T-11",name:"Mr. Sharma"}]);
+    jset("sch_classes", [{class:"4",section:"A",teacherId:"T-42"}]);
+    jset("sch_notices", [{id:"N1",title:"PTM Friday",body:"Parent meeting at 3 PM.",audience:{type:"Class",class:"4"},ts:now,author:"Admin"}]);
+    jset("sch_homework", [{id:"H1",class:"4",section:"A",subject:"Maths",title:"Exercise 4B",details:"Q1–10",due:new Date().toISOString().slice(0,10),teacherId:"T-11",teacherName:"Mr. Sharma",ts:now}]);
+    jset("sch_class_diary", [{id:"D1",class:"4",section:"A",date:new Date().toISOString().slice(0,10),text:"Photosynthesis intro + activity.",link:"",teacherId:"T-42",teacherName:"Ms. Priya",ts:now}]);
+    jset("sch_leaves", []);
+    jset("sch_events", [{id:"E1",type:"Event",title:"Sports Day",start:new Date().toISOString().slice(0,10),end:"",notes:"House-wise races",ts:now}]);
+    renderCounts();
+    alert("Demo data seeded.");
   });
 
   function logout(){ sessionStorage.clear(); location.replace("./index.html"); }
