@@ -1,36 +1,11 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Apartments • Committee</title>
-<link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
-<style>
-  :root{--max:1000px}
-  body{background:#f5f7fa}
-  main{max-width:var(--max);margin:16px auto;padding:16px}
-  .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-
-  /* polish-only */
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
-  .banner{width:100%;height:180px;object-fit:cover;display:block}
-  @media(max-width:560px){.banner{height:140px}}
-  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
-  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:980px){.grid{grid-template-columns:1fr}}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  .muted{color:#666}
-  input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-align:center}
-</style>
-</head><body>
+</head><body class="bg">
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
-<main>
-  <!-- Header -->
+<main class="wrap">
   <div class="card hero">
     <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
     <div class="hero-overlay">
@@ -39,66 +14,54 @@
     </div>
   </div>
 
-  <!-- Post a Notice -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Post a Notice</h2>
-    <div class="grid">
-      <label>Title <input id="n_title" placeholder="e.g., Water supply shutdown"></label>
+  <div class="card mt">
+    <h2 class="h2">Post a Notice</h2>
+    <div class="grid2">
+      <label>Title <input id="n_title" class="in" placeholder="e.g., Water supply shutdown"></label>
       <label>Audience
-        <select id="n_aud"><option value="All">All Residents</option><option>Block A</option><option>Block B</option><option>Block C</option></select>
+        <select id="n_aud" class="in"><option value="All">All Residents</option><option>Block A</option><option>Block B</option><option>Block C</option></select>
       </label>
-      <label style="grid-column:1/-1">Message
-        <textarea id="n_msg" rows="4" placeholder="Short, clear message..."></textarea>
+      <label class="span2">Message
+        <textarea id="n_msg" class="in" rows="4" placeholder="Short, clear message..."></textarea>
       </label>
     </div>
-    <div class="row" style="margin-top:10px">
+    <div class="row mt8">
       <button class="btn" id="n_add">Publish</button>
       <button class="btn" id="n_export">Export Notices CSV</button>
     </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Notice</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead>
-        <tbody id="n_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Notice</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead><tbody id="n_tbody"></tbody></table>
       <div id="n_empty" class="muted">No notices yet.</div>
     </div>
   </div>
 
-  <!-- Complaints Board -->
-  <div class="card" style="margin-top:12px">
-    <div class="row" style="align-items:center;justify-content:space-between">
-      <h2 style="margin:0">Complaints Board</h2>
+  <div class="card mt">
+    <div class="row space">
+      <h2 class="h2">Complaints Board</h2>
       <div class="row">
-        <select id="c_filter"><option value="">All</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
-        <input id="c_search" placeholder="Search flat/category/text" style="max-width:260px">
+        <select id="c_filter" class="in"><option value="">All</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
+        <input id="c_search" class="in" placeholder="Search flat/category/text" style="max-width:260px">
         <button class="btn" id="c_export">Export CSV</button>
       </div>
     </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr>
-          <th>#</th><th>Flat</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th><th>Actions</th>
-        </tr></thead>
-        <tbody id="c_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th><th>Actions</th></tr></thead><tbody id="c_tbody"></tbody></table>
       <div id="c_empty" class="muted">No complaints yet.</div>
     </div>
   </div>
 
-  <!-- Today at a Glance -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Today at a Glance</h2>
-    <div class="row" style="flex-wrap:wrap">
-      <span>Visitors: <b id="s_vis">0</b></span>
-      <span>Deliveries: <b id="s_del">0</b></span>
-      <span>Open Complaints: <b id="s_open">0</b></span>
-      <span>Notices Posted: <b id="s_not">0</b></span>
+  <div class="card mt">
+    <h2 class="h2">Today at a Glance</h2>
+    <div class="row wraptags">
+      <span class="pill">Visitors: <b id="s_vis">0</b></span>
+      <span class="pill">Deliveries: <b id="s_del">0</b></span>
+      <span class="pill">Open Complaints: <b id="s_open">0</b></span>
+      <span class="pill">Notices Posted: <b id="s_not">0</b></span>
     </div>
   </div>
 
-  <!-- Tools -->
-  <div class="card" style="margin-top:12px">
-    <div class="grid">
+  <div class="card mt">
+    <div class="grid2">
       <a class="btn" href="./index.html">Back to PIN</a>
       <a class="btn" href="./reset.html">Reset / Cache Tools</a>
     </div>
@@ -114,43 +77,24 @@ const ymd=()=>new Date().toISOString().slice(0,10);
 const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 const uid=()=>Math.random().toString(36).slice(2,9);
 
-/* Notices */
-function renderNotices(){
-  const rows=jget(K.notices).sort((a,b)=>b.ts-a.ts);
-  n_tbody.innerHTML=""; n_empty.style.display = rows.length? "none":"block";
-  rows.forEach((r,i)=>{
-    const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td><b>${r.title||"Notice"}</b><br>${r.msg||""}</td><td>${r.aud||"All"}</td><td>${t}</td>
-      <td><button class="btn" onclick="delNotice('${r.id}')">Delete</button></td>`;
-    n_tbody.appendChild(tr);
-  });
-}
-n_add.onclick=()=>{
-  const title=n_title.value.trim(), msg=n_msg.value.trim(), aud=n_aud.value;
-  if(!title||!msg){ alert("Title and Message required."); return; }
-  const arr=jget(K.notices); arr.unshift({id:uid(),title,msg,aud,ts:Date.now()}); jset(K.notices,arr);
-  n_title.value=n_msg.value=""; renderNotices(); renderStats();
-};
+// notices
+function renderNotices(){ const rows=jget(K.notices).sort((a,b)=>b.ts-a.ts); n_tbody.innerHTML=""; n_empty.style.display=rows.length?"none":"block"; rows.forEach((r,i)=>{ const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}); const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td><b>${r.title||"Notice"}</b><br>${r.msg||""}</td><td>${r.aud||"All"}</td><td>${t}</td><td><button class="btn" onclick="delNotice('${r.id}')">Delete</button></td>`; n_tbody.appendChild(tr); }); }
+n_add.onclick=()=>{ const title=n_title.value.trim(), msg=n_msg.value.trim(), aud=n_aud.value; if(!title||!msg){alert("Title and Message required.");return;} const arr=jget(K.notices); arr.unshift({id:uid(),title,msg,aud,ts:Date.now()}); jset(K.notices,arr); n_title.value=n_msg.value=""; renderNotices(); renderStats(); };
 n_export.onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices.csv"); };
 window.delNotice=(id)=>{ let arr=jget(K.notices); arr=arr.filter(x=>x.id!==id); jset(K.notices,arr); renderNotices(); renderStats(); };
 
-/* Complaints board */
+// complaints
 function renderComplaints(){
   const q=(c_search.value||"").toLowerCase(), f=c_filter.value||"";
   let rows=jget(K.complaints).slice().sort((a,b)=>b.ts-a.ts);
   if(f) rows=rows.filter(r=>r.status===f);
   rows=rows.filter(r=> (r.flat||"").toLowerCase().includes(q) || (r.cat||"").toLowerCase().includes(q) || (r.desc||"").toLowerCase().includes(q) );
-  c_tbody.innerHTML=""; c_empty.style.display = rows.length? "none":"block";
+  c_tbody.innerHTML=""; c_empty.style.display=rows.length?"none":"block";
   rows.forEach((r,i)=>{
     const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
     const tr=document.createElement("tr");
     tr.innerHTML=`
-      <td>${i+1}</td>
-      <td>${r.flat||"—"}</td>
-      <td>${t}</td>
-      <td>${r.cat}</td>
-      <td>${r.priority}</td>
+      <td>${i+1}</td><td>${r.flat||"—"}</td><td>${t}</td><td>${r.cat}</td><td>${r.priority}</td>
       <td><select onchange="setStatus('${r.id}',this.value)">
             <option${r.status==="Open"?" selected":""}>Open</option>
             <option${r.status==="In Progress"?" selected":""}>In Progress</option>
@@ -158,10 +102,7 @@ function renderComplaints(){
           </select></td>
       <td><input value="${r.assign||""}" onchange="setAssign('${r.id}',this.value)" placeholder="Vendor/Staff"/></td>
       <td>${r.desc||""}</td>
-      <td class="row">
-        <button class="btn" onclick="closeC('${r.id}')">Close</button>
-        <button class="btn" onclick="delC('${r.id}')">Delete</button>
-      </td>`;
+      <td class="row"><button class="btn" onclick="closeC('${r.id}')">Close</button><button class="btn" onclick="delC('${r.id}')">Delete</button></td>`;
     c_tbody.appendChild(tr);
   });
 }
@@ -173,16 +114,9 @@ c_export.onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat
 c_filter.addEventListener("change",renderComplaints);
 c_search.addEventListener("input",renderComplaints);
 
-/* Stats */
-function renderStats(){
-  const today = ymd();
-  const vis = jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
-  const del = jget(K.deliveries).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
-  const open = jget(K.complaints).filter(c=>c.status!=="Closed").length;
-  s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; s_not.textContent=jget(K.notices).length;
-}
+// stats
+function renderStats(){ const today=ymd(); const vis=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length; const del=jget(K.deliveries).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length; const open=jget(K.complaints).filter(c=>c.status!=="Closed").length; s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; s_not.textContent=jget(K.notices).length; }
 
-/* Init */
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 renderNotices(); renderComplaints(); renderStats();
 </script>
