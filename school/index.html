@@ -1,69 +1,99 @@
-
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>School • PIN Login</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./styles.css">
-<meta name="theme-color" content="#111"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>School • PIN Login</title>
+  <meta name="theme-color" content="#111"/>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    /* tiny page-only tweaks (global lives in styles.css) */
+    .wrap{max-width:900px;margin:20px auto;padding:12px}
+    .hero{position:relative;border-radius:22px;overflow:hidden}
+    .banner{width:100%;height:210px;object-fit:cover;display:block}
+    .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
+      padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
+    .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+    .hero-title{color:#fff;font-weight:800;font-size:24px;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px 18px}
+    .mt{margin-top:16px}
+    .h2{font-size:28px;margin:6px 0 4px}
+    .muted{color:#6b7280}
+    .in{width:100%;height:48px;border:1px solid #d1d5db;border-radius:14px;padding:0 14px;font-size:16px}
+    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:50px;padding:0 18px;font-weight:700}
+    .btn:active{transform:translateY(1px)}
+    .w100{width:100%}
+    .mt8{margin-top:12px}
+  </style>
 </head>
 <body class="bg">
 <main class="wrap">
-  <!-- Banner -->
+  <!-- Banner / Brand -->
   <div class="card hero">
-    <img class="banner" src="./assets/school_banner.png" alt="School">
+    <!-- put your image at ./assets/banner.png -->
+    <img class="banner" src="./assets/banner.png" alt="School Banner">
     <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+      <img class="logo" src="./assets/logo.png" alt="Logo" onerror="this.style.display='none'">
       <div class="hero-title">Onestop School</div>
     </div>
   </div>
 
-  <!-- PIN -->
+  <!-- PIN gate -->
   <div class="card mt">
     <h2 class="h2">Enter PIN</h2>
     <p class="muted">You’ll be routed to your role.</p>
-    <form id="pinForm">
-      <input id="pin" class="in" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="4–8 digit PIN">
-      <button class="btn w100 mt8">Continue</button>
+    <form id="pinForm" autocomplete="one-time-code">
+      <input id="pin" class="in" type="password" inputmode="numeric" placeholder="4–8 digit PIN" required>
+      <button class="btn w100 mt8" type="submit">Continue</button>
     </form>
     <div id="msg" class="muted mt8"></div>
   </div>
 </main>
 
 <script>
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-
-const rolePage = {
-  coordinator : "./coordinator.html",
-  parents     : "./parents.html",
-  teacher     : "./teacher.html",
-  admin       : "./admin.html"
-};
-
-async function loadPins(){
-  const r = await fetch("./pins.json",{cache:"no-store"});
-  if(!r.ok) throw new Error("pins.json missing");
-  return r.json(); // { coordinator:"1111", parents:"2222", teacher:"3333", admin:"4444" }
-}
-
-document.getElementById("pinForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const pin = document.getElementById("pin").value.trim();
-  const msg = document.getElementById("msg");
-  msg.textContent = "Checking…";
-  try{
-    const pins = await loadPins();
-    let matched = null;
-    for(const [role,val] of Object.entries(pins)){
-      if(String(val)===pin){ matched = role; break; }
-    }
-    if(!matched){ msg.textContent = "Invalid PIN."; return; }
-    sessionStorage.setItem("school_role", matched);
-    sessionStorage.setItem("school_login_at", String(Date.now()));
-    location.replace(rolePage[matched] || "./index.html");
-  }catch(err){
-    msg.textContent = "Error loading PINs.";
-    console.error(err);
+  // Register SW (installable + offline)
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
-});
+
+  // Role → page mapping
+  const rolePage = {
+    coordinator : "./coordinator.html",
+    parents     : "./parents.html",
+    teacher     : "./teacher.html",
+    admin       : "./admin.html"
+  };
+
+  // Load PINs from pins.json (no-cache)
+  async function loadPins(){
+    const r = await fetch("./pins.json", { cache: "no-store" });
+    if(!r.ok) throw new Error("pins.json not found");
+    return r.json(); // {coordinator:'1111', parents:'2222', teacher:'3333', admin:'4444'}
+  }
+
+  // Submit handler
+  document.getElementById("pinForm").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const pin = document.getElementById("pin").value.trim();
+    const msg = document.getElementById("msg");
+    msg.textContent = "Checking…";
+    try{
+      const pins = await loadPins();
+      let matched = null;
+      for(const [role, val] of Object.entries(pins)){
+        if(String(val) === pin){ matched = role; break; }
+      }
+      if(!matched){ msg.textContent = "Invalid PIN."; return; }
+      // persist session and route (no back to PIN)
+      sessionStorage.setItem("school_role", matched);
+      sessionStorage.setItem("school_login_at", String(Date.now()));
+      location.replace(rolePage[matched] || "./index.html");
+    }catch(err){
+      console.error(err);
+      msg.textContent = "Error loading PINs.";
+    }
+  });
 </script>
-</body></html>
+</body>
+</html>
