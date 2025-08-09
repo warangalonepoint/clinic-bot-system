@@ -6,7 +6,7 @@
   <title>Parents • School</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
-    /* Page polish (global styles live in styles.css if you have it) */
+    /* Page polish (global styles live in styles.css) */
     .wrap{max-width:960px;margin:20px auto;padding:12px}
     .hero{position:relative;border-radius:22px;overflow:hidden}
     .banner{width:100%;height:210px;object-fit:cover;display:block}
@@ -27,7 +27,8 @@
     .tab{padding:10px 14px;border-radius:999px;background:#eee;cursor:pointer;font-weight:700;border:0}
     .tab.active{background:#111;color:#fff}
     .hidden{display:none}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
+    .tablewrap{margin-top:10px;overflow:auto}
+    table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:left;vertical-align:top}
     th{background:#f7f7f7}
     .muted{color:#6b7280}
@@ -48,13 +49,13 @@
   <!-- Child Profile (filters all data) -->
   <div class="card">
     <h2 style="margin:0 0 6px">Child Profile</h2>
-    <p class="muted" style="margin:0 0 10px">Set once. Class Diary & Messages auto-filter to this class/section.</p>
+    <p class="muted" style="margin:0 0 10px">Set once. Diary, Messages & Homework auto-filter to this class/section.</p>
     <div class="grid2">
       <label>Child Name <input id="p_name" class="in" placeholder="e.g., Aarav Gupta"></label>
       <label>Roll No <input id="p_roll" class="in" placeholder="e.g., 21"></label>
       <label>Class <input id="p_class" class="in" placeholder="e.g., 4"></label>
       <label>Section <input id="p_section" class="in" placeholder="e.g., A"></label>
-      <label>Parent Phone <input id="p_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit (used for read receipts)"></label>
+      <label>Parent Phone <input id="p_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit (for read receipts)"></label>
     </div>
     <div class="row" style="margin-top:10px">
       <button class="btn" id="p_save">Save</button>
@@ -67,7 +68,9 @@
   <div class="tabs">
     <button class="tab active" data-t="#t_dash">Dashboard</button>
     <button class="tab" data-t="#t_diary">Class Diary</button>
-    <button class="tab" data-t="#t_msgs">Messages from Teachers</button>
+    <button class="tab" data-t="#t_msgs">Messages</button>
+    <button class="tab" data-t="#t_hw">Homework</button>
+    <button class="tab" data-t="#t_leaves">Leave Requests</button>
   </div>
 
   <!-- Dashboard -->
@@ -119,7 +122,7 @@
     </div>
   </section>
 
-  <!-- Messages from Teachers (Notices filtered to class/section or All) -->
+  <!-- Messages -->
   <section class="card hidden" id="t_msgs">
     <div class="row space">
       <h2 style="margin:0">Messages from Teachers</h2>
@@ -134,6 +137,45 @@
         <tbody id="msg_tbody"></tbody>
       </table>
       <div id="msg_empty" class="muted">No messages yet.</div>
+    </div>
+  </section>
+
+  <!-- Homework -->
+  <section class="card hidden" id="t_hw">
+    <div class="row space">
+      <h2 style="margin:0">Homework</h2>
+      <div class="row">
+        <input id="hw_search" class="in" placeholder="Search subject/title" style="max-width:260px">
+        <button class="btn" id="hw_export">Export CSV</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Subject</th><th>Title</th><th>Due</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="hw_tbody"></tbody>
+      </table>
+      <div id="hw_empty" class="muted">No homework found.</div>
+    </div>
+  </section>
+
+  <!-- Leave Requests -->
+  <section class="card hidden" id="t_leaves">
+    <h2 style="margin:0 0 10px">Leave Requests</h2>
+    <div class="grid2">
+      <label>From <input id="lv_from" type="date" class="in"></label>
+      <label>To <input id="lv_to" type="date" class="in"></label>
+      <label class="span2">Reason <textarea id="lv_reason" class="in" placeholder="Reason for leave"></textarea></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="lv_submit">Submit</button>
+      <button class="btn" id="lv_export">Export My Leaves</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>From</th><th>To</th><th>Reason</th><th>Status</th><th>Updated</th></tr></thead>
+        <tbody id="lv_tbody"></tbody>
+      </table>
+      <div id="lv_empty" class="muted">No leave requests yet.</div>
     </div>
   </section>
 
@@ -165,13 +207,14 @@
     a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));
     a.download=name; a.click();
   };
-
-  // Local keys used by teacher/admin pages in this MVP:
-  // sch_class_diary: [{id,class,section,date,text,link?,teacherId,ts}]
-  // sch_notices: [{id,title,body,audience:{type:"All"|"Class"|"Section",class?,section?},ts,author?}]
-  // sch_homework: [{id,class,section,subject,title,details,due,teacherId,ts}]
-  // Parent profile (local to this device):
+  const uid = () => Math.random().toString(36).slice(2,9);
   const K = { profile: "sch_parent_profile" };
+
+  // Storage used (created by teacher/admin pages in MVP):
+  // sch_class_diary: [{id,class,section,date,text,link?,teacherId,ts}]
+  // sch_notices:     [{id,title,body,audience:{type:"All"|"Class"|"Section",class?,section?},ts,author?}]
+  // sch_homework:    [{id,class,section,subject,title,details,due,teacherId,ts}]
+  // sch_leaves:      [{id,studentId,childName,class,section,from,to,reason,status,approverId?,ts,updatedAt?}]
 
   // ===== Profile =====
   function loadProfile(){
@@ -184,8 +227,7 @@
   }
   function getProfile(){
     const p = JSON.parse(localStorage.getItem(K.profile) || "{}");
-    const cls = (p.class||"").trim(); const sec = (p.section||"").trim();
-    return { ...p, class: cls, section: sec };
+    return { ...p, class:(p.class||"").trim(), section:(p.section||"").trim(), id: (p.phone||"")+":"+(p.roll||"") };
   }
   $("#p_save").addEventListener("click", ()=>{
     const p = {
@@ -216,72 +258,7 @@
     });
   });
 
-  // ===== Dashboard: Today’s Diary + Homework due + Unread count =====
-  function renderDashboard(){
-    const p = getProfile(); if(!p.class || !p.section){ $("#dash_diary_empty").textContent="Set class/section above."; return; }
-    const diaries = jget("sch_class_diary")
-      .filter(d => d.class===p.class && d.section===p.section && (d.date||"").slice(0,10)===todayYMD())
-      .sort((a,b)=>b.ts-a.ts);
-    if(diaries.length){
-      const d = diaries[0];
-      $("#dash_diary_empty").style.display="none";
-      $("#dash_diary").style.display="block";
-      $("#dash_diary_meta").textContent = `By ${d.teacherId||"Teacher"} • ${toTime(d.ts)}`;
-      $("#dash_diary_text").textContent = d.text || "";
-      $("#dash_diary_link").innerHTML = d.link ? `<a href="${d.link}" target="_blank" rel="noopener">Open link</a>` : "";
-    } else {
-      $("#dash_diary").style.display="none";
-      $("#dash_diary_empty").style.display="block";
-    }
-
-    const hw = jget("sch_homework")
-      .filter(h => h.class===p.class && h.section===p.section && (h.due||"").slice(0,10)===todayYMD());
-    $("#d_hw").textContent = hw.length;
-    const tbody = $("#dash_hw"); tbody.innerHTML="";
-    if(hw.length===0){ $("#dash_hw_empty").style.display="block"; }
-    else {
-      $("#dash_hw_empty").style.display="none";
-      hw.forEach((h,i)=>{
-        const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${i+1}</td><td>${h.subject||"—"}</td><td>${h.title||"—"}</td><td>${(h.due||"").slice(0,10)}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Unread messages
-    const unread = computeUnreadCount();
-    $("#d_unread").textContent = unread;
-  }
-
-  // ===== Class Diary Tab =====
-  function renderDiary(){
-    const p = getProfile(); const selDate = $("#diary_date").value || todayYMD();
-    const rows = jget("sch_class_diary")
-      .filter(d => d.class===p.class && d.section===p.section && (!selDate || (d.date||"").slice(0,10)===selDate))
-      .sort((a,b)=>b.ts-a.ts);
-    const tbody = $("#diary_tbody"); tbody.innerHTML="";
-    if(rows.length===0){ $("#diary_empty").style.display="block"; return; }
-    $("#diary_empty").style.display="none";
-    rows.forEach((d,i)=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td>${i+1}</td>
-        <td>${(d.date||"").slice(0,10)}</td>
-        <td>${d.teacherId || "Teacher"}</td>
-        <td>${d.text||""}</td>
-        <td>${d.link ? `<a href="${d.link}" target="_blank" rel="noopener">Open</a>`:"—"}</td>`;
-      tbody.appendChild(tr);
-    });
-  }
-  $("#diary_today").addEventListener("click", ()=>{ $("#diary_date").value=todayYMD(); renderDiary(); });
-  $("#diary_export").addEventListener("click", ()=>{
-    const p = getProfile();
-    const rows = jget("sch_class_diary").filter(d=>d.class===p.class && d.section===p.section);
-    if(!rows.length){ alert("No diary to export."); return; }
-    csv(rows, ["id","class","section","date","text","link","teacherId","ts"], "Class_Diary.csv");
-  });
-
-  // ===== Messages from Teachers (Notices filtered) =====
+  // ===== Messages (Notices) =====
   function matchesAudience(n,p){
     const aud = n.audience || {type:"All"};
     if(aud.type==="All") return true;
@@ -328,7 +305,6 @@
       tbody.appendChild(tr);
     });
 
-    // wire mark-read
     tbody.querySelectorAll("[data-read]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         setRead(btn.getAttribute("data-read"));
@@ -345,8 +321,142 @@
     csv(rows, ["id","title","body","ts","author"], "Messages.csv");
   });
 
+  // ===== Class Diary =====
+  function renderDiary(){
+    const p = getProfile(); const selDate = $("#diary_date").value || todayYMD();
+    const rows = jget("sch_class_diary")
+      .filter(d => d.class===p.class && d.section===p.section && (!selDate || (d.date||"").slice(0,10)===selDate))
+      .sort((a,b)=>b.ts-a.ts);
+    const tbody = $("#diary_tbody"); tbody.innerHTML="";
+    if(rows.length===0){ $("#diary_empty").style.display="block"; return; }
+    $("#diary_empty").style.display="none";
+    rows.forEach((d,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${i+1}</td>
+        <td>${(d.date||"").slice(0,10)}</td>
+        <td>${d.teacherId || "Teacher"}</td>
+        <td>${d.text||""}</td>
+        <td>${d.link ? `<a href="${d.link}" target="_blank" rel="noopener">Open</a>`:"—"}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  $("#diary_today").addEventListener("click", ()=>{ $("#diary_date").value=todayYMD(); renderDiary(); });
+  $("#diary_export").addEventListener("click", ()=>{
+    const p = getProfile();
+    const rows = jget("sch_class_diary").filter(d=>d.class===p.class && d.section===p.section);
+    if(!rows.length){ alert("No diary to export."); return; }
+    csv(rows, ["id","class","section","date","text","link","teacherId","ts"], "Class_Diary.csv");
+  });
+
+  // ===== Homework =====
+  function hwDoneKey(){ const pid=getProfile().id||"unknown"; return `sch_hw_done_${pid}`; }
+  function getDone(){ try{ return JSON.parse(localStorage.getItem(hwDoneKey())||"[]"); }catch{ return []; } }
+  function setDone(id,done){
+    const arr = new Set(getDone());
+    if(done) arr.add(id); else arr.delete(id);
+    localStorage.setItem(hwDoneKey(), JSON.stringify([...arr]));
+  }
+  function renderHomework(){
+    const p = getProfile();
+    const q = ($("#hw_search").value||"").toLowerCase();
+    const done = new Set(getDone());
+    const rows = jget("sch_homework")
+      .filter(h=>h.class===p.class && h.section===p.section)
+      .filter(h=>(h.subject||"").toLowerCase().includes(q) || (h.title||"").toLowerCase().includes(q))
+      .sort((a,b)=> (a.due||"").localeCompare(b.due||""));
+    const tbody=$("#hw_tbody"); tbody.innerHTML="";
+    if(rows.length===0){ $("#hw_empty").style.display="block"; return; }
+    $("#hw_empty").style.display="none";
+    rows.forEach((h,i)=>{
+      const id=h.id||uid();
+      const isDone = done.has(id);
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td>
+        <td>${h.subject||"—"}</td>
+        <td>${h.title||"—"}</td>
+        <td>${(h.due||"").slice(0,10)}</td>
+        <td>${isDone? "Done":"Pending"}</td>
+        <td>${isDone? `<button class="btn" data-hw-undone="${id}">Mark Pending</button>`
+                     : `<button class="btn" data-hw-done="${id}">Mark Done</button>`}</td>`;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll("[data-hw-done]").forEach(b=>{
+      b.addEventListener("click", ()=>{ setDone(b.getAttribute("data-hw-done"), true); renderHomework(); });
+    });
+    tbody.querySelectorAll("[data-hw-undone]").forEach(b=>{
+      b.addEventListener("click", ()=>{ setDone(b.getAttribute("data-hw-undone"), false); renderHomework(); });
+    });
+  }
+  $("#hw_search").addEventListener("input", renderHomework);
+  $("#hw_export").addEventListener("click", ()=>{
+    const p = getProfile();
+    const rows = jget("sch_homework").filter(h=>h.class===p.class && h.section===p.section);
+    if(!rows.length){ alert("No homework to export."); return; }
+    csv(rows, ["id","class","section","subject","title","details","due","teacherId","ts"], "Homework.csv");
+  });
+
+  // ===== Leaves =====
+  function renderLeaves(){
+    const p = getProfile();
+    const rows = jget("sch_leaves").filter(l=> (l.studentId||l.childId)===(p.id||""));
+    const tbody=$("#lv_tbody"); tbody.innerHTML="";
+    if(rows.length===0){ $("#lv_empty").style.display="block"; return; }
+    $("#lv_empty").style.display="none";
+    rows.sort((a,b)=> (b.updatedAt||b.ts||0)-(a.updatedAt||a.ts||0)).forEach((l,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td><td>${l.from||"—"}</td><td>${l.to||"—"}</td><td>${l.reason||""}</td><td>${l.status||"Pending"}</td><td>${toTime(l.updatedAt||l.ts)}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  $("#lv_submit").addEventListener("click", ()=>{
+    const p = getProfile(); if(!p.class||!p.section){ alert("Save Profile (Class & Section) first."); return; }
+    const from=$("#lv_from").value, to=$("#lv_to").value, reason=$("#lv_reason").value.trim();
+    if(!from||!to||!reason){ alert("All fields are required."); return; }
+    const arr=jget("sch_leaves");
+    arr.unshift({
+      id: uid(), studentId: p.id, childId: p.id, childName: p.name||"", class: p.class, section: p.section,
+      from, to, reason, status:"Pending", approverId:"", ts:Date.now(), updatedAt:Date.now()
+    });
+    jset("sch_leaves",arr);
+    $("#lv_reason").value=""; renderLeaves();
+    alert("Leave submitted.");
+  });
+  $("#lv_export").addEventListener("click", ()=>{
+    const p = getProfile();
+    const rows = jget("sch_leaves").filter(l=> (l.studentId||l.childId)===(p.id||""));
+    if(!rows.length){ alert("No leaves to export."); return; }
+    csv(rows, ["id","studentId","childName","class","section","from","to","reason","status","approverId","ts","updatedAt"], "My_Leaves.csv");
+  });
+
+  // ===== Dashboard =====
+  function renderDashboard(){
+    const p = getProfile(); if(!p.class || !p.section){ $("#dash_diary_empty").textContent="Set class/section above."; return; }
+    const diaries = jget("sch_class_diary")
+      .filter(d => d.class===p.class && d.section===p.section && (d.date||"").slice(0,10)===todayYMD())
+      .sort((a,b)=>b.ts-a.ts);
+    if(diaries.length){
+      const d = diaries[0];
+      $("#dash_diary_empty").style.display="none";
+      $("#dash_diary").style.display="block";
+      $("#dash_diary_meta").textContent = `By ${d.teacherId||"Teacher"} • ${toTime(d.ts)}`;
+      $("#dash_diary_text").textContent = d.text || "";
+      $("#dash_diary_link").innerHTML = d.link ? `<a href="${d.link}" target="_blank" rel="noopener">Open link</a>` : "";
+    } else {
+      $("#dash_diary").style.display="none";
+      $("#dash_diary_empty").style.display="block";
+    }
+
+    const hw = jget("sch_homework")
+      .filter(h => h.class===p.class && h.section===p.section && (h.due||"").slice(0,10)===todayYMD());
+    $("#d_hw").textContent = hw.length;
+
+    const unread = computeUnreadCount();
+    $("#d_unread").textContent = unread;
+  }
+
   // ===== Init / Render =====
-  function renderAll(){ renderDashboard(); renderDiary(); renderMessages(); }
+  function renderAll(){ renderDashboard(); renderDiary(); renderMessages(); renderHomework(); renderLeaves(); }
   loadProfile();
   if(!$("#diary_date").value) $("#diary_date").value = todayYMD();
   renderAll();
