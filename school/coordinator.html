@@ -6,18 +6,14 @@
   <title>Coordinator • School</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
-    .wrap{max-width:900px;margin:20px auto;padding:12px}
+    /* Page-only polish; global lives in styles.css */
+    .wrap{max-width:1000px;margin:20px auto;padding:12px}
     .hero{position:relative;border-radius:22px;overflow:hidden}
     .banner{width:100%;height:210px;object-fit:cover;display:block}
     .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
       padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
     .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
     .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-    .card{background:#fff;border-radius:22px;box-shadow:0 6px 28px rgba(0,0,0,.06);padding:18px;margin-top:16px}
-    .btn{background:#0b0b0c;color:#fff;border:none;border-radius:14px;height:50px;padding:0 18px;font-weight:700;text-align:center;display:inline-block;line-height:50px}
-    .btn:active{transform:translateY(1px)}
-    .flex{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-    textarea,input{width:100%;border-radius:10px;border:1px solid #ccc;padding:8px;margin-top:6px}
   </style>
 </head>
 <body class="bg">
@@ -33,39 +29,301 @@
 
   <!-- Quick Links -->
   <div class="card">
-    <h2>Quick Links</h2>
-    <div class="flex">
-      <a class="btn" style="flex:1" href="./manage-classes.html">Manage Classes</a>
-      <a class="btn" style="flex:1" href="./manage-teachers.html">Manage Teachers</a>
-    </div>
-    <div class="flex" style="margin-top:8px">
-      <a class="btn" style="flex:1" href="./announcements.html">Announcements</a>
-      <a class="btn" style="flex:1" href="./reports.html">Reports</a>
+    <h2 class="h2">Quick Links</h2>
+    <div class="row">
+      <a class="btn" href="./teacher.html" style="flex:1">Teacher</a>
+      <a class="btn" href="./parents.html" style="flex:1">Parents</a>
+      <a class="btn" href="./admin.html" style="flex:1">Admin</a>
+      <a class="btn" href="./index.html" style="flex:1">Back to PIN</a>
     </div>
   </div>
 
-  <!-- Post Announcement -->
-  <div class="card">
-    <h2>Post Announcement</h2>
-    <input type="text" placeholder="Title"/>
-    <textarea placeholder="Write announcement..."></textarea>
-    <button class="btn" style="width:100%;margin-top:10px">Post</button>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-t="#t_timetable">Timetable</button>
+    <button class="tab" data-t="#t_events">Events & Exams</button>
+    <button class="tab" data-t="#t_notices">Notices (Moderate)</button>
+    <button class="tab" data-t="#t_rosters">Class Rosters</button>
   </div>
 
-  <!-- Logout -->
+  <!-- Timetable -->
+  <section class="card" id="t_timetable">
+    <div class="row space">
+      <h2 class="h2">Timetable Manager</h2>
+      <div class="row">
+        <button class="btn" id="tt_export">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <label>Class <input id="tt_class" class="in" placeholder="e.g., 4"></label>
+      <label>Section <input id="tt_section" class="in" placeholder="e.g., A"></label>
+      <label>Day
+        <select id="tt_day" class="in">
+          <option>Mon</option><option>Tue</option><option>Wed</option>
+          <option>Thu</option><option>Fri</option><option>Sat</option>
+        </select>
+      </label>
+      <div></div>
+      <label>Period # <input id="tt_period" class="in" type="number" min="1" max="12" placeholder="1-12"></label>
+      <label>Subject <input id="tt_subject" class="in" placeholder="e.g., Maths"></label>
+      <label>Teacher ID <input id="tt_teacher" class="in" placeholder="e.g., T-42"></label>
+      <label>Room <input id="tt_room" class="in" placeholder="e.g., 302"></label>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="tt_add">Add / Update Period</button>
+      <button class="btn" id="tt_clear">Clear Inputs</button>
+    </div>
+
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Class</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th></tr></thead>
+        <tbody id="tt_tbody"></tbody>
+      </table>
+      <div id="tt_empty" class="muted">No timetable entries yet.</div>
+    </div>
+  </section>
+
+  <!-- Events & Exams -->
+  <section class="card hidden" id="t_events">
+    <div class="row space">
+      <h2 class="h2">Events & Exams</h2>
+      <div class="row">
+        <button class="btn" id="ev_export">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <label>Type
+        <select id="ev_type" class="in"><option>Event</option><option>Exam</option></select>
+      </label>
+      <label>Title <input id="ev_title" class="in" placeholder="e.g., Sports Day / Midterm"></label>
+      <label>Start Date <input id="ev_start" class="in" type="date"></label>
+      <label>End Date <input id="ev_end" class="in" type="date"></label>
+      <label class="span2">Notes <textarea id="ev_notes" class="in" placeholder="Details / instructions…"></textarea></label>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="ev_add">Add</button>
+    </div>
+
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Type</th><th>Title</th><th>Start</th><th>End</th><th>Notes</th><th>Action</th></tr></thead>
+        <tbody id="ev_tbody"></tbody>
+      </table>
+      <div id="ev_empty" class="muted">No events/exams yet.</div>
+    </div>
+  </section>
+
+  <!-- Notices Moderate -->
+  <section class="card hidden" id="t_notices">
+    <div class="row space">
+      <h2 class="h2">Notices (Moderate)</h2>
+      <div class="row">
+        <input id="n_search" class="in" placeholder="Search title/body" style="max-width:260px">
+        <button class="btn" id="n_export">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>When</th><th>Title</th><th>Message</th><th>Audience</th><th>Author</th><th>Action</th></tr></thead>
+        <tbody id="n_tbody"></tbody>
+      </table>
+      <div id="n_empty" class="muted">No notices yet.</div>
+    </div>
+  </section>
+
+  <!-- Class Rosters -->
+  <section class="card hidden" id="t_rosters">
+    <div class="row space">
+      <h2 class="h2">Class Rosters</h2>
+      <div class="row">
+        <button class="btn" id="ro_export">Export This Class</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <label>Class <input id="ro_class" class="in" placeholder="e.g., 4"></label>
+      <label>Section <input id="ro_section" class="in" placeholder="e.g., A"></label>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="ro_load">Load</button>
+    </div>
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Name</th><th>Roll</th><th>Parent</th><th>Phone</th></tr></thead>
+        <tbody id="ro_tbody"></tbody>
+      </table>
+      <div id="ro_empty" class="muted">No students found for this class/section.</div>
+    </div>
+  </section>
+
+  <!-- Footer / Utilities -->
   <div class="card">
-    <button class="btn" onclick="logout()">Logout</button>
+    <div class="row">
+      <button class="btn" style="flex:1" onclick="logout()">Logout</button>
+      <a class="btn" href="./index.html" style="flex:1">Back to PIN</a>
+    </div>
   </div>
 </main>
 
 <script>
+  // Role lock
   if(sessionStorage.getItem("school_role") !== "coordinator"){
     location.replace("./index.html");
   }
-  function logout(){
-    sessionStorage.clear();
-    location.replace("./index.html");
+
+  // Helpers
+  const $ = s => document.querySelector(s);
+  const jget = k => JSON.parse(localStorage.getItem(k)||"[]");
+  const jset = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const toTime = ts => new Date(ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+  const csv = (rows, heads, name) => {
+    const out=[heads.join(",")];
+    rows.forEach(r=>out.push(heads.map(h=>`"${String((r||{})[h] ?? "").replace(/"/g,'""')}"`).join(",")));
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"})); a.download=name; a.click();
+  };
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      ["t_timetable","t_events","t_notices","t_rosters"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+      document.querySelector(t.getAttribute("data-t")).classList.remove("hidden");
+    });
+  });
+
+  // === Timetable ===
+  function ttKey(){ return "sch_timetable"; }
+  function renderTT(){
+    const rows = jget(ttKey()).slice().sort((a,b)=> a.class.localeCompare(b.class) || a.section.localeCompare(b.section) || a.day.localeCompare(b.day) || (a.period-b.period) );
+    const tb=$("#tt_tbody"); tb.innerHTML=""; $("#tt_empty").style.display=rows.length?"none":"block";
+    rows.forEach((r,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td><td>${r.class}-${r.section}</td><td>${r.day}</td><td>${r.period}</td><td>${r.subject}</td><td>${r.teacherId||""}</td><td>${r.room||""}</td>
+        <td><button class="btn" data-del="${r.id}">Delete</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("[data-del]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        let arr=jget(ttKey()); arr=arr.filter(x=>x.id!==b.getAttribute("data-del")); jset(ttKey(),arr); renderTT();
+      });
+    });
   }
+  $("#tt_add").addEventListener("click", ()=>{
+    const row={
+      id: uid(),
+      class: $("#tt_class").value.trim(),
+      section: $("#tt_section").value.trim(),
+      day: $("#tt_day").value,
+      period: Number($("#tt_period").value||0),
+      subject: $("#tt_subject").value.trim(),
+      teacherId: $("#tt_teacher").value.trim(),
+      room: $("#tt_room").value.trim(),
+      ts: Date.now()
+    };
+    if(!row.class||!row.section||!row.day||!row.period||!row.subject){ alert("Class, Section, Day, Period, Subject are required."); return; }
+    // upsert (unique by class+section+day+period)
+    let arr=jget(ttKey());
+    const i=arr.findIndex(x=>x.class===row.class && x.section===row.section && x.day===row.day && Number(x.period)===row.period);
+    if(i>-1) arr[i]={...arr[i],...row, id:arr[i].id, ts:Date.now()};
+    else arr.unshift(row);
+    jset(ttKey(),arr); renderTT();
+  });
+  $("#tt_clear").addEventListener("click", ()=>{ ["tt_class","tt_section","tt_period","tt_subject","tt_teacher","tt_room"].forEach(id=>$("#"+id).value=""); });
+  $("#tt_export").addEventListener("click", ()=>{
+    const rows=jget(ttKey()); if(!rows.length){alert("No timetable data.");return;}
+    csv(rows,["id","class","section","day","period","subject","teacherId","room","ts"],"Timetable.csv");
+  });
+
+  // === Events & Exams ===
+  function evKey(){ return "sch_events"; }
+  function renderEvents(){
+    const rows=jget(evKey()).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||"") || (a.end||"").localeCompare(b.end||"") ).reverse();
+    const tb=$("#ev_tbody"); tb.innerHTML=""; $("#ev_empty").style.display=rows.length?"none":"block";
+    rows.forEach((r,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td><td>${r.type}</td><td>${r.title}</td><td>${r.start}</td><td>${r.end||r.start||""}</td><td>${r.notes||""}</td>
+        <td><button class="btn" data-del-ev="${r.id}">Delete</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("[data-del-ev]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        let arr=jget(evKey()); arr=arr.filter(x=>x.id!==b.getAttribute("data-del-ev")); jset(evKey(),arr); renderEvents();
+      });
+    });
+  }
+  $("#ev_add").addEventListener("click", ()=>{
+    const row={ id:uid(), type:$("#ev_type").value, title:$("#ev_title").value.trim(),
+      start:$("#ev_start").value, end:$("#ev_end").value, notes:$("#ev_notes").value.trim(), ts:Date.now() };
+    if(!row.title||!row.start){ alert("Title and Start date required."); return; }
+    const arr=jget(evKey()); arr.unshift(row); jset(evKey(),arr); $("#ev_title").value=""; $("#ev_notes").value=""; renderEvents();
+  });
+  $("#ev_export").addEventListener("click", ()=>{
+    const rows=jget(evKey()); if(!rows.length){alert("No events/exams.");return;}
+    csv(rows,["id","type","title","start","end","notes","ts"],"Events_Exams.csv");
+  });
+
+  // === Notices (Moderate) ===
+  function audienceLabel(a){
+    if(!a) return "All";
+    if(a.type==="All") return "All";
+    if(a.type==="Class") return `Class ${a.class}`;
+    if(a.type==="Section") return `Class ${a.class}-${a.section}`;
+    return "—";
+  }
+  function renderNotices(){
+    const q=($("#n_search").value||"").toLowerCase();
+    const rows=jget("sch_notices").filter(n=>(n.title||"").toLowerCase().includes(q) || (n.body||"").toLowerCase().includes(q))
+      .sort((a,b)=>b.ts-a.ts);
+    const tb=$("#n_tbody"); tb.innerHTML=""; $("#n_empty").style.display=rows.length?"none":"block";
+    rows.forEach((n,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td><td>${toTime(n.ts)}</td><td>${n.title}</td><td>${n.body||""}</td><td>${audienceLabel(n.audience)}</td><td>${n.author||"—"}</td>
+        <td><button class="btn" data-del-n="${n.id}">Delete</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("[data-del-n]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        let arr=jget("sch_notices"); arr=arr.filter(x=>x.id!==b.getAttribute("data-del-n")); jset("sch_notices",arr); renderNotices();
+      });
+    });
+  }
+  $("#n_search").addEventListener("input", renderNotices);
+  $("#n_export").addEventListener("click", ()=>{
+    const rows=jget("sch_notices"); if(!rows.length){alert("No notices.");return;}
+    csv(rows,["id","title","body","ts","author"],"Notices.csv");
+  });
+
+  // === Rosters ===
+  function renderRoster(){
+    const cls=$("#ro_class").value.trim(), sec=$("#ro_section").value.trim();
+    const rows=jget("sch_students").filter(s=> (s.class||"")==cls && (s.section||"")==sec)
+      .sort((a,b)=> (a.roll||"").localeCompare(b.roll||""));
+    const tb=$("#ro_tbody"); tb.innerHTML=""; $("#ro_empty").style.display=rows.length?"none":"block";
+    rows.forEach((s,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i+1}</td><td>${s.name||""}</td><td>${s.roll||""}</td><td>${s.parentName||""}</td><td>${s.parentPhone||""}</td>`;
+      tb.appendChild(tr);
+    });
+  }
+  $("#ro_load").addEventListener("click", renderRoster);
+  $("#ro_export").addEventListener("click", ()=>{
+    const cls=$("#ro_class").value.trim(), sec=$("#ro_section").value.trim();
+    const rows=jget("sch_students").filter(s=> (s.class||"")==cls && (s.section||"")==sec);
+    if(!rows.length){ alert("No students for this class/section."); return; }
+    csv(rows,["id","name","roll","class","section","parentName","parentPhone"],`Roster_${cls}-${sec}.csv`);
+  });
+
+  // Init
+  function renderAll(){ renderTT(); renderEvents(); renderNotices(); }
+  renderAll();
+
+  function logout(){ sessionStorage.clear(); location.replace("./index.html"); }
+  window.logout = logout;
 </script>
 </body>
 </html>
