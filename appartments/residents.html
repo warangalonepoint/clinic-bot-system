@@ -1,45 +1,16 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Apartments • Residents</title>
-<link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
-<style>
-  :root{--max:1000px}
-  body{background:#f5f7fa}
-  main{max-width:var(--max);margin:16px auto;padding:16px}
-  .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-
-  /* polish-only */
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
-  .banner{width:100%;height:180px;object-fit:cover;display:block}
-  @media(max-width:560px){.banner{height:140px}}
-  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
-  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .muted{color:#666}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:900px){.grid{grid-template-columns:1fr}}
-  input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-align:center}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
-  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-  .tab{padding:10px 14px;border-radius:999px;background:#eee;cursor:pointer;font-weight:700}
-  .tab.active{background:#111;color:#fff}
-  .hidden{display:none}
-</style>
-</head><body>
+</head><body class="bg">
 <script>
 // optional lock
 // if(sessionStorage.getItem("apt_role")!=="residents") location.replace("./index.html");
 </script>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
-<main>
-  <!-- Header -->
+<main class="wrap">
   <div class="card hero">
     <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
     <div class="hero-overlay">
@@ -49,128 +20,113 @@
   </div>
 
   <!-- Profile -->
-  <section class="card" id="profile">
-    <h2 style="margin:0 0 8px">My Home</h2>
-    <p class="muted" style="margin:0 0 12px">Set your flat once. All lists auto-filter to your flat.</p>
-    <div class="grid">
-      <label>Flat / Unit <input id="p_flat" placeholder="e.g., A-101"></label>
-      <label>Your Name <input id="p_name" placeholder="Your full name"></label>
-      <label>Phone <input id="p_phone" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
-      <label>Block / Tower (optional) <input id="p_block" placeholder="e.g., Block 1"></label>
+  <section class="card mt" id="profile">
+    <h2 class="h2">My Home</h2>
+    <p class="muted">Set your flat once. All lists auto-filter to your flat.</p>
+    <div class="grid2">
+      <label>Flat / Unit <input id="p_flat" class="in" placeholder="e.g., A-101"></label>
+      <label>Your Name <input id="p_name" class="in" placeholder="Your full name"></label>
+      <label>Phone <input id="p_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
+      <label>Block / Tower (optional) <input id="p_block" class="in" placeholder="e.g., Block 1"></label>
     </div>
-    <div class="row" style="margin-top:10px">
+    <div class="row mt8">
       <button class="btn" id="p_save">Save</button>
     </div>
-    <div id="p_msg" class="muted" style="margin-top:8px"></div>
+    <div id="p_msg" class="muted mt8"></div>
   </section>
 
   <!-- Tabs -->
   <div class="tabs">
-    <div class="tab active" data-t="#t_book">Bookings</div>
-    <div class="tab" data-t="#t_comp">Complaints</div>
-    <div class="tab" data-t="#t_notice">Notices</div>
-    <div class="tab" data-t="#t_log">Visitor Log</div>
-    <div class="tab" data-t="#t_pre">Pre-Approval</div>
+    <button class="tab active" data-t="#t_book">Bookings</button>
+    <button class="tab" data-t="#t_comp">Complaints</button>
+    <button class="tab" data-t="#t_notice">Notices</button>
+    <button class="tab" data-t="#t_log">Visitor Log</button>
+    <button class="tab" data-t="#t_pre">Pre-Approval</button>
   </div>
 
   <!-- Bookings -->
   <section class="card" id="t_book">
-    <h2 style="margin:0 0 8px">Amenity Booking</h2>
-    <div class="grid">
+    <h2 class="h2">Amenity Booking</h2>
+    <div class="grid2">
       <label>Amenity
-        <select id="b_amen"><option>Gym (30 min, cap 8)</option><option>Tennis Court</option><option>Community Hall</option></select>
+        <select id="b_amen" class="in"><option>Gym (30 min, cap 8)</option><option>Tennis Court</option><option>Community Hall</option></select>
       </label>
-      <label>Date <input id="b_date" type="date"></label>
-      <label>Time Slot <input id="b_time" placeholder="e.g., 06:30 PM"></label>
+      <label>Date <input id="b_date" class="in" type="date"></label>
+      <label>Time Slot <input id="b_time" class="in" placeholder="e.g., 06:30 PM"></label>
     </div>
-    <div class="row" style="margin-top:10px">
+    <div class="row mt8">
       <button class="btn" id="b_add">Confirm Booking</button>
       <button class="btn" id="b_export">Export CSV</button>
       <button class="btn" id="b_clear">Clear All</button>
     </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Amenity</th><th>Date</th><th>Time</th><th>Flat</th><th>Action</th></tr></thead>
-        <tbody id="b_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Amenity</th><th>Date</th><th>Time</th><th>Flat</th><th>Action</th></tr></thead><tbody id="b_tbody"></tbody></table>
       <div id="b_empty" class="muted">No bookings yet.</div>
     </div>
   </section>
 
   <!-- Complaints -->
   <section class="card hidden" id="t_comp">
-    <h2 style="margin:0 0 8px">Raise a Complaint</h2>
-    <div class="grid">
+    <h2 class="h2">Raise a Complaint</h2>
+    <div class="grid2">
       <label>Category
-        <select id="c_cat"><option>Electrical</option><option>Plumbing</option><option>Security</option><option>Housekeeping</option><option>Other</option></select>
+        <select id="c_cat" class="in"><option>Electrical</option><option>Plumbing</option><option>Security</option><option>Housekeeping</option><option>Other</option></select>
       </label>
       <label>Priority
-        <select id="c_pri"><option>Normal</option><option>High</option><option>Urgent</option></select>
+        <select id="c_pri" class="in"><option>Normal</option><option>High</option><option>Urgent</option></select>
       </label>
-      <label style="grid-column:1/-1">Details
-        <textarea id="c_desc" rows="3" placeholder="Describe the issue..."></textarea>
+      <label class="span2">Details
+        <textarea id="c_desc" class="in" rows="3" placeholder="Describe the issue..."></textarea>
       </label>
     </div>
-    <div class="row" style="margin-top:10px">
+    <div class="row mt8">
       <button class="btn" id="c_add">Submit</button>
       <button class="btn" id="c_export">Export My Complaints</button>
     </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th></tr></thead>
-        <tbody id="c_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th></tr></thead><tbody id="c_tbody"></tbody></table>
       <div id="c_empty" class="muted">No complaints yet.</div>
     </div>
   </section>
 
   <!-- Notices -->
   <section class="card hidden" id="t_notice">
-    <h2 style="margin:0 0 8px">Notices</h2>
-    <div style="overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Notice</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead>
-        <tbody id="n_tbody"></tbody>
-      </table>
+    <h2 class="h2">Notices</h2>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Notice</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead><tbody id="n_tbody"></tbody></table>
       <div id="n_empty" class="muted">No notices yet.</div>
     </div>
   </section>
 
-  <!-- Visitor Log (my flat) -->
+  <!-- Visitor Log -->
   <section class="card hidden" id="t_log">
-    <h2 style="margin:0 0 8px">Visitor Log</h2>
-    <div class="row" style="align-items:center;justify-content:space-between">
-      <input id="v_search" placeholder="Search name/purpose" style="max-width:260px">
+    <h2 class="h2">Visitor Log</h2>
+    <div class="row space">
+      <input id="v_search" class="in" placeholder="Search name/purpose" style="max-width:260px">
       <button class="btn" id="v_export">Export CSV</button>
     </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead>
-        <tbody id="v_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead><tbody id="v_tbody"></tbody></table>
       <div id="v_empty" class="muted">No visitors yet.</div>
     </div>
   </section>
 
   <!-- Pre-Approval -->
   <section class="card hidden" id="t_pre">
-    <h2 style="margin:0 0 8px">Pre-Approve a Visitor</h2>
-    <div class="grid">
-      <label>Visitor Name <input id="pa_name" placeholder="e.g., Courier / Friend"></label>
-      <label>Phone <input id="pa_phone" inputmode="numeric" maxlength="10" placeholder="10-digit (optional)"></label>
-      <label>Date <input id="pa_date" type="date"></label>
-      <label>Purpose <input id="pa_purpose" placeholder="e.g., Delivery, Guest"></label>
+    <h2 class="h2">Pre-Approve a Visitor</h2>
+    <div class="grid2">
+      <label>Visitor Name <input id="pa_name" class="in" placeholder="e.g., Courier / Friend"></label>
+      <label>Phone <input id="pa_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit (optional)"></label>
+      <label>Date <input id="pa_date" class="in" type="date"></label>
+      <label>Purpose <input id="pa_purpose" class="in" placeholder="e.g., Delivery, Guest"></label>
     </div>
-    <div class="row" style="margin-top:10px">
+    <div class="row mt8">
       <button class="btn" id="pa_add">Add</button>
       <button class="btn" id="pa_export">Export CSV</button>
       <button class="btn" id="pa_clear">Clear My Pre-Approvals</button>
     </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Name</th><th>Date</th><th>Purpose</th><th>Status</th><th>Action</th></tr></thead>
-        <tbody id="pa_tbody"></tbody>
-      </table>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Date</th><th>Purpose</th><th>Status</th><th>Action</th></tr></thead><tbody id="pa_tbody"></tbody></table>
       <div id="pa_empty" class="muted">No pre-approvals yet.</div>
     </div>
   </section>
@@ -186,11 +142,16 @@ const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.pu
 const today=()=>new Date().toISOString().slice(0,10);
 
 // tabs
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");document.querySelectorAll("section.card.hidden, section.card").forEach(s=>{if(s.id.startsWith("t_")) s.classList.add("hidden");});document.querySelector(t.dataset.t).classList.remove("hidden");});
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.querySelectorAll("section.card").forEach(s=>{ if(s.id.startsWith("t_")) s.classList.add("hidden"); });
+  document.querySelector(t.dataset.t).classList.remove("hidden");
+});
 
 // profile
 function loadProfile(){ const p=JSON.parse(localStorage.getItem(K.profile)||"{}"); p_flat.value=p.flat||""; p_name.value=p.name||""; p_phone.value=p.phone||""; p_block.value=p.block||""; }
-$("p_save").onclick=()=>{ const data={flat:p_flat.value.trim(),name:p_name.value.trim(),phone:p_phone.value.trim(),block:p_block.value.trim()}; localStorage.setItem(K.profile,JSON.stringify(data)); p_msg.textContent="Saved locally."; setTimeout(()=>p_msg.textContent="",1800); renderAll(); };
+p_save.onclick=()=>{ const data={flat:p_flat.value.trim(),name:p_name.value.trim(),phone:p_phone.value.trim(),block:p_block.value.trim()}; localStorage.setItem(K.profile,JSON.stringify(data)); p_msg.textContent="Saved locally."; setTimeout(()=>p_msg.textContent="",1800); renderAll(); };
 
 // bookings
 function renderBookings(){
@@ -199,9 +160,9 @@ function renderBookings(){
   b_tbody.innerHTML=""; b_empty.style.display=arr.length?"none":"block";
   arr.forEach((r,i)=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${r.amen}</td><td>${r.date}</td><td>${r.time}</td><td>${r.flat}</td><td><button class="btn" onclick="delBooking('${r.id}')">Cancel</button></td>`; b_tbody.appendChild(tr); });
 }
-$("b_add").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),amen:b_amen.value,date:b_date.value||today(),time:b_time.value.trim(),flat:me.flat,ts:Date.now()}; const arr=jget(K.bookings); arr.unshift(row); jset(K.bookings,arr); renderBookings(); };
-$("b_export").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.bookings).filter(b=>b.flat===(me.flat||"")); csv(rows,["id","amen","date","time","flat","ts"],"My_Bookings.csv"); };
-$("b_clear").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const arr=jget(K.bookings).filter(b=>b.flat!==me.flat); jset(K.bookings,arr); renderBookings(); };
+b_add.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),amen:b_amen.value,date:b_date.value||today(),time:b_time.value.trim(),flat:me.flat,ts:Date.now()}; const arr=jget(K.bookings); arr.unshift(row); jset(K.bookings,arr); renderBookings(); };
+b_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.bookings).filter(b=>b.flat===(me.flat||"")); csv(rows,["id","amen","date","time","flat","ts"],"My_Bookings.csv"); };
+b_clear.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const arr=jget(K.bookings).filter(b=>b.flat!==me.flat); jset(K.bookings,arr); renderBookings(); };
 window.delBooking=(id)=>{ let arr=jget(K.bookings); arr=arr.filter(x=>x.id!==id); jset(K.bookings,arr); renderBookings(); };
 
 // complaints
@@ -211,34 +172,48 @@ function renderMyComplaints(){
   c_tbody.innerHTML=""; c_empty.style.display=arr.length?"none":"block";
   arr.forEach((r,i)=>{ const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}); const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${t}</td><td>${r.cat}</td><td>${r.priority}</td><td>${r.status}</td><td>${r.assign||"—"}</td><td>${r.desc||""}</td>`; c_tbody.appendChild(tr); });
 }
-$("c_add").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),flat:me.flat,cat:c_cat.value,priority:c_pri.value,desc:c_desc.value.trim(),status:"Open",assign:"",ts:Date.now()}; const arr=jget(K.complaints); arr.unshift(row); jset(K.complaints,arr); c_desc.value=""; renderMyComplaints(); };
-$("c_export").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.complaints).filter(c=>c.flat===(me.flat||"")); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"My_Complaints.csv"); };
+c_add.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),flat:me.flat,cat:c_cat.value,priority:c_pri.value,desc:c_desc.value.trim(),status:"Open",assign:"",ts:Date.now()}; const arr=jget(K.complaints); arr.unshift(row); jset(K.complaints,arr); c_desc.value=""; renderMyComplaints(); };
+c_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.complaints).filter(c=>c.flat===(me.flat||"")); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"My_Complaints.csv"); };
 
 // notices
 function renderNotices(){
-  const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const block=me.block||""; const arr=jget(K.notices).slice().sort((a,b)=>b.ts-a.ts);
+  const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const block=me.block||"";
+  const arr=jget(K.notices).slice().sort((a,b)=>b.ts-a.ts);
   n_tbody.innerHTML=""; n_empty.style.display=arr.length?"none":"block";
-  arr.forEach((r,i)=>{ const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}); const show = (r.aud==="All" || r.aud===block || r.aud===me.flat); if(!show) return; const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td><b>${r.title||"Notice"}</b><br>${r.msg||""}</td><td>${r.aud||"All"}</td><td>${t}</td><td><button class="btn" onclick="rmNotice('${r.id}')">Mark Read</button></td>`; n_tbody.appendChild(tr); });
+  arr.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+    const show = (r.aud==="All" || r.aud===block || r.aud===me.flat);
+    if(!show) return;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td><b>${r.title||"Notice"}</b><br>${r.msg||""}</td><td>${r.aud||"All"}</td><td>${t}</td><td><button class="btn" onclick="rmNotice('${r.id}')">Mark Read</button></td>`;
+    n_tbody.appendChild(tr);
+  });
   if(!n_tbody.children.length) n_empty.style.display="block";
 }
-window.rmNotice=(id)=>{ let arr=jget(K.notices); /* per-device read */ const read=JSON.parse(localStorage.getItem("apt_notices_read")||"[]"); if(!read.includes(id)) read.push(id); localStorage.setItem("apt_notices_read",JSON.stringify(read)); renderNotices(); };
+window.rmNotice=(id)=>{ const read=JSON.parse(localStorage.getItem("apt_notices_read")||"[]"); if(!read.includes(id)) read.push(id); localStorage.setItem("apt_notices_read",JSON.stringify(read)); renderNotices(); };
 
-// visitor log (by my flat)
+// visitor log
 function renderVisitorLog(){
   const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
   const q=(v_search.value||"").toLowerCase();
   const rows=jget(K.visits).filter(v=>v.flat===flat).filter(v=>(v.name||"").toLowerCase().includes(q)||(v.purpose||"").toLowerCase().includes(q)).sort((a,b)=>b.ts-a.ts);
   v_tbody.innerHTML=""; v_empty.style.display=rows.length?"none":"block";
-  rows.forEach((r,i)=>{ const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—"; const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.purpose}</td><td>${t}</td><td>${img}</td>`; v_tbody.appendChild(tr); });
+  rows.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+    const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.purpose}</td><td>${t}</td><td>${img}</td>`;
+    v_tbody.appendChild(tr);
+  });
 }
-$("v_search").addEventListener("input",renderVisitorLog);
-$("v_export").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.visits).filter(v=>v.flat===(me.flat||"")).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"My_Visitors.csv"); };
+v_search.addEventListener("input",renderVisitorLog);
+v_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.visits).filter(v=>v.flat===(me.flat||"")).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"My_Visitors.csv"); };
 
 // pre-approvals
 function renderPre(){ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||""; const arr=jget(K.preapprove).filter(p=>p.flat===flat).sort((a,b)=>b.ts-a.ts); pa_tbody.innerHTML=""; pa_empty.style.display=arr.length?"none":"block"; arr.forEach((r,i)=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.date||"—"}</td><td>${r.purpose||"—"}</td><td>${r.status||"Queued"}</td><td><button class="btn" onclick="delPA('${r.id}')">Delete</button></td>`; pa_tbody.appendChild(tr); }); }
-$("pa_add").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),flat:me.flat,name:pa_name.value.trim(),phone:pa_phone.value.trim(),date:pa_date.value||today(),purpose:pa_purpose.value.trim()||"guest",status:"Queued",ts:Date.now()}; if(!row.name){alert("Name required");return;} const arr=jget(K.preapprove); arr.unshift(row); jset(K.preapprove,arr); pa_name.value=pa_phone.value=pa_purpose.value=""; renderPre(); };
-$("pa_export").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.preapprove).filter(p=>p.flat===(me.flat||"")); csv(rows,["id","flat","name","phone","date","purpose","status","ts"],"My_PreApprovals.csv"); };
-$("pa_clear").onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const arr=jget(K.preapprove).filter(p=>p.flat!==me.flat); jset(K.preapprove,arr); renderPre(); };
+pa_add.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),flat:me.flat,name:pa_name.value.trim(),phone:pa_phone.value.trim(),date:pa_date.value||today(),purpose:pa_purpose.value.trim()||"guest",status:"Queued",ts:Date.now()}; if(!row.name){alert("Name required");return;} const arr=jget(K.preapprove); arr.unshift(row); jset(K.preapprove,arr); pa_name.value=pa_phone.value=pa_purpose.value=""; renderPre(); };
+pa_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.preapprove).filter(p=>p.flat===(me.flat||"")); csv(rows,["id","flat","name","phone","date","purpose","status","ts"],"My_PreApprovals.csv"); };
+pa_clear.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const arr=jget(K.preapprove).filter(p=>p.flat!==me.flat); jset(K.preapprove,arr); renderPre(); };
 window.delPA=(id)=>{ let arr=jget(K.preapprove); arr=arr.filter(x=>x.id!==id); jset(K.preapprove,arr); renderPre(); };
 
 // render all
