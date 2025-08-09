@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#111"/>
 <style>
   :root{--max:1000px}
-  body{background:#f8f9fa}
+  body{background:#f5f7fa}
   main{max-width:var(--max);margin:16px auto;padding:16px}
   .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
 
-  /* Polished header */
+  /* polish-only */
   .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
   .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
   .banner{width:100%;height:180px;object-fit:cover;display:block}
@@ -18,9 +18,6 @@
   .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
   .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
   .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:980px){.grid{grid-template-columns:1fr}}
   .row{display:flex;gap:10px;flex-wrap:wrap}
@@ -28,21 +25,21 @@
   input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
   table{width:100%;border-collapse:collapse}
   th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
-  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-decoration:none;text-align:center}
-  .pill{background:#eee;border-radius:999px;padding:4px 10px;display:inline-block}
+  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-align:center}
 </style>
 </head><body>
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 <main>
+  <!-- Header -->
   <div class="card hero">
     <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
     <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/admin.png'">
+      <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
       <div class="hero-title">Committee Console</div>
     </div>
   </div>
 
-  <!-- Notices -->
+  <!-- Post a Notice -->
   <div class="card" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Post a Notice</h2>
     <div class="grid">
@@ -88,14 +85,14 @@
     </div>
   </div>
 
-  <!-- Data glance -->
+  <!-- Today at a Glance -->
   <div class="card" style="margin-top:12px">
     <h2 style="margin:0 0 8px">Today at a Glance</h2>
     <div class="row" style="flex-wrap:wrap">
-      <span class="pill">Visitors: <b id="s_vis">0</b></span>
-      <span class="pill">Deliveries: <b id="s_del">0</b></span>
-      <span class="pill">Open Complaints: <b id="s_open">0</b></span>
-      <span class="pill">Notices Posted: <b id="s_not">0</b></span>
+      <span>Visitors: <b id="s_vis">0</b></span>
+      <span>Deliveries: <b id="s_del">0</b></span>
+      <span>Open Complaints: <b id="s_open">0</b></span>
+      <span>Notices Posted: <b id="s_not">0</b></span>
     </div>
   </div>
 
@@ -113,12 +110,11 @@ const K={notices:"apt_notices", complaints:"apt_complaints", visits:"apt_visits"
 const $=id=>document.getElementById(id);
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
 const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const now=()=>new Date().toLocaleString([], {hour:"2-digit",minute:"2-digit"});
 const ymd=()=>new Date().toISOString().slice(0,10);
 const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 const uid=()=>Math.random().toString(36).slice(2,9);
 
-// Notices
+/* Notices */
 function renderNotices(){
   const rows=jget(K.notices).sort((a,b)=>b.ts-a.ts);
   n_tbody.innerHTML=""; n_empty.style.display = rows.length? "none":"block";
@@ -130,16 +126,16 @@ function renderNotices(){
     n_tbody.appendChild(tr);
   });
 }
-$("n_add").onclick=()=>{
+n_add.onclick=()=>{
   const title=n_title.value.trim(), msg=n_msg.value.trim(), aud=n_aud.value;
   if(!title||!msg){ alert("Title and Message required."); return; }
   const arr=jget(K.notices); arr.unshift({id:uid(),title,msg,aud,ts:Date.now()}); jset(K.notices,arr);
   n_title.value=n_msg.value=""; renderNotices(); renderStats();
 };
-$("n_export").onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices.csv"); };
+n_export.onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices.csv"); };
 window.delNotice=(id)=>{ let arr=jget(K.notices); arr=arr.filter(x=>x.id!==id); jset(K.notices,arr); renderNotices(); renderStats(); };
 
-// Complaints
+/* Complaints board */
 function renderComplaints(){
   const q=(c_search.value||"").toLowerCase(), f=c_filter.value||"";
   let rows=jget(K.complaints).slice().sort((a,b)=>b.ts-a.ts);
@@ -160,7 +156,7 @@ function renderComplaints(){
             <option${r.status==="In Progress"?" selected":""}>In Progress</option>
             <option${r.status==="Closed"?" selected":""}>Closed</option>
           </select></td>
-      <td><input value="${r.assign||""}" onchange="setAssign('${r.id}',this.value)" placeholder="e.g., Electrician"/></td>
+      <td><input value="${r.assign||""}" onchange="setAssign('${r.id}',this.value)" placeholder="Vendor/Staff"/></td>
       <td>${r.desc||""}</td>
       <td class="row">
         <button class="btn" onclick="closeC('${r.id}')">Close</button>
@@ -173,21 +169,20 @@ window.setStatus=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex
 window.setAssign=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].assign=val; jset(K.complaints,arr); } };
 window.closeC=(id)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status="Closed"; jset(K.complaints,arr); renderComplaints(); renderStats(); } };
 window.delC=(id)=>{ let arr=jget(K.complaints); arr=arr.filter(x=>x.id!==id); jset(K.complaints,arr); renderComplaints(); renderStats(); };
-$("c_export").onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints.csv"); };
-$("c_filter").addEventListener("change",renderComplaints);
-$("c_search").addEventListener("input",renderComplaints);
+c_export.onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints.csv"); };
+c_filter.addEventListener("change",renderComplaints);
+c_search.addEventListener("input",renderComplaints);
 
-// Stats
+/* Stats */
 function renderStats(){
   const today = ymd();
   const vis = jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
   const del = jget(K.deliveries).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
   const open = jget(K.complaints).filter(c=>c.status!=="Closed").length;
-  const not = jget(K.notices).length;
-  s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; s_not.textContent=not;
+  s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; s_not.textContent=jget(K.notices).length;
 }
 
-// Init
+/* Init */
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 renderNotices(); renderComplaints(); renderStats();
 </script>
