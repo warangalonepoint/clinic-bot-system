@@ -1,150 +1,149 @@
-/* =======================
-   Global Reset & Base
-======================= */
-* {
+/* =========================================================
+   School / Apartments / Clinic PWA – Unified Styles
+   ========================================================= */
+
+/* ---------- Reset ---------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  color: var(--text); background: var(--bg);
 }
 
-html, body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100%;
+/* ---------- Theme Tokens ---------- */
+:root{
+  /* Base */
+  --bg:#F6F8FB;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --shadow:0 10px 25px rgba(0,0,0,.08);
+  --shadow-sm:0 3px 12px rgba(0,0,0,.06);
+  --radius:22px;
+  --radius-sm:14px;
+
+  /* Primary (solid black buttons) */
+  --primary:#111111;
+  --primaryText:#ffffff;
+
+  /* Accent palette */
+  --blue:#2563eb;
+  --green:#10b981;
+  --amber:#f59e0b;
+  --rose:#f43f5e;
+  --purple:#7c3aed;
+  --slate:#0f172a;
+
+  /* Glass defaults */
+  --glass-radius:24px;
+  --glass-blur:14px;
+  --glass-shadow:0 10px 25px rgba(0,0,0,.10);
+  --glass-head-height:88px;
+  --glass-title:#fff;
+  --glass-subtitle:rgba(255,255,255,.85);
 }
 
-/* =======================
-   Theme Variables
-======================= */
-:root {
-  --bg: #f9fafb;
-  --text: #111827;
-  --card-bg: #ffffff;
-  --line: #e5e7eb;
-  --radius: 12px;
+/* ---------- Layout ---------- */
+.wrap{max-width:1100px;margin:20px auto;padding:12px;}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.space{justify-content:space-between}
+.hidden{display:none !important}
+.stack > * + *{margin-top:12px}
+body:after{content:"";display:block;height:40px} /* bottom breathing room */
 
-  /* Accent Colors */
-  --blue: #2563eb;
-  --green: #10b981;
-  --amber: #f59e0b;
-  --rose: #f43f5e;
-  --purple: #7c3aed;
-  --slate: #0f172a;
+/* ---------- Cards ---------- */
+.card{
+  background:var(--card); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:18px; margin:14px 0;
+  border:1px solid var(--line);
 }
+.h1{font-size:28px;font-weight:800;margin:0 0 10px}
+.h2{font-size:22px;font-weight:800;margin:0 0 10px}
+.muted{color:var(--muted)}
 
-/* Dark Mode */
-body.dark {
-  --bg: #111827;
-  --text: #f3f4f6;
-  --card-bg: #1f2937;
-  --line: #374151;
-}
-
-/* =======================
-   Layout Elements
-======================= */
-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--card-bg);
-  padding: 10px;
-  border-bottom: 1px solid var(--line);
-}
-
-header img {
-  max-height: 60px;
-}
-
-.banner {
-  width: 100%;
-  max-height: 140px;
-  object-fit: cover;
-  border-bottom: 1px solid var(--line);
-}
-
-.container {
-  padding: 16px;
-}
-
-/* =======================
-   Card Styling
-======================= */
-.card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.card h2, .card .h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.card p {
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-/* Accent Stripe Cards */
-.card.accent { position: relative; overflow: hidden; }
-.card.accent-blue    { border-left: 6px solid var(--blue); }
-.card.accent-green   { border-left: 6px solid var(--green); }
-.card.accent-amber   { border-left: 6px solid var(--amber); }
-.card.accent-rose    { border-left: 6px solid var(--rose); }
-.card.accent-purple  { border-left: 6px solid var(--purple); }
-.card.accent-slate   { border-left: 6px solid var(--slate); }
-
-.card.accent::before {
-  content:"";
-  position:absolute; inset:0 0 auto 0; height:46px;
+/* Accent stripe variants */
+.card.accent,
+.btn.accent{position:relative;overflow:hidden}
+.card.accent-blue   { border-left:6px solid var(--blue); }
+.card.accent-green  { border-left:6px solid var(--green); }
+.card.accent-amber  { border-left:6px solid var(--amber); }
+.card.accent-rose   { border-left:6px solid var(--rose); }
+.card.accent-purple { border-left:6px solid var(--purple); }
+.card.accent-slate  { border-left:6px solid var(--slate); }
+.card.accent::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:46px;
   background:linear-gradient(90deg, rgba(0,0,0,.06), transparent 45%);
-  pointer-events:none;
-  border-top-left-radius:var(--radius); 
-  border-top-right-radius:var(--radius);
+  pointer-events:none; border-top-left-radius:var(--radius); border-top-right-radius:var(--radius);
 }
 
-/* =======================
-   Buttons
-======================= */
-.btn {
-  display: inline-block;
-  padding: 8px 14px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  margin: 4px 2px;
-  color: white;
+/* ---------- Banner / Hero ---------- */
+.hero{position:relative;border-radius:var(--radius);overflow:hidden}
+.banner{width:100%;height:210px;object-fit:cover;display:block}
+.hero-overlay{
+  position:absolute; inset:0; display:flex; align-items:flex-end;
+  padding:14px 18px; background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55));
 }
+.hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 
-.btn.blue   { background: var(--blue); }
-.btn.green  { background: var(--green); }
-.btn.amber  { background: var(--amber); color:#111; }
-.btn.rose   { background: var(--rose); }
-.btn.purple { background: var(--purple); }
-.btn.slate  { background: var(--slate); }
+/* ---------- Forms ---------- */
+.in{
+  width:100%; height:48px; padding:0 14px; background:#fff; color:var(--text);
+  border:1px solid #d1d5db; border-radius:var(--radius-sm); font-size:16px;
+}
+textarea.in{min-height:120px;padding:10px 12px;resize:vertical}
+.in:focus{outline:0; box-shadow:0 0 0 3px #2563eb22}
+
+/* Grid helpers for forms */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.span2{grid-column:1/-1}
+@media (max-width:900px){ .grid2,.grid3{grid-template-columns:1fr} }
+
+/* ---------- Buttons ---------- */
+.btn{
+  appearance:none; border:0; background:var(--primary); color:var(--primaryText);
+  border-radius:16px; height:48px; padding:0 18px; font-size:16px; font-weight:700;
+  cursor:pointer; box-shadow:var(--shadow-sm);
+  transition:transform .04s ease, filter .2s ease, opacity .2s ease;
+}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled], .btn.disabled{opacity:.55;cursor:not-allowed}
+.btn.outline{background:#fff;color:var(--text);border:1px solid var(--line)}
+
+/* Colored buttons */
+.btn.blue   { background:var(--blue); }
+.btn.green  { background:var(--green); }
+.btn.amber  { background:var(--amber); color:#111; }
+.btn.rose   { background:var(--rose); }
+.btn.purple { background:var(--purple); }
+.btn.slate  { background:var(--slate); }
 .btn.white  { background:#fff; color:var(--text); border:1px solid var(--line); }
 
-/* =======================
-   Pills (Tags)
-======================= */
-.pill {
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:0.75rem;
-  border:1px solid transparent;
+/* ---------- Tabs ---------- */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 6px}
+.tab{
+  background:#f1f5f9; color:#111827; border:1px solid #e5e7eb;
+  height:40px; padding:0 14px; border-radius:999px; font-weight:700; cursor:pointer;
 }
+.tab.active{background:#111111;color:#fff;border-color:#111111}
 
+/* ---------- Tables ---------- */
+.tablewrap{overflow:auto}
+.tbl{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}
+th{font-weight:800;color:#0f172a;background:#f8fafc;position:sticky;top:0;z-index:1}
+tr:hover{background:#f9fafb}
+
+/* ---------- Pills / Chips ---------- */
+.pill{
+  background:#eef2ff; color:#111827; border:1px solid #e5e7eb;
+  padding:6px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; font-size:13px;
+}
 .pill.blue   { background: color-mix(in srgb, var(--blue) 12%, white);  border-color: color-mix(in srgb, var(--blue) 25%, #e5e7eb); }
 .pill.green  { background: color-mix(in srgb, var(--green)12%, white);  border-color: color-mix(in srgb, var(--green)25%, #e5e7eb); }
 .pill.amber  { background: color-mix(in srgb, var(--amber)12%, white);  border-color: color-mix(in srgb, var(--amber)25%, #e5e7eb); }
@@ -152,171 +151,75 @@ header img {
 .pill.purple { background: color-mix(in srgb, var(--purple)12%, white); border-color: color-mix(in srgb, var(--purple)25%, #e5e7eb); }
 .pill.slate  { background: color-mix(in srgb, var(--slate)12%, white);  border-color: color-mix(in srgb, var(--slate)25%, #e5e7eb); }
 
-/* =======================
-   Tables
-======================= */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 8px;
-}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#111;color:#fff}
 
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  font-size: 0.85rem;
-}
-
-th {
-  background: var(--card-bg);
-  font-weight: 600;
-}
-
-tr:hover {
-  background: rgba(0,0,0,0.03);
-}
-
-/* =======================
-   Footer
-======================= */
-footer {
-  text-align: center;
-  padding: 10px;
-  font-size: 0.8rem;
-  border-top: 1px solid var(--line);
-  background: var(--card-bg);
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-/* =======================
-   Theme Toggle
-======================= */
-.theme-toggle {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-}
-/* ========= Glass Cards (multi-accent) ========= */
-/* Base token defaults */
-:root{
-  --glass-radius: 24px;           /* ~iOS */
-  --glass-blur: 14px;             /* backdrop blur */
-  --glass-shadow: 0 10px 25px rgba(0,0,0,.10);
-  --glass-head-height: 88px;      /* ribbon height inside card */
-  --glass-title: #ffffff;
-  --glass-subtitle: rgba(255,255,255,.85);
-}
-
-/* Card shell */
-.glass {
-  position: relative;
-  border-radius: var(--glass-radius);
-  padding: 14px;
-  overflow: hidden;
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  box-shadow: var(--glass-shadow);
-  border: 1px solid rgba(255,255,255,.35);
-  background:
-    linear-gradient(180deg,
+/* =========================================================
+   Soft Glassmorphism System (Class Diary style)
+   ========================================================= */
+.glass{
+  position:relative; border-radius:var(--glass-radius); padding:14px; overflow:hidden;
+  backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow); border:1px solid rgba(255,255,255,.35);
+  background: linear-gradient(180deg,
       color-mix(in srgb, var(--accent, #ec4899) 12%, #ffffff) 0%,
-      color-mix(in srgb, var(--accent, #ec4899) 22%, #ffffff) 100%)
-    ;
+      color-mix(in srgb, var(--accent, #ec4899) 22%, #ffffff) 100%);
 }
-
-/* Fallback if blur isn’t supported (older Android browsers) */
+/* Fallback for no blur support */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
   .glass{
-    background:
-      linear-gradient(180deg,
-        color-mix(in srgb, var(--accent, #ec4899) 7%, #ffffff) 0%,
-        color-mix(in srgb, var(--accent, #ec4899) 14%, #ffffff) 100%);
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--accent, #ec4899) 7%, #ffffff) 0%,
+      color-mix(in srgb, var(--accent, #ec4899) 14%, #ffffff) 100%);
   }
 }
 
-/* Soft “ribbon” slab for title/subtitle (like your Class Diary) */
+/* Ribbon slab (title/subtitle) */
 .glass-ribbon{
-  position: relative;
-  margin-top: 8px;
-  border-radius: calc(var(--glass-radius) - 8px);
-  height: var(--glass-head-height);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 16px;
-  background:
-    linear-gradient(180deg,
-      color-mix(in srgb, #ffffff 60%, var(--accent, #ec4899)) 0%,
-      color-mix(in srgb, #ffffff 40%, var(--accent, #ec4899)) 100%);
-  border: 1px solid rgba(255,255,255,.55);
+  position:relative; margin-top:8px;
+  border-radius:calc(var(--glass-radius) - 8px);
+  height:var(--glass-head-height);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:0 16px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, #ffffff 60%, var(--accent, #ec4899)) 0%,
+    color-mix(in srgb, #ffffff 40%, var(--accent, #ec4899)) 100%);
+  border:1px solid rgba(255,255,255,.55);
   backdrop-filter: blur(calc(var(--glass-blur) * .7));
   -webkit-backdrop-filter: blur(calc(var(--glass-blur) * .7));
-  box-shadow: 0 6px 18px rgba(0,0,0,.10) inset,
-              0 4px 10px rgba(0,0,0,.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,.10) inset, 0 4px 10px rgba(0,0,0,.06);
 }
 
-/* Title + subtitle */
-.glass-title{
-  font-weight: 800;
-  letter-spacing: .2px;
-  color: var(--glass-title);
-  text-align: center;
-  line-height: 1.1;
-  font-size: clamp(20px, 3.2vw, 28px);
-}
-.glass-sub{
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--glass-subtitle);
-}
+.glass-title{font-weight:800;letter-spacing:.2px;color:var(--glass-title);text-align:center;line-height:1.1;font-size:clamp(20px,3.2vw,28px)}
+.glass-sub{margin-top:6px;font-size:14px;color:var(--glass-subtitle)}
+.glass-body{padding:12px 6px 4px}
 
-/* Content area below ribbon */
-.glass-body{
-  padding: 12px 6px 4px;
-}
-
-/* Accent variants (set --accent per card) */
-.glass.rose   { --accent:#f43f5e; } /* red/pink */
+/* Accent bindings */
+.glass.rose   { --accent:#f43f5e; }
 .glass.amber  { --accent:#f59e0b; }
 .glass.green  { --accent:#10b981; }
 .glass.blue   { --accent:#2563eb; }
 .glass.purple { --accent:#7c3aed; }
 .glass.slate  { --accent:#0f172a; }
 
-/* Optional: glass buttons to match */
+/* Glass buttons */
 .btn-glass{
   display:inline-flex;align-items:center;justify-content:center;
-  height:44px;padding:0 16px;border-radius:14px;
-  border:1px solid rgba(255,255,255,.5);
+  height:44px;padding:0 16px;border-radius:14px;border:1px solid rgba(255,255,255,.5);
   color:#fff;font-weight:700;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
   box-shadow: 0 4px 12px rgba(0,0,0,.08);
 }
-.btn-glass.dark-text{ color:#0f172a } /* for lighter cards */
+.btn-glass.dark-text{ color:#0f172a }
 
-/* Grid helper to place small glass tiles (homework/messages/leaves) */
-.glass-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;
-}
-@media (min-width: 640px){
-  .glass-grid{ grid-template-columns: repeat(3, 1fr); }
-}
+/* Glass grid tiles */
+.glass-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (min-width:640px){ .glass-grid{grid-template-columns:repeat(3,1fr)} }
+.glass.tile{padding:14px;border-radius:18px}
+.tile .glass-title{font-size:18px}
+.tile .glass-sub{font-size:13px}
 
-/* Small tile variant */
-.glass.tile{
-  padding:14px;border-radius:18px;
-}
-.tile .glass-title{ font-size:18px }
-.tile .glass-sub{ font-size:13px }
-
-/* Spacing utility */
-.stack > * + *{ margin-top:12px }
+/* ---------- Links ---------- */
+a{color:#111;text-underline-offset:3px}
+a:hover{opacity:.85}
+```0
