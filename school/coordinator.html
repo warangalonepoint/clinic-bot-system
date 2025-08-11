@@ -1,151 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Coordinator • School</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Coordinator • School PWA</title>
+  <meta name="theme-color" content="#111111"/>
+  <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="icon" href="./assets/logo.png">
   <style>
-    .wrap{max-width:1100px;margin:20px auto;padding:12px}
-    .hero{position:relative;border-radius:22px;overflow:hidden}
-    .banner{width:100%;height:210px;object-fit:cover;display:block}
-    .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
-      padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
-    .hero-title{color:#fff;font-weight:800;font-size:24px}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:900px){.grid2{grid-template-columns:1fr}}
-    .tablewrap{overflow:auto;margin-top:8px}
-    th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
+    .toolbar{position:fixed;top:14px;right:14px;z-index:10}
+    .logout{background:#111;color:#fff;border-radius:14px;height:40px;padding:0 14px;border:0;font-weight:700}
+    .hero .titlewrap{display:flex;align-items:flex-end;gap:10px}
+    .hero .hero-title{font-size:28px}
+    .empty{color:#6b7280}
   </style>
 </head>
-<body class="bg">
-<main class="wrap">
-  <div class="card hero">
-    <img class="banner" src="./assets/banner.png" alt="School Banner">
-    <div class="hero-overlay"><div class="hero-title">Coordinator Panel</div></div>
+<body data-page="coordinator">
+  <div class="toolbar">
+    <button class="logout" id="btnLogout">Logout</button>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" data-t="#t_timetable">Timetable</button>
-    <button class="tab" data-t="#t_events">Events & Exams</button>
-    <button class="tab" data-t="#t_notices">Notices (Moderate)</button>
-    <button class="tab" data-t="#t_rosters">Class Rosters</button>
-  </div>
+  <main class="wrap">
+    <!-- Banner -->
+    <section class="hero card" style="padding:0;overflow:hidden">
+      <img class="banner" src="./assets/banner.png" alt="School Banner">
+      <div class="hero-overlay">
+        <div class="titlewrap">
+          <img src="./assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+          <div class="hero-title">Coordinator Panel</div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Timetable -->
-  <section class="card" id="t_timetable">
-    <div class="grid2">
-      <label>Class <input id="tt_class" class="in" placeholder="e.g., 5"></label>
-      <label>Section <input id="tt_section" class="in" placeholder="e.g., A"></label>
-      <label>Day
-        <select id="tt_day" class="in"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option></select>
-      </label>
-      <label>Period # <input id="tt_period" class="in" type="number" min="1" max="12" placeholder="1-12"></label>
-      <label>Subject <input id="tt_subject" class="in" placeholder="Maths"></label>
-      <label>Teacher ID <input id="tt_teacher" class="in" placeholder="T-42"></label>
-      <label>Room <input id="tt_room" class="in" placeholder="302"></label>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn" id="tt_add">Add / Update</button>
-      <button class="btn" id="tt_export">Export CSV</button>
-    </div>
-    <div class="tablewrap">
-      <table class="tbl"><thead><tr><th>#</th><th>Class</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th></tr></thead>
-        <tbody id="tt_tbody"></tbody></table>
-      <div id="tt_empty" class="muted">No entries.</div>
-    </div>
-  </section>
+    <!-- Class Setup -->
+    <section class="card glass blue">
+      <div class="glass-ribbon">
+        <div class="glass-title">Class Setup</div>
+        <div class="glass-sub">Choose class/section & meta for actions below</div>
+      </div>
+      <div class="glass-body grid2">
+        <input id="cClass" class="in" placeholder="Class e.g., 5">
+        <input id="cSection" class="in" placeholder="Section e.g., A">
+        <select id="cDay" class="in">
+          <option>Mon</option><option>Tue</option><option>Wed</option>
+          <option>Thu</option><option>Fri</option><option>Sat</option>
+        </select>
+        <input id="cPeriod" class="in" placeholder="Period # 1–12" inputmode="numeric">
+        <input id="cSubject" class="in span2" placeholder="Subject e.g., Maths">
+        <div class="row">
+          <button id="btnSaveMeta" class="btn-glass">Save Meta</button>
+          <span id="metaMsg" class="muted" style="margin-left:8px"></span>
+        </div>
+      </div>
+    </section>
 
-  <!-- Events -->
-  <section class="card hidden" id="t_events">
-    <div class="grid2">
-      <label>Type <select id="ev_type" class="in"><option>Event</option><option>Exam</option></select></label>
-      <label>Title <input id="ev_title" class="in" placeholder="Sports Day"></label>
-      <label>Start <input id="ev_start" class="in" type="date"></label>
-      <label>End <input id="ev_end" class="in" type="date"></label>
-      <label class="span2">Notes <textarea id="ev_notes" class="in" placeholder="Details…"></textarea></label>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn" id="ev_add">Add</button>
-      <button class="btn" id="ev_export">Export CSV</button>
-    </div>
-    <div class="tablewrap">
-      <table class="tbl"><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Start</th><th>End</th><th>Notes</th><th>Action</th></tr></thead>
-        <tbody id="ev_tbody"></tbody></table>
-      <div id="ev_empty" class="muted">No items.</div>
-    </div>
-  </section>
+    <!-- Timetable -->
+    <section class="card glass green">
+      <div class="glass-ribbon">
+        <div class="glass-title">Timetable</div>
+        <div class="glass-sub">Add/replace period entries for the selected class</div>
+      </div>
+      <div class="glass-body stack">
+        <div class="grid3">
+          <input id="tTeacher" class="in" placeholder="Teacher name e.g., Ms. Priya">
+          <input id="tRoom" class="in" placeholder="Room (optional)">
+          <button id="btnAddTT" class="btn blue">Add / Update</button>
+        </div>
+        <div class="tablewrap card" style="padding:0">
+          <table class="tbl" id="ttTable">
+            <thead>
+              <tr><th>#</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th></tr>
+            </thead>
+            <tbody id="ttBody">
+              <tr><td colspan="7" class="empty">No entries yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="row space">
+          <div class="row" style="gap:8px">
+            <button id="btnExportTT" class="btn outline">Export CSV</button>
+            <button id="btnClearTT" class="btn rose">Clear Class Timetable</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Notices -->
-  <section class="card hidden" id="t_notices">
-    <div class="row space">
-      <h2 class="h2">Moderate Notices</h2>
-      <input id="n_search" class="in" placeholder="Search…" style="max-width:260px">
-    </div>
-    <div class="tablewrap">
-      <table class="tbl"><thead><tr><th>#</th><th>When</th><th>Title</th><th>Message</th><th>Audience</th><th>Author</th><th>Action</th></tr></thead>
-        <tbody id="n_tbody"></tbody></table>
-      <div id="n_empty" class="muted">No notices.</div>
-    </div>
-  </section>
+    <!-- Assign Teachers (optional quick map) -->
+    <section class="card glass purple">
+      <div class="glass-ribbon">
+        <div class="glass-title">Subject → Teacher Map</div>
+        <div class="glass-sub">Quick assign for this class/section</div>
+      </div>
+      <div class="glass-body grid3">
+        <input id="mSubject" class="in" placeholder="Subject e.g., English">
+        <input id="mTeacher" class="in" placeholder="Teacher name">
+        <button id="btnMap" class="btn purple">Add Mapping</button>
+      </div>
+      <div class="glass-body">
+        <div class="tablewrap card" style="padding:0">
+          <table class="tbl">
+            <thead><tr><th>#</th><th>Subject</th><th>Teacher</th><th>Action</th></tr></thead>
+            <tbody id="mapBody"><tr><td colspan="4" class="empty">No mappings yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-  <!-- Rosters -->
-  <section class="card hidden" id="t_rosters">
-    <div class="grid2">
-      <label>Class <input id="ro_class" class="in" placeholder="e.g., 5"></label>
-      <label>Section <input id="ro_section" class="in" placeholder="e.g., A"></label>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn" id="ro_load">Load</button>
-      <button class="btn" id="ro_export">Export This Class</button>
-    </div>
-    <div class="tablewrap">
-      <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Roll</th><th>Parent</th><th>Phone</th></tr></thead>
-        <tbody id="ro_tbody"></tbody></table>
-      <div id="ro_empty" class="muted">No students.</div>
-    </div>
-  </section>
+    <!-- Broadcast Notice -->
+    <section class="card glass amber">
+      <div class="glass-ribbon">
+        <div class="glass-title">Broadcast Notice</div>
+        <div class="glass-sub">Send to Teachers / Parents (local demo)</div>
+      </div>
+      <div class="glass-body grid2">
+        <input id="nTitle" class="in" placeholder="Title e.g., Water supply shutdown">
+        <select id="nAudience" class="in">
+          <option>All Teachers</option>
+          <option>All Parents</option>
+          <option>Class Parents (current class)</option>
+        </select>
+        <textarea id="nMsg" class="in span2" placeholder="Short, clear message..."></textarea>
+        <div class="row">
+          <button id="btnPublish" class="btn amber">Publish</button>
+          <button id="btnExportNotices" class="btn outline">Export Notices CSV</button>
+        </div>
+      </div>
+      <div class="glass-body">
+        <div class="tablewrap card" style="padding:0">
+          <table class="tbl">
+            <thead><tr><th>#</th><th>Title</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead>
+            <tbody id="noticeBody"><tr><td colspan="5" class="empty">No notices yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-  <div class="card">
-    <div class="row">
-      <button class="btn" onclick="logout()" style="flex:1">Logout</button>
-      <a class="btn" href="./index.html" style="flex:1">Back to PIN</a>
-    </div>
-  </div>
-</main>
+    <!-- Tools -->
+    <section class="card glass slate">
+      <div class="glass-ribbon">
+        <div class="glass-title">Tools</div>
+        <div class="glass-sub">Cache & app helpers</div>
+      </div>
+      <div class="glass-body row" style="gap:8px;flex-wrap:wrap">
+        <button id="btnInstall" class="btn-glass">Install App (PWA)</button>
+        <button id="btnResetSW" class="btn-glass">Reset Cache / SW</button>
+        <button id="btnBackPin" class="btn-glass">Back to PIN</button>
+      </div>
+    </section>
+  </main>
 
-<script>
-  if(sessionStorage.getItem("school_role")!=="coordinator"){ location.replace("./index.html"); }
-  const $=s=>document.querySelector(s);
-  const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
-  const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-  const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String((r||{})[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
-  const uid=()=>Math.random().toString(36).slice(2,9);
-  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["t_timetable","t_events","t_notices","t_rosters"].forEach(id=>document.getElementById(id).classList.add("hidden"));document.querySelector(t.getAttribute("data-t")).classList.remove("hidden");}));
+  <script>
+    // ---------- Simple Auth Gate ----------
+    (function gate(){
+      const role = sessionStorage.getItem('school_role');
+      if(!role || role !== 'coordinator'){
+        // optional: allow index
+        // location.replace('./index.html');
+      }
+    })();
 
-  // Timetable
-  function rTT(){const rows=jget("sch_timetable").slice().sort((a,b)=>a.class.localeCompare(b.class)||a.section.localeCompare(b.section)||a.day.localeCompare(b.day)||(a.period-b.period));const tb=$("#tt_tbody");tb.innerHTML="";$("#tt_empty").style.display=rows.length?"none":"block";rows.forEach((r,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${r.class}-${r.section}</td><td>${r.day}</td><td>${r.period}</td><td>${r.subject}</td><td>${r.teacherId||""}</td><td>${r.room||""}</td><td><button class="btn" data-del="${r.id}">Del</button></td>`;tb.appendChild(tr);});tb.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{jset("sch_timetable",jget("sch_timetable").filter(x=>x.id!==b.getAttribute("data-del")));rTT();}));}
-  $("#tt_add").addEventListener("click",()=>{const row={id:uid(),class:$("#tt_class").value.trim(),section:$("#tt_section").value.trim(),day:$("#tt_day").value,period:Number($("#tt_period").value||0),subject:$("#tt_subject").value.trim(),teacherId:$("#tt_teacher").value.trim(),room:$("#tt_room").value.trim(),ts:Date.now()};if(!row.class||!row.section||!row.day||!row.period||!row.subject){alert("Fill required fields.");return;}let arr=jget("sch_timetable");const i=arr.findIndex(x=>x.class===row.class&&x.section===row.section&&x.day===row.day&&Number(x.period)===row.period);if(i>-1)arr[i]={...arr[i],...row,id:arr[i].id,ts:Date.now()};else arr.unshift(row);jset("sch_timetable",arr);rTT();});
-  $("#tt_export").addEventListener("click",()=>{const rows=jget("sch_timetable");if(!rows.length){alert("No data.");return;}csv(rows,["id","class","section","day","period","subject","teacherId","room","ts"],"timetable.csv");});
+    // ---------- Storage Keys ----------
+    const KEY_META = 'coord_meta';                  // {class, section, day, period, subject}
+    const KEY_TT   = 'coord_timetable';            // array of entries
+    const KEY_MAP  = 'coord_subject_map';          // array of {subject, teacher, class, section}
+    const KEY_NOT  = 'coord_notices';              // array
 
-  // Events
-  function rEV(){const rows=jget("sch_events").slice().sort((a,b)=> (a.start||"").localeCompare(b.start||"")).reverse();const tb=$("#ev_tbody");tb.innerHTML="";$("#ev_empty").style.display=rows.length?"none":"block";rows.forEach((r,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${r.type}</td><td>${r.title}</td><td>${r.start}</td><td>${r.end||""}</td><td>${r.notes||""}</td><td><button class="btn" data-delev="${r.id}">Del</button></td>`;tb.appendChild(tr);});tb.querySelectorAll("[data-delev]").forEach(b=>b.addEventListener("click",()=>{jset("sch_events",jget("sch_events").filter(x=>x.id!==b.getAttribute("data-delev")));rEV();}));}
-  $("#ev_add").addEventListener("click",()=>{const row={id:uid(),type:$("#ev_type").value,title:$("#ev_title").value.trim(),start:$("#ev_start").value,end:$("#ev_end").value,notes:$("#ev_notes").value.trim(),ts:Date.now()};if(!row.title||!row.start){alert("Title + Start required");return;}const arr=jget("sch_events");arr.unshift(row);jset("sch_events",arr);$("#ev_title").value="";$("#ev_notes").value="";rEV();});
-  $("#ev_export").addEventListener("click",()=>{const rows=jget("sch_events");if(!rows.length){alert("No data.");return;}csv(rows,["id","type","title","start","end","notes","ts"],"events.csv");});
+    // ---------- DOM ----------
+    const el = id => document.getElementById(id);
 
-  // Notices
-  function audienceLabel(a){if(!a)return"All";if(a.type==="All")return"All";if(a.type==="Class")return`Class ${a.class}`;if(a.type==="Section")return`Class ${a.class}-${a.section}`;return"—";}
-  function rN(){const q=($("#n_search").value||"").toLowerCase();const rows=jget("sch_notices").filter(n=>(n.title||"").toLowerCase().includes(q)||(n.body||"").toLowerCase().includes(q)).sort((a,b)=>b.ts-a.ts);const tb=$("#n_tbody");tb.innerHTML="";$("#n_empty").style.display=rows.length?"none":"block";rows.forEach((n,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${new Date(n.ts).toLocaleString()}</td><td>${n.title}</td><td>${n.body||""}</td><td>${audienceLabel(n.audience)}</td><td>${n.author||"—"}</td><td><button class="btn" data-deln="${n.id}">Del</button></td>`;tb.appendChild(tr);});tb.querySelectorAll("[data-deln]").forEach(b=>b.addEventListener("click",()=>{jset("sch_notices",jget("sch_notices").filter(x=>x.id!==b.getAttribute("data-deln")));rN();}));}
-  $("#n_search").addEventListener("input", rN);
+    // Meta
+    const cClass = el('cClass'), cSection = el('cSection'), cDay = el('cDay'),
+          cPeriod = el('cPeriod'), cSubject = el('cSubject'),
+          metaMsg = el('metaMsg');
 
-  // Rosters
-  function rRoster(){const cls=$("#ro_class").value.trim(),sec=$("#ro_section").value.trim();const rows=jget("sch_students").filter(s=>String(s.class||"")==cls&&String(s.section||"")==sec).sort((a,b)=> (a.roll||"").localeCompare(b.roll||""));const tb=$("#ro_tbody");tb.innerHTML="";$("#ro_empty").style.display=rows.length?"none":"block";rows.forEach((s,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${s.name||""}</td><td>${s.roll||""}</td><td>${s.parentName||""}</td><td>${s.parentPhone||""}</td>`;tb.appendChild(tr);});}
-  $("#ro_load").addEventListener("click", rRoster);
-  $("#ro_export").addEventListener("click",()=>{const cls=$("#ro_class").value.trim(),sec=$("#ro_section").value.trim();const rows=jget("sch_students").filter(s=>String(s.class||"")==cls&&String(s.section||"")==sec);if(!rows.length){alert("No data.");return;}csv(rows,["id","name","roll","class","section","parentName","parentPhone"],`roster_${cls}-${sec}.csv`);});
+    // Timetable
+    const tTeacher = el('tTeacher'), tRoom = el('tRoom'),
+          ttBody = el('ttBody');
 
-  function logout(){ sessionStorage.clear(); location.replace("./index.html"); }
-  function init(){ rTT(); rEV(); rN(); }
-  init();
-</script>
+    // Maps
+    const mSubject = el('mSubject'), mTeacher = el('mTeacher'), mapBody = el('mapBody');
+
+    // Notices
+    const nTitle = el('nTitle'), nAudience = el('nAudience'), nMsg = el('nMsg'), noticeBody = el('noticeBody');
+
+    // ---------- Helpers ----------
+    const getJSON = (k, d) => { try{ return JSON.parse(localStorage.getItem(k) || 'null') ?? d; }catch{return d;} };
+    const setJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    function currentScope(){
+      return { cls: cClass.value.trim(), sec: cSection.value.trim() };
+    }
+
+    // ---------- Load Meta ----------
+    (function init(){
+      const meta = getJSON(KEY_META, {});
+      if(meta.class) cClass.value = meta.class;
+      if(meta.section) cSection.value = meta.section;
+      if(meta.day) cDay.value = meta.day;
+      if(meta.period) cPeriod.value = meta.period;
+      if(meta.subject) cSubject.value = meta.subject;
+      renderTT();
+      renderMap();
+      renderNotices();
+    })();
+
+    el('btnSaveMeta').addEventListener('click', ()=>{
+      const payload = {
+        class: cClass.value.trim(),
+        section: cSection.value.trim(),
+        day: cDay.value,
+        period: cPeriod.value.trim(),
+        subject: cSubject.value.trim()
+      };
+      setJSON(KEY_META, payload);
+      metaMsg.textContent = 'Saved.';
+      setTimeout(()=> metaMsg.textContent='', 1200);
+    });
+
+    // ---------- Timetable ----------
+    el('btnAddTT').addEventListener('click', ()=>{
+      const meta = getJSON(KEY_META, {});
+      if(!meta.class || !meta.section){ alert('Save Class & Section first.'); return; }
+      const list = getJSON(KEY_TT, []);
+      // Upsert by class+section+day+period
+      const key = (e)=> [e.class,e.section,e.day,e.period].join('|');
+      const entry = {
+        class: meta.class, section: meta.section, day: meta.day,
+        period: meta.period, subject: meta.subject || '(subject?)',
+        teacher: tTeacher.value.trim() || '(teacher?)',
+        room: tRoom.value.trim() || ''
+      };
+      const idx = list.findIndex(e => key(e) === key(entry));
+      if(idx>=0) list[idx]=entry; else list.push(entry);
+      setJSON(KEY_TT, list);
+      tTeacher.value=''; tRoom.value='';
+      renderTT();
+    });
+
+    function renderTT(){
+      const list = getJSON(KEY_TT, []);
+      const {cls, sec} = currentScope();
+      const rows = list.filter(e => (!cls || e.class===cls) && (!sec || e.section===sec))
+                       .sort((a,b)=> a.day.localeCompare(b.day) || (+a.period||0) - (+b.period||0));
+      if(!rows.length){ ttBody.innerHTML = '<tr><td colspan="7" class="empty">No entries yet.</td></tr>'; return; }
+      ttBody.innerHTML = rows.map((e,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td>${e.day}</td>
+          <td>${e.period}</td>
+          <td>${e.subject}</td>
+          <td>${e.teacher}</td>
+          <td>${e.room||''}</td>
+          <td><button class="btn outline" data-del="${i}">Delete</button></td>
+        </tr>`).join('');
+      ttBody.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const list = getJSON(KEY_TT, []);
+          const {cls, sec} = currentScope();
+          const rows = list.filter(e => (!cls || e.class===cls) && (!sec || e.section===sec))
+          const globalIndex = list.indexOf(rows[+btn.dataset.del]);
+          if(globalIndex>=0){ list.splice(globalIndex,1); setJSON(KEY_TT, list); renderTT(); }
+        });
+      });
+    }
+
+    el('btnClearTT').addEventListener('click', ()=>{
+      const {cls, sec} = currentScope();
+      if(!cls||!sec) return alert('Set class & section first.');
+      if(!confirm(`Clear timetable for ${cls}-${sec}?`)) return;
+      const list = getJSON(KEY_TT, []).filter(e => !(e.class===cls && e.section===sec));
+      setJSON(KEY_TT, list); renderTT();
+    });
+
+    el('btnExportTT').addEventListener('click', ()=>{
+      const list = getJSON(KEY_TT, []);
+      const csv = ['Class,Section,Day,Period,Subject,Teacher,Room']
+        .concat(list.map(e => [e.class,e.section,e.day,e.period,qq(e.subject),qq(e.teacher),qq(e.room)].join(',')))
+        .join('\n');
+      downloadCSV(csv, 'timetable.csv');
+    });
+
+    // ---------- Subject Map ----------
+    el('btnMap').addEventListener('click', ()=>{
+      const {cls, sec} = currentScope();
+      if(!cls||!sec) return alert('Set class & section first.');
+      const sub = mSubject.value.trim(); const tea = mTeacher.value.trim();
+      if(!sub || !tea) return;
+      const list = getJSON(KEY_MAP, []);
+      const idx = list.findIndex(x => x.class===cls && x.section===sec && x.subject===sub);
+      const entry = { class:cls, section:sec, subject:sub, teacher:tea };
+      if(idx>=0) list[idx]=entry; else list.push(entry);
+      setJSON(KEY_MAP, list);
+      mSubject.value=''; mTeacher.value=''; renderMap();
+    });
+
+    function renderMap(){
+      const {cls, sec} = currentScope();
+      const list = getJSON(KEY_MAP, []).filter(x => (!cls||x.class===cls) && (!sec||x.section===sec));
+      if(!list.length){ mapBody.innerHTML = '<tr><td colspan="4" class="empty">No mappings yet.</td></tr>'; return; }
+      mapBody.innerHTML = list.map((x,i)=>`
+        <tr>
+          <td>${i+1}</td><td>${x.subject}</td><td>${x.teacher}</td>
+          <td><button class="btn outline" data-rm="${i}">Remove</button></td>
+        </tr>
+      `).join('');
+      mapBody.querySelectorAll('[data-rm]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const {cls, sec} = currentScope();
+          const all = getJSON(KEY_MAP, []);
+          const subset = all.filter(x => (!cls||x.class===cls) && (!sec||x.section===sec));
+          const globalIndex = all.indexOf(subset[+btn.dataset.rm]);
+          if(globalIndex>=0){ all.splice(globalIndex,1); setJSON(KEY_MAP, all); renderMap(); }
+        });
+      });
+    }
+
+    // ---------- Notices ----------
+    el('btnPublish').addEventListener('click', ()=>{
+      const t = nTitle.value.trim(); const a = nAudience.value; const m = nMsg.value.trim();
+      if(!t || !m) return;
+      const list = getJSON(KEY_NOT, []);
+      list.unshift({ title:t, audience:a, msg:m, ts:new Date().toISOString() });
+      setJSON(KEY_NOT, list);
+      nTitle.value=''; nMsg.value='';
+      renderNotices();
+    });
+
+    function renderNotices(){
+      const list = getJSON(KEY_NOT, []);
+      if(!list.length){ noticeBody.innerHTML = '<tr><td colspan="5" class="empty">No notices yet.</td></tr>'; return; }
+      noticeBody.innerHTML = list.map((n,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td>${qq(n.title)}</td>
+          <td>${n.audience}</td>
+          <td>${new Date(n.ts).toLocaleString()}</td>
+          <td><button class="btn outline" data-delnotice="${i}">Delete</button></td>
+        </tr>
+      `).join('');
+      noticeBody.querySelectorAll('[data-delnotice]').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          const list = getJSON(KEY_NOT, []); list.splice(+b.dataset.delnotice,1); setJSON(KEY_NOT, list); renderNotices();
+        });
+      });
+    }
+
+    el('btnExportNotices').addEventListener('click', ()=>{
+      const list = getJSON(KEY_NOT, []);
+      const csv = ['Title,Audience,Message,Time']
+        .concat(list.map(n => [qq(n.title), n.audience, qq(n.msg), new Date(n.ts).toLocaleString()].join(',')))
+        .join('\n');
+      downloadCSV(csv, 'notices.csv');
+    });
+
+    // ---------- Tools / PWA ----------
+    let deferredPrompt=null;
+    window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; });
+    el('btnInstall').addEventListener('click', async ()=>{
+      if(!deferredPrompt) return alert('Install prompt not available yet.');
+      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null;
+    });
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+    el('btnResetSW').addEventListener('click', async ()=>{
+      if('serviceWorker' in navigator){
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r=>r.unregister()));
+      }
+      caches && caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k))));
+      alert('Cache/SW cleared. Reloading…'); location.reload(true);
+    });
+
+    // ---------- Nav ----------
+    el('btnBackPin').addEventListener('click', ()=> location.replace('./index.html'));
+    el('btnLogout').addEventListener('click', ()=>{
+      sessionStorage.removeItem('school_role'); location.replace('./index.html');
+    });
+
+    // ---------- CSV helper ----------
+    function qq(s){ if(s==null) return ''; s = String(s).replaceAll('"','""'); return `"${s}"`; }
+    function downloadCSV(csv, name){
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = name; a.click();
+      setTimeout(()=> URL.revokeObjectURL(url), 1000);
+    }
+  </script>
 </body>
 </html>
