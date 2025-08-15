@@ -1,135 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>School Access • PIN</title>
-
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0a0a14"/>
-
-  <!-- Styles (neon-glass theme) -->
-  <link rel="stylesheet" href="./styles.css?v=glass-1.0" />
-
-  <style>
-    /* Page-specific tiny tweaks */
-    .pin-wrap { max-width: 880px; margin: 18px auto; padding: 0 14px; }
-    .brand-line { margin: 8px 0 22px; opacity:.85; }
-    .pin-form .hint { font-size:.9rem; opacity:.8; margin-top:6px }
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>School PWA • PIN</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0b1020" />
 </head>
 <body>
-  <main class="pin-wrap">
+  <main>
+    <div class="topbar">
+      <span class="badge">School PWA</span>
+      <label title="Dark / Light">
+        <input id="themeToggle" class="theme-toggle" type="checkbox" />
+      </label>
+    </div>
 
-    <!-- Glass hero banner -->
-    <section class="banner card" aria-label="School banner">
-      <img src="./assets/banner.png" alt="School campus banner" />
-      <div class="title-overlay">
-        <div class="logo-badge" aria-hidden="true">🏫</div>
-        <div class="title">School Access</div>
-        <div class="subtitle">Secure entry for staff & parents</div>
-      </div>
-    </section>
+    <header class="hero panel" style="height:200px;">
+      <div class="title">Welcome</div>
+    </header>
 
-    <!-- PIN card -->
-    <section class="card" style="padding:20px 18px;">
-      <h1 class="h-xl" style="margin-bottom:6px;">Enter PIN</h1>
-      <p class="brand-line">You’ll be routed to your role automatically.</p>
+    <div class="spacer"></div>
 
-      <form id="pinForm" class="pin-form" autocomplete="off">
-        <label class="label" for="pin">4–8 digit PIN</label>
-        <input id="pin"
-               class="input"
-               type="password"
-               inputmode="numeric"
-               pattern="[0-9]{4,8}"
-               placeholder="••••"
-               minlength="4"
-               maxlength="8"
-               autocomplete="one-time-code" required />
-
-        <button class="btn btn-primary" type="submit" style="margin-top:14px;">
-          Continue
-        </button>
-        <div id="msg" class="hint"></div>
+    <section class="panel">
+      <h1>Enter PIN</h1>
+      <p class="muted">You’ll be routed to your role automatically.</p>
+      <form id="pinForm" class="card gradient-1">
+        <label for="pin">4–8 digit PIN</label>
+        <input id="pin" inputmode="numeric" placeholder="••••" autocomplete="one-time-code" />
+        <div class="spacer"></div>
+        <button class="btn block">Continue</button>
+        <div id="msg" class="muted" style="margin-top:10px;"></div>
       </form>
-    </section>
-
-    <section class="card" style="padding:14px; text-align:center;">
-      <small class="muted">
-        TIP: install to Home Screen for offline speed. Data stays on your device unless you import/export CSV.
-      </small>
     </section>
   </main>
 
   <script>
-    // --- SW register (quiet) ---
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=glass-1.0').catch(()=>{});
-      });
-    }
+    // THEME
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    root.setAttribute('data-theme', savedTheme);
+    document.getElementById('themeToggle').checked = savedTheme === 'light';
+    document.getElementById('themeToggle').addEventListener('change', e=>{
+      const t = e.target.checked ? 'light' : 'dark';
+      root.setAttribute('data-theme', t); localStorage.setItem('theme', t);
+    });
 
-    // --- Route map ---
     const rolePage = {
-      coordinator: './coordinator.html',
-      teacher: './teacher.html',
-      parents: './parents.html',
-      admin: './admin.html'
+      coordinator: "./coordinator.html",
+      teacher: "./teacher.html",
+      parents: "./parents.html",
+      admin: "./admin.html"
     };
 
-    // If already logged in, don't show PIN page on back nav.
-    (() => {
-      const r = sessionStorage.getItem('sch_role');
-      const at = sessionStorage.getItem('sch_login_at');
-      if (r && at && rolePage[r]) {
-        // Hard redirect prevents back to index
-        location.replace(rolePage[r]);
-      }
-    })();
-
-    async function loadPins() {
-      // cache-bust in case of GitHub Pages SW
-      const res = await fetch('./pins.json?nc=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) throw new Error('pins.json not found');
-      const json = await res.json();
-      // Normalize keys to strings
-      Object.keys(json).forEach(k => json[k] = String(json[k]).trim());
-      return json;
+    async function loadPins(){
+      const r = await fetch("./pins.json", {cache:"no-store"});
+      if(!r.ok) throw new Error("pins.json not found");
+      return r.json(); // { "coordinator":"1111", "teacher":"2222", ... }
     }
 
-    document.getElementById('pinForm').addEventListener('submit', async (e) => {
+    document.getElementById('pinForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
+      const pin = (document.getElementById('pin').value || "").trim();
       const msg = document.getElementById('msg');
-      const pin = (document.getElementById('pin').value || '').trim();
-      if (!/^\d{4,8}$/.test(pin)) {
-        msg.textContent = 'Enter a valid 4–8 digit PIN.';
-        return;
-      }
-      msg.textContent = 'Checking…';
-
-      try {
+      if(pin.length < 4){ msg.textContent = "PIN must be 4+ digits."; return; }
+      msg.textContent = "Checking…";
+      try{
         const pins = await loadPins();
-        // Find matching role by value
         let matchedRole = null;
-        for (const [role, value] of Object.entries(pins)) {
-          if (String(value) === pin) { matchedRole = role; break; }
+        for(const [role,val] of Object.entries(pins)){
+          if(String(val) === pin){ matchedRole = role; break; }
         }
-        if (!matchedRole || !rolePage[matchedRole]) {
-          msg.textContent = 'Invalid PIN.';
-          return;
-        }
+        if(!matchedRole){ msg.textContent = "Invalid PIN"; return; }
 
-        // Save session (role + timestamp)
-        sessionStorage.setItem('sch_role', matchedRole);
-        sessionStorage.setItem('sch_login_at', String(Date.now()));
-
-        // Redirect without leaving index in back stack
-        location.replace(rolePage[matchedRole]);
-      } catch (err) {
-        console.error(err);
-        msg.textContent = 'Error loading PINs.';
+        // Save login
+        sessionStorage.setItem("sch_role", matchedRole);
+        sessionStorage.setItem("sch_login_at", String(Date.now()));
+        location.replace(rolePage[matchedRole] || "./index.html");
+      }catch(err){
+        msg.textContent = "Error loading configuration."; console.error(err);
       }
     });
   </script>
