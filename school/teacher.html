@@ -1,299 +1,324 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Teacher · School PWA</title>
-  <link rel="stylesheet" href="styles.css"/>
-  <style>
-    /* harden tab visibility in case styles.css didn’t load yet */
-    .panel{display:none}
-    .panel.active{display:block}
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="dark">
   <div class="wrapper">
 
-    <!-- Header -->
-    <section class="accent-indigo">
-      <div class="glass header">
-        <div class="row" style="justify-content:space-between; align-items:center;">
-          <div>
-            <div class="eyebrow">Post diary & homework · mark attendance</div>
-            <div class="h1">Teacher</div>
-          </div>
-          <div class="row gap-8">
-            <a class="chip chip-slate" href="index.html">PIN</a>
-            <button id="themeToggle" class="chip chip-blue">Theme</button>
-          </div>
+    <!-- HERO -->
+    <section class="hero glass">
+      <div class="hero-top">
+        <div class="hero-eyebrow">Post diary & homework · mark attendance</div>
+        <div class="hero-title">Teacher</div>
+        <div class="hero-actions">
+          <button class="chip chip-slate" id="pinBtn" title="Back to PIN">PIN</button>
+          <button class="chip chip-blue" id="themeBtn">Theme</button>
         </div>
+      </div>
 
-        <!-- Tabs -->
-        <div id="teacher-tabs" class="tabs mt-12">
-          <button class="chip chip-indigo tab" data-target="#panel-setup" aria-selected="true">Class Setup</button>
-          <button class="chip chip-blue tab" data-target="#panel-diary">Class Diary</button>
-          <button class="chip chip-teal tab" data-target="#panel-homework">Homework</button>
-          <button class="chip chip-orange tab" data-target="#panel-attendance">Attendance</button>
-        </div>
+      <!-- Tabs -->
+      <div class="tabbar" data-tab-group>
+        <button class="chip chip-indigo active" data-tab="tab-setup">Class Setup</button>
+        <button class="chip chip-blue"   data-tab="tab-diary">Class Diary</button>
+        <button class="chip chip-green"  data-tab="tab-hw">Homework</button>
+        <button class="chip chip-orange" data-tab="tab-att">Attendance</button>
+        <button class="chip chip-pink"   data-tab="tab-leaves">Leaves</button>
+        <button class="chip chip-purple" data-tab="tab-requests">Requests</button>
       </div>
     </section>
 
-    <!-- Class Setup -->
-    <section class="accent-slate">
-      <div id="panel-setup" class="glass panel active">
-        <div class="h2">My Class</div>
-        <div class="grid mt-12">
-          <input id="t-class" class="input" placeholder="Class e.g., 5"/>
-          <input id="t-section" class="input" placeholder="Section e.g., A"/>
-          <input id="t-name" class="input" placeholder="Your Name"/>
-          <input id="t-subject" class="input" placeholder="Subject e.g., Maths"/>
-        </div>
-        <div class="row mt-12">
-          <button id="saveMeta" class="btn btn-teal">Save</button>
-        </div>
+    <!-- PANELS -->
+    <section class="panel glass" id="tab-setup">
+      <h2>My Class</h2>
+      <div class="grid">
+        <input id="t-class"   class="input" placeholder="Class e.g., 5" />
+        <input id="t-section" class="input" placeholder="Section e.g., A" />
+        <input id="t-name"    class="input" placeholder="Your Name" />
+        <input id="t-subject" class="input" placeholder="Subject e.g., Maths" />
+      </div>
+      <div class="row-right">
+        <button class="btn btn-primary" id="saveMeta">Save</button>
       </div>
     </section>
 
-    <!-- Class Diary -->
-    <section class="accent-blue">
-      <div id="panel-diary" class="glass panel">
-        <div class="h2">Post to Class Diary</div>
-        <div class="grid mt-12">
-          <select id="d-subject" class="input">
-            <option value="" disabled selected>Subject</option>
-          </select>
-          <textarea id="d-message" class="input" rows="4" placeholder="What was taught / notes..."></textarea>
-          <input id="d-link" class="input" placeholder="Optional Link (https://…)"/>
-        </div>
-        <div class="row mt-12">
-          <button id="publishDiary" class="btn">Publish</button>
-        </div>
-
-        <div class="h3 mt-20">Recent</div>
-        <div id="diaryList" class="list mt-8 text-dim">No entries.</div>
+    <section class="panel glass hidden" id="tab-diary">
+      <h2>Post to Class Diary</h2>
+      <div class="grid">
+        <input id="d-date" type="date" class="input" />
+        <input id="d-subject" class="input" placeholder="Subject" />
+        <textarea id="d-msg" rows="4" class="input" placeholder="What was taught / notes..."></textarea>
+        <input id="d-link" class="input" placeholder="Optional link (https://…)" />
       </div>
+      <div class="row-right">
+        <button class="btn btn-primary" id="d-publish">Publish</button>
+      </div>
+      <h3 class="mt-16">Recent</h3>
+      <div id="d-list" class="list"></div>
     </section>
 
-    <!-- Homework -->
-    <section class="accent-teal">
-      <div id="panel-homework" class="glass panel">
-        <div class="h2">Create Homework</div>
-        <div class="grid mt-12">
-          <input id="h-due" class="input" type="date" />
-          <select id="h-subject" class="input">
-            <option value="" disabled selected>Subject</option>
-          </select>
-          <input id="h-title" class="input" placeholder="Title e.g., Exercise 5A"/>
-          <textarea id="h-details" class="input" rows="4" placeholder="Details…"></textarea>
-        </div>
-        <div class="row mt-12">
-          <button id="publishHomework" class="btn btn-indigo">Publish</button>
-        </div>
-
-        <div class="h3 mt-20">Recent</div>
-        <div id="hwList" class="list mt-8 text-dim">No entries.</div>
+    <section class="panel glass hidden" id="tab-hw">
+      <h2>Create Homework</h2>
+      <div class="grid">
+        <input id="h-due" type="date" class="input" />
+        <input id="h-subject" class="input" placeholder="Subject" />
+        <input id="h-title" class="input" placeholder="Title, e.g., Exercise 5A" />
+        <textarea id="h-details" rows="4" class="input" placeholder="Details…"></textarea>
       </div>
+      <div class="row-right">
+        <button class="btn btn-primary" id="h-publish">Publish</button>
+      </div>
+      <h3 class="mt-16">Assigned</h3>
+      <div id="h-list" class="list"></div>
     </section>
 
-    <!-- Attendance -->
-    <section class="accent-orange">
-      <div id="panel-attendance" class="glass panel">
-        <div class="h2">Mark Attendance</div>
-        <div class="eyebrow mt-4" id="attScope"></div>
-        <div class="grid mt-12">
-          <input id="att-date" class="input" type="date"/>
-          <input id="att-count" class="input" inputmode="numeric" placeholder="Present count (optional)"/>
-        </div>
-        <div class="row mt-12">
-          <button id="saveAttendance" class="btn btn-orange">Save Attendance</button>
-        </div>
-
-        <div class="h3 mt-20">Recent</div>
-        <div id="attList" class="list mt-8 text-dim">No entries.</div>
+    <section class="panel glass hidden" id="tab-att">
+      <h2>Attendance</h2>
+      <div class="grid">
+        <input id="a-date" type="date" class="input" />
+        <input id="a-present" class="input" placeholder="Present roll numbers (e.g., 1,2,4,6…)" />
+        <input id="a-absent"  class="input" placeholder="Absent roll numbers (optional)" />
+        <input id="a-notes"   class="input" placeholder="Notes (optional)" />
       </div>
+      <div class="row-right">
+        <button class="btn btn-primary" id="a-save">Save Attendance</button>
+      </div>
+      <h3 class="mt-16">History</h3>
+      <div id="a-list" class="list"></div>
+    </section>
+
+    <section class="panel glass hidden" id="tab-leaves">
+      <h2>Leave Requests (My Class)</h2>
+      <div id="lv-list" class="list"></div>
+    </section>
+
+    <section class="panel glass hidden" id="tab-requests">
+      <h2>Parent Requests (My Class)</h2>
+      <div id="rq-list" class="list"></div>
     </section>
 
   </div>
 
-  <!-- Shared (ok if present) -->
-  <script type="module" src="ui.js"></script>
-
-  <!-- Page logic -->
   <script>
-  (function(){
-    const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
-    const todayISO = () => new Date().toISOString().slice(0,10);
-    const toast = (m)=>alert(m);
-
-    /* --------- THEME (defensive) --------- */
-    (function themeInit(){
-      const btn = document.getElementById('themeToggle');
-      const apply = t => document.body.className = (t==='light'?'light':'dark');
-      apply(localStorage.getItem('theme') || 'dark');
-      if(btn){ btn.addEventListener('click', ()=> {
-        const next = localStorage.getItem('theme')==='light'?'dark':'light';
-        localStorage.setItem('theme', next); apply(next);
-      });}
-    })();
-
-    /* --------- TABS (robust, page-local) --------- */
-    (function teacherTabs(){
-      const scope = document.getElementById('teacher-tabs');
-      if(!scope) return;
-      const tabs = Array.from(scope.querySelectorAll('.tab'));
-      const panels = Array.from(document.querySelectorAll('.panel'));
-      function activate(id){
-        panels.forEach(p => p.classList.toggle('active', '#'+p.id === id));
-        tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.target === id ? 'true':'false'));
-        localStorage.setItem('teacherTab', id);
-        // optional: reflect in hash
-        if(location.hash !== id) history.replaceState(null,'',id);
-      }
-      tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.target)));
-      // initial: hash > saved > first
-      const first = tabs[0]?.dataset.target || '#panel-setup';
-      const start = location.hash || localStorage.getItem('teacherTab') || first;
-      activate(start);
-    })();
-
-    /* --------- STORAGE KEYS --------- */
-    const K = {
-      META: 'teacherMeta',
-      DIARY: 'classDiary',
-      HOMEWORK: 'homework',
-      ATT: 'attendance'
+    /* ---------- tiny helpers ---------- */
+    const q = s => document.querySelector(s);
+    const qa = s => [...document.querySelectorAll(s)];
+    const db = {
+      get: (k, d=[]) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch{ return d } },
+      set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
+    };
+    const today = () => new Date().toISOString().slice(0,10);
+    const keyMeta = 'teacher_meta';
+    const cid = () => {
+      const m = db.get(keyMeta, {});
+      return (m.class||'') + '_' + (m.section||'');
+    };
+    const tag = (name, attrs={}, html='')=>{
+      const el = document.createElement(name);
+      Object.entries(attrs).forEach(([k,v])=> el.setAttribute(k,v));
+      el.innerHTML = html; return el;
     };
 
-    /* --------- CLASS META --------- */
-    const metaInputs = {
-      cls: $('#t-class'),
-      sec: $('#t-section'),
-      name: $('#t-name'),
-      subj: $('#t-subject')
-    };
-
-    function loadMeta(){
-      try{
-        const m = JSON.parse(localStorage.getItem(K.META) || '{}');
-        if(m.cls) metaInputs.cls.value = m.cls;
-        if(m.sec) metaInputs.sec.value = m.sec;
-        if(m.name) metaInputs.name.value = m.name;
-        if(m.subj) metaInputs.subj.value = m.subj;
-
-        // Populate subject selects with saved subject (kept minimal for demo)
-        const subs = Array.from(new Set([m.subj].filter(Boolean)));
-        const seed = (sel)=> {
-          sel.innerHTML = '<option value="" disabled selected>Subject</option>';
-          subs.forEach(s=>{
-            const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o);
-          });
-        };
-        seed($('#d-subject')); seed($('#h-subject'));
-        $('#attScope').textContent = (m.cls&&m.sec) ? `Class ${m.cls} • Section ${m.sec}` : '';
-      }catch(e){}
+    /* ---------- theme & pin ---------- */
+    function applyThemeFromURL(){
+      const url = new URL(location.href);
+      const t = url.searchParams.get('theme');
+      const saved = localStorage.getItem('theme');
+      const final = t || saved || 'dark';
+      document.body.classList.toggle('dark', final==='dark');
+      localStorage.setItem('theme', final);
     }
-    loadMeta();
+    function toggleTheme(){
+      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      document.body.classList.toggle('dark', next==='dark');
+      localStorage.setItem('theme', next);
+      // keep ?theme in url updated
+      const u = new URL(location.href); u.searchParams.set('theme', next); history.replaceState({},'',u);
+    }
+    applyThemeFromURL();
+    q('#themeBtn').addEventListener('click', toggleTheme);
+    q('#pinBtn').addEventListener('click', ()=> location.href='index.html?theme='+(localStorage.getItem('theme')||'dark'));
 
-    $('#saveMeta').addEventListener('click', ()=>{
-      const m = {
-        cls: metaInputs.cls.value.trim(),
-        sec: metaInputs.sec.value.trim(),
-        name: metaInputs.name.value.trim(),
-        subj: metaInputs.subj.value.trim()
+    /* ---------- tabs (self-contained) ---------- */
+    (function initTabs(){
+      const group = q('[data-tab-group]');
+      const show = id => {
+        qa('.panel').forEach(p=>p.classList.toggle('hidden', p.id!==id));
       };
-      if(!m.cls || !m.sec || !m.name || !m.subj){ toast('Please fill class, section, your name and subject.'); return; }
-      localStorage.setItem(K.META, JSON.stringify(m));
-      loadMeta();
-      toast('Saved class meta.');
-    });
+      group.addEventListener('click', ev=>{
+        const btn = ev.target.closest('[data-tab]'); if(!btn) return;
+        group.querySelectorAll('[data-tab]').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active'); show(btn.dataset.tab);
+      });
+      // initial
+      show('tab-setup');
+    })();
 
-    /* --------- DIARY --------- */
-    const renderDiary = ()=>{
-      const list = $('#diaryList');
-      const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
-      const all = JSON.parse(localStorage.getItem(K.DIARY) || '[]')
-         .filter(x=>x.cls===meta.cls && x.sec===meta.sec)
-         .sort((a,b)=>(b.date||'').localeCompare(a.date));
-      if(!all.length){ list.textContent='No entries.'; return; }
-      list.innerHTML = all.map(x =>
-        `<div class="row card-row">
-           <div><b>${x.subject}</b> · ${x.date}<br>${x.message}${x.link?` — <a href="${x.link}" target="_blank">link</a>`:''}</div>
-         </div>`).join('');
-    };
+    /* ---------- meta ---------- */
+    (function meta(){
+      const meta = db.get(keyMeta, {});
+      if(meta.class)   q('#t-class').value = meta.class;
+      if(meta.section) q('#t-section').value = meta.section;
+      if(meta.name)    q('#t-name').value = meta.name;
+      if(meta.subject) q('#t-subject').value = meta.subject;
 
-    $('#publishDiary').addEventListener('click', ()=>{
-      const m = JSON.parse(localStorage.getItem(K.META) || '{}');
-      const subject = $('#d-subject').value || m.subj || '';
-      const message = $('#d-message').value.trim();
-      const link = $('#d-link').value.trim();
-      if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
-      if(!subject || !message){ toast('Subject and message are required.'); return; }
-      const entry = { cls:m.cls, sec:m.sec, subject, message, link, date:new Date().toISOString().slice(0,10), teacher:m.name||'', ts:Date.now() };
-      const all = JSON.parse(localStorage.getItem(K.DIARY) || '[]'); all.push(entry);
-      localStorage.setItem(K.DIARY, JSON.stringify(all));
-      $('#d-message').value=''; $('#d-link').value='';
-      renderDiary(); toast('Diary posted.');
-    });
+      q('#saveMeta').addEventListener('click', ()=>{
+        const data = {
+          class: q('#t-class').value.trim(),
+          section: q('#t-section').value.trim(),
+          name: q('#t-name').value.trim(),
+          subject: q('#t-subject').value.trim()
+        };
+        db.set(keyMeta, data);
+        alert('Saved ✅');
+      });
+    })();
 
-    /* --------- HOMEWORK --------- */
-    const renderHW = ()=>{
-      const list = $('#hwList');
-      const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
-      const all = JSON.parse(localStorage.getItem(K.HOMEWORK) || '[]')
-         .filter(x=>x.cls===meta.cls && x.sec===meta.sec)
-         .sort((a,b)=>(a.due||'').localeCompare(b.due));
-      if(!all.length){ list.textContent='No entries.'; return; }
-      list.innerHTML = all.map(x =>
-        `<div class="row card-row">
-           <div><b>${x.subject}</b> · Due ${x.due}<br>${x.title}${x.details?` — ${x.details}`:''}</div>
-         </div>`).join('');
-    };
+    /* ---------- diary ---------- */
+    (function diary(){
+      q('#d-date').value = today();
+      const key = ()=>'diary_'+cid();
+      const render = ()=>{
+        const list = db.get(key(), []);
+        const box = q('#d-list'); box.innerHTML='';
+        list.slice().reverse().forEach((it,i)=>{
+          const row = tag('div', {class:'item'},
+            `<div class="item-title"><b>${it.subject||'—'}</b> · ${it.date}</div>
+             <div class="item-sub">${it.msg||''}</div>
+             ${it.link?`<div class="item-link"><a href="${it.link}" target="_blank">${it.link}</a></div>`:''}`);
+          box.appendChild(row);
+        });
+      };
+      q('#d-publish').addEventListener('click', ()=>{
+        const it = {
+          date: q('#d-date').value || today(),
+          subject: q('#d-subject').value.trim(),
+          msg: q('#d-msg').value.trim(),
+          link: q('#d-link').value.trim(),
+          ts: Date.now()
+        };
+        if(!it.subject || !it.msg){ alert('Add subject & message.'); return; }
+        const list = db.get(key(), []); list.push(it); db.set(key(), list);
+        q('#d-msg').value=''; q('#d-link').value=''; render();
+        alert('Posted ✅');
+      });
+      render();
+    })();
 
-    $('#publishHomework').addEventListener('click', ()=>{
-      const m = JSON.parse(localStorage.getItem(K.META) || '{}');
-      if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
-      const due = $('#h-due').value || todayISO();
-      const subject = $('#h-subject').value || m.subj || '';
-      const title = $('#h-title').value.trim();
-      const details = $('#h-details').value.trim();
-      if(!subject || !title){ toast('Subject and title are required.'); return; }
-      const item = { cls:m.cls, sec:m.sec, subject, title, details, due, ts:Date.now() };
-      const all = JSON.parse(localStorage.getItem(K.HOMEWORK) || '[]'); all.push(item);
-      localStorage.setItem(K.HOMEWORK, JSON.stringify(all));
-      $('#h-title').value=''; $('#h-details').value='';
-      renderHW(); toast('Homework published.');
-    });
+    /* ---------- homework ---------- */
+    (function homework(){
+      q('#h-due').value = today();
+      const key = ()=>'hw_'+cid();
+      const render = ()=>{
+        const list = db.get(key(), []);
+        const box = q('#h-list'); box.innerHTML='';
+        list.slice().reverse().forEach(it=>{
+          const row = tag('div',{class:'item'},
+            `<div class="item-title"><b>${it.subject||'—'}</b> · Due ${it.due}</div>
+             <div class="item-sub">${it.title||''}</div>
+             <div class="item-sub">${it.details||''}</div>`);
+          box.appendChild(row);
+        });
+      };
+      q('#h-publish').addEventListener('click', ()=>{
+        const it = {
+          due: q('#h-due').value || today(),
+          subject: q('#h-subject').value.trim(),
+          title: q('#h-title').value.trim(),
+          details: q('#h-details').value.trim(),
+          ts: Date.now()
+        };
+        if(!it.subject || !it.title){ alert('Add subject & title.'); return; }
+        const list = db.get(key(), []); list.push(it); db.set(key(), list);
+        q('#h-title').value=''; q('#h-details').value=''; render();
+        alert('Homework added ✅');
+      });
+      render();
+    })();
 
-    /* --------- ATTENDANCE --------- */
-    $('#att-date').value = todayISO();
+    /* ---------- attendance ---------- */
+    (function attendance(){
+      q('#a-date').value = today();
+      const key = ()=>'att_'+cid();
+      const render = ()=>{
+        const list = db.get(key(), []);
+        const box = q('#a-list'); box.innerHTML='';
+        list.slice().reverse().forEach(it=>{
+          const row = tag('div',{class:'item'},
+            `<div class="item-title">${it.date} · Present: ${it.present?.length||0}${it.absent?.length?` · Absent: ${it.absent.length}`:''}</div>
+             <div class="item-sub">${it.notes||''}</div>`);
+          box.appendChild(row);
+        });
+      };
+      q('#a-save').addEventListener('click', ()=>{
+        const present = q('#a-present').value.split(',').map(s=>s.trim()).filter(Boolean);
+        const absent  = q('#a-absent').value.split(',').map(s=>s.trim()).filter(Boolean);
+        const it = { date:q('#a-date').value||today(), present, absent, notes:q('#a-notes').value.trim(), ts:Date.now() };
+        const list = db.get(key(), []); list.push(it); db.set(key(), list);
+        q('#a-present').value=''; q('#a-absent').value=''; q('#a-notes').value=''; render();
+        alert('Attendance saved ✅');
+      });
+      render();
+    })();
 
-    const renderAtt = ()=>{
-      const list = $('#attList');
-      const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
-      const all = JSON.parse(localStorage.getItem(K.ATT) || '[]')
-         .filter(x=>x.cls===meta.cls && x.sec===meta.sec)
-         .sort((a,b)=>(b.date||'').localeCompare(a.date));
-      if(!all.length){ list.textContent='No entries.'; return; }
-      list.innerHTML = all.map(x =>
-        `<div class="row card-row"><div><b>${x.date}</b> · Present: ${x.present ?? '—'}</div></div>`
-      ).join('');
-    };
+    /* ---------- leaves & requests (filtered to this class/section) ---------- */
+    (function leavesAndRequests(){
+      const meta = db.get(keyMeta,{});
+      const sameClass = it => it.class===meta.class && it.section===meta.section;
 
-    $('#saveAttendance').addEventListener('click', ()=>{
-      const m = JSON.parse(localStorage.getItem(K.META) || '{}');
-      if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
-      const entry = { cls:m.cls, sec:m.sec, date:($('#att-date').value||todayISO()), present:($('#att-count').value?Number($('#att-count').value):null), ts:Date.now() };
-      const all = JSON.parse(localStorage.getItem(K.ATT) || '[]');
-      const i = all.findIndex(x=>x.cls===entry.cls && x.sec===entry.sec && x.date===entry.date);
-      if(i>=0) all[i]=entry; else all.push(entry);
-      localStorage.setItem(K.ATT, JSON.stringify(all));
-      renderAtt(); toast('Attendance saved.');
-    });
+      // Leaves
+      const renderLeaves = ()=>{
+        const all = db.get('leave_requests', []);
+        const box = q('#lv-list'); box.innerHTML='';
+        const list = all.filter(sameClass).sort((a,b)=>b.ts-a.ts);
+        if(!list.length){ box.innerHTML = `<div class="empty">No leave requests.</div>`; return; }
+        list.forEach(it=>{
+          const row = tag('div',{class:'item'},
+            `<div class="item-title"><b>${it.student||'Student'}</b> · ${it.from} → ${it.to} · <span class="badge ${it.status}">${it.status}</span></div>
+             <div class="item-sub">${it.reason||''}</div>
+             <div class="row gap-8 mt-8">
+               <button class="btn btn-approve">Approve</button>
+               <button class="btn btn-reject">Reject</button>
+             </div>`);
+          row.querySelector('.btn-approve').onclick = ()=>{
+            it.status='approved'; db.set('leave_requests', all); renderLeaves();
+          };
+          row.querySelector('.btn-reject').onclick = ()=>{
+            it.status='rejected'; db.set('leave_requests', all); renderLeaves();
+          };
+          box.appendChild(row);
+        });
+      };
 
-    // initial renders
-    renderDiary(); renderHW(); renderAtt();
-  })();
+      // Requests
+      const renderReq = ()=>{
+        const all = db.get('parent_requests', []);
+        const box = q('#rq-list'); box.innerHTML='';
+        const list = all.filter(sameClass).sort((a,b)=>b.ts-a.ts);
+        if(!list.length){ box.innerHTML = `<div class="empty">No requests.</div>`; return; }
+        list.forEach(it=>{
+          const row = tag('div',{class:'item'},
+            `<div class="item-title"><b>${it.student||'Parent'}</b> · <span class="badge ${it.status}">${it.status}</span></div>
+             <div class="item-sub">${it.message||''}</div>
+             <div class="row gap-8 mt-8">
+               <button class="btn btn-approve">Mark Done</button>
+               <button class="btn btn-reject">Dismiss</button>
+             </div>`);
+          row.querySelector('.btn-approve').onclick = ()=>{
+            it.status='done'; db.set('parent_requests', all); renderReq();
+          };
+          row.querySelector('.btn-reject').onclick = ()=>{
+            it.status='dismissed'; db.set('parent_requests', all); renderReq();
+          };
+          box.appendChild(row);
+        });
+      };
+
+      renderLeaves(); renderReq();
+    })();
   </script>
 </body>
 </html>
