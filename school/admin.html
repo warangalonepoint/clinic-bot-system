@@ -1,401 +1,172 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Admin Console</title>
-
-  <!-- PWA + theme -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0a0a14"/>
-  <link rel="stylesheet" href="./styles.css?v=glass-1.0"/>
-
-  <style>
-    .wrap { max-width: 980px; margin: 18px auto; padding: 0 14px; }
-    .banner img { width: 100%; border-radius: 18px; display:block; }
-    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px }
-    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px }
-    @media (max-width:820px){ .grid2,.grid3{ grid-template-columns:1fr } }
-    table{ width:100%; border-collapse:collapse; margin-top:12px; font-size:.92rem }
-    th,td{ border-bottom:1px solid rgba(255,255,255,.08); padding:9px 8px; text-align:left; vertical-align:top }
-    th{ opacity:.8 }
-    .muted{ opacity:.75 }
-    .file { display:inline-block; position:relative; }
-    .file input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
-    .pill{ padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2) }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin • School PWA</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main class="wrap">
-
-    <!-- Banner -->
-    <section class="banner card" style="position:relative;">
-      <img src="./assets/banner.png" alt="School banner"/>
-      <div class="title-overlay">
-        <div class="title">Admin Console</div>
-        <div class="subtitle">Broadcast • Leaves • Data</div>
+  <main>
+    <div class="topbar">
+      <span class="badge">Admin</span>
+      <div style="display:flex; gap:8px; align-items:center">
+        <label title="Dark / Light"><input id="themeToggle" class="theme-toggle" type="checkbox"/></label>
+        <a class="btn ghost" href="./index.html">Logout</a>
       </div>
-      <button id="logoutBtn" class="btn btn-ghost small" style="position:absolute;top:14px;right:14px;">Logout</button>
-    </section>
+    </div>
 
-    <!-- Class Scope (affects Broadcast & Leaves) -->
-    <section class="card" style="padding:20px;">
-      <h2>Class Scope</h2>
-      <div class="grid3">
-        <div>
-          <label class="label">Class</label>
-          <input id="aClass" class="input" placeholder="e.g., 5" inputmode="numeric">
-        </div>
-        <div>
-          <label class="label">Section</label>
-          <input id="aSection" class="input" placeholder="e.g., A">
-        </div>
-        <div style="display:flex;align-items:flex-end;">
-          <button id="saveScope" class="btn btn-blue" style="width:100%;">Save Scope</button>
-        </div>
-      </div>
-      <div class="muted" id="scopeMsg" style="margin-top:6px;"></div>
-    </section>
+    <header class="hero panel"><div class="title">Admin Console</div></header>
 
-    <!-- Broadcast to Parents -->
-    <section class="card" style="padding:20px;">
-      <h2>Broadcast to Parents</h2>
-      <p class="muted">Sends a class-wide message. Parents see it in Messages (their page).</p>
-      <div class="grid2">
-        <div>
-          <label class="label">From</label>
-          <input id="bFrom" class="input" placeholder="Admin / Teacher Name">
-        </div>
-        <div>
-          <label class="label">Subject (optional)</label>
-          <input id="bSubj" class="input" placeholder="e.g., Reminder">
-        </div>
+    <section class="panel" style="margin-top:14px">
+      <div class="tabs">
+        <button class="tab active" data-t="scope">Scope</button>
+        <button class="tab" data-t="broadcast">Broadcast</button>
+        <button class="tab" data-t="leaves">Leaves</button>
+        <button class="tab" data-t="data">Data</button>
+        <button class="tab" data-t="backup">Backup</button>
       </div>
-      <label class="label" style="margin-top:6px;">Message</label>
-      <textarea id="bText" class="input" rows="3" placeholder="Short announcement…"></textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-        <button id="bSend" class="btn btn-violet">Send Broadcast</button>
-        <button id="bClear" class="btn btn-orange">Clear All Class Messages</button>
-      </div>
-      <div id="bOut" class="muted" style="margin-top:6px;"></div>
-    </section>
 
-    <!-- Leave Requests (Approve / Reject) -->
-    <section class="card" style="padding:20px;">
-      <h2>Leave Requests</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-        <button id="lLoad" class="btn btn-ghost">Load for Class</button>
-        <button id="lExport" class="btn btn-ghost">Export CSV</button>
-        <button id="lClearAll" class="btn btn-orange">Clear All Leaves (class)</button>
-      </div>
-      <table id="lTable">
-        <thead>
-          <tr>
-            <th>#</th><th>Student</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th><th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="lBody"><tr><td colspan="8" class="muted">No data loaded.</td></tr></tbody>
-      </table>
-      <div id="lOut" class="muted" style="margin-top:6px;"></div>
-    </section>
-
-    <!-- Data Imports / Exports -->
-    <section class="card" style="padding:20px;">
-      <h2>Data • Import / Export</h2>
-      <div class="grid3">
-        <div class="card" style="padding:14px;">
-          <h3>Students</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button id="expStudents" class="btn btn-ghost">Export</button>
-            <label class="btn btn-teal file">Import CSV<input id="impStudents" type="file" accept=".csv"></label>
+      <!-- Scope -->
+      <div id="sec-scope" class="section active">
+        <div class="card gradient-1">
+          <h2>Class Scope</h2>
+          <div class="row">
+            <div><label>Class</label><input id="a-class" placeholder="e.g., 8"/></div>
+            <div><label>Section</label><input id="a-sec" placeholder="e.g., B"/></div>
           </div>
-          <div class="muted" style="margin-top:6px;">Uses local key: <span class="pill">demo_students</span></div>
-        </div>
-        <div class="card" style="padding:14px;">
-          <h3>Teachers</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button id="expTeachers" class="btn btn-ghost">Export</button>
-            <label class="btn btn-teal file">Import CSV<input id="impTeachers" type="file" accept=".csv"></label>
-          </div>
-          <div class="muted" style="margin-top:6px;">Uses local key: <span class="pill">demo_teachers</span></div>
-        </div>
-        <div class="card" style="padding:14px;">
-          <h3>Timetables</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button id="expTT" class="btn btn-ghost">Export All</button>
-            <label class="btn btn-teal file">Import CSV<input id="impTT" type="file" accept=".csv"></label>
-          </div>
-          <div class="muted" style="margin-top:6px;">Keys like <span class="pill">sch_timetable_5_A</span></div>
+          <div class="spacer"></div>
+          <button id="btnScope" class="btn">Save</button>
         </div>
       </div>
-    </section>
 
-    <!-- Quick Backup / Restore -->
-    <section class="card" style="padding:20px;">
-      <h2>Quick Backup</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button id="backupAll" class="btn btn-pink">Export All Keys (JSON)</button>
-        <label class="btn btn-teal file">Restore JSON<input id="restoreAll" type="file" accept="application/json"></label>
+      <!-- Broadcast -->
+      <div id="sec-broadcast" class="section">
+        <div class="card gradient-3">
+          <h2>Broadcast to Parents</h2>
+          <label>Message</label><textarea id="a-bc" placeholder="Short message…"></textarea>
+          <div class="spacer"></div>
+          <button class="btn" id="btnBc">Send</button>
+        </div>
       </div>
-      <div class="muted" style="margin-top:6px;">Includes: diary, homework, attendance, messages, leaves, timetables, demo_* datasets.</div>
+
+      <!-- Leaves -->
+      <div id="sec-leaves" class="section">
+        <div class="card gradient-2">
+          <h2>All Leave Requests</h2>
+          <table class="table" id="tblLeaves"><thead>
+            <tr><th>Date</th><th>Reason</th><th>Status</th><th>Action</th></tr>
+          </thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- Data -->
+      <div id="sec-data" class="section">
+        <div class="row">
+          <div class="card gradient-1">
+            <h2>Import CSV (Demo)</h2>
+            <p class="muted">Hook here to your sheets / Airtable in live product.</p>
+            <input type="file" id="csv" accept=".csv" />
+          </div>
+          <div class="card gradient-4">
+            <h2>Stats (Local)</h2>
+            <ul class="muted" id="stats"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backup -->
+      <div id="sec-backup" class="section">
+        <div class="row">
+          <div class="card gradient-3">
+            <h2>Quick Backup</h2>
+            <button id="btnExport" class="btn">Export JSON</button>
+          </div>
+          <div class="card gradient-2">
+            <h2>Restore</h2>
+            <input id="restoreFile" type="file" accept="application/json" />
+            <div class="spacer"></div>
+            <button id="btnRestore" class="btn warn">Restore</button>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
   <script>
-    // --- Auth Guard ---
-    (()=>{
-      const r=sessionStorage.getItem('sch_role');
-      if(r!=='admin'){ location.replace('./index.html'); }
-    })();
-    document.getElementById('logoutBtn').onclick=()=>{
-      sessionStorage.clear(); location.replace('./index.html');
-    };
+    // Theme
+    const root=document.documentElement;
+    const tSaved=localStorage.getItem('theme')||'dark';
+    root.setAttribute('data-theme',tSaved);
+    document.getElementById('themeToggle').checked=(tSaved==='light');
+    document.getElementById('themeToggle').addEventListener('change',e=>{
+      const t=e.target.checked?'light':'dark'; root.setAttribute('data-theme',t); localStorage.setItem('theme',t);
+    });
 
-    // --- Scope helpers ---
-    const $ = id => document.getElementById(id);
-    const v = id => (''+($(id).value||'')).trim();
-    const SCOPE_KEY = 'admin_scope'; // {cls,sec}
-    const classKey = ()=> {
-      const s = JSON.parse(localStorage.getItem(SCOPE_KEY)||'{}');
-      return `${(s.cls||'').toUpperCase()}-${(s.sec||'').toUpperCase()}`;
-    };
-    (function loadScope(){
-      const s = JSON.parse(localStorage.getItem(SCOPE_KEY)||'{}');
-      if(s.cls) $('aClass').value = s.cls;
-      if(s.sec) $('aSection').value = s.sec;
-    })();
-    $('saveScope').onclick=()=>{
-      const s = { cls: v('aClass'), sec: v('aSection') };
-      if(!s.cls || !s.sec) return $('scopeMsg').textContent='Enter Class & Section.';
-      localStorage.setItem(SCOPE_KEY, JSON.stringify(s));
-      $('scopeMsg').textContent = `Saved scope: ${s.cls.toUpperCase()}-${s.sec.toUpperCase()}`;
-      setTimeout(()=> $('scopeMsg').textContent='', 1500);
-    };
-
-    // --- Keys used across app ---
-    const MSG_KEY = 'sch_msgs';   // { "5-A": [ {time,from,phone,subj,text,status} ] }
-    const LEV_KEY = 'sch_leaves'; // { "5-A": [ {from,to,reason,days,child,phone,status,ts} ] }
-
-    // --- Broadcast ---
-    $('bSend').onclick=()=>{
-      const scope = classKey();
-      const [cls, sec] = scope.split('-');
-      if(!cls || !sec) { $('bOut').textContent='Set Class Scope first.'; return; }
-      const from = v('bFrom') || 'Admin';
-      const subj = v('bSubj') || '';
-      const text = v('bText').trim();
-      if(!text){ $('bOut').textContent='Write a message.'; return; }
-
-      const all = JSON.parse(localStorage.getItem(MSG_KEY)||'{}');
-      const list = all[scope] || [];
-      list.unshift({
-        time: new Date().toLocaleString(),
-        from, phone: '', subj, text,
-        status: 'Broadcast'
+    // Tabs
+    document.querySelectorAll('.tab').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+        document.getElementById('sec-'+b.dataset.t).classList.add('active');
       });
-      all[scope] = list;
-      localStorage.setItem(MSG_KEY, JSON.stringify(all));
-      $('bText').value=''; $('bSubj').value='';
-      $('bOut').textContent='Broadcast sent ✓';
-      setTimeout(()=> $('bOut').textContent='', 1500);
-    };
-    $('bClear').onclick=()=>{
-      const scope = classKey();
-      const [cls, sec] = scope.split('-');
-      if(!cls || !sec) { $('bOut').textContent='Set Class Scope first.'; return; }
-      if(confirm('Clear ALL messages for this class?')){
-        const all = JSON.parse(localStorage.getItem(MSG_KEY)||'{}');
-        delete all[scope];
-        localStorage.setItem(MSG_KEY, JSON.stringify(all));
-        $('bOut').textContent='Cleared ✓'; setTimeout(()=> $('bOut').textContent='', 1500);
-      }
-    };
+    });
 
-    // --- Leaves (Load / Approve / Reject / Export / Clear) ---
-    const lBody=$('lBody');
-    function loadLeaves(){
-      const scope = classKey();
-      const [cls, sec] = scope.split('-');
-      if(!cls || !sec){ $('lOut').textContent='Set Class Scope first.'; return; }
-      const all = JSON.parse(localStorage.getItem(LEV_KEY)||'{}');
-      const list = all[scope] || [];
-      lBody.innerHTML='';
-      if(!list.length){ lBody.innerHTML='<tr><td colspan="8" class="muted">No leaves for this class.</td></tr>'; return; }
-      list.forEach((r,i)=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML = `
-          <td>${i+1}</td>
-          <td>${r.child||'-'}</td>
-          <td>${r.from}</td>
-          <td>${r.to}</td>
-          <td>${r.days}</td>
-          <td>${esc(r.reason)}</td>
-          <td><span class="pill">${r.status||'Pending'}</span></td>
-          <td>
-            <button class="btn btn-success small" data-act="approve" data-i="${i}">Approve</button>
-            <button class="btn btn-orange small" data-act="reject" data-i="${i}">Reject</button>
-            <button class="btn btn-ghost small" data-act="pending" data-i="${i}">Pending</button>
-            <button class="btn btn-ghost small" data-act="del" data-i="${i}">Del</button>
-          </td>`;
-        lBody.appendChild(tr);
-      });
-      $('lOut').textContent=`Loaded ${list.length} rows`;
-      setTimeout(()=> $('lOut').textContent='', 1500);
+    // Local helpers
+    const L={get:k=>JSON.parse(localStorage.getItem(k)||"[]"), set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+    function renderLeaves(){
+      const tb=document.querySelector('#tblLeaves tbody'); tb.innerHTML="";
+      L.get('leaves').forEach((x,i)=>tb.insertAdjacentHTML('beforeend',
+        `<tr><td>${x.date}</td><td>${x.reason}</td><td>${x.status||'Pending'}</td>
+         <td>
+           <button class="btn" data-a="Approve" data-i="${i}">Approve</button>
+           <button class="btn warn" data-a="Reject" data-i="${i}">Reject</button>
+         </td></tr>`));
+      tb.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+        const arr=L.get('leaves'); arr[Number(b.dataset.i)].status=b.dataset.a; L.set('leaves',arr); renderLeaves();
+      }));
     }
-    $('lLoad').onclick=loadLeaves;
+    renderLeaves();
 
-    lBody.addEventListener('click', (e)=>{
-      const act=e.target.getAttribute('data-act');
-      if(!act) return;
-      const i=+e.target.getAttribute('data-i');
-      const all = JSON.parse(localStorage.getItem(LEV_KEY)||'{}');
-      const scope = classKey();
-      const list = all[scope] || [];
-      if(!list[i]) return;
-      if(act==='del'){ list.splice(i,1); }
-      else { list[i].status = act==='approve'?'Approved': act==='reject'?'Rejected':'Pending'; }
-      all[scope]=list; localStorage.setItem(LEV_KEY, JSON.stringify(all)); loadLeaves();
+    // Scope save
+    document.getElementById('btnScope').addEventListener('click', ()=>{
+      localStorage.setItem('scope_class', document.getElementById('a-class').value.trim());
+      localStorage.setItem('scope_sec', document.getElementById('a-sec').value.trim());
+      alert('Scope saved.');
     });
 
-    $('lExport').onclick=()=>{
-      const all = JSON.parse(localStorage.getItem(LEV_KEY)||'{}');
-      const scope=classKey(); const list = all[scope] || [];
-      const hdr=['Student','From','To','Days','Reason','Status','Timestamp'];
-      const lines=[hdr.join(',')].concat(list.map(r=>[
-        esc(r.child||''), r.from, r.to, r.days, esc(r.reason||''), (r.status||'Pending'), r.ts||''
-      ].join(',')));
-      downloadCSV(lines.join('\n'), `leaves_${scope||'X'}.csv`);
-    };
+    // Broadcast
+    document.getElementById('btnBc').addEventListener('click', ()=>{
+      const text=(document.getElementById('a-bc').value||"").trim();
+      if(!text) return alert('Type a message');
+      const msgs=L.get('msgs'); msgs.push({time:Date.now(), text}); L.set('msgs',msgs);
+      alert('Broadcasted (demo).'); document.getElementById('a-bc').value="";
+    });
 
-    $('lClearAll').onclick=()=>{
-      const scope = classKey();
-      const [cls, sec] = scope.split('-');
-      if(!cls || !sec){ $('lOut').textContent='Set Class Scope first.'; return; }
-      if(!confirm('Clear ALL leaves for this class?')) return;
-      const all=JSON.parse(localStorage.getItem(LEV_KEY)||'{}');
-      all[scope]=[]; localStorage.setItem(LEV_KEY, JSON.stringify(all)); loadLeaves();
-    };
-
-    // --- Data Import / Export ---
-    // Helpers
-    function downloadCSV(text,name){
-      const blob=new Blob([text],{type:'text/csv;charset=utf-8;'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    // Stats
+    function stats(){
+      const s=document.getElementById('stats'); s.innerHTML="";
+      const d=[['Diary posts','diary'],['Homework','hw'],['Messages','msgs'],['Leaves','leaves']];
+      d.forEach(([t,k])=> s.insertAdjacentHTML('beforeend', `<li>${t}: ${L.get(k).length}</li>`));
     }
-    function esc(s){ s=''+(s||''); s=s.replaceAll('"','""'); return s.includes(',')?`"${s}"`:s; }
-    function parseCSV(file, cb){
-      if(!file) return;
-      const reader=new FileReader();
-      reader.onload=()=>{
-        const lines = reader.result.split(/\r?\n/).filter(Boolean);
-        const hdr = (lines.shift()||'').split(',').map(h=>h.trim());
-        const rows = lines.map(line=>{
-          // crude CSV split (works for our simple demos)
-          const parts = line.split(',');
-          const obj={}; hdr.forEach((h,i)=> obj[h]=parts[i]??'');
-          return obj;
-        });
-        cb(rows);
-      };
-      reader.readAsText(file);
-    }
+    stats();
 
-    // Students
-    $('expStudents').onclick=()=>{
-      const rows=JSON.parse(localStorage.getItem('demo_students')||'[]');
-      const hdr=['id','name','class','section','phone'];
-      const csv=[hdr.join(',')].concat(rows.map(r=>[r.id,esc(r.name),r.class,esc(r.section),r.phone].join(','))).join('\n');
-      downloadCSV(csv,'students.csv');
-    };
-    $('impStudents').addEventListener('change', (e)=>{
-      parseCSV(e.target.files[0], rows=>{
-        localStorage.setItem('demo_students', JSON.stringify(rows));
-        alert(`Imported ${rows.length} students into demo_students`);
-      });
+    // Backup/Restore
+    document.getElementById('btnExport').addEventListener('click', ()=>{
+      const dump=JSON.stringify(localStorage,null,2);
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([dump],{type:'application/json'}));
+      a.download='school-local-backup.json'; a.click();
     });
-
-    // Teachers
-    $('expTeachers').onclick=()=>{
-      const rows=JSON.parse(localStorage.getItem('demo_teachers')||'[]');
-      const hdr=['id','name','subject','phone'];
-      const csv=[hdr.join(',')].concat(rows.map(r=>[r.id,esc(r.name),esc(r.subject),r.phone].join(','))).join('\n');
-      downloadCSV(csv,'teachers.csv');
-    };
-    $('impTeachers').addEventListener('change', (e)=>{
-      parseCSV(e.target.files[0], rows=>{
-        localStorage.setItem('demo_teachers', JSON.stringify(rows));
-        alert(`Imported ${rows.length} teachers into demo_teachers`);
-      });
-    });
-
-    // Timetables
-    $('expTT').onclick=()=>{
-      const keys=Object.keys(localStorage).filter(k=>k.startsWith('sch_timetable_'));
-      const out=[['class_section','Day','Period','Subject','Teacher','Room','Timestamp'].join(',')];
-      keys.forEach(k=>{
-        const rows=JSON.parse(localStorage.getItem(k)||'[]');
-        rows.forEach(r=>out.push([k.replace('sch_timetable_',''),r.day,r.period,esc(r.subject),esc(r.teacher),esc(r.room||''),r.ts||''].join(',')));
-      });
-      downloadCSV(out.join('\n'),'timetables.csv');
-    };
-    $('impTT').addEventListener('change', (e)=>{
-      parseCSV(e.target.files[0], rows=>{
-        // Expect columns: class_section,Day,Period,Subject,Teacher,Room,Timestamp
-        const group = {};
-        rows.forEach(r=>{
-          const cs = (r.class_section||'').replace(/\s+/g,'').toUpperCase();
-          if(!cs) return;
-          group[cs] = group[cs] || [];
-          group[cs].push({
-            class: cs.split('_')[0],
-            section: cs.split('_')[1],
-            day: r.Day || r.day || 'Mon',
-            period: r.Period || r.period || '',
-            subject: r.Subject || r.subject || '',
-            teacher: r.Teacher || r.teacher || '',
-            room: r.Room || r.room || '',
-            ts: r.Timestamp || r.ts || Date.now()
-          });
-        });
-        Object.entries(group).forEach(([cs,rows])=>{
-          localStorage.setItem('sch_timetable_'+cs, JSON.stringify(rows));
-        });
-        alert(`Imported timetables for ${Object.keys(group).length} class/sections`);
-      });
-    });
-
-    // --- Quick Backup / Restore ---
-    $('backupAll').onclick=()=>{
-      const dump={};
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i);
-        // include only school/demo keys to keep file small
-        if(/^sch_|^demo_/.test(k)){
-          dump[k]=localStorage.getItem(k);
-        }
-      }
-      const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download=`school-backup-${new Date().toISOString().slice(0,10)}.json`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    };
-
-    $('restoreAll').addEventListener('change',(e)=>{
-      const f=e.target.files[0]; if(!f) return;
-      const reader=new FileReader();
-      reader.onload=()=>{
+    document.getElementById('btnRestore').addEventListener('click', ()=>{
+      const f=document.getElementById('restoreFile').files[0]; if(!f) return alert('Pick a file');
+      const reader=new FileReader(); reader.onload=()=>{
         try{
-          const dump=JSON.parse(reader.result);
-          Object.entries(dump).forEach(([k,v])=>{
-            if(typeof v==='string') localStorage.setItem(k,v);
-          });
-          alert('Restore complete. Reloading.');
-          location.reload();
-        }catch(err){ alert('Invalid JSON.'); }
-      };
-      reader.readAsText(f);
+          const obj=JSON.parse(reader.result);
+          Object.keys(obj).forEach(k=>localStorage.setItem(k, obj[k]));
+          alert('Restored. Reloading…'); location.reload();
+        }catch(e){ alert('Invalid file'); }
+      }; reader.readAsText(f);
     });
   </script>
 </body>
