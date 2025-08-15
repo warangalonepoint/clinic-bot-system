@@ -1,184 +1,314 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Teacher · School Demo</title>
-  <link rel="stylesheet" href="styles.css">
-<script type="module" src="ui.js"></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Teacher · School PWA</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body class="dark">
   <div class="wrapper">
+
+    <!-- Header -->
     <section class="accent-indigo">
       <div class="glass header">
-        <div class="row" style="justify-content:space-between;align-items:center;">
-          <div class="h1">Teacher</div>
-          <div class="row">
-            <a class="btn" href="index.html">PIN</a>
-            <button class="btn btn-gradient" onclick="toggleTheme()">Theme</button>
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div>
+            <div class="eyebrow">Post diary & homework · mark attendance</div>
+            <div class="h1">Teacher</div>
+          </div>
+          <div class="row gap-8">
+            <a class="chip chip-slate" href="index.html">PIN</a>
+            <button id="themeToggle" class="chip chip-blue">Theme</button>
           </div>
         </div>
-        <div class="text-dim">Post diary & homework · mark attendance</div>
+
+        <!-- Tabs -->
+        <div class="tabs mt-12">
+          <button class="chip chip-indigo tab" data-target="#panel-setup" aria-selected="true">Class Setup</button>
+          <button class="chip chip-blue tab" data-target="#panel-diary">Class Diary</button>
+          <button class="chip chip-teal tab" data-target="#panel-homework">Homework</button>
+          <button class="chip chip-orange tab" data-target="#panel-attendance">Attendance</button>
+        </div>
       </div>
     </section>
 
-    <div class="tabs mt-16">
-      <div class="tab-list">
-        <button class="tab-btn" data-tab="t-setup" aria-selected="true">Class Setup</button>
-        <button class="tab-btn" data-tab="t-diary">Class Diary</button>
-        <button class="tab-btn" data-tab="t-hw">Homework</button>
-        <button class="tab-btn" data-tab="t-att">Attendance</button>
+    <!-- Class Setup -->
+    <section class="accent-slate">
+      <div id="panel-setup" class="glass panel active">
+        <div class="h2">My Class</div>
+        <div class="grid mt-12">
+          <input id="t-class" class="input" placeholder="Class e.g., 5"/>
+          <input id="t-section" class="input" placeholder="Section e.g., A"/>
+          <input id="t-name" class="input" placeholder="Your Name"/>
+          <input id="t-subject" class="input" placeholder="Subject e.g., Maths"/>
+        </div>
+        <div class="row mt-12">
+          <button id="saveMeta" class="btn btn-teal">Save</button>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="tab-panels">
-      <!-- Setup -->
-      <div class="tab-panel active" id="t-setup">
-        <section class="accent-violet">
-          <div class="glass">
-            <div class="h2">My Class</div>
-            <div class="grid cols-2">
-              <input id="tc-class" class="input" placeholder="Class e.g., 5">
-              <input id="tc-sec" class="input" placeholder="Section e.g., A">
-              <input id="tc-name" class="input" placeholder="Your Name">
-              <input id="tc-subj" class="input" placeholder="Subject e.g., Maths">
-            </div>
-            <div class="mt-12"><button class="btn btn-indigo" id="tcSave">Save</button></div>
-            <div id="tcMsg" class="text-dim mt-12"></div>
-          </div>
-        </section>
-      </div>
+    <!-- Class Diary -->
+    <section class="accent-blue">
+      <div id="panel-diary" class="glass panel">
+        <div class="h2">Post to Class Diary</div>
+        <div class="grid mt-12">
+          <select id="d-subject" class="input">
+            <option value="" disabled selected>Subject</option>
+          </select>
+          <textarea id="d-message" class="input" rows="4" placeholder="What was taught / notes..."></textarea>
+          <input id="d-link" class="input" placeholder="Optional Link (https://…)"/>
+        </div>
+        <div class="row mt-12">
+          <button id="publishDiary" class="btn">Publish</button>
+        </div>
 
-      <!-- Diary -->
-      <div class="tab-panel" id="t-diary">
-        <section class="accent-rose">
-          <div class="glass">
-            <div class="h2">Post to Class Diary</div>
-            <div class="grid cols-2">
-              <input type="date" id="td-date" class="input">
-              <input id="td-subj" class="input" placeholder="Subject">
-            </div>
-            <textarea id="td-note" class="input mt-12" placeholder="What was taught / notes..."></textarea>
-            <div class="mt-12">
-              <button class="btn btn-rose" id="tdPost">Publish</button>
-            </div>
-            <div class="h2 mt-16">Recent</div>
-            <div id="td-list" class="mt-12"></div>
-          </div>
-        </section>
+        <div class="h3 mt-20">Recent</div>
+        <div id="diaryList" class="list mt-8 text-dim">No entries.</div>
       </div>
+    </section>
 
-      <!-- Homework -->
-      <div class="tab-panel" id="t-hw">
-        <section class="accent-indigo">
-          <div class="glass">
-            <div class="h2">Create Homework</div>
-            <div class="grid cols-2">
-              <input type="date" id="hw-due" class="input">
-              <input id="hw-subj" class="input" placeholder="Subject">
-            </div>
-            <input id="hw-title" class="input mt-12" placeholder="Title e.g., Exercise 5A">
-            <textarea id="hw-details" class="input mt-12" placeholder="Details..."></textarea>
-            <div class="mt-12"><button class="btn btn-indigo" id="hwAdd">Publish</button></div>
-            <div class="h2 mt-16">Recent</div>
-            <div id="hw-list" class="mt-12"></div>
-          </div>
-        </section>
-      </div>
+    <!-- Homework -->
+    <section class="accent-teal">
+      <div id="panel-homework" class="glass panel">
+        <div class="h2">Create Homework</div>
+        <div class="grid mt-12">
+          <input id="h-due" class="input" type="date" />
+          <select id="h-subject" class="input">
+            <option value="" disabled selected>Subject</option>
+          </select>
+          <input id="h-title" class="input" placeholder="Title e.g., Exercise 5A"/>
+          <textarea id="h-details" class="input" rows="4" placeholder="Details…"></textarea>
+        </div>
+        <div class="row mt-12">
+          <button id="publishHomework" class="btn btn-indigo">Publish</button>
+        </div>
 
-      <!-- Attendance -->
-      <div class="tab-panel" id="t-att">
-        <section class="accent-teal">
-          <div class="glass">
-            <div class="h2">Attendance (demo)</div>
-            <div class="text-dim">Tap to toggle P/A. Stored locally.</div>
-            <div id="att-wrap" class="grid cols-3 mt-12"></div>
-            <div class="mt-12"><button class="btn btn-teal" id="attSave">Save</button></div>
-          </div>
-        </section>
+        <div class="h3 mt-20">Recent</div>
+        <div id="hwList" class="list mt-8 text-dim">No entries.</div>
       </div>
-    </div>
+    </section>
+
+    <!-- Attendance -->
+    <section class="accent-orange">
+      <div id="panel-attendance" class="glass panel">
+        <div class="h2">Mark Attendance</div>
+        <div class="eyebrow mt-4" id="attScope"></div>
+        <div class="grid mt-12">
+          <input id="att-date" class="input" type="date"/>
+          <input id="att-count" class="input" inputmode="numeric" placeholder="Present count (optional)"/>
+        </div>
+        <div class="row mt-12">
+          <button id="saveAttendance" class="btn btn-orange">Save Attendance</button>
+        </div>
+
+        <div class="h3 mt-20">Recent</div>
+        <div id="attList" class="list mt-8 text-dim">No entries.</div>
+      </div>
+    </section>
+
   </div>
 
+  <!-- Shared UI helpers (tabs + theme). Keep, if present in your repo -->
   <script type="module" src="ui.js"></script>
+
+  <!-- Page logic -->
   <script>
-  const db = {
-    get(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
-    set(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-  };
+  (function(){
+    // ---------- tiny helpers ----------
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const todayISO = () => new Date().toISOString().slice(0,10);
+    const toast = (msg) => { alert(msg); };
 
-  // Setup
-  const profileKey = 'teacherProfile';
-  function loadProfile(){
-    const p = db.get(profileKey,{cls:'',sec:'',name:'',sub:''});
-    document.getElementById('tc-class').value = p.cls;
-    document.getElementById('tc-sec').value = p.sec;
-    document.getElementById('tc-name').value = p.name;
-    document.getElementById('tc-subj').value = p.sub;
-  }
-  document.getElementById('tcSave').addEventListener('click', ()=>{
-    const p = {
-      cls: document.getElementById('tc-class').value.trim(),
-      sec: document.getElementById('tc-sec').value.trim(),
-      name: document.getElementById('tc-name').value.trim(),
-      sub: document.getElementById('tc-subj').value.trim()
-    };
-    db.set(profileKey,p);
-    document.getElementById('tcMsg').textContent = 'Saved locally.';
-  });
-  loadProfile();
+    // ---------- theme (fallback if ui.js absent) ----------
+    const themeBtn = $('#themeToggle');
+    if(themeBtn){
+      const applyTheme = (t)=> document.body.className = t === 'light' ? 'light' : 'dark';
+      applyTheme(localStorage.getItem('theme') || 'dark');
+      themeBtn.addEventListener('click', () => {
+        const next = (localStorage.getItem('theme') === 'light') ? 'dark' : 'light';
+        localStorage.setItem('theme', next);
+        applyTheme(next);
+      });
+    }
 
-  // Diary
-  const diaryKey = 'diary';
-  function renderDiary(){
-    const arr = db.get(diaryKey,[]);
-    document.getElementById('td-list').innerHTML =
-      arr.slice(-10).reverse().map(d=>`<div class="glass"><b>${d.subject}</b> · <span class="text-dim">${d.date}</span><div class="mt-8">${d.note}</div></div>`).join('') || '<div class="text-dim">No entries.</div>';
-  }
-  document.getElementById('tdPost').addEventListener('click', ()=>{
-    const date = document.getElementById('td-date').value || new Date().toISOString().slice(0,10);
-    const subject = document.getElementById('td-subj').value || db.get(profileKey,{}).sub || 'General';
-    const note = (document.getElementById('td-note').value||'').trim();
-    if(!note) return;
-    const arr = db.get(diaryKey,[]); arr.push({date,subject,note}); db.set(diaryKey,arr);
-    document.getElementById('td-note').value=''; renderDiary();
-  });
-  renderDiary();
-
-  // Homework
-  const hwKey='homework';
-  function renderHW(){
-    const arr = db.get(hwKey,[]);
-    document.getElementById('hw-list').innerHTML =
-      arr.slice(-10).reverse().map(h=>`<div class="glass"><b>${h.subject}</b> · <span class="text-dim">Due ${h.due}</span><div class="mt-8">${h.title} — ${h.details}</div></div>`).join('') || '<div class="text-dim">No homework.</div>';
-  }
-  document.getElementById('hwAdd').addEventListener('click', ()=>{
-    const due = document.getElementById('hw-due').value || new Date(Date.now()+86400000).toISOString().slice(0,10);
-    const subject = document.getElementById('hw-subj').value || db.get(profileKey,{}).sub || 'General';
-    const title = document.getElementById('hw-title').value || 'Homework';
-    const details = document.getElementById('hw-details').value || '';
-    const arr = db.get(hwKey,[]); arr.push({due,subject,title,details}); db.set(hwKey,arr);
-    renderHW();
-  });
-  renderHW();
-
-  // Attendance demo
-  function renderAtt(){
-    const names = db.get('studentsDemo',['Aarav','Isha','Kabir','Mira','Rohan','Zara','Veer','Anaya','Dev','Ira','Sai','Tara']);
-    const state = db.get('attState', {});
-    const wrap = document.getElementById('att-wrap');
-    wrap.innerHTML = '';
-    names.forEach((n,i)=>{
-      const btn = document.createElement('button');
-      btn.className='btn';
-      btn.textContent = (state[n]?'P':'A')+' · '+n;
-      btn.style.width='100%';
-      btn.onclick = ()=>{ state[n] = !state[n]; btn.textContent=(state[n]?'P':'A')+' · '+n; };
-      wrap.appendChild(btn);
+    // ---------- tabs (fallback if ui.js absent) ----------
+    $$('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        $$('.tab').forEach(t => t.removeAttribute('aria-selected'));
+        tab.setAttribute('aria-selected','true');
+        const target = tab.dataset.target;
+        $$('.panel').forEach(p => p.classList.remove('active'));
+        if (target) $(target).classList.add('active');
+      });
     });
-    document.getElementById('attSave').onclick = ()=>{ db.set('attState', state); };
-  }
-  renderAtt();
+
+    // ---------- storage keys ----------
+    const K = {
+      META: 'teacherMeta',
+      DIARY: 'classDiary',
+      HOMEWORK: 'homework',
+      ATT: 'attendance'
+    };
+
+    // ---------- class meta ----------
+    const metaInputs = {
+      cls: $('#t-class'),
+      sec: $('#t-section'),
+      name: $('#t-name'),
+      subj: $('#t-subject')
+    };
+
+    function loadMeta(){
+      try{
+        const m = JSON.parse(localStorage.getItem(K.META) || '{}');
+        if(m.cls) metaInputs.cls.value = m.cls;
+        if(m.sec) metaInputs.sec.value = m.sec;
+        if(m.name) metaInputs.name.value = m.name;
+        if(m.subj) metaInputs.subj.value = m.subj;
+        // seed subjects in selects
+        const subjects = Array.from(new Set([m.subj].filter(Boolean)));
+        const fill = (sel) => {
+          sel.innerHTML = '<option value="" disabled selected>Subject</option>';
+          subjects.forEach(s=>{
+            const opt = document.createElement('option');
+            opt.value = s; opt.textContent = s;
+            sel.appendChild(opt);
+          });
+        };
+        fill($('#d-subject'));
+        fill($('#h-subject'));
+        // att scope
+        $('#attScope').textContent = m.cls && m.sec ? `Class ${m.cls} • Section ${m.sec}` : '';
+      }catch(e){}
+    }
+    loadMeta();
+
+    $('#saveMeta').addEventListener('click', () => {
+      const m = {
+        cls: metaInputs.cls.value.trim(),
+        sec: metaInputs.sec.value.trim(),
+        name: metaInputs.name.value.trim(),
+        subj: metaInputs.subj.value.trim()
+      };
+      if(!m.cls || !m.sec || !m.name || !m.subj){
+        toast('Please fill class, section, your name and subject.');
+        return;
+      }
+      localStorage.setItem(K.META, JSON.stringify(m));
+      loadMeta();
+      toast('Saved class meta.');
+    });
+
+    // ---------- diary ----------
+    const renderDiary = () => {
+      const list = $('#diaryList');
+      const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
+      const all = JSON.parse(localStorage.getItem(K.DIARY) || '[]')
+        .filter(x => x.cls === meta.cls && x.sec === meta.sec)
+        .sort((a,b)=> (b.date||'').localeCompare(a.date));
+      if(!all.length){ list.textContent = 'No entries.'; return; }
+      list.innerHTML = all.map(x =>
+        `<div class="row card-row">
+           <div><b>${x.subject}</b> · ${x.date}<br>${x.message}${x.link ? ` — <a href="${x.link}" target="_blank">link</a>`:''}</div>
+         </div>`).join('');
+    };
+
+    $('#publishDiary').addEventListener('click', () => {
+      const m = JSON.parse(localStorage.getItem(K.META) || '{}');
+      const subject = $('#d-subject').value || m.subj || '';
+      const message = $('#d-message').value.trim();
+      const link = $('#d-link').value.trim();
+      if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
+      if(!subject || !message){ toast('Subject and message are required.'); return; }
+      const entry = {
+        cls: m.cls, sec: m.sec,
+        subject, message, link,
+        date: todayISO(),
+        teacher: m.name || '',
+        ts: Date.now()
+      };
+      const all = JSON.parse(localStorage.getItem(K.DIARY) || '[]');
+      all.push(entry);
+      localStorage.setItem(K.DIARY, JSON.stringify(all));
+      $('#d-message').value = ''; $('#d-link').value = '';
+      renderDiary();
+      toast('Diary posted.');
+    });
+
+    // ---------- homework ----------
+    const renderHW = () => {
+      const list = $('#hwList');
+      const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
+      const all = JSON.parse(localStorage.getItem(K.HOMEWORK) || '[]')
+        .filter(x => x.cls === meta.cls && x.sec === meta.sec)
+        .sort((a,b)=> (a.due||'').localeCompare(b.due));
+      if(!all.length){ list.textContent = 'No entries.'; return; }
+      list.innerHTML = all.map(x =>
+        `<div class="row card-row">
+           <div><b>${x.subject}</b> · Due ${x.due}<br>${x.title}${x.details?` — ${x.details}`:''}</div>
+         </div>`).join('');
+    };
+
+    $('#publishHomework').addEventListener('click', () => {
+      const m = JSON.parse(localStorage.getItem(K.META) || '{}');
+      if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
+      const due = $('#h-due').value || todayISO();
+      const subject = $('#h-subject').value || m.subj || '';
+      const title = $('#h-title').value.trim();
+      const details = $('#h-details').value.trim();
+      if(!subject || !title){ toast('Subject and title are required.'); return; }
+      const item = {
+        cls: m.cls, sec: m.sec,
+        subject, title, details,
+        due, ts: Date.now()
+      };
+      const all = JSON.parse(localStorage.getItem(K.HOMEWORK) || '[]');
+      all.push(item);
+      localStorage.setItem(K.HOMEWORK, JSON.stringify(all));
+      $('#h-title').value = ''; $('#h-details').value = '';
+      renderHW();
+      toast('Homework published.');
+    });
+
+    // ---------- attendance ----------
+    $('#att-date').value = todayISO();
+
+    const renderAtt = () => {
+      const list = $('#attList');
+      const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
+      const all = JSON.parse(localStorage.getItem(K.ATT) || '[]')
+        .filter(x => x.cls === meta.cls && x.sec === meta.sec)
+        .sort((a,b)=> (b.date||'').localeCompare(a.date));
+      if(!all.length){ list.textContent = 'No entries.'; return; }
+      list.innerHTML = all.map(x =>
+        `<div class="row card-row"><div><b>${x.date}</b> · Present: ${x.present ?? '—'}</div></div>`
+      ).join('');
+    };
+
+    $('#saveAttendance').addEventListener('click', () => {
+      const m = JSON.parse(localStorage.getItem(K.META) || '{}');
+      if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
+      const entry = {
+        cls: m.cls, sec: m.sec,
+        date: $('#att-date').value || todayISO(),
+        present: $('#att-count').value ? Number($('#att-count').value) : null,
+        ts: Date.now()
+      };
+      const all = JSON.parse(localStorage.getItem(K.ATT) || '[]');
+      // replace same-date record
+      const idx = all.findIndex(x => x.cls===entry.cls && x.sec===entry.sec && x.date===entry.date);
+      if(idx >= 0) all[idx] = entry; else all.push(entry);
+      localStorage.setItem(K.ATT, JSON.stringify(all));
+      renderAtt();
+      toast('Attendance saved.');
+    });
+
+    // initial renders
+    renderDiary(); renderHW(); renderAtt();
+  })();
   </script>
 </body>
 </html>
