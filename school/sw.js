@@ -1,48 +1,72 @@
-const CACHE = "school-pwa-v1";
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./parents.html",
-  "./teacher.html",
-  "./coordinator.html",
-  "./admin.html",
-  "./styles.css",
-  "./assets/banner.png",
-  "./assets/logo.png",
-  "./pins.json"
+/* School PWA – Service Worker */
+const VERSION = 'v1.0.0';
+const APP_SHELL = [
+  './',
+  './index.html',
+  './parents.html',
+  './teacher.html',
+  './coordinator.html',
+  './admin.html',
+  './styles.css',
+  './register-sw.js',
+  './manifest.webmanifest',
+  './assets/banner.png',
+  './pins.json'
 ];
 
-// Install
-self.addEventListener("install", (e)=>{
-  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open('shell-' + VERSION).then((cache) => cache.addAll(APP_SHELL))
+  );
   self.skipWaiting();
 });
 
-// Activate (clean old)
-self.addEventListener("activate", (e)=>{
+self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k.includes('shell-') && k !== 'shell-' + VERSION) ? caches.delete(k) : null))
+    )
   );
   self.clients.claim();
 });
 
-// Fetch: network-first for HTML, cache-first for assets
-self.addEventListener("fetch", (e)=>{
-  if(e.request.method !== "GET") return;
-  const url = new URL(e.request.url);
-  const isHTML = url.pathname.endsWith(".html") || url.pathname === "/";
+/* Strategy:
+   - HTML: network-first (so you see updates), fallback cache.
+   - CSS/JS/PNG: stale-while-revalidate.
+*/
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
 
-  if(isHTML){
-    e.respondWith(
-      fetch(e.request).then(resp=>{
-        const copy = resp.clone();
-        caches.open(CACHE).then(c=>c.put(e.request, copy));
-        return resp;
-      }).catch(()=>caches.match(e.request))
+  // Only handle same-origin
+  if (url.origin !== location.origin) return;
+
+  if (req.destination === 'document' || req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open('shell-' + VERSION).then((c) => c.put(req, copy));
+        return res;
+      }).catch(() => caches.match(req))
     );
-  } else {
-    e.respondWith(
-      caches.match(e.request).then(cached => cached || fetch(e.request))
+    return;
+  }
+
+  if (['style', 'script', 'image', 'font'].includes(req.destination)) {
+    event.respondWith(
+      caches.match(req).then((hit) => {
+        const fetcher = fetch(req).then((res) => {
+          const copy = res.clone();
+          caches.open('shell-' + VERSION).then((c) => c.put(req, copy));
+          return res;
+        });
+        return hit || fetcher;
+      })
     );
   }
+});
+
+// Listen for manual update ping from register-sw.js
+self.addEventListener('message', (e) => {
+  if (e.data === 'skip-waiting') self.skipWaiting();
 });
