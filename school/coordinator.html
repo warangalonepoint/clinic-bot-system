@@ -1,390 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Coordinator • School PWA</title>
-  <meta name="theme-color" content="#111111"/>
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css">
-  <link rel="icon" href="./assets/logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coordinator Panel • School PWA</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+  <meta name="theme-color" content="#ffffff" />
   <style>
-    .toolbar{position:fixed;top:14px;right:14px;z-index:10}
-    .logout{background:#111;color:#fff;border-radius:14px;height:40px;padding:0 14px;border:0;font-weight:700}
-    .hero .titlewrap{display:flex;align-items:flex-end;gap:10px}
-    .hero .hero-title{font-size:28px}
-    .empty{color:#6b7280}
+    /* Page-specific tiny tweaks (rest is from styles.css) */
+    .banner {
+      width: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.12);
+    }
+    .banner img {
+      width: 100%;
+      display: block;
+      height: 180px;
+      object-fit: cover;
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .banner h1 {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      margin: 0;
+      color: #fff;
+      font-size: 28px;
+      text-shadow: 0 4px 14px rgba(0,0,0,.35);
+      letter-spacing: .2px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 720px){
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 560px){
+      .row-2 { grid-template-columns: 1fr 1fr; }
+      .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .btn-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-primary { background: rgba(255,255,255,.28); }
+    .pill {
+      display:inline-flex; align-items:center; gap:8px;
+      font-weight:700; font-size:12px; padding:6px 10px;
+      border-radius:999px; background: rgba(255,255,255,.25);
+      border:1px solid rgba(255,255,255,.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .muted { opacity:.8; }
+    .caption { font-size:12px; opacity:.8; }
+
+    /* colored accents for panels */
+    .glass-blue   { background: linear-gradient(135deg, rgba(25,118,210,.18), rgba(3,169,244,.14)); }
+    .glass-green  { background: linear-gradient(135deg, rgba(46,125,50,.18), rgba(102,187,106,.14)); }
+    .glass-orange { background: linear-gradient(135deg, rgba(230,126,34,.18), rgba(253,187,45,.14)); }
   </style>
 </head>
-<body data-page="coordinator">
-  <div class="toolbar">
-    <button class="logout" id="btnLogout">Logout</button>
-  </div>
+<body>
+  <header class="navbar">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div class="pill">Coordinator</div>
+      <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+  </header>
 
-  <main class="wrap">
+  <main class="container">
     <!-- Banner -->
-    <section class="hero card" style="padding:0;overflow:hidden">
-      <img class="banner" src="./assets/banner.png" alt="School Banner">
-      <div class="hero-overlay">
-        <div class="titlewrap">
-          <img src="./assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-          <div class="hero-title">Coordinator Panel</div>
-        </div>
-      </div>
-    </section>
+    <div class="banner card">
+      <img src="./assets/banner.png" alt="School" />
+      <h1>Coordinator Panel</h1>
+    </div>
 
     <!-- Class Setup -->
-    <section class="card glass blue">
-      <div class="glass-ribbon">
-        <div class="glass-title">Class Setup</div>
-        <div class="glass-sub">Choose class/section & meta for actions below</div>
-      </div>
-      <div class="glass-body grid2">
-        <input id="cClass" class="in" placeholder="Class e.g., 5">
-        <input id="cSection" class="in" placeholder="Section e.g., A">
-        <select id="cDay" class="in">
-          <option>Mon</option><option>Tue</option><option>Wed</option>
-          <option>Thu</option><option>Fri</option><option>Sat</option>
-        </select>
-        <input id="cPeriod" class="in" placeholder="Period # 1–12" inputmode="numeric">
-        <input id="cSubject" class="in span2" placeholder="Subject e.g., Maths">
-        <div class="row">
-          <button id="btnSaveMeta" class="btn-glass">Save Meta</button>
-          <span id="metaMsg" class="muted" style="margin-left:8px"></span>
+    <section class="panel card glass-blue">
+      <h2 style="margin-top:0">Class Setup</h2>
+      <p class="muted">Choose class/section & meta for actions below</p>
+
+      <div class="row row-2">
+        <div>
+          <label>Class</label>
+          <input id="clz" placeholder="e.g., 5" inputmode="numeric" />
         </div>
+        <div>
+          <label>Section</label>
+          <input id="sec" placeholder="e.g., A" />
+        </div>
+      </div>
+
+      <div class="row row-3">
+        <div>
+          <label>Day</label>
+          <select id="day">
+            <option>Mon</option><option>Tue</option><option>Wed</option>
+            <option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
+          </select>
+        </div>
+        <div>
+          <label>Period #</label>
+          <input id="period" placeholder="1–12" inputmode="numeric" />
+        </div>
+        <div>
+          <label>Subject</label>
+          <input id="subject" placeholder="e.g., Maths" />
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:10px">
+        <button id="saveMeta" class="btn btn-primary">Save Meta</button>
+        <span class="caption" id="metaSavedMsg"></span>
       </div>
     </section>
 
-    <!-- Timetable -->
-    <section class="card glass green">
-      <div class="glass-ribbon">
-        <div class="glass-title">Timetable</div>
-        <div class="glass-sub">Add/replace period entries for the selected class</div>
+    <!-- Timetable Editor -->
+    <section class="panel card glass-green">
+      <h2 style="margin-top:0">Timetable</h2>
+      <p class="muted">Add/replace period entries for the selected class</p>
+
+      <div class="row row-2">
+        <div>
+          <label>Teacher name</label>
+          <input id="teacher" placeholder="e.g., Ms. Priya" />
+        </div>
+        <div>
+          <label>Room (optional)</label>
+          <input id="room" placeholder="e.g., 203" />
+        </div>
       </div>
-      <div class="glass-body stack">
-        <div class="grid3">
-          <input id="tTeacher" class="in" placeholder="Teacher name e.g., Ms. Priya">
-          <input id="tRoom" class="in" placeholder="Room (optional)">
-          <button id="btnAddTT" class="btn blue">Add / Update</button>
-        </div>
-        <div class="tablewrap card" style="padding:0">
-          <table class="tbl" id="ttTable">
-            <thead>
-              <tr><th>#</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th></tr>
-            </thead>
-            <tbody id="ttBody">
-              <tr><td colspan="7" class="empty">No entries yet.</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="row space">
-          <div class="row" style="gap:8px">
-            <button id="btnExportTT" class="btn outline">Export CSV</button>
-            <button id="btnClearTT" class="btn rose">Clear Class Timetable</button>
-          </div>
-        </div>
+
+      <div class="btn-row" style="margin-top:10px">
+        <button id="addUpdate" class="btn btn-primary">Add / Update</button>
+        <button id="exportCSV" class="btn">Export CSV</button>
+        <button id="clearTable" class="btn">Clear Class Timetable</button>
+        <span class="caption" id="opMsg"></span>
+      </div>
+
+      <div class="table-container" style="margin-top:14px">
+        <table id="table">
+          <thead>
+            <tr>
+              <th>#</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="7" class="muted">No entries yet.</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <!-- Assign Teachers (optional quick map) -->
-    <section class="card glass purple">
-      <div class="glass-ribbon">
-        <div class="glass-title">Subject → Teacher Map</div>
-        <div class="glass-sub">Quick assign for this class/section</div>
-      </div>
-      <div class="glass-body grid3">
-        <input id="mSubject" class="in" placeholder="Subject e.g., English">
-        <input id="mTeacher" class="in" placeholder="Teacher name">
-        <button id="btnMap" class="btn purple">Add Mapping</button>
-      </div>
-      <div class="glass-body">
-        <div class="tablewrap card" style="padding:0">
-          <table class="tbl">
-            <thead><tr><th>#</th><th>Subject</th><th>Teacher</th><th>Action</th></tr></thead>
-            <tbody id="mapBody"><tr><td colspan="4" class="empty">No mappings yet.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Broadcast Notice -->
-    <section class="card glass amber">
-      <div class="glass-ribbon">
-        <div class="glass-title">Broadcast Notice</div>
-        <div class="glass-sub">Send to Teachers / Parents (local demo)</div>
-      </div>
-      <div class="glass-body grid2">
-        <input id="nTitle" class="in" placeholder="Title e.g., Water supply shutdown">
-        <select id="nAudience" class="in">
-          <option>All Teachers</option>
-          <option>All Parents</option>
-          <option>Class Parents (current class)</option>
-        </select>
-        <textarea id="nMsg" class="in span2" placeholder="Short, clear message..."></textarea>
-        <div class="row">
-          <button id="btnPublish" class="btn amber">Publish</button>
-          <button id="btnExportNotices" class="btn outline">Export Notices CSV</button>
-        </div>
-      </div>
-      <div class="glass-body">
-        <div class="tablewrap card" style="padding:0">
-          <table class="tbl">
-            <thead><tr><th>#</th><th>Title</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead>
-            <tbody id="noticeBody"><tr><td colspan="5" class="empty">No notices yet.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tools -->
-    <section class="card glass slate">
-      <div class="glass-ribbon">
-        <div class="glass-title">Tools</div>
-        <div class="glass-sub">Cache & app helpers</div>
-      </div>
-      <div class="glass-body row" style="gap:8px;flex-wrap:wrap">
-        <button id="btnInstall" class="btn-glass">Install App (PWA)</button>
-        <button id="btnResetSW" class="btn-glass">Reset Cache / SW</button>
-        <button id="btnBackPin" class="btn-glass">Back to PIN</button>
-      </div>
+    <!-- Logs (optional lightweight view) -->
+    <section class="panel card glass-orange">
+      <h2 style="margin-top:0">Recent Changes</h2>
+      <div id="log" class="caption muted">No changes yet.</div>
     </section>
   </main>
 
   <script>
-    // ---------- Simple Auth Gate ----------
-    (function gate(){
+    // ------- Simple role lock (expect index.html to set school_role in sessionStorage) -------
+    (function lock(){
       const role = sessionStorage.getItem('school_role');
-      if(!role || role !== 'coordinator'){
-        // optional: allow index
-        // location.replace('./index.html');
+      if (role !== 'coordinator') {
+        // optional: preserve that user tried
+        location.replace('./index.html');
       }
     })();
 
-    // ---------- Storage Keys ----------
-    const KEY_META = 'coord_meta';                  // {class, section, day, period, subject}
-    const KEY_TT   = 'coord_timetable';            // array of entries
-    const KEY_MAP  = 'coord_subject_map';          // array of {subject, teacher, class, section}
-    const KEY_NOT  = 'coord_notices';              // array
+    // Helpers
+    const $ = (id)=>document.getElementById(id);
+    const val = (id)=>$(id).value.trim();
 
-    // ---------- DOM ----------
-    const el = id => document.getElementById(id);
-
-    // Meta
-    const cClass = el('cClass'), cSection = el('cSection'), cDay = el('cDay'),
-          cPeriod = el('cPeriod'), cSubject = el('cSubject'),
-          metaMsg = el('metaMsg');
-
-    // Timetable
-    const tTeacher = el('tTeacher'), tRoom = el('tRoom'),
-          ttBody = el('ttBody');
-
-    // Maps
-    const mSubject = el('mSubject'), mTeacher = el('mTeacher'), mapBody = el('mapBody');
-
-    // Notices
-    const nTitle = el('nTitle'), nAudience = el('nAudience'), nMsg = el('nMsg'), noticeBody = el('noticeBody');
-
-    // ---------- Helpers ----------
-    const getJSON = (k, d) => { try{ return JSON.parse(localStorage.getItem(k) || 'null') ?? d; }catch{return d;} };
-    const setJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-
-    function currentScope(){
-      return { cls: cClass.value.trim(), sec: cSection.value.trim() };
+    function keyFor() {
+      const clz = val('clz').toUpperCase();
+      const sec = val('sec').toUpperCase();
+      if(!clz || !sec) return null;
+      return `sch_timetable_${clz}_${sec}`;
     }
 
-    // ---------- Load Meta ----------
-    (function init(){
-      const meta = getJSON(KEY_META, {});
-      if(meta.class) cClass.value = meta.class;
-      if(meta.section) cSection.value = meta.section;
-      if(meta.day) cDay.value = meta.day;
-      if(meta.period) cPeriod.value = meta.period;
-      if(meta.subject) cSubject.value = meta.subject;
-      renderTT();
-      renderMap();
-      renderNotices();
-    })();
+    function readMeta(){
+      const meta = JSON.parse(localStorage.getItem('sch_meta')||'{}');
+      if(meta.clz) $('clz').value = meta.clz;
+      if(meta.sec) $('sec').value = meta.sec;
+      if(meta.day) $('day').value = meta.day;
+      if(meta.period) $('period').value = meta.period;
+      if(meta.subject) $('subject').value = meta.subject;
+    }
 
-    el('btnSaveMeta').addEventListener('click', ()=>{
-      const payload = {
-        class: cClass.value.trim(),
-        section: cSection.value.trim(),
-        day: cDay.value,
-        period: cPeriod.value.trim(),
-        subject: cSubject.value.trim()
+    function saveMeta(){
+      const m = {
+        clz: val('clz'),
+        sec: val('sec'),
+        day: val('day'),
+        period: val('period'),
+        subject: val('subject'),
       };
-      setJSON(KEY_META, payload);
-      metaMsg.textContent = 'Saved.';
-      setTimeout(()=> metaMsg.textContent='', 1200);
-    });
+      localStorage.setItem('sch_meta', JSON.stringify(m));
+      $('metaSavedMsg').textContent = 'Saved ✓';
+      setTimeout(()=>{ $('metaSavedMsg').textContent = '';}, 1500);
+      renderTable();
+    }
 
-    // ---------- Timetable ----------
-    el('btnAddTT').addEventListener('click', ()=>{
-      const meta = getJSON(KEY_META, {});
-      if(!meta.class || !meta.section){ alert('Save Class & Section first.'); return; }
-      const list = getJSON(KEY_TT, []);
-      // Upsert by class+section+day+period
-      const key = (e)=> [e.class,e.section,e.day,e.period].join('|');
+    function readTable(){
+      const k = keyFor();
+      if(!k) return [];
+      return JSON.parse(localStorage.getItem(k) || '[]');
+    }
+
+    function writeTable(rows){
+      const k = keyFor();
+      if(!k) return;
+      localStorage.setItem(k, JSON.stringify(rows));
+    }
+
+    function renderTable(){
+      const tbody = $('tbody');
+      const rows = readTable();
+      tbody.innerHTML = '';
+      if(rows.length === 0){
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 7;
+        td.className = 'muted';
+        td.textContent = 'No entries yet.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+      rows
+        .sort((a,b)=>{
+          const dayOrder = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+          if (a.day !== b.day) return dayOrder.indexOf(a.day)-dayOrder.indexOf(b.day);
+          return (parseInt(a.period)||0)-(parseInt(b.period)||0);
+        })
+        .forEach((r,i)=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${i+1}</td>
+            <td>${r.day}</td>
+            <td>${r.period}</td>
+            <td>${r.subject||''}</td>
+            <td>${r.teacher||''}</td>
+            <td>${r.room||''}</td>
+            <td><button class="btn" data-del="${r.day}|${r.period}">Delete</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    function addOrUpdate(){
+      const clz = val('clz'), sec = val('sec');
+      if(!clz || !sec){ $('opMsg').textContent = 'Enter Class & Section first.'; return; }
+
       const entry = {
-        class: meta.class, section: meta.section, day: meta.day,
-        period: meta.period, subject: meta.subject || '(subject?)',
-        teacher: tTeacher.value.trim() || '(teacher?)',
-        room: tRoom.value.trim() || ''
+        day: val('day'),
+        period: val('period'),
+        subject: val('subject'),
+        teacher: val('teacher'),
+        room: val('room'),
+        ts: Date.now()
       };
-      const idx = list.findIndex(e => key(e) === key(entry));
-      if(idx>=0) list[idx]=entry; else list.push(entry);
-      setJSON(KEY_TT, list);
-      tTeacher.value=''; tRoom.value='';
-      renderTT();
-    });
+      if(!entry.period){ $('opMsg').textContent = 'Enter Period #'; return; }
 
-    function renderTT(){
-      const list = getJSON(KEY_TT, []);
-      const {cls, sec} = currentScope();
-      const rows = list.filter(e => (!cls || e.class===cls) && (!sec || e.section===sec))
-                       .sort((a,b)=> a.day.localeCompare(b.day) || (+a.period||0) - (+b.period||0));
-      if(!rows.length){ ttBody.innerHTML = '<tr><td colspan="7" class="empty">No entries yet.</td></tr>'; return; }
-      ttBody.innerHTML = rows.map((e,i)=>`
-        <tr>
-          <td>${i+1}</td>
-          <td>${e.day}</td>
-          <td>${e.period}</td>
-          <td>${e.subject}</td>
-          <td>${e.teacher}</td>
-          <td>${e.room||''}</td>
-          <td><button class="btn outline" data-del="${i}">Delete</button></td>
-        </tr>`).join('');
-      ttBody.querySelectorAll('[data-del]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const list = getJSON(KEY_TT, []);
-          const {cls, sec} = currentScope();
-          const rows = list.filter(e => (!cls || e.class===cls) && (!sec || e.section===sec))
-          const globalIndex = list.indexOf(rows[+btn.dataset.del]);
-          if(globalIndex>=0){ list.splice(globalIndex,1); setJSON(KEY_TT, list); renderTT(); }
-        });
-      });
+      let rows = readTable();
+      const idx = rows.findIndex(r => r.day===entry.day && String(r.period)===String(entry.period));
+      if(idx>=0){ rows[idx] = entry; log(`Updated ${entry.day} P${entry.period}`); }
+      else { rows.push(entry); log(`Added ${entry.day} P${entry.period}`); }
+
+      writeTable(rows);
+      $('opMsg').textContent = 'Saved ✓';
+      setTimeout(()=>{ $('opMsg').textContent=''; }, 1200);
+      renderTable();
     }
 
-    el('btnClearTT').addEventListener('click', ()=>{
-      const {cls, sec} = currentScope();
-      if(!cls||!sec) return alert('Set class & section first.');
-      if(!confirm(`Clear timetable for ${cls}-${sec}?`)) return;
-      const list = getJSON(KEY_TT, []).filter(e => !(e.class===cls && e.section===sec));
-      setJSON(KEY_TT, list); renderTT();
-    });
-
-    el('btnExportTT').addEventListener('click', ()=>{
-      const list = getJSON(KEY_TT, []);
-      const csv = ['Class,Section,Day,Period,Subject,Teacher,Room']
-        .concat(list.map(e => [e.class,e.section,e.day,e.period,qq(e.subject),qq(e.teacher),qq(e.room)].join(',')))
-        .join('\n');
-      downloadCSV(csv, 'timetable.csv');
-    });
-
-    // ---------- Subject Map ----------
-    el('btnMap').addEventListener('click', ()=>{
-      const {cls, sec} = currentScope();
-      if(!cls||!sec) return alert('Set class & section first.');
-      const sub = mSubject.value.trim(); const tea = mTeacher.value.trim();
-      if(!sub || !tea) return;
-      const list = getJSON(KEY_MAP, []);
-      const idx = list.findIndex(x => x.class===cls && x.section===sec && x.subject===sub);
-      const entry = { class:cls, section:sec, subject:sub, teacher:tea };
-      if(idx>=0) list[idx]=entry; else list.push(entry);
-      setJSON(KEY_MAP, list);
-      mSubject.value=''; mTeacher.value=''; renderMap();
-    });
-
-    function renderMap(){
-      const {cls, sec} = currentScope();
-      const list = getJSON(KEY_MAP, []).filter(x => (!cls||x.class===cls) && (!sec||x.section===sec));
-      if(!list.length){ mapBody.innerHTML = '<tr><td colspan="4" class="empty">No mappings yet.</td></tr>'; return; }
-      mapBody.innerHTML = list.map((x,i)=>`
-        <tr>
-          <td>${i+1}</td><td>${x.subject}</td><td>${x.teacher}</td>
-          <td><button class="btn outline" data-rm="${i}">Remove</button></td>
-        </tr>
-      `).join('');
-      mapBody.querySelectorAll('[data-rm]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const {cls, sec} = currentScope();
-          const all = getJSON(KEY_MAP, []);
-          const subset = all.filter(x => (!cls||x.class===cls) && (!sec||x.section===sec));
-          const globalIndex = all.indexOf(subset[+btn.dataset.rm]);
-          if(globalIndex>=0){ all.splice(globalIndex,1); setJSON(KEY_MAP, all); renderMap(); }
-        });
-      });
+    function delEntry(day, period){
+      let rows = readTable();
+      rows = rows.filter(r => !(r.day===day && String(r.period)===String(period)));
+      writeTable(rows);
+      renderTable();
+      log(`Deleted ${day} P${period}`);
     }
 
-    // ---------- Notices ----------
-    el('btnPublish').addEventListener('click', ()=>{
-      const t = nTitle.value.trim(); const a = nAudience.value; const m = nMsg.value.trim();
-      if(!t || !m) return;
-      const list = getJSON(KEY_NOT, []);
-      list.unshift({ title:t, audience:a, msg:m, ts:new Date().toISOString() });
-      setJSON(KEY_NOT, list);
-      nTitle.value=''; nMsg.value='';
-      renderNotices();
-    });
+    function exportCSV(){
+      const rows = readTable();
+      const hdr = ['Day','Period','Subject','Teacher','Room','Timestamp'];
+      const lines = [hdr.join(',')].concat(
+        rows.map(r=>[r.day,r.period,esc(r.subject),esc(r.teacher),esc(r.room),r.ts].join(','))
+      );
+      const blob = new Blob([lines.join('\n')], {type: 'text/csv;charset=utf-8;'});
+      const a = document.createElement('a');
+      const clz = val('clz').toUpperCase()||'X';
+      const sec = val('sec').toUpperCase()||'X';
+      a.href = URL.createObjectURL(blob);
+      a.download = `timetable_${clz}_${sec}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      log('Exported CSV');
+    }
+    const esc = (s)=>(''+(s||'')).replaceAll('"','""').includes(',')?`"${(''+(s||'')).replaceAll('"','""')}"`:(''+(s||''));
 
-    function renderNotices(){
-      const list = getJSON(KEY_NOT, []);
-      if(!list.length){ noticeBody.innerHTML = '<tr><td colspan="5" class="empty">No notices yet.</td></tr>'; return; }
-      noticeBody.innerHTML = list.map((n,i)=>`
-        <tr>
-          <td>${i+1}</td>
-          <td>${qq(n.title)}</td>
-          <td>${n.audience}</td>
-          <td>${new Date(n.ts).toLocaleString()}</td>
-          <td><button class="btn outline" data-delnotice="${i}">Delete</button></td>
-        </tr>
-      `).join('');
-      noticeBody.querySelectorAll('[data-delnotice]').forEach(b=>{
-        b.addEventListener('click', ()=>{
-          const list = getJSON(KEY_NOT, []); list.splice(+b.dataset.delnotice,1); setJSON(KEY_NOT, list); renderNotices();
-        });
-      });
+    function clearTable(){
+      const k = keyFor();
+      if(!k) return;
+      if(!confirm('Clear timetable for this class/section?')) return;
+      localStorage.removeItem(k);
+      renderTable();
+      log('Cleared timetable');
     }
 
-    el('btnExportNotices').addEventListener('click', ()=>{
-      const list = getJSON(KEY_NOT, []);
-      const csv = ['Title,Audience,Message,Time']
-        .concat(list.map(n => [qq(n.title), n.audience, qq(n.msg), new Date(n.ts).toLocaleString()].join(',')))
-        .join('\n');
-      downloadCSV(csv, 'notices.csv');
-    });
+    function log(msg){
+      const el = $('log');
+      const t = new Date().toLocaleTimeString();
+      el.textContent = `[${t}] ${msg}`;
+    }
 
-    // ---------- Tools / PWA ----------
-    let deferredPrompt=null;
-    window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; });
-    el('btnInstall').addEventListener('click', async ()=>{
-      if(!deferredPrompt) return alert('Install prompt not available yet.');
-      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null;
-    });
-    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
-    el('btnResetSW').addEventListener('click', async ()=>{
-      if('serviceWorker' in navigator){
-        const regs = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(regs.map(r=>r.unregister()));
+    // Events
+    $('saveMeta').addEventListener('click', saveMeta);
+    $('addUpdate').addEventListener('click', addOrUpdate);
+    $('exportCSV').addEventListener('click', exportCSV);
+    $('clearTable').addEventListener('click', clearTable);
+
+    $('tbody').addEventListener('click', (e)=>{
+      const del = e.target.getAttribute('data-del');
+      if(del){
+        const [d,p] = del.split('|');
+        delEntry(d,p);
       }
-      caches && caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k))));
-      alert('Cache/SW cleared. Reloading…'); location.reload(true);
     });
 
-    // ---------- Nav ----------
-    el('btnBackPin').addEventListener('click', ()=> location.replace('./index.html'));
-    el('btnLogout').addEventListener('click', ()=>{
-      sessionStorage.removeItem('school_role'); location.replace('./index.html');
+    $('logoutBtn').addEventListener('click', ()=>{
+      sessionStorage.removeItem('school_role');
+      location.replace('./index.html');
     });
 
-    // ---------- CSV helper ----------
-    function qq(s){ if(s==null) return ''; s = String(s).replaceAll('"','""'); return `"${s}"`; }
-    function downloadCSV(csv, name){
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = name; a.click();
-      setTimeout(()=> URL.revokeObjectURL(url), 1000);
-    }
+    // Init
+    readMeta();
+    renderTable();
   </script>
 </body>
 </html>
