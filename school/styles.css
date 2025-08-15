@@ -97,3 +97,135 @@ th {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+/* === Neon Glass Theme (screenshot style) === */
+
+/* Palette */
+:root{
+  --bg-900:#0d0f1a;          /* deep navy */
+  --bg-800:#121429;
+  --text-100:#f5f7ff;
+  --text-70:rgba(245,247,255,.75);
+  --card-20:rgba(255,255,255,.10);  /* translucent card */
+  --card-30:rgba(255,255,255,.16);
+  --stroke:rgba(255,255,255,.18);
+
+  /* gradients like the screenshot */
+  --grad-blue:  linear-gradient(135deg,#4f7cff 0%, #6ae0ff 100%);
+  --grad-violet:linear-gradient(135deg,#6b4eff 0%, #b66bff 100%);
+  --grad-teal:  linear-gradient(135deg,#30d0d0 0%, #2ef3a2 100%);
+  --grad-pink:  linear-gradient(135deg,#ff6bd6 0%, #ff8a8a 100%);
+  --grad-orange:linear-gradient(135deg,#ff9a44 0%, #f86b6b 100%);
+
+  /* shadows / blur */
+  --glass-blur: 18px;
+  --glass-shadow: 0 18px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+  --pill-shadow: 0 10px 20px rgba(0,0,0,.28);
+}
+
+/* Page BG + ambient blobs */
+body{
+  background: radial-gradient(1200px 600px at 10% 5%, rgba(111,76,255,.22) 0%, transparent 60%),
+              radial-gradient(900px 500px at 90% 15%, rgba(255,108,170,.18) 0%, transparent 60%),
+              radial-gradient(800px 500px at 75% 85%, rgba(60,220,200,.14) 0%, transparent 60%),
+              var(--bg-900);
+  color: var(--text-100);
+}
+
+/* Headings, muted text */
+h1,h2,h3{ color: var(--text-100); letter-spacing:.2px }
+.muted, .text-muted{ color: var(--text-70)!important }
+
+/* Cards -> glass */
+.card, .panel, .box, .section, .kard, .pill-card{
+  background: linear-gradient(180deg, var(--card-30), var(--card-20));
+  border: 1px solid var(--stroke);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 22px;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Banner */
+.banner, .hero, .page-hero{ border-radius:24px; overflow:hidden; }
+.banner img{ display:block; width:100%; height:auto; }
+.banner .title-overlay{
+  position:absolute; inset:auto 0 0 0;
+  padding:14px 18px;
+  color:#fff; font-weight:800; font-size:1.8rem;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.35));
+}
+
+/* Buttons */
+.btn, button, .chip-btn{
+  color:#fff; font-weight:700; border:0; cursor:pointer;
+  padding:14px 18px; border-radius:16px;
+  background: linear-gradient(180deg,var(--card-30),var(--card-20));
+  border:1px solid var(--stroke);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--pill-shadow);
+  transition: transform .06s ease, filter .2s ease, opacity .2s ease;
+}
+.btn:hover{ transform: translateY(-1px); filter: brightness(1.06) }
+.btn:active{ transform: translateY(1px); }
+
+.btn-primary{ background: var(--grad-violet); }
+.btn-blue   { background: var(--grad-blue); }
+.btn-teal   { background: var(--grad-teal); }
+.btn-pink   { background: var(--grad-pink); }
+.btn-orange { background: var(--grad-orange); }
+
+.btn-ghost{ background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05)); }
+
+/* “Tile” rows like the screenshot */
+.tile{
+  display:flex; align-items:center; gap:14px;
+  padding:16px; border-radius:20px;
+  background: linear-gradient(180deg,var(--card-30),var(--card-20));
+  border:1px solid var(--stroke);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+.tile .icon{
+  width:42px; height:42px; border-radius:12px; flex:0 0 42px;
+  background: var(--grad-blue);
+  display:grid; place-items:center; color:white; font-weight:800;
+}
+.tile .label{ font-size:1.05rem; font-weight:800; color:var(--text-100) }
+.tile .cta{ margin-left:auto }
+.tile .cta .btn{ padding:10px 14px; border-radius:12px }
+
+/* Inputs inside glass cards */
+input, select, textarea{
+  background: rgba(255,255,255,.06);
+  color: var(--text-100);
+  border: 1px solid var(--stroke);
+  border-radius:14px; padding:12px 14px;
+  outline:none; width:100%;
+}
+input::placeholder, textarea::placeholder{ color: rgba(245,247,255,.55) }
+
+/* Tables inside dark mode */
+table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
+th{ color:var(--text-70); font-weight:700; text-transform:uppercase; font-size:.78rem; }
+td{ background: linear-gradient(180deg,var(--card-30),var(--card-20)); border:1px solid var(--stroke); color:var(--text-100); padding:12px 14px; }
+td:first-child{ border-radius:14px 0 0 14px }
+td:last-child{  border-radius:0 14px 14px 0 }
+
+/* Progress bars (debit card-style) */
+.progress{ height:12px; background: rgba(255,255,255,.08); border-radius:999px; overflow:hidden; border:1px solid var(--stroke); }
+.progress > span{ display:block; height:100%; background: var(--grad-pink); box-shadow: inset 0 0 10px rgba(255,255,255,.25); }
+
+/* Quick helpers to colorize tiles/CTAs per section */
+.is-blue   { background: var(--grad-blue)!important; color:#fff }
+.is-violet { background: var(--grad-violet)!important; color:#fff }
+.is-teal   { background: var(--grad-teal)!important; color:#0b1320 }
+.is-orange { background: var(--grad-orange)!important; color:#29140a }
+.is-pink   { background: var(--grad-pink)!important; color:#2b0d1f }
+
+.section-blue   .tile .icon{background:var(--grad-blue)}
+.section-violet .tile .icon{background:var(--grad-violet)}
+.section-teal   .tile .icon{background:var(--grad-teal)}
+.section-orange .tile .icon{background:var(--grad-orange)}
+.section-pink   .tile .icon{background:var(--grad-pink)}
