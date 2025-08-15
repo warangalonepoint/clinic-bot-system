@@ -1,153 +1,115 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Parents · School Demo</title>
-  <link rel="stylesheet" href="styles.css">
-<script type="module" src="ui.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Parents • School PWA</title>
+  <script>
+    (function(){var t=localStorage.getItem('theme')||new URLSearchParams(location.search).get('theme')||'dark';
+      document.documentElement.classList.add(t);
+      document.addEventListener('DOMContentLoaded',()=>document.body.classList.add(t));})();
+  </script>
+  <link rel="preload" href="styles.css?v=2025-08-15-2" as="style" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="styles.css?v=2025-08-15-2"></noscript>
 </head>
-<body class="dark">
+<body>
   <div class="wrapper">
-    <section class="accent-violet">
+    <section class="accent-indigo">
       <div class="glass header">
-        <div class="row" style="justify-content:space-between;align-items:center;">
+        <div class="row between center">
           <div class="h1">Parents</div>
-          <div class="row">
-            <a class="btn" href="index.html">PIN</a>
-            <button class="btn btn-gradient" onclick="toggleTheme()">Theme</button>
+          <div class="row gap-8">
+            <a class="chip" href="index.html">PIN</a>
+            <button class="btn" onclick="toggleTheme()">Theme</button>
           </div>
         </div>
-        <div class="text-dim">View diary, homework, messages & leaves</div>
+        <div class="tabs mt-12">
+          <button class="tab chip chip-indigo" data-tab="diary" aria-selected="true">Class Diary</button>
+          <button class="tab chip chip-blue"   data-tab="homework">Homework</button>
+          <button class="tab chip chip-pink"   data-tab="messages">Messages</button>
+          <button class="tab chip chip-teal"   data-tab="leaves">Leaves</button>
+        </div>
       </div>
     </section>
 
-    <!-- Tabs -->
-    <div class="tabs mt-16">
-      <div class="tab-list">
-        <button class="tab-btn" data-tab="tab-diary" aria-selected="true">Class Diary</button>
-        <button class="tab-btn" data-tab="tab-home">Homework</button>
-        <button class="tab-btn" data-tab="tab-msg">Messages</button>
-        <button class="tab-btn" data-tab="tab-leave">Leaves</button>
+    <!-- Panels -->
+    <section class="accent-indigo">
+      <div class="glass mt-12 tabpanel" id="panel-diary">
+        <div class="h2">Today’s Class Diary</div>
+        <p class="text-dim">Teacher notes for the selected class.</p>
+        <div id="diary-list" class="list mt-10"></div>
       </div>
-    </div>
-
-    <div class="tab-panels">
-      <!-- Diary -->
-      <div class="tab-panel active" id="tab-diary">
-        <section class="accent-rose">
-          <div class="glass">
-            <div class="h2">Today’s Class Diary</div>
-            <div class="text-dim">Teacher notes for the selected class.</div>
-            <div id="diaryList" class="mt-12"></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-homework">
+        <div class="h2">Homework</div>
+        <div id="hw-list" class="list mt-10"></div>
       </div>
-
-      <!-- Homework -->
-      <div class="tab-panel" id="tab-home">
-        <section class="accent-indigo">
-          <div class="glass">
-            <div class="h2">Homework</div>
-            <div id="homeworkList" class="mt-12"></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-messages">
+        <div class="h2">Messages from Teachers</div>
+        <div id="msg-list" class="list mt-10"></div>
       </div>
-
-      <!-- Messages -->
-      <div class="tab-panel" id="tab-msg">
-        <section class="accent-teal">
-          <div class="glass">
-            <div class="h2">Messages from Teachers</div>
-            <div id="msgList" class="mt-12"></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-leaves">
+        <div class="h2">Apply Leave</div>
+        <form class="grid mt-10" id="leave-form" onsubmit="return false;">
+          <select class="input" id="leave-day">
+            <option value="1">1 day</option><option value="2">2 days</option>
+            <option value="3">3 days</option>
+          </select>
+          <textarea class="input" id="leave-reason" rows="3" placeholder="Reason"></textarea>
+          <button class="btn" id="leave-submit">Submit</button>
+        </form>
+        <div class="h3 mt-16">My Leave Requests</div>
+        <div id="leave-list" class="list mt-8 text-dim">No leave requests.</div>
       </div>
-
-      <!-- Leaves -->
-      <div class="tab-panel" id="tab-leave">
-        <section class="accent-violet">
-          <div class="glass">
-            <div class="h2">Apply Leave</div>
-            <form id="leaveForm" class="grid cols-2 mt-12">
-              <input class="input" type="date" id="lvDate" required>
-              <input class="input" type="number" id="lvDays" placeholder="Days" min="1" value="1" required>
-            </form>
-            <textarea class="input mt-12" id="lvReason" placeholder="Reason" required></textarea>
-            <div class="mt-12">
-              <button class="btn btn-teal" id="lvSubmit">Submit</button>
-            </div>
-            <div class="h2 mt-16">My Leave Requests</div>
-            <div id="leaveList" class="mt-12"></div>
-          </div>
-        </section>
-      </div>
-    </div>
+    </section>
   </div>
 
-  <script type="module" src="ui.js"></script>
+  <!-- Tabs + Theme + Demo data -->
   <script>
-  // Simple local demo store
-  const db = {
-    get(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
-    set(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-  };
-
-  // Seed demo data if empty
-  if(!db.get('diary')){
-    db.set('diary', [
-      {date:new Date().toISOString().slice(0,10), subject:'Maths', note:'Fractions & examples'},
-      {date:new Date().toISOString().slice(0,10), subject:'Science', note:'Plants and photosynthesis'}
-    ]);
-  }
-  if(!db.get('homework')){
-    db.set('homework', [
-      {due:new Date(Date.now()+86400000).toISOString().slice(0,10), subject:'Maths', title:'Exercise 5A', details:'Q1–10'},
-      {due:new Date(Date.now()+2*86400000).toISOString().slice(0,10), subject:'English', title:'Read Ch.3', details:'Make notes'}
-    ]);
-  }
-  if(!db.get('messages')){
-    db.set('messages', [{time:Date.now(), text:'PTM on Friday 4 PM.'}]);
-  }
-  if(!db.get('leaves')) db.set('leaves', []);
-
-  function card(html){ return `<div class="glass mt-12">${html}</div>`; }
-
-  function render(){
-    const diary = db.get('diary',[]);
-    document.getElementById('diaryList').innerHTML =
-      diary.map(d=>card(`<div><b>${d.subject}</b> · <span class="text-dim">${d.date}</span><div class="mt-8">${d.note}</div></div>`)).join('') || '<div class="text-dim">No entries.</div>';
-
-    const hw = db.get('homework',[]);
-    document.getElementById('homeworkList').innerHTML =
-      hw.map(h=>card(`<div><b>${h.subject}</b> · <span class="text-dim">Due ${h.due}</span><div class="mt-8">${h.title} — ${h.details}</div></div>`)).join('') || '<div class="text-dim">No homework.</div>';
-
-    const msgs = db.get('messages',[]);
-    document.getElementById('msgList').innerHTML =
-      msgs.map(m=>card(`<div><span class="text-dim">${new Date(m.time).toLocaleString()}</span><div class="mt-8">${m.text}</div></div>`)).join('') || '<div class="text-dim">No messages.</div>';
-
-    const leaves = db.get('leaves',[]);
-    document.getElementById('leaveList').innerHTML =
-      leaves.map((l,i)=>card(`<div><b>${l.date}</b> · ${l.days} day(s)<div class="mt-8">${l.reason}</div><div class="mt-12"><button class="btn" onclick="cancelLeave(${i})">Cancel</button></div></div>`)).join('') || '<div class="text-dim">No leave requests.</div>';
-  }
-
-  document.getElementById('lvSubmit').addEventListener('click', ()=>{
-    const date = document.getElementById('lvDate').value;
-    const days = +document.getElementById('lvDays').value||1;
-    const reason = (document.getElementById('lvReason').value||'').trim();
-    if(!date || !reason) return;
-    const arr = db.get('leaves',[]);
-    arr.push({date,days,reason,status:'Pending',created:Date.now()});
-    db.set('leaves', arr);
-    document.getElementById('lvReason').value='';
+    function toggleTheme(){
+      var cur=document.documentElement.classList.contains('dark')?'dark':'light';
+      var nxt=cur==='dark'?'light':'dark';
+      document.documentElement.classList.replace(cur,nxt);
+      document.body.classList.replace(cur,nxt);
+      localStorage.setItem('theme',nxt);
+    }
+    // tabs
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected','false'));
+        btn.setAttribute('aria-selected','true');
+        const t=btn.dataset.tab;
+        document.querySelectorAll('.tabpanel').forEach(p=>p.classList.add('hidden'));
+        document.getElementById('panel-'+t).classList.remove('hidden');
+      });
+    });
+    // demo content
+    const diary=[{sub:'Maths',date:'2025-08-15',msg:'Fractions & examples'},
+                 {sub:'Science',date:'2025-08-15',msg:'Plants and photosynthesis'}];
+    const hw=[{sub:'Maths',due:'2025-08-16',msg:'Exercise 5A — Q1–10'},
+              {sub:'English',due:'2025-08-17',msg:'Read Ch.3 — Make notes'}];
+    const msgs=[{time:new Date().toLocaleString(),msg:'PTM on Friday 4 PM.'}];
+    function render(){
+      const d=document.getElementById('diary-list');
+      d.innerHTML=diary.map(x=>`<div class="row between item"><b>${x.sub}</b><span class="text-dim">${x.date}</span><div>${x.msg}</div></div>`).join('');
+      const h=document.getElementById('hw-list');
+      h.innerHTML=hw.map(x=>`<div class="row between item"><b>${x.sub}</b><span class="text-dim">Due ${x.due}</span><div>${x.msg}</div></div>`).join('');
+      const m=document.getElementById('msg-list');
+      m.innerHTML=msgs.map(x=>`<div class="row between item"><span>${x.time}</span><div>${x.msg}</div></div>`).join('');
+    }
     render();
-  });
-  window.cancelLeave = (idx)=>{
-    const arr = db.get('leaves',[]);
-    arr.splice(idx,1); db.set('leaves',arr); render();
-  };
-
-  render();
+    document.getElementById('leave-submit').addEventListener('click',()=>{
+      const days=document.getElementById('leave-day').value;
+      const reason=(document.getElementById('leave-reason').value||'').trim();
+      if(!reason) return alert('Please add a reason.');
+      const list=document.getElementById('leave-list');
+      const row=document.createElement('div');
+      row.className='item'; row.textContent=`${days} day(s) — ${reason}`;
+      list.appendChild(row);
+      document.getElementById('leave-reason').value='';
+      list.classList.remove('text-dim'); list.textContent='';
+    });
   </script>
+
+  <script type="module" src="ui.js?v=2025-08-15-2"></script>
 </body>
 </html>
