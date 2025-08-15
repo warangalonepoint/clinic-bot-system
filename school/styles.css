@@ -239,3 +239,79 @@ button.btn > input[type="file"]{ display:none }
 @media (min-width: 920px){
   .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
 }
+/* === Neon Glass Chips (vivid gradients + glow) ========================== */
+/* Gradients */
+:root{
+  --grad-indigo: linear-gradient(135deg,#8da2ff 0%,#c084fc 100%);
+  --grad-blue:   linear-gradient(135deg,#7dd3fc 0%,#60a5fa 100%);
+  --grad-pink:   linear-gradient(135deg,#fb7185 0%,#d946ef 100%);
+  --grad-green:  linear-gradient(135deg,#34d399 0%,#10b981 100%);
+  --grad-cyan:   linear-gradient(135deg,#22d3ee 0%,#38bdf8 100%);
+  --grad-purple: linear-gradient(135deg,#a78bfa 0%,#7c3aed 100%);
+  --grad-teal:   linear-gradient(135deg,#5eead4 0%,#14b8a6 100%);
+  --grad-orange: linear-gradient(135deg,#fb923c 0%,#f43f5e 100%);
+}
+
+/* Base chip – soft glass by default */
+.chip{
+  position: relative;
+  border-radius: 18px;
+  padding: 10px 16px;
+  font-weight: 700;
+  letter-spacing:.2px;
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.55);
+  color: #0f172a;
+}
+.dark .chip{
+  border-color: rgba(255,255,255,.12);
+  background: rgba(255,255,255,.07);
+  color: #e5edff;
+}
+
+/* Soft tint for idle chips (light mode) */
+.chip-indigo{ background: color-mix(in srgb, white 70%, #8da2ff 30%); }
+.chip-blue  { background: color-mix(in srgb, white 70%, #60a5fa 30%); }
+.chip-pink  { background: color-mix(in srgb, white 70%, #d946ef 30%); }
+.chip-green { background: color-mix(in srgb, white 70%, #10b981 30%); }
+.chip-cyan  { background: color-mix(in srgb, white 70%, #22d3ee 30%); }
+.chip-purple{ background: color-mix(in srgb, white 70%, #7c3aed 30%); }
+.chip-teal  { background: color-mix(in srgb, white 70%, #14b8a6 30%); }
+.chip-orange{ background: color-mix(in srgb, white 70%, #fb923c 30%); }
+
+/* Dark mode idle chips: faint neon film */
+.dark .chip-indigo{ background: rgba(141,162,255,.16); }
+.dark .chip-blue  { background: rgba(96,165,250,.16); }
+.dark .chip-pink  { background: rgba(217,70,239,.16); }
+.dark .chip-green { background: rgba(16,185,129,.16); }
+.dark .chip-cyan  { background: rgba(34,211,238,.16); }
+.dark .chip-purple{ background: rgba(124,58,237,.16); }
+.dark .chip-teal  { background: rgba(20,184,166,.16); }
+.dark .chip-orange{ background: rgba(251,146,60,.16); }
+
+/* Hover: a little lift */
+.chip:hover{ transform: translateY(-1px); }
+
+/* Active state – full neon gradient + glow */
+.chip.active{
+  color:#fff;
+  border-color: transparent;
+  box-shadow:
+    0 12px 24px rgba(0,0,0,.18),
+    0 0 0 1px rgba(255,255,255,.18) inset;
+}
+.chip-indigo.active{ background: var(--grad-indigo); box-shadow: 0 10px 24px rgba(124,58,237,.45); }
+.chip-blue.active  { background: var(--grad-blue);   box-shadow: 0 10px 24px rgba(37,99,235,.45); }
+.chip-pink.active  { background: var(--grad-pink);   box-shadow: 0 10px 24px rgba(236,72,153,.45); }
+.chip-green.active { background: var(--grad-green);  box-shadow: 0 10px 24px rgba(5,150,105,.45); }
+.chip-cyan.active  { background: var(--grad-cyan);   box-shadow: 0 10px 24px rgba(6,182,212,.45); }
+.chip-purple.active{ background: var(--grad-purple); box-shadow: 0 10px 24px rgba(109,40,217,.45); }
+.chip-teal.active  { background: var(--grad-teal);   box-shadow: 0 10px 24px rgba(13,148,136,.45); }
+.chip-orange.active{ background: var(--grad-orange); box-shadow: 0 10px 24px rgba(234,88,12,.45); }
+
+/* Optional: panel header tint to match first active chip */
+.panel:not(.hidden) .h2,
+.panel:not(.hidden) .h3 { text-shadow: 0 1px 0 rgba(0,0,0,.08); }
