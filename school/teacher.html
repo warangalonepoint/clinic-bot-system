@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Teacher · School PWA</title>
   <link rel="stylesheet" href="styles.css"/>
+  <style>
+    /* harden tab visibility in case styles.css didn’t load yet */
+    .panel{display:none}
+    .panel.active{display:block}
+  </style>
 </head>
 <body class="dark">
   <div class="wrapper">
@@ -24,7 +29,7 @@
         </div>
 
         <!-- Tabs -->
-        <div class="tabs mt-12">
+        <div id="teacher-tabs" class="tabs mt-12">
           <button class="chip chip-indigo tab" data-target="#panel-setup" aria-selected="true">Class Setup</button>
           <button class="chip chip-blue tab" data-target="#panel-diary">Class Diary</button>
           <button class="chip chip-teal tab" data-target="#panel-homework">Homework</button>
@@ -110,42 +115,49 @@
 
   </div>
 
-  <!-- Shared UI helpers (tabs + theme). Keep, if present in your repo -->
+  <!-- Shared (ok if present) -->
   <script type="module" src="ui.js"></script>
 
   <!-- Page logic -->
   <script>
   (function(){
-    // ---------- tiny helpers ----------
     const $ = s => document.querySelector(s);
     const $$ = s => Array.from(document.querySelectorAll(s));
     const todayISO = () => new Date().toISOString().slice(0,10);
-    const toast = (msg) => { alert(msg); };
+    const toast = (m)=>alert(m);
 
-    // ---------- theme (fallback if ui.js absent) ----------
-    const themeBtn = $('#themeToggle');
-    if(themeBtn){
-      const applyTheme = (t)=> document.body.className = t === 'light' ? 'light' : 'dark';
-      applyTheme(localStorage.getItem('theme') || 'dark');
-      themeBtn.addEventListener('click', () => {
-        const next = (localStorage.getItem('theme') === 'light') ? 'dark' : 'light';
-        localStorage.setItem('theme', next);
-        applyTheme(next);
-      });
-    }
+    /* --------- THEME (defensive) --------- */
+    (function themeInit(){
+      const btn = document.getElementById('themeToggle');
+      const apply = t => document.body.className = (t==='light'?'light':'dark');
+      apply(localStorage.getItem('theme') || 'dark');
+      if(btn){ btn.addEventListener('click', ()=> {
+        const next = localStorage.getItem('theme')==='light'?'dark':'light';
+        localStorage.setItem('theme', next); apply(next);
+      });}
+    })();
 
-    // ---------- tabs (fallback if ui.js absent) ----------
-    $$('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        $$('.tab').forEach(t => t.removeAttribute('aria-selected'));
-        tab.setAttribute('aria-selected','true');
-        const target = tab.dataset.target;
-        $$('.panel').forEach(p => p.classList.remove('active'));
-        if (target) $(target).classList.add('active');
-      });
-    });
+    /* --------- TABS (robust, page-local) --------- */
+    (function teacherTabs(){
+      const scope = document.getElementById('teacher-tabs');
+      if(!scope) return;
+      const tabs = Array.from(scope.querySelectorAll('.tab'));
+      const panels = Array.from(document.querySelectorAll('.panel'));
+      function activate(id){
+        panels.forEach(p => p.classList.toggle('active', '#'+p.id === id));
+        tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.target === id ? 'true':'false'));
+        localStorage.setItem('teacherTab', id);
+        // optional: reflect in hash
+        if(location.hash !== id) history.replaceState(null,'',id);
+      }
+      tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.target)));
+      // initial: hash > saved > first
+      const first = tabs[0]?.dataset.target || '#panel-setup';
+      const start = location.hash || localStorage.getItem('teacherTab') || first;
+      activate(start);
+    })();
 
-    // ---------- storage keys ----------
+    /* --------- STORAGE KEYS --------- */
     const K = {
       META: 'teacherMeta',
       DIARY: 'classDiary',
@@ -153,7 +165,7 @@
       ATT: 'attendance'
     };
 
-    // ---------- class meta ----------
+    /* --------- CLASS META --------- */
     const metaInputs = {
       cls: $('#t-class'),
       sec: $('#t-section'),
@@ -168,91 +180,77 @@
         if(m.sec) metaInputs.sec.value = m.sec;
         if(m.name) metaInputs.name.value = m.name;
         if(m.subj) metaInputs.subj.value = m.subj;
-        // seed subjects in selects
-        const subjects = Array.from(new Set([m.subj].filter(Boolean)));
-        const fill = (sel) => {
+
+        // Populate subject selects with saved subject (kept minimal for demo)
+        const subs = Array.from(new Set([m.subj].filter(Boolean)));
+        const seed = (sel)=> {
           sel.innerHTML = '<option value="" disabled selected>Subject</option>';
-          subjects.forEach(s=>{
-            const opt = document.createElement('option');
-            opt.value = s; opt.textContent = s;
-            sel.appendChild(opt);
+          subs.forEach(s=>{
+            const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o);
           });
         };
-        fill($('#d-subject'));
-        fill($('#h-subject'));
-        // att scope
-        $('#attScope').textContent = m.cls && m.sec ? `Class ${m.cls} • Section ${m.sec}` : '';
+        seed($('#d-subject')); seed($('#h-subject'));
+        $('#attScope').textContent = (m.cls&&m.sec) ? `Class ${m.cls} • Section ${m.sec}` : '';
       }catch(e){}
     }
     loadMeta();
 
-    $('#saveMeta').addEventListener('click', () => {
+    $('#saveMeta').addEventListener('click', ()=>{
       const m = {
         cls: metaInputs.cls.value.trim(),
         sec: metaInputs.sec.value.trim(),
         name: metaInputs.name.value.trim(),
         subj: metaInputs.subj.value.trim()
       };
-      if(!m.cls || !m.sec || !m.name || !m.subj){
-        toast('Please fill class, section, your name and subject.');
-        return;
-      }
+      if(!m.cls || !m.sec || !m.name || !m.subj){ toast('Please fill class, section, your name and subject.'); return; }
       localStorage.setItem(K.META, JSON.stringify(m));
       loadMeta();
       toast('Saved class meta.');
     });
 
-    // ---------- diary ----------
-    const renderDiary = () => {
+    /* --------- DIARY --------- */
+    const renderDiary = ()=>{
       const list = $('#diaryList');
       const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
       const all = JSON.parse(localStorage.getItem(K.DIARY) || '[]')
-        .filter(x => x.cls === meta.cls && x.sec === meta.sec)
-        .sort((a,b)=> (b.date||'').localeCompare(a.date));
-      if(!all.length){ list.textContent = 'No entries.'; return; }
+         .filter(x=>x.cls===meta.cls && x.sec===meta.sec)
+         .sort((a,b)=>(b.date||'').localeCompare(a.date));
+      if(!all.length){ list.textContent='No entries.'; return; }
       list.innerHTML = all.map(x =>
         `<div class="row card-row">
-           <div><b>${x.subject}</b> · ${x.date}<br>${x.message}${x.link ? ` — <a href="${x.link}" target="_blank">link</a>`:''}</div>
+           <div><b>${x.subject}</b> · ${x.date}<br>${x.message}${x.link?` — <a href="${x.link}" target="_blank">link</a>`:''}</div>
          </div>`).join('');
     };
 
-    $('#publishDiary').addEventListener('click', () => {
+    $('#publishDiary').addEventListener('click', ()=>{
       const m = JSON.parse(localStorage.getItem(K.META) || '{}');
       const subject = $('#d-subject').value || m.subj || '';
       const message = $('#d-message').value.trim();
       const link = $('#d-link').value.trim();
       if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
       if(!subject || !message){ toast('Subject and message are required.'); return; }
-      const entry = {
-        cls: m.cls, sec: m.sec,
-        subject, message, link,
-        date: todayISO(),
-        teacher: m.name || '',
-        ts: Date.now()
-      };
-      const all = JSON.parse(localStorage.getItem(K.DIARY) || '[]');
-      all.push(entry);
+      const entry = { cls:m.cls, sec:m.sec, subject, message, link, date:new Date().toISOString().slice(0,10), teacher:m.name||'', ts:Date.now() };
+      const all = JSON.parse(localStorage.getItem(K.DIARY) || '[]'); all.push(entry);
       localStorage.setItem(K.DIARY, JSON.stringify(all));
-      $('#d-message').value = ''; $('#d-link').value = '';
-      renderDiary();
-      toast('Diary posted.');
+      $('#d-message').value=''; $('#d-link').value='';
+      renderDiary(); toast('Diary posted.');
     });
 
-    // ---------- homework ----------
-    const renderHW = () => {
+    /* --------- HOMEWORK --------- */
+    const renderHW = ()=>{
       const list = $('#hwList');
       const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
       const all = JSON.parse(localStorage.getItem(K.HOMEWORK) || '[]')
-        .filter(x => x.cls === meta.cls && x.sec === meta.sec)
-        .sort((a,b)=> (a.due||'').localeCompare(b.due));
-      if(!all.length){ list.textContent = 'No entries.'; return; }
+         .filter(x=>x.cls===meta.cls && x.sec===meta.sec)
+         .sort((a,b)=>(a.due||'').localeCompare(b.due));
+      if(!all.length){ list.textContent='No entries.'; return; }
       list.innerHTML = all.map(x =>
         `<div class="row card-row">
            <div><b>${x.subject}</b> · Due ${x.due}<br>${x.title}${x.details?` — ${x.details}`:''}</div>
          </div>`).join('');
     };
 
-    $('#publishHomework').addEventListener('click', () => {
+    $('#publishHomework').addEventListener('click', ()=>{
       const m = JSON.parse(localStorage.getItem(K.META) || '{}');
       if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
       const due = $('#h-due').value || todayISO();
@@ -260,50 +258,37 @@
       const title = $('#h-title').value.trim();
       const details = $('#h-details').value.trim();
       if(!subject || !title){ toast('Subject and title are required.'); return; }
-      const item = {
-        cls: m.cls, sec: m.sec,
-        subject, title, details,
-        due, ts: Date.now()
-      };
-      const all = JSON.parse(localStorage.getItem(K.HOMEWORK) || '[]');
-      all.push(item);
+      const item = { cls:m.cls, sec:m.sec, subject, title, details, due, ts:Date.now() };
+      const all = JSON.parse(localStorage.getItem(K.HOMEWORK) || '[]'); all.push(item);
       localStorage.setItem(K.HOMEWORK, JSON.stringify(all));
-      $('#h-title').value = ''; $('#h-details').value = '';
-      renderHW();
-      toast('Homework published.');
+      $('#h-title').value=''; $('#h-details').value='';
+      renderHW(); toast('Homework published.');
     });
 
-    // ---------- attendance ----------
+    /* --------- ATTENDANCE --------- */
     $('#att-date').value = todayISO();
 
-    const renderAtt = () => {
+    const renderAtt = ()=>{
       const list = $('#attList');
       const meta = JSON.parse(localStorage.getItem(K.META) || '{}');
       const all = JSON.parse(localStorage.getItem(K.ATT) || '[]')
-        .filter(x => x.cls === meta.cls && x.sec === meta.sec)
-        .sort((a,b)=> (b.date||'').localeCompare(a.date));
-      if(!all.length){ list.textContent = 'No entries.'; return; }
+         .filter(x=>x.cls===meta.cls && x.sec===meta.sec)
+         .sort((a,b)=>(b.date||'').localeCompare(a.date));
+      if(!all.length){ list.textContent='No entries.'; return; }
       list.innerHTML = all.map(x =>
         `<div class="row card-row"><div><b>${x.date}</b> · Present: ${x.present ?? '—'}</div></div>`
       ).join('');
     };
 
-    $('#saveAttendance').addEventListener('click', () => {
+    $('#saveAttendance').addEventListener('click', ()=>{
       const m = JSON.parse(localStorage.getItem(K.META) || '{}');
       if(!m.cls || !m.sec){ toast('Save class meta first.'); return; }
-      const entry = {
-        cls: m.cls, sec: m.sec,
-        date: $('#att-date').value || todayISO(),
-        present: $('#att-count').value ? Number($('#att-count').value) : null,
-        ts: Date.now()
-      };
+      const entry = { cls:m.cls, sec:m.sec, date:($('#att-date').value||todayISO()), present:($('#att-count').value?Number($('#att-count').value):null), ts:Date.now() };
       const all = JSON.parse(localStorage.getItem(K.ATT) || '[]');
-      // replace same-date record
-      const idx = all.findIndex(x => x.cls===entry.cls && x.sec===entry.sec && x.date===entry.date);
-      if(idx >= 0) all[idx] = entry; else all.push(entry);
+      const i = all.findIndex(x=>x.cls===entry.cls && x.sec===entry.sec && x.date===entry.date);
+      if(i>=0) all[i]=entry; else all.push(entry);
       localStorage.setItem(K.ATT, JSON.stringify(all));
-      renderAtt();
-      toast('Attendance saved.');
+      renderAtt(); toast('Attendance saved.');
     });
 
     // initial renders
