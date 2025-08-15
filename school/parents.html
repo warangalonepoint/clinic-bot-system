@@ -1,220 +1,152 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Parents • School PWA</title>
-  <link rel="stylesheet" href="./styles.css" />
-  <meta name="theme-color" content="#0b1020" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Parents · School PWA</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main>
-    <div class="topbar">
-      <span class="badge">Parents</span>
-      <div style="display:flex; gap:8px; align-items:center">
-        <label title="Dark / Light"><input id="themeToggle" class="theme-toggle" type="checkbox"/></label>
-        <a class="btn ghost" href="./index.html">Logout</a>
+<body class="dark">
+  <div class="wrapper">
+    <section class="accent-violet">
+      <div class="glass header">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div class="h1">Parents</div>
+          <div class="row">
+            <a class="btn" href="index.html">PIN</a>
+            <button class="btn btn-gradient" onclick="toggleTheme()">Theme</button>
+          </div>
+        </div>
+        <div class="text-dim">View diary, homework, messages & leaves</div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs mt-16">
+      <div class="tab-list">
+        <button class="tab-btn" data-tab="tab-diary" aria-selected="true">Class Diary</button>
+        <button class="tab-btn" data-tab="tab-home">Homework</button>
+        <button class="tab-btn" data-tab="tab-msg">Messages</button>
+        <button class="tab-btn" data-tab="tab-leave">Leaves</button>
       </div>
     </div>
 
-    <header class="hero panel"><div class="title">Parent Console</div></header>
-
-    <section class="panel" style="margin-top:14px">
-      <div class="tabs" id="tabs">
-        <button class="tab active" data-t="diary">Class Diary</button>
-        <button class="tab" data-t="homework">Homework</button>
-        <button class="tab" data-t="messages">Messages</button>
-        <button class="tab" data-t="leaves">Leaves</button>
-        <button class="tab" data-t="complaints">Complaints</button>
-        <button class="tab" data-t="fees">Fees</button>
-      </div>
-
+    <div class="tab-panels">
       <!-- Diary -->
-      <div id="sec-diary" class="section active">
-        <div class="card gradient-1"><h2>Recent Diary</h2>
-          <table class="table" id="tblDiary"><thead>
-            <tr><th>Date</th><th>Subject</th><th>Message</th><th>Link</th></tr>
-          </thead><tbody></tbody></table>
-          <p class="muted">Auto-synced from teacher posts (local demo).</p>
-        </div>
+      <div class="tab-panel active" id="tab-diary">
+        <section class="accent-rose">
+          <div class="glass">
+            <div class="h2">Today’s Class Diary</div>
+            <div class="text-dim">Teacher notes for the selected class.</div>
+            <div id="diaryList" class="mt-12"></div>
+          </div>
+        </section>
       </div>
 
       <!-- Homework -->
-      <div id="sec-homework" class="section">
-        <div class="card gradient-2"><h2>Homework</h2>
-          <table class="table" id="tblHw"><thead>
-            <tr><th>Due</th><th>Subject</th><th>Title</th><th>Details</th></tr>
-          </thead><tbody></tbody></table>
-        </div>
+      <div class="tab-panel" id="tab-home">
+        <section class="accent-indigo">
+          <div class="glass">
+            <div class="h2">Homework</div>
+            <div id="homeworkList" class="mt-12"></div>
+          </div>
+        </section>
       </div>
 
       <!-- Messages -->
-      <div id="sec-messages" class="section">
-        <div class="card gradient-3"><h2>Announcements</h2>
-          <ul id="listMsgs" class="muted" style="margin:0;padding-left:18px"></ul>
-        </div>
+      <div class="tab-panel" id="tab-msg">
+        <section class="accent-teal">
+          <div class="glass">
+            <div class="h2">Messages from Teachers</div>
+            <div id="msgList" class="mt-12"></div>
+          </div>
+        </section>
       </div>
 
       <!-- Leaves -->
-      <div id="sec-leaves" class="section">
-        <div class="row">
-          <div class="card gradient-4">
-            <h2>Request Leave</h2>
-            <label>Date</label><input id="lvDate" type="date"/>
-            <label>Reason</label><textarea id="lvReason" placeholder="Family function / Sick…"></textarea>
-            <div class="spacer"></div>
-            <button class="btn" id="btnLeave">Submit</button>
+      <div class="tab-panel" id="tab-leave">
+        <section class="accent-violet">
+          <div class="glass">
+            <div class="h2">Apply Leave</div>
+            <form id="leaveForm" class="grid cols-2 mt-12">
+              <input class="input" type="date" id="lvDate" required>
+              <input class="input" type="number" id="lvDays" placeholder="Days" min="1" value="1" required>
+            </form>
+            <textarea class="input mt-12" id="lvReason" placeholder="Reason" required></textarea>
+            <div class="mt-12">
+              <button class="btn btn-teal" id="lvSubmit">Submit</button>
+            </div>
+            <div class="h2 mt-16">My Leave Requests</div>
+            <div id="leaveList" class="mt-12"></div>
           </div>
-          <div class="card gradient-3">
-            <h2>My Leaves</h2>
-            <table class="table" id="tblLeaves"><thead>
-              <tr><th>Date</th><th>Reason</th><th>Status</th></tr>
-            </thead><tbody></tbody></table>
-          </div>
-        </div>
+        </section>
       </div>
+    </div>
+  </div>
 
-      <!-- Complaints -->
-      <div id="sec-complaints" class="section">
-        <div class="row">
-          <div class="card gradient-2">
-            <h2>Raise a Complaint</h2>
-            <label>Subject</label><input id="cmpSub" placeholder="Bus delay, Teacher change…"/>
-            <label>Details</label><textarea id="cmpMsg"></textarea>
-            <div class="spacer"></div>
-            <button class="btn warn" id="btnCmp">Submit</button>
-          </div>
-          <div class="card gradient-1">
-            <h2>My Complaints</h2>
-            <table class="table" id="tblCmp"><thead>
-              <tr><th>Time</th><th>Subject</th><th>Status</th></tr>
-            </thead><tbody></tbody></table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Fees -->
-      <div id="sec-fees" class="section">
-        <div class="row">
-          <div class="card gradient-1">
-            <h2>Fee Summary</h2>
-            <table class="table" id="tblFees"><thead>
-              <tr><th>Term</th><th>Amount</th><th>Status</th></tr>
-            </thead><tbody></tbody></table>
-          </div>
-          <div class="card gradient-4">
-            <h2>Quick Pay (Demo)</h2>
-            <p class="muted">In live mode this will open your payment link / UPI.</p>
-            <button class="btn block">Pay Now</button>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
+  <script type="module" src="ui.js"></script>
   <script>
-    // THEME
-    const root=document.documentElement;
-    const tSaved=localStorage.getItem('theme')||'dark';
-    root.setAttribute('data-theme',tSaved);
-    document.getElementById('themeToggle').checked = (tSaved==='light');
-    document.getElementById('themeToggle').addEventListener('change',e=>{
-      const t=e.target.checked?'light':'dark'; root.setAttribute('data-theme',t); localStorage.setItem('theme',t);
-    });
+  // Simple local demo store
+  const db = {
+    get(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
+    set(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+  };
 
-    // Guard access
-    if((sessionStorage.getItem('sch_role')||'')!=='parents'){ /* still allow for quick testing */ }
+  // Seed demo data if empty
+  if(!db.get('diary')){
+    db.set('diary', [
+      {date:new Date().toISOString().slice(0,10), subject:'Maths', note:'Fractions & examples'},
+      {date:new Date().toISOString().slice(0,10), subject:'Science', note:'Plants and photosynthesis'}
+    ]);
+  }
+  if(!db.get('homework')){
+    db.set('homework', [
+      {due:new Date(Date.now()+86400000).toISOString().slice(0,10), subject:'Maths', title:'Exercise 5A', details:'Q1–10'},
+      {due:new Date(Date.now()+2*86400000).toISOString().slice(0,10), subject:'English', title:'Read Ch.3', details:'Make notes'}
+    ]);
+  }
+  if(!db.get('messages')){
+    db.set('messages', [{time:Date.now(), text:'PTM on Friday 4 PM.'}]);
+  }
+  if(!db.get('leaves')) db.set('leaves', []);
 
-    // Tabs
-    document.querySelectorAll('.tab').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        const id = btn.dataset.t;
-        document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-        document.getElementById('sec-'+id).classList.add('active');
-      });
-    });
+  function card(html){ return `<div class="glass mt-12">${html}</div>`; }
 
-    // Demo local data API
-    const L = {
-      get:(k)=>JSON.parse(localStorage.getItem(k)||"[]"),
-      set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
-    };
+  function render(){
+    const diary = db.get('diary',[]);
+    document.getElementById('diaryList').innerHTML =
+      diary.map(d=>card(`<div><b>${d.subject}</b> · <span class="text-dim">${d.date}</span><div class="mt-8">${d.note}</div></div>`)).join('') || '<div class="text-dim">No entries.</div>';
 
-    // Render helpers
-    function rows(el, arr, mapper){
-      const tb = el.querySelector('tbody'); tb.innerHTML="";
-      arr.forEach((it)=>tb.insertAdjacentHTML('beforeend', mapper(it)));
-    }
+    const hw = db.get('homework',[]);
+    document.getElementById('homeworkList').innerHTML =
+      hw.map(h=>card(`<div><b>${h.subject}</b> · <span class="text-dim">Due ${h.due}</span><div class="mt-8">${h.title} — ${h.details}</div></div>`)).join('') || '<div class="text-dim">No homework.</div>';
 
-    // Seed demo messages if empty
-    if(!localStorage.getItem('msgs')){
-      L.set('msgs',[
-        {time:Date.now()-86400000, text:'Half-day on Friday for Sports meet.'},
-        {time:Date.now()-3600*1000, text:'Bus route B will be delayed by 10 mins.'}
-      ]);
-    }
-    if(!localStorage.getItem('fees')){
-      L.set('fees',[
-        {term:"Term 1", amt: "₹15,000", status:"Paid"},
-        {term:"Term 2", amt: "₹15,000", status:"Due"}
-      ]);
-    }
+    const msgs = db.get('messages',[]);
+    document.getElementById('msgList').innerHTML =
+      msgs.map(m=>card(`<div><span class="text-dim">${new Date(m.time).toLocaleString()}</span><div class="mt-8">${m.text}</div></div>`)).join('') || '<div class="text-dim">No messages.</div>';
 
-    // Render all
-    function render(){
-      rows(document.getElementById('tblDiary'),
-        L.get('diary').slice(-20).reverse(),
-        (d)=>`<tr>
-                <td>${new Date(d.date).toLocaleDateString()}</td>
-                <td>${d.subject||'-'}</td>
-                <td>${d.msg||''}</td>
-                <td>${d.link?`<a href="${d.link}" target="_blank">Open</a>`:""}</td>
-              </tr>`);
+    const leaves = db.get('leaves',[]);
+    document.getElementById('leaveList').innerHTML =
+      leaves.map((l,i)=>card(`<div><b>${l.date}</b> · ${l.days} day(s)<div class="mt-8">${l.reason}</div><div class="mt-12"><button class="btn" onclick="cancelLeave(${i})">Cancel</button></div></div>`)).join('') || '<div class="text-dim">No leave requests.</div>';
+  }
 
-      rows(document.getElementById('tblHw'),
-        L.get('hw').slice(-20).reverse(),
-        (h)=>`<tr>
-              <td>${new Date(h.due).toLocaleDateString()}</td>
-              <td>${h.subject||'-'}</td>
-              <td>${h.title||''}</td>
-              <td>${h.details||''}</td>
-            </tr>`);
-
-      const ul=document.getElementById('listMsgs'); ul.innerHTML="";
-      L.get('msgs').slice(-15).reverse().forEach(m=>{
-        ul.insertAdjacentHTML('beforeend', `<li>${m.text} <span class="muted">· ${new Date(m.time).toLocaleString()}</span></li>`);
-      });
-
-      rows(document.getElementById('tblLeaves'), L.get('leaves').slice(-20).reverse(),
-        (x)=>`<tr><td>${x.date}</td><td>${x.reason}</td><td>${x.status||'Pending'}</td></tr>`);
-
-      rows(document.getElementById('tblCmp'), L.get('complaints').slice(-20).reverse(),
-        (c)=>`<tr><td>${new Date(c.time).toLocaleString()}</td><td>${c.sub}</td><td>${c.status||'Open'}</td></tr>`);
-
-      rows(document.getElementById('tblFees'), L.get('fees'),
-        (f)=>`<tr><td>${f.term}</td><td>${f.amt}</td><td>${f.status}</td></tr>`);
-    }
+  document.getElementById('lvSubmit').addEventListener('click', ()=>{
+    const date = document.getElementById('lvDate').value;
+    const days = +document.getElementById('lvDays').value||1;
+    const reason = (document.getElementById('lvReason').value||'').trim();
+    if(!date || !reason) return;
+    const arr = db.get('leaves',[]);
+    arr.push({date,days,reason,status:'Pending',created:Date.now()});
+    db.set('leaves', arr);
+    document.getElementById('lvReason').value='';
     render();
+  });
+  window.cancelLeave = (idx)=>{
+    const arr = db.get('leaves',[]);
+    arr.splice(idx,1); db.set('leaves',arr); render();
+  };
 
-    // Actions
-    document.getElementById('btnLeave').addEventListener('click', ()=>{
-      const date=document.getElementById('lvDate').value;
-      const reason=document.getElementById('lvReason').value.trim();
-      if(!date||!reason) return alert("Select date & reason");
-      const arr=L.get('leaves'); arr.push({date,reason,status:'Pending'}); L.set('leaves',arr); render();
-      document.getElementById('lvReason').value=""; alert('Leave sent.');
-    });
-
-    document.getElementById('btnCmp').addEventListener('click', ()=>{
-      const sub=document.getElementById('cmpSub').value.trim();
-      const msg=document.getElementById('cmpMsg').value.trim();
-      if(!sub||!msg) return alert("Subject & details required");
-      const arr=L.get('complaints'); arr.push({time:Date.now(), sub, msg, status:'Open'}); L.set('complaints',arr); render();
-      document.getElementById('cmpSub').value=""; document.getElementById('cmpMsg').value="";
-      alert('Complaint submitted.');
-    });
+  render();
   </script>
 </body>
 </html>
