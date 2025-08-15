@@ -6,7 +6,6 @@
   <title>School PWA</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* minimal banner style (kept here so it works even if CSS cache lags) */
     .banner-wrap{margin:12px 0 4px}
     .banner{
       width:100%; height:160px; object-fit:cover;
@@ -14,6 +13,8 @@
       box-shadow: var(--shadow);
       border:1px solid var(--ring);
     }
+    #pin-debug{font-size:.8rem;opacity:.6;margin-top:.5rem}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;}
   </style>
 </head>
 <body class="dark">
@@ -22,10 +23,9 @@
     <section class="accent-indigo">
       <div class="glass header">
         <div class="banner-wrap">
-          <!-- Try assets/banner.png first, then fall back to /school/assets/banner.png -->
           <img class="banner"
                src="assets/banner.png"
-               onerror="this.onerror=null; this.src='assets/school_banner.png';" 
+               onerror="this.onerror=null; this.src='assets/school_banner.png';"
                alt="School banner" />
         </div>
 
@@ -33,6 +33,7 @@
           <div class="h1">School Demo</div>
           <button class="btn" onclick="toggleTheme()">Theme</button>
         </div>
+      </div> <!-- ← missing close in your snippet -->
     </section>
 
     <!-- PIN -->
@@ -42,12 +43,13 @@
         <p class="text-dim">You’ll be routed to your role automatically.</p>
 
         <form id="pin-form" class="grid mt-12" onsubmit="return false;">
-          <input id="pin-input" class="input" inputmode="numeric" pattern="[0-9]*" maxlength="8"
+          <input id="pin-input" class="input mono" inputmode="numeric" pattern="[0-9]*" maxlength="8"
                  placeholder="4–8 digit PIN" autocomplete="one-time-code" />
           <div class="row">
-            <button id="pin-go" class="btn btn-teal">Continue</button>
+            <button id="pin-go" class="btn btn-teal" type="button">Continue</button>
           </div>
           <div id="pin-msg" class="text-dim"></div>
+          <div id="pin-debug" class="text-dim mono"></div>
         </form>
       </div>
     </section>
@@ -56,10 +58,10 @@
   <!-- Shared UI (tabs/theme) -->
   <script type="module" src="ui.js"></script>
 
-  <!-- PIN Router (self-contained) -->
+  <!-- PIN Router (robust) -->
   <script>
   (function(){
-    // Inline fallback (works even if pins.json missing)
+    // 1) Good defaults that ALWAYS work
     let pinMap = {
       "1111":"parents",
       "2222":"teacher",
@@ -67,29 +69,56 @@
       "4444":"admin"
     };
 
-    // Try to load pins.json from the same folder (/school/)
+    const dbg = document.getElementById('pin-debug');
+    function setDebug(text){ dbg.textContent = text; }
+
+    // 2) Normalize any object into string=>string map
+    function normalizePins(obj){
+      const out = {};
+      for (const k in obj){
+        if (!Object.hasOwn(obj,k)) continue;
+        const key = String(k).trim();
+        let val = obj[k];
+        if (typeof val !== 'string') val = String(val || '');
+        val = val.trim().toLowerCase();
+        if (!key || !val) continue;
+        out[key] = val; // parents/teacher/coordinator/admin (lowercased)
+      }
+      return out;
+    }
+
+    // 3) Try to load pins.json and MERGE (do not replace)
     fetch('pins.json', {cache:'no-store'})
-      .then(r => r.ok ? r.json() : null)
-      .then(json => { if(json && typeof json === 'object') pinMap = json; })
-      .catch(()=>{ /* ignore; fallback is already set */ });
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(json => {
+        const merged = { ...pinMap, ...normalizePins(json) };
+        pinMap = merged;
+        setDebug('Loaded pins.json ✓  Keys: ' + Object.keys(pinMap).join(', '));
+      })
+      .catch(()=> setDebug('Using inline fallback pins (pins.json not found or invalid).'));
 
     const form = document.getElementById('pin-form');
     const input = document.getElementById('pin-input');
     const go = document.getElementById('pin-go');
     const msg = document.getElementById('pin-msg');
 
+    // Optional: quick test via ?pin=1111
+    const u = new URL(location.href);
+    const qp = u.searchParams.get('pin');
+    if (qp) input.value = qp;
+
     function route(){
-      const pin = (input.value || '').trim();
+      const raw = (input.value || '').trim();
+      // defensive: kill stray spaces/Unicode digits
+      const pin = raw.replace(/[^\d]/g,'');
       if(!pin){ msg.textContent='Enter a PIN.'; return; }
       const role = pinMap[pin];
       if(!role){
         msg.textContent = 'Unknown PIN. Please try again.';
         return;
       }
-      // Persist theme preference across pages
       const theme = localStorage.getItem('theme') || 'dark';
-      const url = role.toLowerCase() + '.html';
-      // add cache-buster to avoid stale HTML on GH Pages
+      const url = role + '.html';
       const q = (url.includes('?')?'&':'?') + 't=' + Date.now() + '&theme=' + theme;
       location.href = url + q;
     }
