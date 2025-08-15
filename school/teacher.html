@@ -1,156 +1,183 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Teacher • School PWA</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Teacher · School PWA</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main>
-    <div class="topbar">
-      <span class="badge">Teacher / Manager</span>
-      <div style="display:flex; gap:8px; align-items:center">
-        <label title="Dark / Light"><input id="themeToggle" class="theme-toggle" type="checkbox"/></label>
-        <a class="btn ghost" href="./index.html">Logout</a>
+<body class="dark">
+  <div class="wrapper">
+    <section class="accent-indigo">
+      <div class="glass header">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div class="h1">Teacher</div>
+          <div class="row">
+            <a class="btn" href="index.html">PIN</a>
+            <button class="btn btn-gradient" onclick="toggleTheme()">Theme</button>
+          </div>
+        </div>
+        <div class="text-dim">Post diary & homework · mark attendance</div>
+      </div>
+    </section>
+
+    <div class="tabs mt-16">
+      <div class="tab-list">
+        <button class="tab-btn" data-tab="t-setup" aria-selected="true">Class Setup</button>
+        <button class="tab-btn" data-tab="t-diary">Class Diary</button>
+        <button class="tab-btn" data-tab="t-hw">Homework</button>
+        <button class="tab-btn" data-tab="t-att">Attendance</button>
       </div>
     </div>
 
-    <header class="hero panel"><div class="title">Today</div></header>
-
-    <section class="panel" style="margin-top:14px">
-      <div class="tabs">
-        <button class="tab active" data-t="diary">Post Diary</button>
-        <button class="tab" data-t="hw">Homework</button>
-        <button class="tab" data-t="att">Attendance</button>
-        <button class="tab" data-t="broadcast">Broadcast</button>
+    <div class="tab-panels">
+      <!-- Setup -->
+      <div class="tab-panel active" id="t-setup">
+        <section class="accent-violet">
+          <div class="glass">
+            <div class="h2">My Class</div>
+            <div class="grid cols-2">
+              <input id="tc-class" class="input" placeholder="Class e.g., 5">
+              <input id="tc-sec" class="input" placeholder="Section e.g., A">
+              <input id="tc-name" class="input" placeholder="Your Name">
+              <input id="tc-subj" class="input" placeholder="Subject e.g., Maths">
+            </div>
+            <div class="mt-12"><button class="btn btn-indigo" id="tcSave">Save</button></div>
+            <div id="tcMsg" class="text-dim mt-12"></div>
+          </div>
+        </section>
       </div>
 
       <!-- Diary -->
-      <div id="sec-diary" class="section active">
-        <div class="row">
-          <div class="card gradient-1">
-            <h2>Post to Class Diary</h2>
-            <label>Date</label><input id="d-date" type="date" />
-            <label>Subject</label><input id="d-sub" placeholder="e.g., Maths" />
-            <label>Message</label><textarea id="d-msg" placeholder="What was taught / notes…"></textarea>
-            <label>Optional Link</label><input id="d-link" placeholder="https://…" />
-            <div class="spacer"></div>
-            <button id="btnDiary" class="btn">Publish</button>
+      <div class="tab-panel" id="t-diary">
+        <section class="accent-rose">
+          <div class="glass">
+            <div class="h2">Post to Class Diary</div>
+            <div class="grid cols-2">
+              <input type="date" id="td-date" class="input">
+              <input id="td-subj" class="input" placeholder="Subject">
+            </div>
+            <textarea id="td-note" class="input mt-12" placeholder="What was taught / notes..."></textarea>
+            <div class="mt-12">
+              <button class="btn btn-rose" id="tdPost">Publish</button>
+            </div>
+            <div class="h2 mt-16">Recent</div>
+            <div id="td-list" class="mt-12"></div>
           </div>
-          <div class="card gradient-2">
-            <h2>Recent</h2>
-            <table class="table" id="tblDiary"><thead>
-              <tr><th>Date</th><th>Subject</th><th>Message</th></tr>
-            </thead><tbody></tbody></table>
-          </div>
-        </div>
+        </section>
       </div>
 
       <!-- Homework -->
-      <div id="sec-hw" class="section">
-        <div class="row">
-          <div class="card gradient-3">
-            <h2>Create Homework</h2>
-            <label>Due Date</label><input id="h-due" type="date"/>
-            <label>Subject</label><input id="h-sub" placeholder="e.g., Science"/>
-            <label>Title</label><input id="h-title" placeholder="e.g., Exercise 5A"/>
-            <label>Details</label><textarea id="h-det" placeholder="Q1-10…"></textarea>
-            <div class="spacer"></div>
-            <button id="btnHw" class="btn">Publish</button>
+      <div class="tab-panel" id="t-hw">
+        <section class="accent-indigo">
+          <div class="glass">
+            <div class="h2">Create Homework</div>
+            <div class="grid cols-2">
+              <input type="date" id="hw-due" class="input">
+              <input id="hw-subj" class="input" placeholder="Subject">
+            </div>
+            <input id="hw-title" class="input mt-12" placeholder="Title e.g., Exercise 5A">
+            <textarea id="hw-details" class="input mt-12" placeholder="Details..."></textarea>
+            <div class="mt-12"><button class="btn btn-indigo" id="hwAdd">Publish</button></div>
+            <div class="h2 mt-16">Recent</div>
+            <div id="hw-list" class="mt-12"></div>
           </div>
-          <div class="card gradient-4">
-            <h2>Assigned</h2>
-            <table class="table" id="tblHw"><thead>
-              <tr><th>Due</th><th>Subject</th><th>Title</th></tr>
-            </thead><tbody></tbody></table>
+        </section>
+      </div>
+
+      <!-- Attendance -->
+      <div class="tab-panel" id="t-att">
+        <section class="accent-teal">
+          <div class="glass">
+            <div class="h2">Attendance (demo)</div>
+            <div class="text-dim">Tap to toggle P/A. Stored locally.</div>
+            <div id="att-wrap" class="grid cols-3 mt-12"></div>
+            <div class="mt-12"><button class="btn btn-teal" id="attSave">Save</button></div>
           </div>
-        </div>
+        </section>
       </div>
+    </div>
+  </div>
 
-      <!-- Attendance (demo marker only) -->
-      <div id="sec-att" class="section">
-        <div class="card gradient-2">
-          <h2>Attendance (Demo)</h2>
-          <p class="muted">In live mode, bind with class roster and mark status. Here we store a simple timestamp.</p>
-          <button class="btn" id="btnAtt">Mark Class Taken</button>
-          <div class="spacer"></div>
-          <ul id="attList" class="muted"></ul>
-        </div>
-      </div>
-
-      <!-- Broadcast -->
-      <div id="sec-broadcast" class="section">
-        <div class="card gradient-1">
-          <h2>Broadcast to Parents</h2>
-          <label>Message</label><textarea id="bc-msg" placeholder="Short announcement…"></textarea>
-          <div class="spacer"></div>
-          <button class="btn" id="btnBc">Send</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
+  <script type="module" src="ui.js"></script>
   <script>
-    // Theme
-    const root=document.documentElement;
-    const tSaved=localStorage.getItem('theme')||'dark';
-    root.setAttribute('data-theme',tSaved);
-    document.getElementById('themeToggle').checked = (tSaved==='light');
-    document.getElementById('themeToggle').addEventListener('change',e=>{
-      const t=e.target.checked?'light':'dark'; root.setAttribute('data-theme',t); localStorage.setItem('theme',t);
-    });
+  const db = {
+    get(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
+    set(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+  };
 
-    // Tabs
-    document.querySelectorAll('.tab').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
-        document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
-        document.getElementById('sec-'+b.dataset.t).classList.add('active');
-      });
-    });
-
-    const L={
-      get:k=>JSON.parse(localStorage.getItem(k)||"[]"),
-      set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+  // Setup
+  const profileKey = 'teacherProfile';
+  function loadProfile(){
+    const p = db.get(profileKey,{cls:'',sec:'',name:'',sub:''});
+    document.getElementById('tc-class').value = p.cls;
+    document.getElementById('tc-sec').value = p.sec;
+    document.getElementById('tc-name').value = p.name;
+    document.getElementById('tc-subj').value = p.sub;
+  }
+  document.getElementById('tcSave').addEventListener('click', ()=>{
+    const p = {
+      cls: document.getElementById('tc-class').value.trim(),
+      sec: document.getElementById('tc-sec').value.trim(),
+      name: document.getElementById('tc-name').value.trim(),
+      sub: document.getElementById('tc-subj').value.trim()
     };
+    db.set(profileKey,p);
+    document.getElementById('tcMsg').textContent = 'Saved locally.';
+  });
+  loadProfile();
 
-    function rows(el,arr,map){ const tb=el.querySelector('tbody'); tb.innerHTML=""; arr.slice(-20).reverse().forEach(it=>tb.insertAdjacentHTML('beforeend',map(it))); }
+  // Diary
+  const diaryKey = 'diary';
+  function renderDiary(){
+    const arr = db.get(diaryKey,[]);
+    document.getElementById('td-list').innerHTML =
+      arr.slice(-10).reverse().map(d=>`<div class="glass"><b>${d.subject}</b> · <span class="text-dim">${d.date}</span><div class="mt-8">${d.note}</div></div>`).join('') || '<div class="text-dim">No entries.</div>';
+  }
+  document.getElementById('tdPost').addEventListener('click', ()=>{
+    const date = document.getElementById('td-date').value || new Date().toISOString().slice(0,10);
+    const subject = document.getElementById('td-subj').value || db.get(profileKey,{}).sub || 'General';
+    const note = (document.getElementById('td-note').value||'').trim();
+    if(!note) return;
+    const arr = db.get(diaryKey,[]); arr.push({date,subject,note}); db.set(diaryKey,arr);
+    document.getElementById('td-note').value=''; renderDiary();
+  });
+  renderDiary();
 
-    function render(){
-      rows(document.getElementById('tblDiary'), L.get('diary'), d=>`<tr><td>${new Date(d.date).toLocaleDateString()}</td><td>${d.subject}</td><td>${d.msg}</td></tr>`);
-      rows(document.getElementById('tblHw'), L.get('hw'), h=>`<tr><td>${new Date(h.due).toLocaleDateString()}</td><td>${h.subject}</td><td>${h.title}</td></tr>`);
-      const ul=document.getElementById('attList'); ul.innerHTML=""; L.get('att').slice(-10).reverse().forEach(a=>ul.insertAdjacentHTML('beforeend', `<li>${new Date(a).toLocaleString()}</li>`));
-    }
-    render();
+  // Homework
+  const hwKey='homework';
+  function renderHW(){
+    const arr = db.get(hwKey,[]);
+    document.getElementById('hw-list').innerHTML =
+      arr.slice(-10).reverse().map(h=>`<div class="glass"><b>${h.subject}</b> · <span class="text-dim">Due ${h.due}</span><div class="mt-8">${h.title} — ${h.details}</div></div>`).join('') || '<div class="text-dim">No homework.</div>';
+  }
+  document.getElementById('hwAdd').addEventListener('click', ()=>{
+    const due = document.getElementById('hw-due').value || new Date(Date.now()+86400000).toISOString().slice(0,10);
+    const subject = document.getElementById('hw-subj').value || db.get(profileKey,{}).sub || 'General';
+    const title = document.getElementById('hw-title').value || 'Homework';
+    const details = document.getElementById('hw-details').value || '';
+    const arr = db.get(hwKey,[]); arr.push({due,subject,title,details}); db.set(hwKey,arr);
+    renderHW();
+  });
+  renderHW();
 
-    // Actions
-    document.getElementById('btnDiary').addEventListener('click', ()=>{
-      const date=document.getElementById('d-date').value||new Date().toISOString().slice(0,10);
-      const subject=document.getElementById('d-sub').value||'General';
-      const msg=document.getElementById('d-msg').value.trim(); if(!msg) return alert('Message required');
-      const link=document.getElementById('d-link').value.trim();
-      const arr=L.get('diary'); arr.push({date,subject,msg,link}); L.set('diary',arr); render();
-      document.getElementById('d-msg').value=""; alert('Posted to diary.');
+  // Attendance demo
+  function renderAtt(){
+    const names = db.get('studentsDemo',['Aarav','Isha','Kabir','Mira','Rohan','Zara','Veer','Anaya','Dev','Ira','Sai','Tara']);
+    const state = db.get('attState', {});
+    const wrap = document.getElementById('att-wrap');
+    wrap.innerHTML = '';
+    names.forEach((n,i)=>{
+      const btn = document.createElement('button');
+      btn.className='btn';
+      btn.textContent = (state[n]?'P':'A')+' · '+n;
+      btn.style.width='100%';
+      btn.onclick = ()=>{ state[n] = !state[n]; btn.textContent=(state[n]?'P':'A')+' · '+n; };
+      wrap.appendChild(btn);
     });
-
-    document.getElementById('btnHw').addEventListener('click', ()=>{
-      const due=document.getElementById('h-due').value||new Date().toISOString().slice(0,10);
-      const subject=document.getElementById('h-sub').value||'General';
-      const title=document.getElementById('h-title').value||'Homework';
-      const details=document.getElementById('h-det').value||'';
-      const arr=L.get('hw'); arr.push({due,subject,title,details}); L.set('hw',arr); render(); alert('Homework published.');
-    });
-
-    document.getElementById('btnAtt').addEventListener('click', ()=>{
-      const arr=L.get('att'); arr.push(Date.now()); L.set('att',arr); render(); alert('Attendance marked (demo).');
-    });
-
-    document.getElementById('btnBc').addEventListener('click', ()=>{
-      const text=document.getElementById('bc-msg').value.trim(); if(!text) return alert('Type a message');
-      const arr=L.get('msgs'); arr.push({time:Date.now(), text}); L.set('msgs',arr); alert('Sent to parents (demo).'); document.getElementById('bc-msg').value="";
-    });
+    document.getElementById('attSave').onclick = ()=>{ db.set('attState', state); };
+  }
+  renderAtt();
   </script>
 </body>
 </html>
