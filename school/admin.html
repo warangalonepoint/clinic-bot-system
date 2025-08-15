@@ -3,105 +3,236 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin • School PWA</title>
-  <script>
-    (function(){var t=localStorage.getItem('theme')||new URLSearchParams(location.search).get('theme')||'dark';
-      document.documentElement.classList.add(t);
-      document.addEventListener('DOMContentLoaded',()=>document.body.classList.add(t));})();
-  </script>
-  <link rel="preload" href="styles.css?v=2025-08-15-2" as="style" onload="this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="styles.css?v=2025-08-15-2"></noscript>
+  <title>Admin · School PWA</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="dark">
   <div class="wrapper">
-    <section class="accent-pink">
-      <div class="glass header">
-        <div class="row between center">
-          <div class="h1">Admin</div>
-          <div class="row gap-8">
-            <a class="chip" href="index.html">PIN</a>
-            <button class="btn" onclick="toggleTheme()">Theme</button>
-          </div>
+
+    <!-- HEADER -->
+    <section class="hero glass">
+      <div class="hero-top">
+        <div class="hero-eyebrow">Scope, broadcast, leaves, data, backup</div>
+        <div class="hero-title">Admin</div>
+        <div class="hero-actions">
+          <button class="chip chip-slate" id="pinBtn">PIN</button>
+          <button class="chip chip-blue" id="themeBtn">Theme</button>
         </div>
-        <div class="tabs mt-12">
-          <button class="tab chip chip-indigo" data-tab="scope" aria-selected="true">Scope</button>
-          <button class="tab chip chip-blue"   data-tab="broadcast">Broadcast</button>
-          <button class="tab chip chip-pink"   data-tab="leaves">Leaves</button>
-          <button class="tab chip chip-teal"   data-tab="data">Data</button>
-          <button class="tab chip chip-orange" data-tab="backup">Backup</button>
-        </div>
+      </div>
+      <div class="tabbar" data-tab-group>
+        <button class="chip chip-indigo active" data-tab="ad-scope">Scope</button>
+        <button class="chip chip-blue"   data-tab="ad-bc">Broadcast</button>
+        <button class="chip chip-pink"   data-tab="ad-leaves">Leaves</button>
+        <button class="chip chip-green"  data-tab="ad-data">Data</button>
+        <button class="chip chip-orange" data-tab="ad-backup">Backup</button>
+        <button class="chip chip-purple" data-tab="ad-events">Events</button>
+        <button class="chip chip-cyan"   data-tab="ad-complaints">Complaints</button>
       </div>
     </section>
 
-    <section class="accent-pink">
-      <!-- Scope -->
-      <div class="glass mt-12 tabpanel" id="panel-scope">
-        <div class="h2">Class Scope</div>
-        <div class="grid mt-10">
-          <input class="input" id="sClass" placeholder="Class eg, 5">
-          <input class="input" id="sSec"   placeholder="Section eg, A">
-          <button class="btn" id="sSave">Save</button>
-        </div>
+    <!-- SCOPE -->
+    <section class="panel glass" id="ad-scope">
+      <h2>Class Scope</h2>
+      <div class="grid">
+        <input id="s-class" class="input" placeholder="Class eg, 5" />
+        <input id="s-section" class="input" placeholder="Section eg, A" />
       </div>
-
-      <!-- Broadcast -->
-      <div class="glass mt-12 tabpanel hidden" id="panel-broadcast">
-        <div class="h2">Broadcast to Parents</div>
-        <div class="grid mt-10">
-          <textarea class="input" id="abMsg" rows="3" placeholder="Message..."></textarea>
-          <button class="btn" id="abSend">Send</button>
-        </div>
-        <div class="h3 mt-16">Sent</div>
-        <div id="abList" class="list mt-8 text-dim">No broadcasts.</div>
-      </div>
-
-      <!-- Leaves -->
-      <div class="glass mt-12 tabpanel hidden" id="panel-leaves">
-        <div class="h2">Leave Requests</div>
-        <div id="lvList" class="list mt-8 text-dim">No pending requests.</div>
-      </div>
-
-      <!-- Data -->
-      <div class="glass mt-12 tabpanel hidden" id="panel-data">
-        <div class="h2">Data</div>
-        <p class="text-dim">This demo shows local data only.</p>
-        <div class="row wrap gap-8 mt-10">
-          <a class="btn" href="students.csv" download>Students.csv</a>
-          <a class="btn" href="teachers.csv" download>Teachers.csv</a>
-          <a class="btn" href="timetable.csv" download>Timetable.csv</a>
-        </div>
-      </div>
-
-      <!-- Backup -->
-      <div class="glass mt-12 tabpanel hidden" id="panel-backup">
-        <div class="h2">Quick Backup / Restore</div>
-        <div class="row wrap gap-8 mt-10">
-          <button class="btn" id="bkBtn">Backup</button>
-          <label class="btn"><input type="file" id="rsBtn" hidden><span>Restore</span></label>
-        </div>
+      <div class="row-right">
+        <button class="btn btn-primary" id="s-save">Save</button>
       </div>
     </section>
+
+    <!-- BROADCAST -->
+    <section class="panel glass hidden" id="ad-bc">
+      <h2>Broadcast to Parents</h2>
+      <textarea id="ab-msg" rows="4" class="input" placeholder="Message..."></textarea>
+      <div class="row-right">
+        <button class="btn btn-primary" id="ab-send">Send</button>
+      </div>
+      <div id="ab-list" class="list mt-12"></div>
+    </section>
+
+    <!-- LEAVES -->
+    <section class="panel glass hidden" id="ad-leaves">
+      <h2>Leave Requests</h2>
+      <div id="al-list" class="list"></div>
+    </section>
+
+    <!-- DATA -->
+    <section class="panel glass hidden" id="ad-data">
+      <h2>Data</h2>
+      <p class="text-dim">This demo shows local data only.</p>
+      <div class="row gap-8 mt-8">
+        <button class="btn btn-secondary" id="dl-students">Students.csv</button>
+        <button class="btn btn-secondary" id="dl-teachers">Teachers.csv</button>
+        <button class="btn btn-secondary" id="dl-tt">Timetable.csv</button>
+      </div>
+    </section>
+
+    <!-- BACKUP -->
+    <section class="panel glass hidden" id="ad-backup">
+      <h2>Quick Backup / Restore</h2>
+      <div class="row gap-8">
+        <button class="btn btn-secondary" id="ad-back">Backup</button>
+        <label class="btn btn-secondary">Restore
+          <input type="file" id="ad-rest" hidden />
+        </label>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section class="panel glass hidden" id="ad-events">
+      <h2>Events & Exams</h2>
+      <div id="ae-list" class="list"></div>
+    </section>
+
+    <!-- COMPLAINTS -->
+    <section class="panel glass hidden" id="ad-complaints">
+      <h2>Complaints Board</h2>
+      <div id="ac-list" class="list"></div>
+    </section>
+
   </div>
 
   <script>
-    function toggleTheme(){var c=document.documentElement.classList.contains('dark')?'dark':'light';
-      var n=c==='dark'?'light':'dark';
-      document.documentElement.classList.replace(c,n);document.body.classList.replace(c,n);
-      localStorage.setItem('theme',n);}
-    document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
-      document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected','false'));
-      b.setAttribute('aria-selected','true');
-      const k=b.dataset.tab;
-      document.querySelectorAll('.tabpanel').forEach(p=>p.classList.add('hidden'));
-      document.getElementById('panel-'+k).classList.remove('hidden');
-    }));
-    document.getElementById('abSend').onclick=function(){
-      const m=(abMsg.value||'').trim(); if(!m) return;
-      const row=document.createElement('div'); row.className='item'; row.textContent=m;
-      abList.appendChild(row); abList.classList.remove('text-dim'); abMsg.value='';
-    };
-  </script>
+    const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
+    const db={ get:(k,d=[])=>{ try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}, set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)) };
 
-  <script type="module" src="ui.js?v=2025-08-15-2"></script>
+    // theme + pin
+    (function(){
+      const url=new URL(location.href);
+      const t = url.searchParams.get('theme') || localStorage.getItem('theme') || 'dark';
+      document.body.classList.toggle('dark', t==='dark');
+      localStorage.setItem('theme', t);
+      q('#themeBtn').onclick=()=>{
+        const next=document.body.classList.contains('dark')?'light':'dark';
+        document.body.classList.toggle('dark', next==='dark'); localStorage.setItem('theme', next);
+        const u=new URL(location.href);u.searchParams.set('theme', next);history.replaceState({},'',u);
+      };
+      q('#pinBtn').onclick=()=>location.href='index.html?theme='+(localStorage.getItem('theme')||'dark');
+    })();
+
+    // tabs
+    (function(){
+      const bar=q('[data-tab-group]');
+      const show=id=>qa('.panel').forEach(p=>p.classList.toggle('hidden', p.id!==id));
+      bar.addEventListener('click',e=>{
+        const b=e.target.closest('[data-tab]'); if(!b) return;
+        bar.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active'); show(b.dataset.tab);
+      });
+      show('ad-scope');
+    })();
+
+    // scope
+    (function(){
+      const m=db.get('admin_scope',{});
+      if(m.class) q('#s-class').value=m.class;
+      if(m.section) q('#s-section').value=m.section;
+      q('#s-save').onclick=()=>{ db.set('admin_scope',{class:q('#s-class').value.trim(),section:q('#s-section').value.trim()}); alert('Saved ✅'); };
+    })();
+
+    // broadcast
+    (function(){
+      const key='broadcasts';
+      const render=()=>{
+        const list=db.get(key,[]).slice(-20).reverse();
+        const box=q('#ab-list'); box.innerHTML='';
+        list.forEach(it=>{
+          const row=document.createElement('div');row.className='item';
+          row.innerHTML=`<div class="item-title">${new Date(it.ts).toLocaleString()}</div>
+                         <div class="item-sub">${it.msg}</div>`;
+          box.appendChild(row);
+        });
+      };
+      q('#ab-send').onclick=()=>{
+        const msg=q('#ab-msg').value.trim(); if(!msg) return;
+        const list=db.get(key,[]); list.push({msg,ts:Date.now()}); db.set(key,list); q('#ab-msg').value=''; render(); alert('Sent ✅');
+      };
+      render();
+    })();
+
+    // leaves
+    (function(){
+      const key='leave_requests';
+      const render=()=>{
+        const list=db.get(key,[]).sort((a,b)=>b.ts-a.ts);
+        const box=q('#al-list'); box.innerHTML='';
+        if(!list.length){ box.innerHTML='<div class="empty">No pending requests.</div>'; return; }
+        list.forEach(it=>{
+          const row=document.createElement('div');row.className='item';
+          row.innerHTML=`<div class="item-title"><b>${it.student||'Student'}</b> · ${it.class||''}${it.section?('-'+it.section):''} · ${it.from} → ${it.to} · <span class="badge ${it.status}">${it.status}</span></div>
+                         <div class="item-sub">${it.reason||''}</div>
+                         <div class="row gap-8 mt-8"><button class="btn btn-approve">Approve</button><button class="btn btn-reject">Reject</button></div>`;
+          row.querySelector('.btn-approve').onclick=()=>{ it.status='approved'; db.set(key,db.get(key,[])); render(); };
+          row.querySelector('.btn-reject').onclick=()=>{ it.status='rejected'; db.set(key,db.get(key,[])); render(); };
+          box.appendChild(row);
+        });
+      };
+      render();
+    })();
+
+    // data CSV (simple sample exports)
+    (function(){
+      function download(name, rows){
+        const csv = rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+        const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=name; a.click();
+      }
+      q('#dl-students').onclick=()=>download('students.csv', [['class','section','roll','name','phone'],
+        ['5','A','1','Aarav','900000001'],['5','A','2','Diya','900000002'],['5','A','3','Ishaan','900000003'] ]);
+      q('#dl-teachers').onclick=()=>download('teachers.csv', [['name','subject','phone'], ['Ms. Priya','Maths','911111111'],['Mr. Arjun','Science','922222222'] ]);
+      q('#dl-tt').onclick=()=>download('timetable.csv', [['day','period','subject','teacher','room'], ['Mon','1','Maths','Ms. Priya','101'] ]);
+    })();
+
+    // backup/restore
+    (function(){
+      q('#ad-back').onclick=()=>{
+        const dump=JSON.stringify(localStorage,null,2);
+        const a=document.createElement('a');
+        a.href=URL.createObjectURL(new Blob([dump],{type:'application/json'}));
+        a.download='school-backup.json'; a.click();
+      };
+      q('#ad-rest').onchange=e=>{
+        const f=e.target.files[0]; if(!f) return;
+        const r=new FileReader(); r.onload=()=>{ try{
+          const map=JSON.parse(r.result); Object.keys(map).forEach(k=>localStorage.setItem(k,map[k])); alert('Restored ✅'); location.reload();
+        }catch{ alert('Invalid file'); } }; r.readAsText(f);
+      };
+    })();
+
+    // events
+    (function(){
+      const key='school_events';
+      const render=()=>{
+        const list=db.get(key,[]).sort((a,b)=>a.date.localeCompare(b.date));
+        const box=q('#ae-list'); box.innerHTML='';
+        if(!list.length){ box.innerHTML='<div class="empty">No events.</div>'; return; }
+        list.forEach(it=>{
+          const row=document.createElement('div'); row.className='item';
+          row.innerHTML=`<div class="item-title"><b>${it.title}</b> · ${it.date} · <span class="badge ${it.type}">${it.type}</span></div>
+                         <div class="item-sub">${it.notes||''}</div>`;
+          box.appendChild(row);
+        });
+      };
+      render();
+    })();
+
+    // complaints
+    (function(){
+      const key='school_complaints';
+      const render=()=>{
+        const list=db.get(key,[]).sort((a,b)=>b.ts-a.ts);
+        const box=q('#ac-list'); box.innerHTML='';
+        if(!list.length){ box.innerHTML='<div class="empty">No complaints.</div>'; return; }
+        list.forEach(it=>{
+          const row=document.createElement('div'); row.className='item';
+          row.innerHTML=`<div class="item-title"><b>${it.category||'Complaint'}</b> · ${it.class||''}${it.section?('-'+it.section):''} · <span class="badge ${it.status}">${it.status}</span></div>
+                         <div class="item-sub">${it.message||''}</div>`;
+          box.appendChild(row);
+        });
+      };
+      render();
+    })();
+  </script>
 </body>
 </html>
