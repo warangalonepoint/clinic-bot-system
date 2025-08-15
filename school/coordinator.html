@@ -1,291 +1,200 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Coordinator Panel</title>
-
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0a0a14"/>
-
-  <!-- Global neon-glass styles -->
-  <link rel="stylesheet" href="./styles.css?v=glass-1.0"/>
-
-  <style>
-    .wrap { max-width: 920px; margin: 18px auto; padding: 0 14px; }
-    .banner img { width: 100%; border-radius: 18px; display:block; }
-    h2 { margin: 6px 0 10px; }
-    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px }
-    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px }
-    @media (max-width:760px){ .grid2,.grid3{ grid-template-columns:1fr } }
-    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:.92rem }
-    th,td { border-bottom:1px solid rgba(255,255,255,0.08); padding:9px 8px; text-align:left; vertical-align:top }
-    th { opacity:.8 }
-    .muted { opacity:.75 }
-    .toolbar { display:flex; gap:8px; flex-wrap:wrap }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Coordinator • School PWA</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main class="wrap">
-    <!-- Banner -->
-    <section class="banner card" style="position:relative;">
-      <img src="./assets/banner.png" alt="School banner"/>
-      <div class="title-overlay">
-        <div class="title">Coordinator Panel</div>
-        <div class="subtitle">Manage class meta & timetable</div>
+  <main>
+    <div class="topbar">
+      <span class="badge">Coordinator</span>
+      <div style="display:flex; gap:8px; align-items:center">
+        <label title="Dark / Light"><input id="themeToggle" class="theme-toggle" type="checkbox"/></label>
+        <a class="btn ghost" href="./index.html">Logout</a>
       </div>
-      <button id="logoutBtn" class="btn btn-ghost small" style="position:absolute;top:14px;right:14px;">Logout</button>
-    </section>
+    </div>
 
-    <!-- Class Setup -->
-    <section class="card" style="padding:20px;">
-      <h2>Class Setup</h2>
-      <p class="muted" style="margin-bottom:10px">Choose class/section & defaults for timetable ops.</p>
+    <header class="hero panel"><div class="title">Coordinator Panel</div></header>
 
-      <div class="grid3">
-        <div>
-          <label class="label">Class</label>
-          <input id="cClass" class="input" placeholder="e.g., 5" inputmode="numeric"/>
-        </div>
-        <div>
-          <label class="label">Section</label>
-          <input id="cSection" class="input" placeholder="e.g., A"/>
-        </div>
-        <div>
-          <label class="label">Day</label>
-          <select id="cDay" class="input">
-            <option>Mon</option><option>Tue</option><option>Wed</option>
-            <option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
-          </select>
-        </div>
+    <section class="panel" style="margin-top:14px">
+      <div class="tabs">
+        <button class="tab active" data-t="scope">Class Scope</button>
+        <button class="tab" data-t="tt">Timetable</button>
+        <button class="tab" data-t="leaves">Leaves</button>
+        <button class="tab" data-t="backup">Backup</button>
       </div>
 
-      <div class="grid3" style="margin-top:10px;">
-        <div>
-          <label class="label">Period #</label>
-          <input id="cPeriod" class="input" placeholder="1–12" inputmode="numeric"/>
-        </div>
-        <div>
-          <label class="label">Subject</label>
-          <input id="cSubject" class="input" placeholder="e.g., Maths"/>
-        </div>
-        <div style="display:flex; align-items:flex-end;">
-          <button id="saveMeta" class="btn btn-blue" style="width:100%">Save Meta</button>
+      <!-- Scope -->
+      <div id="sec-scope" class="section active">
+        <div class="card gradient-1">
+          <h2>Choose class/section & meta for actions</h2>
+          <div class="row">
+            <div>
+              <label>Class</label><input id="s-class" placeholder="e.g., 5"/>
+              <label>Section</label><input id="s-sec" placeholder="e.g., A"/>
+            </div>
+            <div>
+              <label>Day</label>
+              <select id="s-day"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option></select>
+              <label>Period #</label><input id="s-p" placeholder="1–12"/>
+            </div>
+          </div>
+          <label>Subject</label><input id="s-sub" placeholder="e.g., Maths"/>
+          <div class="spacer"></div>
+          <button class="btn" id="btnMeta">Save Meta</button>
         </div>
       </div>
 
-      <div id="metaMsg" class="muted" style="margin-top:6px;"></div>
-    </section>
-
-    <!-- Timetable Editor -->
-    <section class="card" style="padding:20px;">
-      <h2>Timetable</h2>
-      <p class="muted" style="margin-bottom:10px">Add/replace entries for the selected class/section.</p>
-
-      <div class="grid3">
-        <div>
-          <label class="label">Teacher</label>
-          <input id="tTeacher" class="input" placeholder="e.g., Ms. Priya"/>
+      <!-- Timetable -->
+      <div id="sec-tt" class="section">
+        <div class="card gradient-3">
+          <h2>Add / Replace period entry (for selected class)</h2>
+          <label>Teacher name</label><input id="tt-teacher" placeholder="e.g., Ms. Priya"/>
+          <label>Room (optional)</label><input id="tt-room" placeholder="e.g., 302"/>
+          <div class="spacer"></div>
+          <button class="btn" id="btnAdd">Add / Update</button>
         </div>
-        <div>
-          <label class="label">Room (optional)</label>
-          <input id="tRoom" class="input" placeholder="e.g., 203"/>
-        </div>
-        <div style="display:flex; align-items:flex-end;">
-          <button id="addUpdate" class="btn btn-teal" style="width:100%">Add / Update</button>
+
+        <div class="card gradient-2">
+          <h2>Class Timetable</h2>
+          <table class="table" id="tblTt"><thead>
+            <tr><th>#</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th></tr>
+          </thead><tbody></tbody></table>
+          <div class="spacer"></div>
+          <button class="btn ghost" id="btnClear">Clear Class Timetable</button>
         </div>
       </div>
 
-      <table id="ttTable" style="margin-top:14px;">
-        <thead>
-          <tr>
-            <th>#</th><th>Day</th><th>Period</th><th>Subject</th>
-            <th>Teacher</th><th>Room</th><th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="ttBody">
-          <tr><td colspan="7" class="muted">No entries yet.</td></tr>
-        </tbody>
-      </table>
-
-      <div class="toolbar" style="margin-top:14px;">
-        <button id="exportTT" class="btn btn-ghost">Export CSV</button>
-        <button id="clearTT" class="btn btn-orange">Clear Class Timetable</button>
+      <!-- Leaves -->
+      <div id="sec-leaves" class="section">
+        <div class="card gradient-4">
+          <h2>Parent Leave Requests</h2>
+          <table class="table" id="tblLeaves"><thead>
+            <tr><th>Date</th><th>Reason</th><th>Status</th><th>Action</th></tr>
+          </thead><tbody></tbody></table>
+        </div>
       </div>
-      <div id="opMsg" class="muted" style="margin-top:6px;"></div>
+
+      <!-- Backup -->
+      <div id="sec-backup" class="section">
+        <div class="row">
+          <div class="card gradient-1">
+            <h2>Backup (local demo)</h2>
+            <button class="btn" id="btnExport">Export JSON</button>
+          </div>
+          <div class="card gradient-2">
+            <h2>Restore</h2>
+            <input id="restoreFile" type="file" accept="application/json" />
+            <div class="spacer"></div>
+            <button class="btn warn" id="btnRestore">Restore JSON</button>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
   <script>
-    // -------- Auth guard --------
-    (()=>{
-      const r = sessionStorage.getItem('sch_role');
-      if (r !== 'coordinator') location.replace('./index.html');
-    })();
-    document.getElementById('logoutBtn').onclick = ()=>{
-      sessionStorage.clear();
-      location.replace('./index.html');
-    };
+    // Theme
+    const root=document.documentElement;
+    const tSaved=localStorage.getItem('theme')||'dark';
+    root.setAttribute('data-theme',tSaved);
+    document.getElementById('themeToggle').checked=(tSaved==='light');
+    document.getElementById('themeToggle').addEventListener('change',e=>{
+      const t=e.target.checked?'light':'dark'; root.setAttribute('data-theme',t); localStorage.setItem('theme',t);
+    });
 
-    // -------- DOM helpers --------
-    const $ = id => document.getElementById(id);
-    const getVal = id => (''+($(id).value||'')).trim();
+    // Tabs
+    document.querySelectorAll('.tab').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+        document.getElementById('sec-'+b.dataset.t).classList.add('active');
+      });
+    });
 
-    // -------- Keys --------
-    const META_KEY = 'coord_meta';        // {class, section, day, period, subject}
-    const TT_PREFIX = 'sch_timetable_';   // sch_timetable_{CLASS}_{SECTION}
+    // Data helpers
+    const L={get:k=>JSON.parse(localStorage.getItem(k)||"[]"), set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+    const S={get:k=>localStorage.getItem(k)||"", set:(k,v)=>localStorage.setItem(k,v)};
 
-    const scopeKey = () => {
-      const cls = getVal('cClass').toUpperCase();
-      const sec = getVal('cSection').toUpperCase();
-      return (cls && sec) ? `${TT_PREFIX}${cls}_${sec}` : null;
-    };
-
-    // -------- Meta load/save --------
-    (function initMeta(){
-      try {
-        const m = JSON.parse(localStorage.getItem(META_KEY) || '{}');
-        if (m.class) $('cClass').value = m.class;
-        if (m.section) $('cSection').value = m.section;
-        if (m.day) $('cDay').value = m.day;
-        if (m.period) $('cPeriod').value = m.period;
-        if (m.subject) $('cSubject').value = m.subject;
-      } catch {}
-      renderTT();
-    })();
-
-    $('saveMeta').addEventListener('click', ()=>{
-      const m = {
-        class: getVal('cClass'),
-        section: getVal('cSection'),
-        day: $('cDay').value,
-        period: getVal('cPeriod'),
-        subject: getVal('cSubject')
-      };
-      if (!m.class || !m.section){ $('metaMsg').textContent='Enter Class & Section.'; return; }
-      localStorage.setItem(META_KEY, JSON.stringify(m));
-      $('metaMsg').textContent = 'Saved ✓';
-      setTimeout(()=> $('metaMsg').textContent='', 1500);
+    // Save meta
+    document.getElementById('btnMeta').addEventListener('click', ()=>{
+      S.set('meta_class', document.getElementById('s-class').value.trim());
+      S.set('meta_sec',   document.getElementById('s-sec').value.trim());
+      S.set('meta_day',   document.getElementById('s-day').value);
+      S.set('meta_p',     document.getElementById('s-p').value.trim());
+      S.set('meta_sub',   document.getElementById('s-sub').value.trim());
+      alert('Meta saved.');
       renderTT();
     });
 
-    // -------- Timetable CRUD --------
-    function readTT(){
-      const key = scopeKey();
-      if (!key) return [];
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-    }
-    function saveTT(rows){
-      const key = scopeKey();
-      if (!key) return;
-      localStorage.setItem(key, JSON.stringify(rows));
-    }
-
-    $('addUpdate').addEventListener('click', ()=>{
-      const meta = JSON.parse(localStorage.getItem(META_KEY)||'{}');
-      if (!meta.class || !meta.section){ $('opMsg').textContent='Save Class & Section first.'; return; }
-      const entry = {
-        class: meta.class,
-        section: meta.section,
-        day: meta.day,
-        period: meta.period,
-        subject: meta.subject || '(subject?)',
-        teacher: getVal('tTeacher') || '(teacher?)',
-        room: getVal('tRoom') || '',
-        ts: Date.now()
-      };
-      if (!entry.period){ $('opMsg').textContent='Set Period # in Class Setup.'; return; }
-
-      const rows = readTT();
-      const key = (e) => [e.class,e.section,e.day,e.period].join('|');
-      const i = rows.findIndex(r => key(r) === key(entry));
-      if (i >= 0) rows[i] = entry; else rows.push(entry);
-      saveTT(rows);
-      $('tTeacher').value=''; $('tRoom').value='';
-      $('opMsg').textContent = 'Saved ✓';
-      setTimeout(()=> $('opMsg').textContent='', 1200);
-      renderTT();
+    // Timetable add
+    document.getElementById('btnAdd').addEventListener('click', ()=>{
+      const cls=S.get('meta_class'), sec=S.get('meta_sec'), day=S.get('meta_day'), p=S.get('meta_p'), sub=S.get('meta_sub');
+      if(!cls||!sec||!day||!p||!sub) return alert("Save class meta first");
+      const key=`tt_${cls}_${sec}`;
+      const list=L.get(key);
+      const idx=list.findIndex(x=>x.day===day && x.p===p);
+      const rec={day,p,subject:sub,teacher:document.getElementById('tt-teacher').value.trim(),room:document.getElementById('tt-room').value.trim()};
+      if(idx>=0) list[idx]=rec; else list.push(rec);
+      L.set(key,list); renderTT(); alert('Timetable updated.');
     });
 
     function renderTT(){
-      const body = $('ttBody');
-      const rows = readTT();
-      body.innerHTML = '';
-      if (!rows.length){
-        body.innerHTML = '<tr><td colspan="7" class="muted">No entries yet.</td></tr>';
-        return;
-      }
-      const dayOrder = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-      rows.sort((a,b)=> dayOrder.indexOf(a.day)-dayOrder.indexOf(b.day) || (+a.period||0) - (+b.period||0));
-      rows.forEach((r,i)=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML = `
-          <td>${i+1}</td>
-          <td>${r.day}</td>
-          <td>${r.period}</td>
-          <td>${r.subject}</td>
-          <td>${r.teacher}</td>
-          <td>${r.room||''}</td>
-          <td>
-            <button class="btn btn-ghost small" data-edit="${i}">Edit</button>
-            <button class="btn btn-orange small" data-del="${i}">Delete</button>
-          </td>`;
-        body.appendChild(tr);
-      });
+      const cls=S.get('meta_class'), sec=S.get('meta_sec');
+      const key=`tt_${cls}_${sec}`; const list=L.get(key);
+      const tb=document.querySelector('#tblTt tbody'); tb.innerHTML="";
+      list.forEach((r,i)=>tb.insertAdjacentHTML('beforeend',
+        `<tr><td>${i+1}</td><td>${r.day}</td><td>${r.p}</td><td>${r.subject}</td><td>${r.teacher||''}</td><td>${r.room||''}</td>
+         <td><button class="btn ghost" data-i="${i}">Delete</button></td></tr>`));
+      tb.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+        const arr=L.get(key); arr.splice(Number(b.dataset.i),1); L.set(key,arr); renderTT();
+      }));
     }
+    renderTT();
 
-    $('ttBody').addEventListener('click', (e)=>{
-      const del = e.target.getAttribute('data-del');
-      const edit = e.target.getAttribute('data-edit');
-      if (del !== null){
-        const rows = readTT();
-        rows.splice(+del,1); saveTT(rows); renderTT();
-      }
-      if (edit !== null){
-        const rows = readTT();
-        const r = rows[+edit];
-        if (!r) return;
-        // load into meta + teacher inputs for quick update
-        $('cDay').value = r.day;
-        $('cPeriod').value = r.period;
-        $('cSubject').value = r.subject;
-        $('tTeacher').value = r.teacher;
-        $('tRoom').value = r.room||'';
-        // also persist meta change so Add/Update replaces same key
-        const m = JSON.parse(localStorage.getItem(META_KEY)||'{}');
-        m.day = r.day; m.period = r.period; m.subject = r.subject;
-        localStorage.setItem(META_KEY, JSON.stringify(m));
-        $('metaMsg').textContent='Loaded row into editor.';
-        setTimeout(()=> $('metaMsg').textContent='', 1200);
-      }
+    document.getElementById('btnClear').addEventListener('click', ()=>{
+      const cls=S.get('meta_class'), sec=S.get('meta_sec'); if(!cls||!sec) return;
+      localStorage.removeItem(`tt_${cls}_${sec}`); renderTT(); alert('Cleared.');
     });
 
-    // -------- Export / Clear --------
-    $('exportTT').addEventListener('click', ()=>{
-      const rows = readTT();
-      const hdr = ['Class','Section','Day','Period','Subject','Teacher','Room','Timestamp'];
-      const lines = [hdr.join(',')].concat(
-        rows.map(r => [r.class,r.section,r.day,r.period,qq(r.subject),qq(r.teacher),qq(r.room||''),r.ts].join(','))
-      );
-      downloadCSV(lines.join('\n'), `timetable_${getVal('cClass')||'X'}_${getVal('cSection')||'X'}.csv`);
-    });
-
-    $('clearTT').addEventListener('click', ()=>{
-      const key = scopeKey();
-      if (!key) return alert('Set Class & Section first.');
-      if (!confirm('Clear timetable for this class/section?')) return;
-      localStorage.removeItem(key); renderTT();
-    });
-
-    // -------- Utils --------
-    function qq(s){ if(s==null) return ''; s=(''+s).replaceAll('"','""'); return s.includes(',')?`"${s}"`:s; }
-    function downloadCSV(text, name){
-      const blob = new Blob([text], {type:'text/csv;charset=utf-8;'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = name;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    // Leave approvals
+    function renderLeaves(){
+      const tb=document.querySelector('#tblLeaves tbody'); tb.innerHTML="";
+      const arr=L.get('leaves');
+      arr.forEach((x,i)=>tb.insertAdjacentHTML('beforeend',
+        `<tr><td>${x.date}</td><td>${x.reason}</td><td>${x.status||'Pending'}</td>
+        <td>
+          <button class="btn" data-a="Approve" data-i="${i}">Approve</button>
+          <button class="btn warn" data-a="Reject" data-i="${i}">Reject</button>
+        </td></tr>`
+      ));
+      tb.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+        const i=Number(b.dataset.i), action=b.dataset.a;
+        const arr=L.get('leaves'); arr[i].status=action; L.set('leaves',arr); renderLeaves();
+      }));
     }
+    renderLeaves();
+
+    // Backup / Restore
+    document.getElementById('btnExport').addEventListener('click', ()=>{
+      const dump = JSON.stringify(localStorage, null, 2);
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([dump],{type:'application/json'}));
+      a.download='school-local-backup.json'; a.click();
+    });
+    document.getElementById('btnRestore').addEventListener('click', ()=>{
+      const f=document.getElementById('restoreFile').files[0]; if(!f) return alert('Pick a file');
+      const reader=new FileReader(); reader.onload=()=>{
+        try{
+          const obj=JSON.parse(reader.result);
+          Object.keys(obj).forEach(k=>localStorage.setItem(k, obj[k]));
+          alert('Restored. Reloading…'); location.reload();
+        }catch(e){ alert('Invalid file'); }
+      }; reader.readAsText(f);
+    });
   </script>
 </body>
 </html>
