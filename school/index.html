@@ -1,85 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>School • PIN</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>School Access • PIN</title>
+
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css">
+  <meta name="theme-color" content="#0a0a14"/>
+
+  <!-- Styles (neon-glass theme) -->
+  <link rel="stylesheet" href="./styles.css?v=glass-1.0" />
+
   <style>
-    .wrap{max-width:900px;margin:20px auto;padding:12px}
-    .hero{position:relative;border-radius:22px;overflow:hidden}
-    .banner{width:100%;height:210px;object-fit:cover;display:block}
-    .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;
-      padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
-    .logo{width:44px;height:44px;border-radius:12px;background:#fff;margin-right:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.35)}
-    .hero-title{color:#fff;font-weight:800;font-size:24px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+    /* Page-specific tiny tweaks */
+    .pin-wrap { max-width: 880px; margin: 18px auto; padding: 0 14px; }
+    .brand-line { margin: 8px 0 22px; opacity:.85; }
+    .pin-form .hint { font-size:.9rem; opacity:.8; margin-top:6px }
   </style>
 </head>
-<body class="bg">
-<main class="wrap">
-  <div class="card hero">
-    <img class="banner" src="./assets/banner.png" alt="School Banner">
-    <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" alt="Logo" onerror="this.style.display='none'">
-      <div class="hero-title">Welcome</div>
-    </div>
-  </div>
+<body>
+  <main class="pin-wrap">
 
-  <div class="card">
-    <h2 class="h2">Enter PIN</h2>
-    <p class="muted">You’ll be routed to your role.</p>
-    <form id="pinForm">
-      <input id="pin" class="in" inputmode="numeric" autocomplete="one-time-code"
-             placeholder="4–8 digit PIN">
-      <button class="btn" style="width:100%;margin-top:12px">Continue</button>
-      <div id="msg" class="muted" style="margin-top:8px"></div>
-    </form>
-  </div>
-</main>
+    <!-- Glass hero banner -->
+    <section class="banner card" aria-label="School banner">
+      <img src="./assets/banner.png" alt="School campus banner" />
+      <div class="title-overlay">
+        <div class="logo-badge" aria-hidden="true">🏫</div>
+        <div class="title">School Access</div>
+        <div class="subtitle">Secure entry for staff & parents</div>
+      </div>
+    </section>
 
-<script>
-  const rolePage = {
-    coordinator: "./coordinator.html",
-    parents: "./parents.html",
-    teacher: "./teacher.html",
-    admin: "./admin.html"
-  };
+    <!-- PIN card -->
+    <section class="card" style="padding:20px 18px;">
+      <h1 class="h-xl" style="margin-bottom:6px;">Enter PIN</h1>
+      <p class="brand-line">You’ll be routed to your role automatically.</p>
 
-  async function loadPins(){
-    try{
-      const base = await fetch("./pins.json",{cache:"no-store"}).then(r=>r.json());
-      const ov = JSON.parse(localStorage.getItem("pins_override")||"{}");
-      return {...base, ...ov};
-    }catch(e){
-      return {coordinator:"1111",parents:"2222",teacher:"3333",admin:"4444"};
+      <form id="pinForm" class="pin-form" autocomplete="off">
+        <label class="label" for="pin">4–8 digit PIN</label>
+        <input id="pin"
+               class="input"
+               type="password"
+               inputmode="numeric"
+               pattern="[0-9]{4,8}"
+               placeholder="••••"
+               minlength="4"
+               maxlength="8"
+               autocomplete="one-time-code" required />
+
+        <button class="btn btn-primary" type="submit" style="margin-top:14px;">
+          Continue
+        </button>
+        <div id="msg" class="hint"></div>
+      </form>
+    </section>
+
+    <section class="card" style="padding:14px; text-align:center;">
+      <small class="muted">
+        TIP: install to Home Screen for offline speed. Data stays on your device unless you import/export CSV.
+      </small>
+    </section>
+  </main>
+
+  <script>
+    // --- SW register (quiet) ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=glass-1.0').catch(()=>{});
+      });
     }
-  }
 
-  document.getElementById("pinForm").addEventListener("submit", async (e)=>{
-    e.preventDefault();
-    const pin = (document.getElementById("pin").value||"").trim();
-    const msg = document.getElementById("msg");
-    msg.textContent="Checking…";
-    try{
-      const pins = await loadPins();
-      let matched=null;
-      for(const [role,val] of Object.entries(pins)){
-        if(String(val)===pin){ matched=role; break; }
+    // --- Route map ---
+    const rolePage = {
+      coordinator: './coordinator.html',
+      teacher: './teacher.html',
+      parents: './parents.html',
+      admin: './admin.html'
+    };
+
+    // If already logged in, don't show PIN page on back nav.
+    (() => {
+      const r = sessionStorage.getItem('sch_role');
+      const at = sessionStorage.getItem('sch_login_at');
+      if (r && at && rolePage[r]) {
+        // Hard redirect prevents back to index
+        location.replace(rolePage[r]);
       }
-      if(!matched){ msg.textContent="Invalid PIN."; return; }
-      sessionStorage.setItem("school_role", matched);
-      sessionStorage.setItem("school_login_at", String(Date.now()));
-      location.replace(rolePage[matched] || "./index.html");
-    }catch{
-      msg.textContent="Error loading PINs.";
-    }
-  });
+    })();
 
-  // PWA SW
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  }
-</script>
+    async function loadPins() {
+      // cache-bust in case of GitHub Pages SW
+      const res = await fetch('./pins.json?nc=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('pins.json not found');
+      const json = await res.json();
+      // Normalize keys to strings
+      Object.keys(json).forEach(k => json[k] = String(json[k]).trim());
+      return json;
+    }
+
+    document.getElementById('pinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      const pin = (document.getElementById('pin').value || '').trim();
+      if (!/^\d{4,8}$/.test(pin)) {
+        msg.textContent = 'Enter a valid 4–8 digit PIN.';
+        return;
+      }
+      msg.textContent = 'Checking…';
+
+      try {
+        const pins = await loadPins();
+        // Find matching role by value
+        let matchedRole = null;
+        for (const [role, value] of Object.entries(pins)) {
+          if (String(value) === pin) { matchedRole = role; break; }
+        }
+        if (!matchedRole || !rolePage[matchedRole]) {
+          msg.textContent = 'Invalid PIN.';
+          return;
+        }
+
+        // Save session (role + timestamp)
+        sessionStorage.setItem('sch_role', matchedRole);
+        sessionStorage.setItem('sch_login_at', String(Date.now()));
+
+        // Redirect without leaving index in back stack
+        location.replace(rolePage[matchedRole]);
+      } catch (err) {
+        console.error(err);
+        msg.textContent = 'Error loading PINs.';
+      }
+    });
+  </script>
 </body>
 </html>
