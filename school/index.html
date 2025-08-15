@@ -1,87 +1,81 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>School PWA • PIN</title>
-  <link rel="stylesheet" href="./styles.css" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#0b1020" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>School PWA · PIN</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#0b0e1a">
 </head>
-<body>
-  <main>
-    <div class="topbar">
-      <span class="badge">School PWA</span>
-      <label title="Dark / Light">
-        <input id="themeToggle" class="theme-toggle" type="checkbox" />
-      </label>
-    </div>
-
-    <header class="hero panel" style="height:200px;">
-      <div class="title">Welcome</div>
-    </header>
-
-    <div class="spacer"></div>
-
-    <section class="panel">
-      <h1>Enter PIN</h1>
-      <p class="muted">You’ll be routed to your role automatically.</p>
-      <form id="pinForm" class="card gradient-1">
-        <label for="pin">4–8 digit PIN</label>
-        <input id="pin" inputmode="numeric" placeholder="••••" autocomplete="one-time-code" />
-        <div class="spacer"></div>
-        <button class="btn block">Continue</button>
-        <div id="msg" class="muted" style="margin-top:10px;"></div>
-      </form>
+<body class="dark">
+  <div class="wrapper">
+    <section class="accent-violet">
+      <div class="glass header">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div class="h1">School PWA</div>
+          <div class="row">
+            <a class="btn btn-gradient" href="parents.html">Parents</a>
+            <a class="btn btn-indigo" href="teacher.html">Teacher</a>
+            <a class="btn btn-teal" href="coordinator.html">Coordinator</a>
+            <a class="btn btn-rose" href="admin.html">Admin</a>
+            <button class="btn" onclick="toggleTheme()">Theme</button>
+          </div>
+        </div>
+        <div class="text-dim">Neon glass · Dark/Light</div>
+      </div>
     </section>
-  </main>
 
+    <section class="accent-indigo" style="margin-top:16px;">
+      <div class="glass">
+        <div class="h1">Enter PIN</div>
+        <div class="text-dim">You’ll be routed to your role automatically.</div>
+        <form id="pinForm" class="mt-16" autocomplete="off">
+          <div class="grid">
+            <input id="pin" class="input" inputmode="numeric" pattern="[0-9]*" placeholder="4–8 digit PIN" maxlength="8" required>
+          </div>
+          <div class="mt-12">
+            <button class="btn btn-indigo" type="submit">Continue</button>
+          </div>
+        </form>
+        <div id="pinMsg" class="text-dim mt-12"></div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="ui.js"></script>
   <script>
-    // THEME
-    const root = document.documentElement;
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    root.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeToggle').checked = savedTheme === 'light';
-    document.getElementById('themeToggle').addEventListener('change', e=>{
-      const t = e.target.checked ? 'light' : 'dark';
-      root.setAttribute('data-theme', t); localStorage.setItem('theme', t);
-    });
+  // Simple PIN router: tries pins.json, falls back to inline map.
+  const FALLBACK = {
+    "1111":"parents","2222":"teacher","3333":"coordinator","4444":"admin"
+  };
+  async function loadPins(){
+    try{
+      const res = await fetch('pins.json',{cache:'no-store'});
+      if(!res.ok) throw 0;
+      return await res.json();
+    }catch{ return FALLBACK; }
+  }
+  document.getElementById('pinForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const pins = await loadPins();
+    const code = (document.getElementById('pin').value||'').trim();
+    const role = pins[code];
+    const msg = document.getElementById('pinMsg');
+    if(!role){ msg.textContent = 'Unknown PIN. Please try again.'; return; }
+    const target = {
+      parents:'parents.html',
+      teacher:'teacher.html',
+      coordinator:'coordinator.html',
+      admin:'admin.html'
+    }[role] || 'parents.html';
+    location.replace(target);
+  });
 
-    const rolePage = {
-      coordinator: "./coordinator.html",
-      teacher: "./teacher.html",
-      parents: "./parents.html",
-      admin: "./admin.html"
-    };
-
-    async function loadPins(){
-      const r = await fetch("./pins.json", {cache:"no-store"});
-      if(!r.ok) throw new Error("pins.json not found");
-      return r.json(); // { "coordinator":"1111", "teacher":"2222", ... }
-    }
-
-    document.getElementById('pinForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const pin = (document.getElementById('pin').value || "").trim();
-      const msg = document.getElementById('msg');
-      if(pin.length < 4){ msg.textContent = "PIN must be 4+ digits."; return; }
-      msg.textContent = "Checking…";
-      try{
-        const pins = await loadPins();
-        let matchedRole = null;
-        for(const [role,val] of Object.entries(pins)){
-          if(String(val) === pin){ matchedRole = role; break; }
-        }
-        if(!matchedRole){ msg.textContent = "Invalid PIN"; return; }
-
-        // Save login
-        sessionStorage.setItem("sch_role", matchedRole);
-        sessionStorage.setItem("sch_login_at", String(Date.now()));
-        location.replace(rolePage[matchedRole] || "./index.html");
-      }catch(err){
-        msg.textContent = "Error loading configuration."; console.error(err);
-      }
-    });
+  // PWA SW
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
   </script>
 </body>
 </html>
