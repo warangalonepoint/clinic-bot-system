@@ -1,82 +1,111 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>School Demo · PIN</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css">
-<script type="module" src="ui.js"></script>
-  <meta name="theme-color" content="#0b0e1a">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>School PWA</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* minimal banner style (kept here so it works even if CSS cache lags) */
+    .banner-wrap{margin:12px 0 4px}
+    .banner{
+      width:100%; height:160px; object-fit:cover;
+      border-radius:22px; display:block;
+      box-shadow: var(--shadow);
+      border:1px solid var(--ring);
+    }
+  </style>
 </head>
 <body class="dark">
   <div class="wrapper">
-    <section class="accent-violet">
+    <!-- Hero / Banner -->
+    <section class="accent-indigo">
       <div class="glass header">
-        <div class="row" style="justify-content:space-between;align-items:center;">
-          <div class="h1">School PWA</div>
-          <div class="row">
-            <a class="btn btn-gradient" href="parents.html">Parents</a>
-            <a class="btn btn-indigo" href="teacher.html">Teacher</a>
-            <a class="btn btn-teal" href="coordinator.html">Coordinator</a>
-            <a class="btn btn-rose" href="admin.html">Admin</a>
-            <button class="btn" onclick="toggleTheme()">Theme</button>
-          </div>
+        <div class="banner-wrap">
+          <!-- Try assets/banner.png first, then fall back to /school/assets/banner.png -->
+          <img class="banner"
+               src="assets/banner.png"
+               onerror="this.onerror=null; this.src='assets/school_banner.png';" 
+               alt="School banner" />
         </div>
-        <div class="text-dim">Neon · Dark/Light</div>
+
+        <div class="row" style="align-items:center; justify-content:space-between">
+          <div class="h1">School Demo</div>
+          <button class="btn" onclick="toggleTheme()">Theme</button>
+        </div>
+
+        <div class="row mt-12">
+          <a class="btn tab-btn btn-indigo" href="parents.html">Parents</a>
+          <a class="btn tab-btn btn-indigo" href="teacher.html">Teacher</a>
+          <a class="btn tab-btn btn-teal"   href="coordinator.html">Coordinator</a>
+          <a class="btn tab-btn btn-rose"   href="admin.html">Admin</a>
+        </div>
+        <div class="text-dim mt-8">Neon • Dark/Light</div>
       </div>
     </section>
 
-    <section class="accent-indigo" style="margin-top:16px;">
-      <div class="glass">
+    <!-- PIN -->
+    <section class="accent-teal">
+      <div class="glass mt-16">
         <div class="h1">Enter PIN</div>
-        <div class="text-dim">You’ll be routed to your role automatically.</div>
-        <form id="pinForm" class="mt-16" autocomplete="off">
-          <div class="grid">
-            <input id="pin" class="input" inputmode="numeric" pattern="[0-9]*" placeholder="4–8 digit PIN" maxlength="8" required>
+        <p class="text-dim">You’ll be routed to your role automatically.</p>
+
+        <form id="pin-form" class="grid mt-12" onsubmit="return false;">
+          <input id="pin-input" class="input" inputmode="numeric" pattern="[0-9]*" maxlength="8"
+                 placeholder="4–8 digit PIN" autocomplete="one-time-code" />
+          <div class="row">
+            <button id="pin-go" class="btn btn-teal">Continue</button>
           </div>
-          <div class="mt-12">
-            <button class="btn btn-indigo" type="submit">Continue</button>
-          </div>
+          <div id="pin-msg" class="text-dim"></div>
         </form>
-        <div id="pinMsg" class="text-dim mt-12"></div>
       </div>
     </section>
   </div>
 
+  <!-- Shared UI (tabs/theme) -->
   <script type="module" src="ui.js"></script>
-  <script>
-  // Simple PIN router: tries pins.json, falls back to inline map.
-  const FALLBACK = {
-    "1111":"parents","2222":"teacher","3333":"coordinator","4444":"admin"
-  };
-  async function loadPins(){
-    try{
-      const res = await fetch('pins.json',{cache:'no-store'});
-      if(!res.ok) throw 0;
-      return await res.json();
-    }catch{ return FALLBACK; }
-  }
-  document.getElementById('pinForm').addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    const pins = await loadPins();
-    const code = (document.getElementById('pin').value||'').trim();
-    const role = pins[code];
-    const msg = document.getElementById('pinMsg');
-    if(!role){ msg.textContent = 'Unknown PIN. Please try again.'; return; }
-    const target = {
-      parents:'parents.html',
-      teacher:'teacher.html',
-      coordinator:'coordinator.html',
-      admin:'admin.html'
-    }[role] || 'parents.html';
-    location.replace(target);
-  });
 
-  // PWA SW
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  }
+  <!-- PIN Router (self-contained) -->
+  <script>
+  (function(){
+    // Inline fallback (works even if pins.json missing)
+    let pinMap = {
+      "1111":"parents",
+      "2222":"teacher",
+      "3333":"coordinator",
+      "4444":"admin"
+    };
+
+    // Try to load pins.json from the same folder (/school/)
+    fetch('pins.json', {cache:'no-store'})
+      .then(r => r.ok ? r.json() : null)
+      .then(json => { if(json && typeof json === 'object') pinMap = json; })
+      .catch(()=>{ /* ignore; fallback is already set */ });
+
+    const form = document.getElementById('pin-form');
+    const input = document.getElementById('pin-input');
+    const go = document.getElementById('pin-go');
+    const msg = document.getElementById('pin-msg');
+
+    function route(){
+      const pin = (input.value || '').trim();
+      if(!pin){ msg.textContent='Enter a PIN.'; return; }
+      const role = pinMap[pin];
+      if(!role){
+        msg.textContent = 'Unknown PIN. Please try again.';
+        return;
+      }
+      // Persist theme preference across pages
+      const theme = localStorage.getItem('theme') || 'dark';
+      const url = role.toLowerCase() + '.html';
+      // add cache-buster to avoid stale HTML on GH Pages
+      const q = (url.includes('?')?'&':'?') + 't=' + Date.now() + '&theme=' + theme;
+      location.href = url + q;
+    }
+
+    go.addEventListener('click', route);
+    form.addEventListener('submit', route);
+  })();
   </script>
 </body>
 </html>
