@@ -1,457 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Parent Console</title>
-
-  <!-- PWA + theme -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0a0a14"/>
-
-  <!-- Global glass/neon styles -->
-  <link rel="stylesheet" href="./styles.css?v=glass-1.0"/>
-
-  <style>
-    .wrap { max-width: 880px; margin: 18px auto; padding: 0 14px; }
-    .banner img { width: 100%; border-radius: 18px; }
-    .seg { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 6px }
-    .seg .chip { padding:8px 12px; border-radius:12px; cursor:pointer;
-      background: var(--glass-soft); backdrop-filter: blur(8px);
-      border: 1px solid var(--glass-stroke); color:#fff; opacity:.8
-    }
-    .seg .chip.active { opacity:1; box-shadow: var(--elev-2); background: var(--glass-strong) }
-    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px }
-    @media (max-width:720px){ .grid2 { grid-template-columns:1fr } }
-    .list { display:flex; flex-direction:column; gap:10px; margin-top:10px }
-    .item { padding:12px; border-radius:14px; backdrop-filter: blur(12px);
-      background: var(--glass-soft); border:1px solid var(--glass-stroke); color:#fff }
-    .item .meta{ font-size:.85rem; opacity:.8 }
-    .muted{opacity:.72}
-    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center }
-    .pill { padding:4px 8px; border-radius:999px; font-size:.8rem;
-      background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18) }
-    table { width:100%; border-collapse:collapse; margin-top:10px }
-    th,td { border-bottom:1px solid rgba(255,255,255,0.08); padding:8px 6px; text-align:left }
-    th { opacity:.8 }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Parents • School PWA</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <meta name="theme-color" content="#0b1020" />
 </head>
 <body>
-  <main class="wrap">
-    <!-- Banner -->
-    <section class="banner card">
-      <img src="./assets/banner.png" alt="School banner"/>
-      <div class="title-overlay">
-        <div class="title">Parent Console</div>
-        <div class="subtitle">Diary • Homework • Leaves • Messages</div>
+  <main>
+    <div class="topbar">
+      <span class="badge">Parents</span>
+      <div style="display:flex; gap:8px; align-items:center">
+        <label title="Dark / Light"><input id="themeToggle" class="theme-toggle" type="checkbox"/></label>
+        <a class="btn ghost" href="./index.html">Logout</a>
       </div>
-      <button id="logoutBtn" class="btn btn-danger small" style="position:absolute;top:14px;right:14px;">Logout</button>
-    </section>
+    </div>
 
-    <!-- Child meta -->
-    <section class="card" style="padding:20px;">
-      <h2>My Child</h2>
-      <div class="grid2">
-        <div>
-          <label class="label">Child Name</label>
-          <input id="pChild" class="input" placeholder="e.g., Riya Shah">
-        </div>
-        <div>
-          <label class="label">Class</label>
-          <input id="pClass" class="input" placeholder="e.g., 5">
-        </div>
-        <div>
-          <label class="label">Section</label>
-          <input id="pSection" class="input" placeholder="e.g., A">
-        </div>
-        <div>
-          <label class="label">Parent Phone</label>
-          <input id="pPhone" class="input" placeholder="10-digit">
+    <header class="hero panel"><div class="title">Parent Console</div></header>
+
+    <section class="panel" style="margin-top:14px">
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-t="diary">Class Diary</button>
+        <button class="tab" data-t="homework">Homework</button>
+        <button class="tab" data-t="messages">Messages</button>
+        <button class="tab" data-t="leaves">Leaves</button>
+        <button class="tab" data-t="complaints">Complaints</button>
+        <button class="tab" data-t="fees">Fees</button>
+      </div>
+
+      <!-- Diary -->
+      <div id="sec-diary" class="section active">
+        <div class="card gradient-1"><h2>Recent Diary</h2>
+          <table class="table" id="tblDiary"><thead>
+            <tr><th>Date</th><th>Subject</th><th>Message</th><th>Link</th></tr>
+          </thead><tbody></tbody></table>
+          <p class="muted">Auto-synced from teacher posts (local demo).</p>
         </div>
       </div>
-      <button id="saveMeta" class="btn btn-primary" style="margin-top:12px;">Save</button>
 
-      <div class="seg" style="margin-top:14px;">
-        <div class="chip active" data-tab="tabDiary">Class Diary</div>
-        <div class="chip" data-tab="tabHomework">Homework</div>
-        <div class="chip" data-tab="tabLeaves">Leaves</div>
-        <div class="chip" data-tab="tabMessages">Messages</div>
+      <!-- Homework -->
+      <div id="sec-homework" class="section">
+        <div class="card gradient-2"><h2>Homework</h2>
+          <table class="table" id="tblHw"><thead>
+            <tr><th>Due</th><th>Subject</th><th>Title</th><th>Details</th></tr>
+          </thead><tbody></tbody></table>
+        </div>
       </div>
-    </section>
 
-    <!-- Class Diary feed -->
-    <section id="tabDiary" class="card" style="padding:20px;">
-      <div class="row" style="justify-content:space-between;">
-        <h2>Class Diary</h2>
+      <!-- Messages -->
+      <div id="sec-messages" class="section">
+        <div class="card gradient-3"><h2>Announcements</h2>
+          <ul id="listMsgs" class="muted" style="margin:0;padding-left:18px"></ul>
+        </div>
+      </div>
+
+      <!-- Leaves -->
+      <div id="sec-leaves" class="section">
         <div class="row">
-          <input id="dFilter" class="input" placeholder="Search subject/text…" style="width:220px">
-          <button id="dRefresh" class="btn btn-secondary small">Refresh</button>
+          <div class="card gradient-4">
+            <h2>Request Leave</h2>
+            <label>Date</label><input id="lvDate" type="date"/>
+            <label>Reason</label><textarea id="lvReason" placeholder="Family function / Sick…"></textarea>
+            <div class="spacer"></div>
+            <button class="btn" id="btnLeave">Submit</button>
+          </div>
+          <div class="card gradient-3">
+            <h2>My Leaves</h2>
+            <table class="table" id="tblLeaves"><thead>
+              <tr><th>Date</th><th>Reason</th><th>Status</th></tr>
+            </thead><tbody></tbody></table>
+          </div>
         </div>
       </div>
-      <div id="diaryList" class="list"></div>
-      <div id="dEmpty" class="muted" style="margin-top:6px;">No diary entries yet.</div>
-    </section>
 
-    <!-- Homework -->
-    <section id="tabHomework" class="card" style="padding:20px; display:none;">
-      <div class="row" style="justify-content:space-between;">
-        <h2>Homework</h2>
+      <!-- Complaints -->
+      <div id="sec-complaints" class="section">
         <div class="row">
-          <select id="hShow" class="input" style="width:180px">
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="done">Marked Done</option>
-          </select>
-          <button id="hRefresh" class="btn btn-secondary small">Refresh</button>
+          <div class="card gradient-2">
+            <h2>Raise a Complaint</h2>
+            <label>Subject</label><input id="cmpSub" placeholder="Bus delay, Teacher change…"/>
+            <label>Details</label><textarea id="cmpMsg"></textarea>
+            <div class="spacer"></div>
+            <button class="btn warn" id="btnCmp">Submit</button>
+          </div>
+          <div class="card gradient-1">
+            <h2>My Complaints</h2>
+            <table class="table" id="tblCmp"><thead>
+              <tr><th>Time</th><th>Subject</th><th>Status</th></tr>
+            </thead><tbody></tbody></table>
+          </div>
         </div>
       </div>
-      <table id="hTable">
-        <thead><tr>
-          <th>Due</th><th>Subject</th><th>Title</th><th>Details</th><th>Status</th><th>Action</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
-      <div id="hEmpty" class="muted" style="margin-top:6px;">No homework found.</div>
-    </section>
 
-    <!-- Leaves -->
-    <section id="tabLeaves" class="card" style="padding:20px; display:none;">
-      <h2>Request Leave</h2>
-      <div class="grid2">
-        <div>
-          <label class="label">From</label>
-          <input id="lFrom" class="input" type="date">
-        </div>
-        <div>
-          <label class="label">To</label>
-          <input id="lTo" class="input" type="date">
+      <!-- Fees -->
+      <div id="sec-fees" class="section">
+        <div class="row">
+          <div class="card gradient-1">
+            <h2>Fee Summary</h2>
+            <table class="table" id="tblFees"><thead>
+              <tr><th>Term</th><th>Amount</th><th>Status</th></tr>
+            </thead><tbody></tbody></table>
+          </div>
+          <div class="card gradient-4">
+            <h2>Quick Pay (Demo)</h2>
+            <p class="muted">In live mode this will open your payment link / UPI.</p>
+            <button class="btn block">Pay Now</button>
+          </div>
         </div>
       </div>
-      <label class="label" style="margin-top:6px;">Reason</label>
-      <textarea id="lReason" class="input" rows="3" placeholder="Short reason…"></textarea>
-
-      <div class="row" style="margin-top:10px;">
-        <button id="lSubmit" class="btn btn-success">Submit</button>
-        <button id="lExport" class="btn btn-secondary">Export Leaves CSV</button>
-        <button id="lClear" class="btn btn-danger">Clear Local Leaves</button>
-      </div>
-
-      <h3 style="margin-top:16px;">My Leave Requests</h3>
-      <table id="lTable">
-        <thead><tr>
-          <th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th><th>Action</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
-      <div id="lEmpty" class="muted" style="margin-top:6px;">No leave requests.</div>
-    </section>
-
-    <!-- Messages -->
-    <section id="tabMessages" class="card" style="padding:20px; display:none;">
-      <h2>Message Teacher</h2>
-      <label class="label">Subject (optional)</label>
-      <input id="mSubj" class="input" placeholder="e.g., Regarding homework">
-
-      <label class="label">Message</label>
-      <textarea id="mText" class="input" rows="3" placeholder="Write your message…"></textarea>
-
-      <div class="row" style="margin-top:10px;">
-        <button id="mSend" class="btn btn-primary">Send</button>
-        <button id="mExport" class="btn btn-secondary">Export Messages CSV</button>
-        <button id="mClear" class="btn btn-danger">Clear Local Messages</button>
-      </div>
-
-      <h3 style="margin-top:16px;">My Messages</h3>
-      <table id="mTable">
-        <thead><tr>
-          <th>Time</th><th>Subject</th><th>Message</th><th>Status</th><th>Action</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
-      <div id="mEmpty" class="muted" style="margin-top:6px;">No messages yet.</div>
     </section>
   </main>
 
   <script>
-    // ---------- auth guard ----------
-    (()=>{
-      const r=sessionStorage.getItem('sch_role');
-      if(r!=='parent'){ location.replace('./index.html'); }
-    })();
-    document.getElementById('logoutBtn').onclick=()=>{
-      sessionStorage.clear();
-      location.replace('./index.html');
-    };
+    // THEME
+    const root=document.documentElement;
+    const tSaved=localStorage.getItem('theme')||'dark';
+    root.setAttribute('data-theme',tSaved);
+    document.getElementById('themeToggle').checked = (tSaved==='light');
+    document.getElementById('themeToggle').addEventListener('change',e=>{
+      const t=e.target.checked?'light':'dark'; root.setAttribute('data-theme',t); localStorage.setItem('theme',t);
+    });
 
-    // ---------- meta (child/class/section/phone) ----------
-    const META_KEY='sch_parent_meta';
-    const metaEls={
-      child:document.getElementById('pChild'),
-      cls:document.getElementById('pClass'),
-      sec:document.getElementById('pSection'),
-      phone:document.getElementById('pPhone'),
-    };
-    const loadMeta=()=>{
-      try{
-        const m=JSON.parse(localStorage.getItem(META_KEY)||'{}');
-        metaEls.child.value=m.child||'';
-        metaEls.cls.value=m.cls||'';
-        metaEls.sec.value=m.sec||'';
-        metaEls.phone.value=m.phone||'';
-      }catch{}
-    };
-    const saveMeta=()=>{
-      const m={child:metaEls.child.value.trim(),cls:metaEls.cls.value.trim(),sec:metaEls.sec.value.trim(),phone:metaEls.phone.value.trim()};
-      if(!m.child||!m.cls||!m.sec) return alert('Please fill name, class & section.');
-      localStorage.setItem(META_KEY,JSON.stringify(m));
-      alert('Saved');
-      // refresh lists for scope
-      renderDiary(); renderHW(); renderLeaves(); renderMsgs();
-    };
-    document.getElementById('saveMeta').onclick=saveMeta;
-    loadMeta();
+    // Guard access
+    if((sessionStorage.getItem('sch_role')||'')!=='parents'){ /* still allow for quick testing */ }
 
-    const classKey = ()=> {
-      const m=JSON.parse(localStorage.getItem(META_KEY)||'{}');
-      return `${m.cls||'X'}-${m.sec||'Y'}`;
-    };
-    const myName = ()=> (JSON.parse(localStorage.getItem(META_KEY)||'{}').child || 'Student');
-
-    // ---------- tabs ----------
-    const chips=[...document.querySelectorAll('.chip')];
-    chips.forEach(c=>{
-      c.addEventListener('click',()=>{
-        chips.forEach(x=>x.classList.remove('active'));
-        c.classList.add('active');
-        ['tabDiary','tabHomework','tabLeaves','tabMessages'].forEach(id=>{
-          document.getElementById(id).style.display = (c.dataset.tab===id)?'block':'none';
-        });
+    // Tabs
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const id = btn.dataset.t;
+        document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+        document.getElementById('sec-'+id).classList.add('active');
       });
     });
 
-    // ---------- keys used also by teacher/admin ----------
-    const D_KEY='sch_diary';   // { "5-A": [ {date,subj,msg,link}, ... ] }
-    const H_KEY='sch_hw';      // { "5-A": [ {due,subj,title,details}, ... ] }
+    // Demo local data API
+    const L = {
+      get:(k)=>JSON.parse(localStorage.getItem(k)||"[]"),
+      set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+    };
 
-    // ---------- Diary feed ----------
-    const diaryList = document.getElementById('diaryList');
-    const dEmpty    = document.getElementById('dEmpty');
-    const dFilter   = document.getElementById('dFilter');
+    // Render helpers
+    function rows(el, arr, mapper){
+      const tb = el.querySelector('tbody'); tb.innerHTML="";
+      arr.forEach((it)=>tb.insertAdjacentHTML('beforeend', mapper(it)));
+    }
 
-    function getDiary(){
-      const all=JSON.parse(localStorage.getItem(D_KEY)||'{}');
-      return all[classKey()]||[];
+    // Seed demo messages if empty
+    if(!localStorage.getItem('msgs')){
+      L.set('msgs',[
+        {time:Date.now()-86400000, text:'Half-day on Friday for Sports meet.'},
+        {time:Date.now()-3600*1000, text:'Bus route B will be delayed by 10 mins.'}
+      ]);
     }
-    function renderDiary(){
-      const q=(dFilter.value||'').toLowerCase();
-      const list=getDiary().filter(r=>{
-        return !q || (r.subj||'').toLowerCase().includes(q) || (r.msg||'').toLowerCase().includes(q);
-      });
-      diaryList.innerHTML='';
-      list.forEach(r=>{
-        const div=document.createElement('div');
-        div.className='item';
-        div.innerHTML=`
-          <div class="row" style="justify-content:space-between;gap:12px;">
-            <div><strong>${r.subj||'General'}</strong></div>
-            <div class="meta pill">${r.date}</div>
-          </div>
-          <div style="margin-top:6px">${(r.msg||'').replace(/\n/g,'<br>')}</div>
-          ${r.link? `<div class="row" style="margin-top:8px"><a class="btn btn-secondary small" target="_blank" href="${r.link}">Open Link</a></div>`:''}
-        `;
-        diaryList.appendChild(div);
-      });
-      dEmpty.style.display=list.length? 'none':'block';
+    if(!localStorage.getItem('fees')){
+      L.set('fees',[
+        {term:"Term 1", amt: "₹15,000", status:"Paid"},
+        {term:"Term 2", amt: "₹15,000", status:"Due"}
+      ]);
     }
-    dFilter.oninput=renderDiary;
-    document.getElementById('dRefresh').onclick=renderDiary;
 
-    // ---------- Homework ----------
-    const hTable = document.querySelector('#hTable tbody');
-    const hEmpty = document.getElementById('hEmpty');
-    const hShow  = document.getElementById('hShow');
-    const HW_DONE_KEY='sch_hw_done'; // { "5-A": { "due|title": true } }
+    // Render all
+    function render(){
+      rows(document.getElementById('tblDiary'),
+        L.get('diary').slice(-20).reverse(),
+        (d)=>`<tr>
+                <td>${new Date(d.date).toLocaleDateString()}</td>
+                <td>${d.subject||'-'}</td>
+                <td>${d.msg||''}</td>
+                <td>${d.link?`<a href="${d.link}" target="_blank">Open</a>`:""}</td>
+              </tr>`);
 
-    function classDoneMap(){
-      const all=JSON.parse(localStorage.getItem(HW_DONE_KEY)||'{}');
-      return all[classKey()]||{};
-    }
-    function setDoneKey(key, val){
-      const all=JSON.parse(localStorage.getItem(HW_DONE_KEY)||'{}');
-      const map=all[classKey()]||{};
-      map[key]=val;
-      all[classKey()]=map;
-      localStorage.setItem(HW_DONE_KEY,JSON.stringify(all));
-    }
-    function getHW(){
-      const all=JSON.parse(localStorage.getItem(H_KEY)||'{}');
-      return all[classKey()]||[];
-    }
-    function renderHW(){
-      const done=classDoneMap();
-      const filter=hShow.value;
-      const rows=getHW().filter(r=>{
-        const k=`${r.due}|${r.title}`;
-        const isDone=!!done[k];
-        if(filter==='pending') return !isDone;
-        if(filter==='done')    return isDone;
-        return true;
+      rows(document.getElementById('tblHw'),
+        L.get('hw').slice(-20).reverse(),
+        (h)=>`<tr>
+              <td>${new Date(h.due).toLocaleDateString()}</td>
+              <td>${h.subject||'-'}</td>
+              <td>${h.title||''}</td>
+              <td>${h.details||''}</td>
+            </tr>`);
+
+      const ul=document.getElementById('listMsgs'); ul.innerHTML="";
+      L.get('msgs').slice(-15).reverse().forEach(m=>{
+        ul.insertAdjacentHTML('beforeend', `<li>${m.text} <span class="muted">· ${new Date(m.time).toLocaleString()}</span></li>`);
       });
-      hTable.innerHTML='';
-      rows.forEach(r=>{
-        const k=`${r.due}|${r.title}`;
-        const isDone=!!done[k];
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${r.due}</td><td>${r.subj}</td><td>${r.title}</td><td>${r.details}</td>
-          <td>${isDone?'<span class="pill">Done</span>':'Pending'}</td>
-          <td>
-            ${isDone? `<button data-k="${k}" class="btn btn-danger small">Undo</button>`
-                     : `<button data-k="${k}" class="btn btn-success small">Mark Done</button>`}
-          </td>`;
-        hTable.appendChild(tr);
-      });
-      hEmpty.style.display=rows.length? 'none':'block';
+
+      rows(document.getElementById('tblLeaves'), L.get('leaves').slice(-20).reverse(),
+        (x)=>`<tr><td>${x.date}</td><td>${x.reason}</td><td>${x.status||'Pending'}</td></tr>`);
+
+      rows(document.getElementById('tblCmp'), L.get('complaints').slice(-20).reverse(),
+        (c)=>`<tr><td>${new Date(c.time).toLocaleString()}</td><td>${c.sub}</td><td>${c.status||'Open'}</td></tr>`);
+
+      rows(document.getElementById('tblFees'), L.get('fees'),
+        (f)=>`<tr><td>${f.term}</td><td>${f.amt}</td><td>${f.status}</td></tr>`);
     }
-    document.getElementById('hRefresh').onclick=renderHW;
-    hShow.onchange=renderHW;
-    hTable.addEventListener('click',e=>{
-      const k=e.target?.dataset?.k;
-      if(!k) return;
-      const done=classDoneMap();
-      const newVal = !done[k];
-      setDoneKey(k,newVal);
-      renderHW();
+    render();
+
+    // Actions
+    document.getElementById('btnLeave').addEventListener('click', ()=>{
+      const date=document.getElementById('lvDate').value;
+      const reason=document.getElementById('lvReason').value.trim();
+      if(!date||!reason) return alert("Select date & reason");
+      const arr=L.get('leaves'); arr.push({date,reason,status:'Pending'}); L.set('leaves',arr); render();
+      document.getElementById('lvReason').value=""; alert('Leave sent.');
     });
 
-    // ---------- Leaves ----------
-    const L_KEY='sch_leaves'; // { "5-A": [ {from,to,reason,days,child,phone,status} ] }
-    const lFrom=document.getElementById('lFrom');
-    const lTo=document.getElementById('lTo');
-    const lReason=document.getElementById('lReason');
-    const lTable=document.querySelector('#lTable tbody');
-    const lEmpty=document.getElementById('lEmpty');
-    lFrom.value = new Date().toISOString().slice(0,10);
-    lTo.value   = new Date().toISOString().slice(0,10);
-
-    function getLeaves(){
-      const all=JSON.parse(localStorage.getItem(L_KEY)||'{}');
-      return all[classKey()]||[];
-    }
-    function saveLeaves(list){
-      const all=JSON.parse(localStorage.getItem(L_KEY)||'{}');
-      all[classKey()]=list;
-      localStorage.setItem(L_KEY,JSON.stringify(all));
-    }
-    function renderLeaves(){
-      const list=getLeaves().filter(r=>r.child===myName()); // show only my child’s requests
-      lTable.innerHTML='';
-      list.forEach((r,i)=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${r.from}</td><td>${r.to}</td><td>${r.days}</td><td>${r.reason}</td><td>${r.status}</td>
-        <td><button class="btn btn-danger small" data-i="${i}">Del</button></td>`;
-        lTable.appendChild(tr);
-      });
-      lEmpty.style.display=list.length? 'none':'block';
-    }
-    document.getElementById('lSubmit').onclick=()=>{
-      const m=JSON.parse(localStorage.getItem(META_KEY)||'{}');
-      if(!m.child||!m.cls||!m.sec) return alert('Save child/class/section first.');
-      const days = (new Date(lTo.value) - new Date(lFrom.value)) / (1000*3600*24) + 1;
-      if(days<1 || isNaN(days)) return alert('Invalid date range');
-      const list=getLeaves();
-      list.unshift({from:lFrom.value,to:lTo.value,reason:lReason.value.trim(),days,child:m.child,phone:m.phone||'',status:'Pending'});
-      saveLeaves(list); renderLeaves();
-      lReason.value=''; alert('Leave submitted (local demo).');
-    };
-    lTable.addEventListener('click',e=>{
-      if(e.target.dataset.i){
-        const i=+e.target.dataset.i;
-        const list=getLeaves().filter(r=>r.child===myName()); // index in filtered list -> find in all
-        const target=list[i];
-        const all=getLeaves();
-        const idx=all.findIndex(r=>r===target);
-        if(idx>-1){ all.splice(idx,1); saveLeaves(all); renderLeaves(); }
-      }
+    document.getElementById('btnCmp').addEventListener('click', ()=>{
+      const sub=document.getElementById('cmpSub').value.trim();
+      const msg=document.getElementById('cmpMsg').value.trim();
+      if(!sub||!msg) return alert("Subject & details required");
+      const arr=L.get('complaints'); arr.push({time:Date.now(), sub, msg, status:'Open'}); L.set('complaints',arr); render();
+      document.getElementById('cmpSub').value=""; document.getElementById('cmpMsg').value="";
+      alert('Complaint submitted.');
     });
-    document.getElementById('lExport').onclick=()=>{
-      const mine=getLeaves().filter(r=>r.child===myName());
-      let csv="From,To,Days,Reason,Status\n";
-      mine.forEach(r=>csv+=`${r.from},${r.to},${r.days},"${r.reason.replace(/"/g,'""')}",${r.status}\n`);
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-      a.download=`Leaves-${classKey()}-${myName()}.csv`; a.click();
-    };
-    document.getElementById('lClear').onclick=()=>{
-      if(confirm('Clear ALL leaves for this class (including others)?')){
-        saveLeaves([]); renderLeaves();
-      }
-    };
-
-    // ---------- Messages ----------
-    const M_KEY='sch_msgs'; // { "5-A": [ {time,from,phone,subj,text,status} ] }
-    const mSubj=document.getElementById('mSubj');
-    const mText=document.getElementById('mText');
-    const mTable=document.querySelector('#mTable tbody');
-    const mEmpty=document.getElementById('mEmpty');
-
-    function getMsgs(){
-      const all=JSON.parse(localStorage.getItem(M_KEY)||'{}');
-      return all[classKey()]||[];
-    }
-    function saveMsgs(list){
-      const all=JSON.parse(localStorage.getItem(M_KEY)||'{}');
-      all[classKey()]=list;
-      localStorage.setItem(M_KEY,JSON.stringify(all));
-    }
-    function renderMsgs(){
-      const list=getMsgs().filter(r=>r.from===myName());
-      mTable.innerHTML='';
-      list.forEach((r,i)=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${r.time}</td><td>${r.subj||''}</td><td>${r.text}</td><td>${r.status||'Sent'}</td>
-        <td><button class="btn btn-danger small" data-i="${i}">Del</button></td>`;
-        mTable.appendChild(tr);
-      });
-      mEmpty.style.display=list.length? 'none':'block';
-    }
-    document.getElementById('mSend').onclick=()=>{
-      const m=JSON.parse(localStorage.getItem(META_KEY)||'{}');
-      if(!m.child||!m.cls||!m.sec) return alert('Save child/class/section first.');
-      if(!mText.value.trim()) return alert('Write a message');
-      const list=getMsgs();
-      const now=new Date();
-      const ts = now.toLocaleString();
-      list.unshift({time:ts,from:m.child,phone:m.phone||'',subj:mSubj.value.trim(),text:mText.value.trim(),status:'Sent'});
-      saveMsgs(list); renderMsgs();
-      mText.value=''; mSubj.value='';
-      alert('Message sent (local demo).');
-    };
-    mTable.addEventListener('click',e=>{
-      if(e.target.dataset.i){
-        const i=+e.target.dataset.i;
-        const list=getMsgs().filter(r=>r.from===myName());
-        const target=list[i];
-        const all=getMsgs();
-        const idx=all.findIndex(r=>r===target);
-        if(idx>-1){ all.splice(idx,1); saveMsgs(all); renderMsgs(); }
-      }
-    });
-    document.getElementById('mExport').onclick=()=>{
-      const mine=getMsgs().filter(r=>r.from===myName());
-      let csv="Time,Subject,Message,Status\n";
-      mine.forEach(r=>csv+=`"${r.time}","${(r.subj||'').replace(/"/g,'""')}","${r.text.replace(/"/g,'""')}",${r.status||'Sent'}\n`);
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-      a.download=`Messages-${classKey()}-${myName()}.csv`; a.click();
-    };
-    document.getElementById('mClear').onclick=()=>{
-      if(confirm('Clear ALL messages for this class (including others)?')){
-        saveMsgs([]); renderMsgs();
-      }
-    };
-
-    // initial renders
-    renderDiary(); renderHW(); renderLeaves(); renderMsgs();
   </script>
 </body>
 </html>
