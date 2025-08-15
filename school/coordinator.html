@@ -1,357 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coordinator Panel • School PWA</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="stylesheet" href="./styles.css" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Coordinator Panel</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0a0a14"/>
+
+  <link rel="stylesheet" href="./styles.css?v=glass-1.0"/>
+
   <style>
-    /* Page-specific tiny tweaks (rest is from styles.css) */
-    .banner {
-      width: 100%;
-      border-radius: 24px;
-      overflow: hidden;
-      position: relative;
-      margin-bottom: 18px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.12);
-    }
-    .banner img {
-      width: 100%;
-      display: block;
-      height: 180px;
-      object-fit: cover;
-      filter: saturate(1.05) contrast(1.02);
-    }
-    .banner h1 {
-      position: absolute;
-      left: 20px;
-      bottom: 20px;
-      margin: 0;
-      color: #fff;
-      font-size: 28px;
-      text-shadow: 0 4px 14px rgba(0,0,0,.35);
-      letter-spacing: .2px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-    @media (min-width: 720px){
-      .grid-2 { grid-template-columns: 1fr 1fr; }
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    @media (min-width: 560px){
-      .row-2 { grid-template-columns: 1fr 1fr; }
-      .row-3 { grid-template-columns: 1fr 1fr 1fr; }
-    }
-
-    .btn-row { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn-primary { background: rgba(255,255,255,.28); }
-    .pill {
-      display:inline-flex; align-items:center; gap:8px;
-      font-weight:700; font-size:12px; padding:6px 10px;
-      border-radius:999px; background: rgba(255,255,255,.25);
-      border:1px solid rgba(255,255,255,.35);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    .muted { opacity:.8; }
-    .caption { font-size:12px; opacity:.8; }
-
-    /* colored accents for panels */
-    .glass-blue   { background: linear-gradient(135deg, rgba(25,118,210,.18), rgba(3,169,244,.14)); }
-    .glass-green  { background: linear-gradient(135deg, rgba(46,125,50,.18), rgba(102,187,106,.14)); }
-    .glass-orange { background: linear-gradient(135deg, rgba(230,126,34,.18), rgba(253,187,45,.14)); }
+    .wrap { max-width: 880px; margin: 18px auto; padding: 0 14px; }
+    .banner img { width: 100%; border-radius: 18px; }
+    h2 { margin: 16px 0 10px; }
+    table { width:100%; border-collapse: collapse; margin-top:12px; font-size:.9rem }
+    th,td { border-bottom:1px solid rgba(255,255,255,0.08); padding:8px 6px; text-align:left }
+    th { opacity:.8 }
   </style>
 </head>
 <body>
-  <header class="navbar">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-      <div class="pill">Coordinator</div>
-      <button id="logoutBtn" class="btn">Logout</button>
-    </div>
-  </header>
-
-  <main class="container">
+  <main class="wrap">
     <!-- Banner -->
-    <div class="banner card">
-      <img src="./assets/banner.png" alt="School" />
-      <h1>Coordinator Panel</h1>
-    </div>
+    <section class="banner card">
+      <img src="./assets/banner.png" alt="School banner"/>
+      <div class="title-overlay">
+        <div class="title">Coordinator Panel</div>
+        <div class="subtitle">Manage class timetable & meta</div>
+      </div>
+      <button id="logoutBtn" class="btn btn-danger small" style="position:absolute;top:14px;right:14px;">Logout</button>
+    </section>
 
     <!-- Class Setup -->
-    <section class="panel card glass-blue">
-      <h2 style="margin-top:0">Class Setup</h2>
-      <p class="muted">Choose class/section & meta for actions below</p>
+    <section class="card" style="padding:20px;">
+      <h2>Class Setup</h2>
+      <p>Choose class/section & meta for actions below</p>
 
-      <div class="row row-2">
-        <div>
-          <label>Class</label>
-          <input id="clz" placeholder="e.g., 5" inputmode="numeric" />
-        </div>
-        <div>
-          <label>Section</label>
-          <input id="sec" placeholder="e.g., A" />
-        </div>
-      </div>
+      <label class="label">Class</label>
+      <input id="class" class="input" placeholder="e.g., 5"/>
 
-      <div class="row row-3">
-        <div>
-          <label>Day</label>
-          <select id="day">
-            <option>Mon</option><option>Tue</option><option>Wed</option>
-            <option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
-          </select>
-        </div>
-        <div>
-          <label>Period #</label>
-          <input id="period" placeholder="1–12" inputmode="numeric" />
-        </div>
-        <div>
-          <label>Subject</label>
-          <input id="subject" placeholder="e.g., Maths" />
-        </div>
-      </div>
+      <label class="label">Section</label>
+      <input id="section" class="input" placeholder="e.g., A"/>
 
-      <div class="btn-row" style="margin-top:10px">
-        <button id="saveMeta" class="btn btn-primary">Save Meta</button>
-        <span class="caption" id="metaSavedMsg"></span>
-      </div>
+      <label class="label">Day</label>
+      <select id="day" class="input">
+        <option>Mon</option><option>Tue</option><option>Wed</option>
+        <option>Thu</option><option>Fri</option><option>Sat</option>
+      </select>
+
+      <label class="label">Period #</label>
+      <input id="period" class="input" placeholder="1–12"/>
+
+      <label class="label">Subject</label>
+      <input id="subject" class="input" placeholder="e.g., Maths"/>
+
+      <button id="saveMeta" class="btn btn-primary" style="margin-top:12px;">Save Meta</button>
     </section>
 
     <!-- Timetable Editor -->
-    <section class="panel card glass-green">
-      <h2 style="margin-top:0">Timetable</h2>
-      <p class="muted">Add/replace period entries for the selected class</p>
+    <section class="card" style="padding:20px;">
+      <h2>Timetable</h2>
+      <p>Add/replace period entries for the selected class</p>
 
-      <div class="row row-2">
-        <div>
-          <label>Teacher name</label>
-          <input id="teacher" placeholder="e.g., Ms. Priya" />
-        </div>
-        <div>
-          <label>Room (optional)</label>
-          <input id="room" placeholder="e.g., 203" />
-        </div>
+      <label class="label">Teacher Name</label>
+      <input id="teacher" class="input" placeholder="e.g., Ms. Priya"/>
+
+      <label class="label">Room (optional)</label>
+      <input id="room" class="input" placeholder="Room #"/>
+
+      <button id="addUpdate" class="btn btn-success" style="margin-top:12px;">Add / Update</button>
+
+      <table id="timetableTable">
+        <thead>
+          <tr>
+            <th>#</th><th>Day</th><th>Period</th><th>Subject</th>
+            <th>Teacher</th><th>Room</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button id="exportCsv" class="btn btn-secondary">Export CSV</button>
+        <button id="clear" class="btn btn-danger">Clear Class Timetable</button>
       </div>
-
-      <div class="btn-row" style="margin-top:10px">
-        <button id="addUpdate" class="btn btn-primary">Add / Update</button>
-        <button id="exportCSV" class="btn">Export CSV</button>
-        <button id="clearTable" class="btn">Clear Class Timetable</button>
-        <span class="caption" id="opMsg"></span>
-      </div>
-
-      <div class="table-container" style="margin-top:14px">
-        <table id="table">
-          <thead>
-            <tr>
-              <th>#</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="tbody">
-            <tr><td colspan="7" class="muted">No entries yet.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Logs (optional lightweight view) -->
-    <section class="panel card glass-orange">
-      <h2 style="margin-top:0">Recent Changes</h2>
-      <div id="log" class="caption muted">No changes yet.</div>
     </section>
   </main>
 
   <script>
-    // ------- Simple role lock (expect index.html to set school_role in sessionStorage) -------
-    (function lock(){
-      const role = sessionStorage.getItem('school_role');
-      if (role !== 'coordinator') {
-        // optional: preserve that user tried
-        location.replace('./index.html');
-      }
+    // Redirect if not logged in
+    (()=>{
+      const r=sessionStorage.getItem('sch_role');
+      if(r!=='coordinator'){ location.replace('./index.html'); }
     })();
 
-    // Helpers
-    const $ = (id)=>document.getElementById(id);
-    const val = (id)=>$(id).value.trim();
-
-    function keyFor() {
-      const clz = val('clz').toUpperCase();
-      const sec = val('sec').toUpperCase();
-      if(!clz || !sec) return null;
-      return `sch_timetable_${clz}_${sec}`;
-    }
-
-    function readMeta(){
-      const meta = JSON.parse(localStorage.getItem('sch_meta')||'{}');
-      if(meta.clz) $('clz').value = meta.clz;
-      if(meta.sec) $('sec').value = meta.sec;
-      if(meta.day) $('day').value = meta.day;
-      if(meta.period) $('period').value = meta.period;
-      if(meta.subject) $('subject').value = meta.subject;
-    }
-
-    function saveMeta(){
-      const m = {
-        clz: val('clz'),
-        sec: val('sec'),
-        day: val('day'),
-        period: val('period'),
-        subject: val('subject'),
-      };
-      localStorage.setItem('sch_meta', JSON.stringify(m));
-      $('metaSavedMsg').textContent = 'Saved ✓';
-      setTimeout(()=>{ $('metaSavedMsg').textContent = '';}, 1500);
-      renderTable();
-    }
-
-    function readTable(){
-      const k = keyFor();
-      if(!k) return [];
-      return JSON.parse(localStorage.getItem(k) || '[]');
-    }
-
-    function writeTable(rows){
-      const k = keyFor();
-      if(!k) return;
-      localStorage.setItem(k, JSON.stringify(rows));
-    }
-
-    function renderTable(){
-      const tbody = $('tbody');
-      const rows = readTable();
-      tbody.innerHTML = '';
-      if(rows.length === 0){
-        const tr = document.createElement('tr');
-        const td = document.createElement('td');
-        td.colSpan = 7;
-        td.className = 'muted';
-        td.textContent = 'No entries yet.';
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-        return;
-      }
-      rows
-        .sort((a,b)=>{
-          const dayOrder = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-          if (a.day !== b.day) return dayOrder.indexOf(a.day)-dayOrder.indexOf(b.day);
-          return (parseInt(a.period)||0)-(parseInt(b.period)||0);
-        })
-        .forEach((r,i)=>{
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${i+1}</td>
-            <td>${r.day}</td>
-            <td>${r.period}</td>
-            <td>${r.subject||''}</td>
-            <td>${r.teacher||''}</td>
-            <td>${r.room||''}</td>
-            <td><button class="btn" data-del="${r.day}|${r.period}">Delete</button></td>
-          `;
-          tbody.appendChild(tr);
-        });
-    }
-
-    function addOrUpdate(){
-      const clz = val('clz'), sec = val('sec');
-      if(!clz || !sec){ $('opMsg').textContent = 'Enter Class & Section first.'; return; }
-
-      const entry = {
-        day: val('day'),
-        period: val('period'),
-        subject: val('subject'),
-        teacher: val('teacher'),
-        room: val('room'),
-        ts: Date.now()
-      };
-      if(!entry.period){ $('opMsg').textContent = 'Enter Period #'; return; }
-
-      let rows = readTable();
-      const idx = rows.findIndex(r => r.day===entry.day && String(r.period)===String(entry.period));
-      if(idx>=0){ rows[idx] = entry; log(`Updated ${entry.day} P${entry.period}`); }
-      else { rows.push(entry); log(`Added ${entry.day} P${entry.period}`); }
-
-      writeTable(rows);
-      $('opMsg').textContent = 'Saved ✓';
-      setTimeout(()=>{ $('opMsg').textContent=''; }, 1200);
-      renderTable();
-    }
-
-    function delEntry(day, period){
-      let rows = readTable();
-      rows = rows.filter(r => !(r.day===day && String(r.period)===String(period)));
-      writeTable(rows);
-      renderTable();
-      log(`Deleted ${day} P${period}`);
-    }
-
-    function exportCSV(){
-      const rows = readTable();
-      const hdr = ['Day','Period','Subject','Teacher','Room','Timestamp'];
-      const lines = [hdr.join(',')].concat(
-        rows.map(r=>[r.day,r.period,esc(r.subject),esc(r.teacher),esc(r.room),r.ts].join(','))
-      );
-      const blob = new Blob([lines.join('\n')], {type: 'text/csv;charset=utf-8;'});
-      const a = document.createElement('a');
-      const clz = val('clz').toUpperCase()||'X';
-      const sec = val('sec').toUpperCase()||'X';
-      a.href = URL.createObjectURL(blob);
-      a.download = `timetable_${clz}_${sec}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      log('Exported CSV');
-    }
-    const esc = (s)=>(''+(s||'')).replaceAll('"','""').includes(',')?`"${(''+(s||'')).replaceAll('"','""')}"`:(''+(s||''));
-
-    function clearTable(){
-      const k = keyFor();
-      if(!k) return;
-      if(!confirm('Clear timetable for this class/section?')) return;
-      localStorage.removeItem(k);
-      renderTable();
-      log('Cleared timetable');
-    }
-
-    function log(msg){
-      const el = $('log');
-      const t = new Date().toLocaleTimeString();
-      el.textContent = `[${t}] ${msg}`;
-    }
-
-    // Events
-    $('saveMeta').addEventListener('click', saveMeta);
-    $('addUpdate').addEventListener('click', addOrUpdate);
-    $('exportCSV').addEventListener('click', exportCSV);
-    $('clearTable').addEventListener('click', clearTable);
-
-    $('tbody').addEventListener('click', (e)=>{
-      const del = e.target.getAttribute('data-del');
-      if(del){
-        const [d,p] = del.split('|');
-        delEntry(d,p);
-      }
-    });
-
-    $('logoutBtn').addEventListener('click', ()=>{
-      sessionStorage.removeItem('school_role');
+    document.getElementById('logoutBtn').onclick=()=>{
+      sessionStorage.clear();
       location.replace('./index.html');
+    };
+
+    const tableBody=document.querySelector('#timetableTable tbody');
+    let entries=[];
+
+    function render(){
+      tableBody.innerHTML='';
+      entries.forEach((row,i)=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${i+1}</td>
+          <td>${row.day}</td><td>${row.period}</td><td>${row.subject}</td>
+          <td>${row.teacher}</td><td>${row.room||''}</td>
+          <td><button data-i="${i}" class="btn btn-danger small">Del</button></td>`;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('addUpdate').onclick=()=>{
+      const cls=document.getElementById('class').value.trim();
+      const sec=document.getElementById('section').value.trim();
+      const day=document.getElementById('day').value;
+      const per=document.getElementById('period').value.trim();
+      const sub=document.getElementById('subject').value.trim();
+      const teacher=document.getElementById('teacher').value.trim();
+      const room=document.getElementById('room').value.trim();
+      if(!cls||!sec||!per||!sub||!teacher) return alert('Fill all required');
+      entries.push({cls,sec,day,period:per,subject:sub,teacher,room});
+      render();
+    };
+
+    tableBody.addEventListener('click',(e)=>{
+      if(e.target.dataset.i){
+        entries.splice(e.target.dataset.i,1);
+        render();
+      }
     });
 
-    // Init
-    readMeta();
-    renderTable();
+    document.getElementById('exportCsv').onclick=()=>{
+      let csv="Day,Period,Subject,Teacher,Room\n";
+      entries.forEach(r=>{ csv+=`${r.day},${r.period},${r.subject},${r.teacher},${r.room||''}\n`;});
+      const blob=new Blob([csv],{type:'text/csv'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='timetable.csv';
+      a.click();
+    };
+
+    document.getElementById('clear').onclick=()=>{
+      if(confirm('Clear all entries?')){ entries=[];render(); }
+    };
   </script>
 </body>
 </html>
