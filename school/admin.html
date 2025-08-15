@@ -1,162 +1,107 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Admin · School Demo</title>
-  <link rel="stylesheet" href="styles.css">
-<script type="module" src="ui.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin • School PWA</title>
+  <script>
+    (function(){var t=localStorage.getItem('theme')||new URLSearchParams(location.search).get('theme')||'dark';
+      document.documentElement.classList.add(t);
+      document.addEventListener('DOMContentLoaded',()=>document.body.classList.add(t));})();
+  </script>
+  <link rel="preload" href="styles.css?v=2025-08-15-2" as="style" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="styles.css?v=2025-08-15-2"></noscript>
 </head>
-<body class="dark">
+<body>
   <div class="wrapper">
-    <section class="accent-rose">
+    <section class="accent-pink">
       <div class="glass header">
-        <div class="row" style="justify-content:space-between;align-items:center;">
+        <div class="row between center">
           <div class="h1">Admin</div>
-          <div class="row">
-            <a class="btn" href="index.html">PIN</a>
-            <button class="btn btn-gradient" onclick="toggleTheme()">Theme</button>
+          <div class="row gap-8">
+            <a class="chip" href="index.html">PIN</a>
+            <button class="btn" onclick="toggleTheme()">Theme</button>
           </div>
         </div>
-        <div class="text-dim">Scope, broadcast, leaves, data, backup</div>
+        <div class="tabs mt-12">
+          <button class="tab chip chip-indigo" data-tab="scope" aria-selected="true">Scope</button>
+          <button class="tab chip chip-blue"   data-tab="broadcast">Broadcast</button>
+          <button class="tab chip chip-pink"   data-tab="leaves">Leaves</button>
+          <button class="tab chip chip-teal"   data-tab="data">Data</button>
+          <button class="tab chip chip-orange" data-tab="backup">Backup</button>
+        </div>
       </div>
     </section>
 
-    <div class="tabs mt-16">
-      <div class="tab-list">
-        <button class="tab-btn" data-tab="a-scope" aria-selected="true">Scope</button>
-        <button class="tab-btn" data-tab="a-bcast">Broadcast</button>
-        <button class="tab-btn" data-tab="a-leaves">Leaves</button>
-        <button class="tab-btn" data-tab="a-data">Data</button>
-        <button class="tab-btn" data-tab="a-backup">Backup</button>
-      </div>
-    </div>
-
-    <div class="tab-panels">
+    <section class="accent-pink">
       <!-- Scope -->
-      <div class="tab-panel active" id="a-scope">
-        <section class="accent-violet">
-          <div class="glass">
-            <div class="h2">Class Scope</div>
-            <div class="grid cols-2">
-              <input id="as-class" class="input" placeholder="Class eg, 5">
-              <input id="as-sec" class="input" placeholder="Section eg, A">
-            </div>
-            <div class="mt-12"><button class="btn btn-indigo" id="asSave">Save</button></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel" id="panel-scope">
+        <div class="h2">Class Scope</div>
+        <div class="grid mt-10">
+          <input class="input" id="sClass" placeholder="Class eg, 5">
+          <input class="input" id="sSec"   placeholder="Section eg, A">
+          <button class="btn" id="sSave">Save</button>
+        </div>
       </div>
 
       <!-- Broadcast -->
-      <div class="tab-panel" id="a-bcast">
-        <section class="accent-teal">
-          <div class="glass">
-            <div class="h2">Broadcast to Parents</div>
-            <textarea id="abText" class="input" placeholder="Message…"></textarea>
-            <div class="mt-12"><button class="btn btn-teal" id="abSend">Send</button></div>
-            <div id="abList" class="mt-12"></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-broadcast">
+        <div class="h2">Broadcast to Parents</div>
+        <div class="grid mt-10">
+          <textarea class="input" id="abMsg" rows="3" placeholder="Message..."></textarea>
+          <button class="btn" id="abSend">Send</button>
+        </div>
+        <div class="h3 mt-16">Sent</div>
+        <div id="abList" class="list mt-8 text-dim">No broadcasts.</div>
       </div>
 
       <!-- Leaves -->
-      <div class="tab-panel" id="a-leaves">
-        <section class="accent-indigo">
-          <div class="glass">
-            <div class="h2">Leave Requests</div>
-            <div id="alList" class="mt-12"></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-leaves">
+        <div class="h2">Leave Requests</div>
+        <div id="lvList" class="list mt-8 text-dim">No pending requests.</div>
       </div>
 
       <!-- Data -->
-      <div class="tab-panel" id="a-data">
-        <section class="accent-rose">
-          <div class="glass">
-            <div class="h2">Data</div>
-            <div class="text-dim">This demo shows local data only.</div>
-            <div class="grid cols-3 mt-12">
-              <button class="btn">Students.csv</button>
-              <button class="btn">Teachers.csv</button>
-              <button class="btn">Timetable.csv</button>
-            </div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-data">
+        <div class="h2">Data</div>
+        <p class="text-dim">This demo shows local data only.</p>
+        <div class="row wrap gap-8 mt-10">
+          <a class="btn" href="students.csv" download>Students.csv</a>
+          <a class="btn" href="teachers.csv" download>Teachers.csv</a>
+          <a class="btn" href="timetable.csv" download>Timetable.csv</a>
+        </div>
       </div>
 
       <!-- Backup -->
-      <div class="tab-panel" id="a-backup">
-        <section class="accent-rose">
-          <div class="glass">
-            <div class="h2">Quick Backup / Restore</div>
-            <div class="row mt-12">
-              <button class="btn btn-rose" id="bk">Backup</button>
-              <button class="btn btn-rose" id="rs">Restore</button>
-            </div>
-            <input id="bkFile" class="input mt-12" type="file" accept="application/json">
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-backup">
+        <div class="h2">Quick Backup / Restore</div>
+        <div class="row wrap gap-8 mt-10">
+          <button class="btn" id="bkBtn">Backup</button>
+          <label class="btn"><input type="file" id="rsBtn" hidden><span>Restore</span></label>
+        </div>
       </div>
-    </div>
+    </section>
   </div>
 
-  <script type="module" src="ui.js"></script>
   <script>
-  const db = {
-    get(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
-    set(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-  };
-
-  // Scope
-  const scopeKey='adminScope';
-  document.getElementById('asSave').onclick=()=>{
-    db.set(scopeKey,{cls:gid('as-class').value.trim(),sec:gid('as-sec').value.trim()});
-    alert('Saved.');
-  };
-
-  // Broadcast
-  function renderB(){
-    const arr=db.get('broadcasts',[]);
-    gid('abList').innerHTML=arr.map(b=>`<div class="glass"><span class="text-dim">${new Date(b.time).toLocaleString()}</span><div class="mt-8">${b.text}</div></div>`).join('') || '<div class="text-dim">No broadcasts.</div>';
-  }
-  gid('abSend').onclick=()=>{
-    const txt=(gid('abText').value||'').trim(); if(!txt) return;
-    const arr=db.get('broadcasts',[]); arr.unshift({time:Date.now(), text:txt}); db.set('broadcasts',arr);
-    gid('abText').value=''; renderB();
-  };
-
-  // Leaves (approve/deny demo)
-  function renderLeaves(){
-    const arr=db.get('leaves',[]);
-    gid('alList').innerHTML = arr.map((l,i)=>`
-      <div class="glass">
-        <div><b>${l.date}</b> · ${l.days} day(s) — <span class="text-dim">${l.reason}</span></div>
-        <div class="row mt-12">
-          <button class="btn btn-teal" onclick="setLs(${i},'Approved')">Approve</button>
-          <button class="btn btn-rose" onclick="setLs(${i},'Denied')">Deny</button>
-        </div>
-      </div>`).join('') || '<div class="text-dim">No pending requests.</div>';
-  }
-  window.setLs=(i,status)=>{
-    const arr=db.get('leaves',[]);
-    if(arr[i]){ arr[i].status=status; db.set('leaves',arr); renderLeaves(); }
-  };
-
-  // Backup/Restore
-  gid('bk').onclick=()=>{
-    const all={localStorage:{...localStorage}};
-    const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='school-backup.json'; a.click();
-  };
-  gid('rs').onclick=()=> gid('bkFile').click();
-  gid('bkFile').addEventListener('change', async (e)=>{
-    const f=e.target.files?.[0]; if(!f) return;
-    const j=JSON.parse(await f.text());
-    if(j.localStorage){ Object.entries(j.localStorage).forEach(([k,v])=>localStorage.setItem(k,v)); alert('Restored.'); renderB(); renderLeaves(); }
-  });
-
-  function gid(id){ return document.getElementById(id); }
-  renderB(); renderLeaves();
+    function toggleTheme(){var c=document.documentElement.classList.contains('dark')?'dark':'light';
+      var n=c==='dark'?'light':'dark';
+      document.documentElement.classList.replace(c,n);document.body.classList.replace(c,n);
+      localStorage.setItem('theme',n);}
+    document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected','false'));
+      b.setAttribute('aria-selected','true');
+      const k=b.dataset.tab;
+      document.querySelectorAll('.tabpanel').forEach(p=>p.classList.add('hidden'));
+      document.getElementById('panel-'+k).classList.remove('hidden');
+    }));
+    document.getElementById('abSend').onclick=function(){
+      const m=(abMsg.value||'').trim(); if(!m) return;
+      const row=document.createElement('div'); row.className='item'; row.textContent=m;
+      abList.appendChild(row); abList.classList.remove('text-dim'); abMsg.value='';
+    };
   </script>
+
+  <script type="module" src="ui.js?v=2025-08-15-2"></script>
 </body>
 </html>
