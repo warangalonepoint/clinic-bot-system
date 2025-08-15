@@ -1,182 +1,131 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Coordinator · School Demo</title>
-  <link rel="stylesheet" href="styles.css">
-<script type="module" src="ui.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Coordinator • School PWA</title>
+  <script>
+    (function(){var t=localStorage.getItem('theme')||new URLSearchParams(location.search).get('theme')||'dark';
+      document.documentElement.classList.add(t);
+      document.addEventListener('DOMContentLoaded',()=>document.body.classList.add(t));})();
+  </script>
+  <link rel="preload" href="styles.css?v=2025-08-15-2" as="style" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="styles.css?v=2025-08-15-2"></noscript>
 </head>
-<body class="dark">
+<body>
   <div class="wrapper">
     <section class="accent-teal">
       <div class="glass header">
-        <div class="row" style="justify-content:space-between;align-items:center;">
-          <div class="h1">Coordinator Panel</div>
-          <div class="row">
-            <a class="btn" href="index.html">PIN</a>
-            <button class="btn btn-gradient" onclick="toggleTheme()">Theme</button>
+        <div class="row between center">
+          <div>
+            <div class="h1">Coordinator Panel</div>
+            <div class="text-dim">Manage timetable and broadcast</div>
+          </div>
+          <div class="row gap-8">
+            <a class="chip" href="index.html">PIN</a>
+            <button class="btn" onclick="toggleTheme()">Theme</button>
           </div>
         </div>
-        <div class="text-dim">Manage timetable and broadcast</div>
+        <div class="tabs mt-12">
+          <button class="tab chip chip-indigo" data-tab="setup" aria-selected="true">Class Setup</button>
+          <button class="tab chip chip-blue"   data-tab="timetable">Timetable</button>
+          <button class="tab chip chip-pink"   data-tab="broadcast">Broadcast</button>
+          <button class="tab chip chip-teal"   data-tab="data">Data</button>
+        </div>
       </div>
     </section>
 
-    <div class="tabs mt-16">
-      <div class="tab-list">
-        <button class="tab-btn" data-tab="c-setup" aria-selected="true">Class Setup</button>
-        <button class="tab-btn" data-tab="c-tt">Timetable</button>
-        <button class="tab-btn" data-tab="c-bcast">Broadcast</button>
-        <button class="tab-btn" data-tab="c-data">Data</button>
-      </div>
-    </div>
-
-    <div class="tab-panels">
+    <section class="accent-teal">
       <!-- Setup -->
-      <div class="tab-panel active" id="c-setup">
-        <section class="accent-violet">
-          <div class="glass">
-            <div class="h2">Choose Class</div>
-            <div class="grid cols-2">
-              <input id="cc-class" class="input" placeholder="Class e.g., 5">
-              <input id="cc-sec" class="input" placeholder="Section e.g., A">
-            </div>
-            <div class="mt-12"><button class="btn btn-indigo" id="ccSave">Save Meta</button></div>
-            <div id="ccMsg" class="text-dim mt-12"></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel" id="panel-setup">
+        <div class="h2">Choose Class</div>
+        <div class="grid mt-10">
+          <input class="input" id="cClass" placeholder="Class e.g., 5">
+          <input class="input" id="cSec"   placeholder="Section e.g., A">
+          <button class="btn" id="cSave">Save Meta</button>
+        </div>
       </div>
 
       <!-- Timetable -->
-      <div class="tab-panel" id="c-tt">
-        <section class="accent-indigo">
-          <div class="glass">
-            <div class="h2">Add / Replace Period</div>
-            <div class="grid cols-3">
-              <select id="tt-day" class="input">
-                <option>Mon</option><option>Tue</option><option>Wed</option>
-                <option>Thu</option><option>Fri</option><option>Sat</option>
-              </select>
-              <input id="tt-period" class="input" placeholder="Period # 1–12">
-              <input id="tt-subj" class="input" placeholder="Subject">
-            </div>
-            <input id="tt-teacher" class="input mt-12" placeholder="Teacher name">
-            <input id="tt-room" class="input mt-12" placeholder="Room (optional)">
-            <div class="mt-12"><button class="btn btn-indigo" id="ttAdd">Add / Update</button></div>
-
-            <div class="h2 mt-16">Class Timetable</div>
-            <div id="ttList" class="mt-12"></div>
-
-            <div class="row mt-16">
-              <button class="btn" id="ttExport">Export CSV</button>
-              <button class="btn" id="ttClear">Clear Class Timetable</button>
-            </div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-timetable">
+        <div class="h2">Add / Replace Period</div>
+        <div class="grid mt-10">
+          <select class="input" id="ttDay">
+            <option>Mon</option><option>Tue</option><option>Wed</option>
+            <option>Thu</option><option>Fri</option><option>Sat</option>
+          </select>
+          <input class="input" id="ttPeriod" placeholder="Period # 1–12">
+          <input class="input" id="ttSubject" placeholder="Subject">
+          <input class="input" id="ttTeacher" placeholder="Teacher name">
+          <input class="input" id="ttRoom" placeholder="Room (optional)">
+          <button class="btn" id="ttAdd">Add / Update</button>
+        </div>
+        <div class="h3 mt-16">Class Timetable</div>
+        <div id="ttList" class="list mt-8 text-dim">No entries yet.</div>
+        <div class="row gap-8 mt-10">
+          <button class="btn" id="ttExport">Export CSV</button>
+          <button class="btn btn-danger" id="ttClear">Clear Class Timetable</button>
+        </div>
       </div>
 
       <!-- Broadcast -->
-      <div class="tab-panel" id="c-bcast">
-        <section class="accent-teal">
-          <div class="glass">
-            <div class="h2">Broadcast to Parents</div>
-            <textarea id="bcText" class="input" placeholder="Message..."></textarea>
-            <div class="mt-12"><button class="btn btn-teal" id="bcSend">Send</button></div>
-            <div id="bcList" class="mt-12"></div>
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-broadcast">
+        <div class="h2">Broadcast to Parents</div>
+        <div class="grid mt-10">
+          <textarea class="input" id="bMsg" rows="3" placeholder="Message..."></textarea>
+          <button class="btn" id="bSend">Send</button>
+        </div>
+        <div class="h3 mt-16">Sent</div>
+        <div id="bList" class="list mt-8 text-dim">No broadcasts.</div>
       </div>
 
       <!-- Data -->
-      <div class="tab-panel" id="c-data">
-        <section class="accent-rose">
-          <div class="glass">
-            <div class="h2">Data Tools</div>
-            <div class="text-dim">Local-only demo tools.</div>
-            <div class="row mt-12">
-              <button class="btn btn-rose" id="backup">Backup (JSON)</button>
-              <button class="btn btn-rose" id="restore">Restore</button>
-            </div>
-            <input id="restoreFile" class="input mt-12" type="file" accept="application/json">
-          </div>
-        </section>
+      <div class="glass mt-12 tabpanel hidden" id="panel-data">
+        <div class="h2">Data Tools</div>
+        <p class="text-dim">Local-only demo tools.</p>
+        <div class="row wrap gap-8 mt-10">
+          <button class="btn" id="bk">Backup (JSON)</button>
+          <label class="btn">
+            <input type="file" id="rs" hidden>
+            <span>Restore</span>
+          </label>
+        </div>
       </div>
-    </div>
+    </section>
   </div>
 
-  <script type="module" src="ui.js"></script>
   <script>
-  const db = {
-    get(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
-    set(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-  };
-  const scopeKey='coordScope';
-  document.getElementById('ccSave').onclick = ()=>{
-    const v={cls:cc('cc-class'), sec:cc('cc-sec')};
-    db.set(scopeKey,v);
-    gid('ccMsg').textContent='Saved.';
-    renderTT();
-  };
-  function loadScope(){
-    const v=db.get(scopeKey,{cls:'',sec:''});
-    gid('cc-class').value=v.cls; gid('cc-sec').value=v.sec;
-  }
-  function keyTT(){ const s=db.get(scopeKey,{cls:'',sec:''}); return `tt:${s.cls}-${s.sec}`; }
-  function gid(id){ return document.getElementById(id); }
-  function cc(id){ return gid(id).value.trim(); }
-
-  // Timetable
-  function renderTT(){
-    const arr = db.get(keyTT(),[]);
-    gid('ttList').innerHTML = arr.map(t=>`<div class="glass"><b>${t.day} P${t.period}</b> · ${t.subject} — <span class="text-dim">${t.teacher}${t.room?(', Room '+t.room):''}</span></div>`).join('') || '<div class="text-dim">No entries yet.</div>';
-  }
-  gid('ttAdd').onclick = ()=>{
-    if(!cc('cc-class')||!cc('cc-sec')){ alert('Save Class Setup first.'); return; }
-    const rec={day:cc('tt-day'), period:cc('tt-period'), subject:cc('tt-subj'), teacher:cc('tt-teacher'), room:cc('tt-room')};
-    const arr=db.get(keyTT(),[]);
-    const idx=arr.findIndex(x=>x.day===rec.day && x.period===rec.period);
-    if(idx>-1) arr[idx]=rec; else arr.push(rec);
-    db.set(keyTT(),arr); renderTT();
-  };
-  gid('ttClear').onclick=()=>{ db.set(keyTT(),[]); renderTT(); };
-  gid('ttExport').onclick=()=>{
-    const arr=db.get(keyTT(),[]);
-    let csv='Day,Period,Subject,Teacher,Room\n';
-    arr.forEach(r=> csv+=`${r.day},${r.period},${r.subject},${r.teacher},${r.room||''}\n`);
-    const blob = new Blob([csv],{type:'text/csv'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='timetable.csv'; a.click();
-  };
-
-  // Broadcast (demo)
-  gid('bcSend').onclick=()=>{
-    const txt=gid('bcText').value.trim(); if(!txt) return;
-    const arr=db.get('broadcasts',[]); arr.unshift({time:Date.now(), text:txt}); db.set('broadcasts',arr);
-    gid('bcText').value=''; renderBC();
-  };
-  function renderBC(){
-    const arr=db.get('broadcasts',[]);
-    gid('bcList').innerHTML = arr.map(b=>`<div class="glass"><span class="text-dim">${new Date(b.time).toLocaleString()}</span><div class="mt-8">${b.text}</div></div>`).join('') || '<div class="text-dim">No broadcasts.</div>';
-  }
-
-  // Backup/Restore
-  gid('backup').onclick=()=>{
-    const all={localStorage: {...localStorage}};
-    const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='school-backup.json'; a.click();
-  };
-  gid('restore').onclick=()=> gid('restoreFile').click();
-  gid('restoreFile').addEventListener('change', async (e)=>{
-    const file=e.target.files?.[0]; if(!file) return;
-    const text=await file.text();
-    const json=JSON.parse(text);
-    if(json.localStorage){
-      Object.entries(json.localStorage).forEach(([k,v])=> localStorage.setItem(k,v));
-      alert('Restore complete (local).');
-      renderTT(); renderBC(); loadScope();
+    function toggleTheme(){var c=document.documentElement.classList.contains('dark')?'dark':'light';
+      var n=c==='dark'?'light':'dark';
+      document.documentElement.classList.replace(c,n);document.body.classList.replace(c,n);
+      localStorage.setItem('theme',n);}
+    document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected','false'));
+      b.setAttribute('aria-selected','true');
+      const k=b.dataset.tab;
+      document.querySelectorAll('.tabpanel').forEach(p=>p.classList.add('hidden'));
+      document.getElementById('panel-'+k).classList.remove('hidden');
+    }));
+    // demo actions
+    const ttList=document.getElementById('ttList'); const rows=[];
+    document.getElementById('ttAdd').onclick=function(){
+      const r={day:ttDay.value,period:ttPeriod.value,sub:ttSubject.value,teacher:ttTeacher.value,room:ttRoom.value};
+      rows.push(r); renderTT();
+    };
+    document.getElementById('ttClear').onclick=function(){rows.length=0; renderTT();};
+    function renderTT(){
+      if(!rows.length){ttList.textContent='No entries yet.'; ttList.classList.add('text-dim'); return;}
+      ttList.classList.remove('text-dim');
+      ttList.innerHTML=rows.map((r,i)=>`<div class="item"><b>${i+1}.</b> ${r.day} · <b>${r.period}</b> · ${r.sub} — ${r.teacher} <span class="text-dim">${r.room||''}</span></div>`).join('');
     }
-  });
-
-  loadScope(); renderTT(); renderBC();
+    document.getElementById('bSend').onclick=function(){
+      const m=(bMsg.value||'').trim(); if(!m) return;
+      const li=document.getElementById('bList');
+      const row=document.createElement('div'); row.className='item'; row.textContent=m;
+      li.appendChild(row); li.classList.remove('text-dim'); bMsg.value='';
+    };
   </script>
+
+  <script type="module" src="ui.js?v=2025-08-15-2"></script>
 </body>
 </html>
