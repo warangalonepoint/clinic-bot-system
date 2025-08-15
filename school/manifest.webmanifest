@@ -1,22 +1,23 @@
 {
-  "name": "Onestop School App",
-  "short_name": "SchoolApp",
-  "description": "A PWA for school management with roles: Admin, Teachers, Coordinators, Parents",
+  "name": "School PWA",
+  "short_name": "School",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1976d2",
-  "orientation": "portrait",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "description": "Neon-glass School PWA: Coordinator, Teachers, Parents, Admin.",
   "icons": [
-    {
-      "src": "assets/logo-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/logo-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "./assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "./assets/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable any" },
+    { "src": "./assets/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
+  ],
+  "screenshots": [
+    { "src": "./assets/screen-admin-dark.png", "sizes": "1242x2208", "type": "image/png", "form_factor": "narrow" }
+  ],
+  "shortcuts": [
+    { "name": "Parents", "url": "./parents.html", "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Teacher", "url": "./teacher.html", "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Admin", "url": "./admin.html", "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }] }
   ]
 }
