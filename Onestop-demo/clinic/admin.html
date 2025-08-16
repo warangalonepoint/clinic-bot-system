@@ -3,237 +3,50 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic — Admin</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <title>Onestop Clinic – Admin Panel</title>
+  <link rel="stylesheet" href="./styles.css?v=glass6" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#0b0f1a" />
 </head>
-<body class="glass">
-  <!-- Header -->
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
   <header class="app-header">
     <div class="brand">
-      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="logo"></div>
       <div class="brand-text">
-        <h1>Onestop C-Demo</h1>
+        <h1>Onestop Clinic</h1>
         <p>Admin Panel</p>
       </div>
     </div>
-    <button id="themeToggle" class="icon-btn" title="Light/Dark">🌗</button>
   </header>
 
-  <!-- Banner -->
-  <div class="banner">
-    <img src="./assets/clinic_banner.png" alt="Clinic banner">
-  </div>
-
-  <!-- Page Tabs -->
-  <nav class="tabs">
-    <button class="tab active" data-screen="dashboard">Dashboard</button>
-    <button class="tab" data-screen="export">Export</button>
-    <button class="tab" data-screen="settings">Settings</button>
-  </nav>
-
-  <main style="padding-bottom:90px">
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="screen active">
-      <div class="cards">
-        <a class="card" href="./booking.html">
-          <div class="card-ic">📅</div>
-          <div class="card-txt">
-            <h3>Open Booking</h3>
-            <p>Create bookings & tokens</p>
-          </div>
-        </a>
-
-        <a class="card" href="./staff.html">
-          <div class="card-ic">📲</div>
-          <div class="card-txt">
-            <h3>Staff / Reminders</h3>
-            <p>View list & send WhatsApp</p>
-          </div>
-        </a>
-
-        <a class="card" href="#export" onclick="openTab('export')">
-          <div class="card-ic">⬇️</div>
-          <div class="card-txt">
-            <h3>Export Panel</h3>
-            <p>Logs & Slots download</p>
-          </div>
-        </a>
-
-        <a class="card" href="#settings" onclick="openTab('settings')">
-          <div class="card-ic">🔐</div>
-          <div class="card-txt">
-            <h3>PIN & Branding</h3>
-            <p>Generate JSON snippets</p>
-          </div>
-        </a>
+  <main>
+    <h2>Admin Controls</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-ic">👥</div>
+        <div class="card-txt"><h3>Manage Staff</h3></div>
       </div>
-    </section>
-
-    <!-- EXPORT -->
-    <section id="export" class="screen">
-      <div class="card" id="export-panel">
-        <h3 style="margin:0 0 8px">Export Panel</h3>
-        <p class="muted" style="margin:0 0 10px">Paste your live CSV URLs (GitHub or Airtable CSV endpoints) and use quick download.</p>
-
-        <div class="cards" style="grid-template-columns:1fr">
-          <div class="card" style="padding:12px">
-            <label>Logs CSV URL</label>
-            <input id="logsUrl" placeholder="https://.../logs.csv" />
-            <div style="display:flex; gap:10px; margin-top:10px">
-              <button class="primary" onclick="quickDownload('logsUrl')">Download Logs CSV</button>
-              <button onclick="copyField('logsUrl')">Copy URL</button>
-            </div>
-          </div>
-
-          <div class="card" style="padding:12px">
-            <label>Slots CSV URL</label>
-            <input id="slotsUrl" placeholder="https://.../Slots.csv" />
-            <div style="display:flex; gap:10px; margin-top:10px">
-              <button class="primary" onclick="quickDownload('slotsUrl')">Download Slots CSV</button>
-              <button onclick="copyField('slotsUrl')">Copy URL</button>
-            </div>
-          </div>
-
-          <div class="card" style="padding:12px">
-            <h4 style="margin:0 0 8px">One-click Backup (opens both)</h4>
-            <button onclick="backupBoth()">Open Logs & Slots</button>
-            <p class="muted" style="margin-top:8px">Tip: Long-press and “Download Link” on mobile if the file opens in the browser.</p>
-          </div>
-        </div>
+      <div class="card">
+        <div class="card-ic">📊</div>
+        <div class="card-txt"><h3>Reports</h3></div>
       </div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section id="settings" class="screen">
-      <div class="cards" style="grid-template-columns:1fr">
-        <!-- PIN -->
-        <div class="card pad">
-          <h3 style="margin:0 0 8px">PIN JSON Generator</h3>
-          <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <div style="flex:1; min-width:220px">
-              <label>Clinic Code</label>
-              <input id="clinicCode" placeholder="e.g., clinic1" />
-            </div>
-            <div style="flex:1; min-width:220px">
-              <label>PIN</label>
-              <input id="clinicPin" placeholder="e.g., 2525" />
-            </div>
-          </div>
-          <div style="margin-top:10px">
-            <label>Output (pins.json)</label>
-            <textarea id="pinsOut" rows="4" style="width:100%; border-radius:14px; border:1px solid var(--stroke); background:var(--surface); color:inherit; padding:10px" readonly></textarea>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:10px">
-            <button class="primary" onclick="buildPins()">Generate</button>
-            <button onclick="copyText('pinsOut')">Copy</button>
-          </div>
-          <p class="muted" style="margin-top:8px">Upload this JSON to <code>pins.json</code> in your GitHub repo.</p>
-        </div>
-
-        <!-- Branding -->
-        <div class="card pad">
-          <h3 style="margin:0 0 8px">Branding JSON Generator</h3>
-          <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <div style="flex:1; min-width:220px">
-              <label>App Title</label>
-              <input id="brandTitle" placeholder="Onestop C-Demo" />
-            </div>
-            <div style="flex:1; min-width:220px">
-              <label>Logo Path</label>
-              <input id="brandLogo" placeholder="./assets/logo.png" />
-            </div>
-          </div>
-          <div style="margin-top:10px">
-            <label>Output (branding.json)</label>
-            <textarea id="brandOut" rows="4" style="width:100%; border-radius:14px; border:1px solid var(--stroke); background:var(--surface); color:inherit; padding:10px" readonly></textarea>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:10px">
-            <button class="primary" onclick="buildBrand()">Generate</button>
-            <button onclick="copyText('brandOut')">Copy</button>
-          </div>
-          <p class="muted" style="margin-top:8px">Upload this JSON to <code>branding.json</code> (optional; for future dynamic branding).</p>
-        </div>
-      </div>
-    </section>
+    </div>
   </main>
 
-  <!-- Dock -->
-  <footer class="dock">
-    <a class="icon-btn" href="./index.html" title="Home">🏠</a>
-    <a class="icon-btn" href="./booking.html" title="Bookings">📅</a>
-    <a class="icon-btn" href="./admin.html" title="Admin">⚙️</a>
-  </footer>
+  <div class="dock">
+    <a href="index.html" class="icon-btn">🏠</a>
+    <a href="booking.html" class="icon-btn">📅</a>
+    <a href="admin.html" class="icon-btn">⚙️</a>
+  </div>
 
-  <!-- WhatsApp Help -->
-  <a class="wa" href="https://wa.me/919390664577" target="_blank" rel="noopener">🟢</a>
-
-<script>
-  // Theme
-  const KEY='pwa-theme';
-  if(localStorage.getItem(KEY)==='light') document.body.classList.add('light');
-  document.getElementById('themeToggle').onclick=()=>{
-    document.body.classList.toggle('light');
-    localStorage.setItem(KEY, document.body.classList.contains('light')?'light':'dark');
-  };
-
-  // Tabs
-  function openTab(name){
-    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
-    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===name));
-    scrollTo({top:0,behavior:'smooth'});
-  }
-  document.querySelector('.tabs').addEventListener('click',(e)=>{
-    const t=e.target.closest('.tab'); if(!t) return;
-    openTab(t.dataset.screen);
-  });
-
-  // Export helpers
-  function val(id){ return document.getElementById(id).value.trim(); }
-  function quickDownload(id){
-    const url = val(id);
-    if(!url){ alert('Paste a valid URL.'); return; }
-    window.open(url,'_blank');
-  }
-  function copyField(id){
-    const url = val(id);
-    if(!url){ alert('Nothing to copy.'); return; }
-    navigator.clipboard.writeText(url);
-    toast('URL copied');
-  }
-  function backupBoth(){
-    const a = val('logsUrl'); const b = val('slotsUrl');
-    if(a) window.open(a,'_blank'); if(b) window.open(b,'_blank');
-    if(!a && !b) alert('Add URLs first.');
-  }
-
-  // Generators
-  function buildPins(){
-    const code = document.getElementById('clinicCode').value.trim() || 'clinic1';
-    const pin  = document.getElementById('clinicPin').value.trim()  || '2525';
-    const json = { [code]: { pin } };
-    document.getElementById('pinsOut').value = JSON.stringify(json, null, 2);
-    toast('pins.json ready');
-  }
-  function buildBrand(){
-    const title = document.getElementById('brandTitle').value.trim() || 'Onestop C-Demo';
-    const logo  = document.getElementById('brandLogo').value.trim()  || './assets/logo.png';
-    const json = { appTitle: title, logo };
-    document.getElementById('brandOut').value = JSON.stringify(json, null, 2);
-    toast('branding.json ready');
-  }
-
-  // Micro toast
-  function toast(msg){
-    const el=document.createElement('div');
-    el.textContent=msg;
-    el.style.cssText='position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;padding:8px 12px;border-radius:12px;font-size:13px;z-index:9999';
-    document.body.appendChild(el); setTimeout(()=>el.remove(),1500);
-  }
-
-  // SW (optional)
-  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
-</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </body>
 </html>
