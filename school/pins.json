@@ -1,6 +1,6 @@
 {
-  "coordinator": "1111",
-  "parents": "2222",
-  "teacher": "3333",
-  "admin": "4444"
+  "1111": "parents",
+  "2222": "teacher",
+  "3333": "coordinator",
+  "4444": "admin"
 }
