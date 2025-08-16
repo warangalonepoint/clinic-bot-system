@@ -7,54 +7,48 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=16">
+  <link rel="stylesheet" href="./styles.css?v=31">
   <style>
-    /* tiny page-local helpers to avoid touching your global css */
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+    /* page-local helpers, won’t fight your main css */
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
     .chip{padding:8px 12px;border-radius:999px;border:1px solid rgba(17,24,39,.10);
-      background:rgba(255,255,255,.8);backdrop-filter:blur(10px);cursor:pointer;font-weight:700}
+      background:rgba(255,255,255,.85);backdrop-filter:blur(10px);cursor:pointer;font-weight:700}
     .chip:hover{transform:translateY(-1px)}
     .hint{font-size:.9rem;color:#5b6475;margin-top:6px}
     .warn{padding:10px 12px;border-radius:14px;background:#fff6e6;border:1px solid #facc15;color:#854d0e;font-weight:700}
-    .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-    .hidden{display:none}
+    .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .grid{display:grid;gap:12px}
+    .two{grid-template-columns:1fr}
+    @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
   <div class="app-shell">
     <div class="header">
       <div class="brand-logo"></div>
-      <div><div class="title">Doctor Panel</div><div class="subtitle">Today’s Patients & Notes</div></div>
+      <div><div class="title">Doctor Panel</div><div class="subtitle">Today’s Patients, Notes & Rx</div></div>
     </div>
 
-    <!-- Controls -->
+    <!-- Filters -->
     <div class="section glass">
       <h2>Filter</h2>
       <div class="toolbar">
-        <div style="flex:1;min-width:220px">
-          <div class="row"><div class="label">Search</div>
-            <input id="q" class="input" placeholder="Name / token / reason">
-          </div>
-        </div>
-        <div style="width:220px">
-          <div class="row"><div class="label">Status</div>
-            <select id="fStatus" class="input">
-              <option value="Pending" selected>Pending</option>
-              <option value="Seen">Seen</option>
-              <option value="all">All</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <button class="btn btn-secondary" id="nextBtn" title="Jump to first pending">Next Pending</button>
-        </div>
+        <select id="fDoctor" class="input" style="max-width:220px"></select>
+        <select id="fStatus" class="input" style="max-width:180px">
+          <option value="Pending" selected>Pending</option>
+          <option value="Seen">Seen</option>
+          <option value="all">All</option>
+        </select>
+        <input id="q" class="input" placeholder="Search name / reason / token" style="min-width:220px">
+        <button class="btn btn-secondary" id="nextBtn" title="Jump to first pending">Next Pending</button>
       </div>
       <div id="modeBanner" class="hint"></div>
     </div>
 
     <!-- List -->
-    <div id="list"></div>
+    <div id="list" class="grid two"></div>
+    <div id="emptyState" class="section glass" style="display:none"><h2>No patients match.</h2></div>
 
     <div class="footer">© 2025 Onestop Clinic</div>
   </div>
@@ -63,103 +57,125 @@
 /* =========================
    Config / Backends
 ========================= */
-let CFG=null, BACKEND='csv';
+let CFG=null, BACKEND='csv', DOCTORS=[];
 async function loadCfg(){
   try{
     const res = await fetch('./config.json?v=' + Date.now());
     if(!res.ok) throw 0;
     CFG = await res.json();
     BACKEND = (CFG.backend||'csv').toLowerCase();
+    DOCTORS = CFG.doctors || [];
   }catch{
     CFG = { backend:'csv', csv:{ logs:'./logs.csv' } };
     BACKEND = 'csv';
+    DOCTORS = [];
   }
+  // banner
   const banner = document.getElementById('modeBanner');
-  if(BACKEND==='csv'){
-    banner.innerHTML = `<span class="warn">CSV mode: read-only.</span> <span class="hint">Saving/marking needs Airtable credentials in <span class="mono">config.json</span>.</span>`;
-  }else{
-    banner.textContent = 'Airtable mode • changes are saved live.';
-  }
+  banner.innerHTML = (BACKEND==='airtable')
+    ? 'Airtable mode • changes are saved live.'
+    : `<span class="warn">CSV mode: read-only.</span> <span class="hint">Saving/marking needs Airtable in <span class="mono">config.json</span>.</span>`;
+
+  // doctor filter
+  const fDoc = document.getElementById('fDoctor');
+  fDoc.innerHTML = '<option value="all">All Doctors</option>' + DOCTORS.map(d=>`<option>${d}</option>`).join('');
 }
 
-/* Parse CSV robust(ish) */
+/* =========================
+   Utilities
+========================= */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function DONLY(s){ return (s||'').slice(0,10); }
+function slotBucket(t){
+  const m=/(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(String(t)||''); if(!m) return 'all';
+  let h=+m[1]%12; if(m[3].toUpperCase()==='PM') h+=12;
+  if(h<12) return 'morning'; if(h<16) return 'afternoon'; return 'evening';
+}
+
+/* Robust-ish CSV parse */
 function parseCSV(text){
-  const rows=[]; let cur=[], str='', inQ=false;
+  const rows=[]; let cur=[], str='', q=false;
   for(let i=0;i<text.length;i++){
     const c=text[i], n=text[i+1];
-    if(c=='"' ){ if(inQ && n=='"'){ str+='"'; i++; } else inQ = !inQ; }
-    else if(c===',' && !inQ){ cur.push(str); str=''; }
-    else if((c==='\n' || c==='\r') && !inQ){ if(str!==''||cur.length){ cur.push(str); rows.push(cur); cur=[]; str=''; } }
-    else{ str+=c; }
+    if(c=='"'){ if(q && n=='"'){ str+='"'; i++; } else q=!q; }
+    else if(c==',' && !q){ cur.push(str); str=''; }
+    else if((c=='\n'||c=='\r') && !q){ if(str!==''||cur.length){ cur.push(str); rows.push(cur); cur=[]; str=''; } }
+    else { str+=c; }
   }
-  if(str!==''||cur.length) { cur.push(str); rows.push(cur); }
+  if(str!==''||cur.length){ cur.push(str); rows.push(cur); }
   return rows;
 }
 function csvToObjs(text){
   const r=parseCSV(text).filter(a=>a.length && a.join('').trim()!=='');
-  const headers=r.shift().map(h=>h.trim());
-  return r.map(line=>{
-    const o={}; headers.forEach((h,i)=>o[h]= (line[i]||'').trim()); return o;
-  });
+  const h=r.shift().map(x=>x.trim());
+  return r.map(line=>{const o={}; h.forEach((k,i)=>o[k]=(line[i]||'').trim()); return o;});
 }
-function toDateOnly(ts){ return (ts||'').slice(0,10); }
 
-/* Airtable API */
+/* =========================
+   Airtable API
+========================= */
 const AT = {
-  headers(){ return { Authorization: 'Bearer ' + CFG.airtable.apiKey, 'Content-Type':'application/json' }; },
-  async today(){
+  headers(){ return { Authorization:'Bearer '+CFG.airtable.apiKey, 'Content-Type':'application/json' }; },
+  async listToday(doctor='all'){
     const d = new Date().toISOString().slice(0,10);
-    const base = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
-    const url = `${base}?filterByFormula=${encodeURIComponent("DATETIME_FORMAT({Timestamp}, 'YYYY-MM-DD')='"+d+"'")}&sort[0][field]=Slot Time&sort[0][direction]=asc&pageSize=100`;
+    const base = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable||'BookingsLogs')}`;
+    const filters = [`DATETIME_FORMAT({Timestamp}, 'YYYY-MM-DD')='${d}'`];
+    if(doctor && doctor!=='all') filters.push(`{Doctor}='${doctor}'`);
+    const formula = filters.length>1 ? `AND(${filters.join(',')})` : filters[0];
+    const url = `${base}?filterByFormula=${encodeURIComponent(formula)}&sort[0][field]=Slot Time&sort[0][direction]=asc&pageSize=200`;
     const j = await (await fetch(url,{headers:this.headers()})).json();
     return (j.records||[]).map(r=>({id:r.id, ...r.fields}));
   },
   async update(id, fields){
-    const url = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    const url = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable||'BookingsLogs')}`;
     const body = JSON.stringify({ records: [{ id, fields }] });
-    const res = await fetch(url,{ method:'PATCH', headers:this.headers(), body });
-    if(!res.ok) throw new Error('Update failed');
+    const r = await fetch(url,{ method:'PATCH', headers:this.headers(), body });
+    if(!r.ok) throw new Error('Update failed');
   }
 };
 
-/* Data load */
-async function fetchRows(){
-  if(BACKEND==='airtable') return await AT.today();
-  // CSV fallback (read only)
+/* =========================
+   Data Loader
+========================= */
+async function loadRows(){
+  if(BACKEND==='airtable'){
+    return await AT.listToday(document.getElementById('fDoctor').value);
+  }
+  // CSV fallback (read-only)
   const url = (CFG.csv && CFG.csv.logs) ? CFG.csv.logs : './logs.csv';
   const txt = await (await fetch(url + '?v=' + Date.now())).text();
   const rows = csvToObjs(txt);
   const today = new Date().toISOString().slice(0,10);
   return rows
-    .filter(r=> toDateOnly(r['Timestamp']) === today )
+    .filter(r=> DONLY(r['Timestamp'])===today )
     .sort((a,b)=> (a['Slot Time']||'').localeCompare(b['Slot Time']||''))
     .map(r=>({ id: r['id']||'', ...r }));
 }
 
 /* =========================
-   UI Render
+   UI Rendering
 ========================= */
-let ALL=[], FILTER_STATUS='Pending', QUERY='';
+let ALL=[], FILTER='Pending', QUERY='';
 const listEl = document.getElementById('list');
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function chip(label,val,cls=''){ return `<span class="chip ${cls}" data-val="${esc(val)}">${esc(label)}</span>`; }
+function rxChip(label,val){ return `<span class="chip" data-val="${esc(val)}">${esc(label)}</span>`; }
 
-function cardTpl(r,index){
-  const status = r['Status'] || 'Pending';
-  const fup = r['Follow Up'] ? String(r['Follow Up']).slice(0,10) : '';
-  const name = r['Patient Name']||'';
-  const token = r['Token']||'-';
-  const slot = r['Slot Time']||'';
+function cardTpl(r){
+  const status = r['Status']||'Pending';
+  const fup    = r['Follow Up'] ? String(r['Follow Up']).slice(0,10) : '';
+  const name   = r['Patient Name']||'';
+  const token  = r['Token']||'-';
+  const slot   = r['Slot Time']||'';
   const reason = r['Reason']||'-';
-  const contact = r['Contact']||'';
-  const diag = r['Diagnosis']||'';
-  const rx = r['Prescription']||'';
-  const notes = r['Doctor Notes']||'';
+  const contact= r['Contact']||'';
+  const diag   = r['Diagnosis']||'';
+  const rx     = r['Prescription']||'';
+  const notes  = r['Doctor Notes']||'';
+  const doctor = r['Doctor']||'—';
 
   return `
-  <div class="section glass" data-id="${esc(r.id||'')}" data-idx="${index}">
-    <h2>#${esc(token)} • ${esc(name)} <span class="muted">(${esc(slot)})</span></h2>
+  <div class="section glass" data-id="${esc(r.id||'')}">
+    <h2>#${esc(token)} • ${esc(name)} <span class="muted">(${esc(slot)} · ${esc(doctor)})</span></h2>
 
     <div class="row"><div class="label">Reason</div><div class="value">${esc(reason)}</div></div>
     <div class="row"><div class="label">Contact</div><div class="value">${esc(contact)}</div></div>
@@ -173,10 +189,10 @@ function cardTpl(r,index){
     </div>
 
     <div class="chips">
-      ${chip('Paracetamol 500mg b.i.d ×3d','Paracetamol 500mg — 1 tab twice daily for 3 days')}
-      ${chip('Cetrizine 10mg o.d ×5d','Cetrizine 10mg — 1 tab at night for 5 days')}
-      ${chip('ORS + Rest','ORS sachet with water; rest & fluids')}
-      ${chip('Omeprazole 20mg o.d ×7d','Omeprazole 20mg — 1 cap empty stomach for 7 days')}
+      ${rxChip('Paracetamol 500mg b.i.d ×3d','Paracetamol 500 mg — 1 tab twice daily for 3 days')}
+      ${rxChip('Cetrizine 10mg o.d ×5d','Cetrizine 10 mg — 1 tab at night for 5 days')}
+      ${rxChip('ORS + Rest','ORS sachet with water; rest & fluids')}
+      ${rxChip('Omeprazole 20mg o.d ×7d','Omeprazole 20 mg — 1 cap empty stomach for 7 days')}
     </div>
 
     <div class="row"><div class="label">Doctor Notes</div>
@@ -203,89 +219,90 @@ function cardTpl(r,index){
   </div>`;
 }
 
-function render(){
-  const q = QUERY.trim().toLowerCase();
-  const items = ALL.filter(r=>{
+function applyFilters(src){
+  const fDoc = document.getElementById('fDoctor').value;
+  return src.filter(r=>{
     const s = (r['Status']||'Pending');
-    if(FILTER_STATUS!=='all' && s!==FILTER_STATUS) return false;
-    if(!q) return true;
-    const hay = [
-      r['Patient Name'], r['Token'], r['Reason'], r['Slot Time'], r['Diagnosis'], r['Prescription']
-    ].join(' ').toLowerCase();
-    return hay.includes(q);
+    if(FILTER!=='all' && s!==FILTER) return false;
+    if(fDoc!=='all' && (r['Doctor']||'')!==fDoc) return false;
+    const hay = [r['Patient Name'], r['Reason'], r['Token'], r['Slot Time'], r['Diagnosis'], r['Prescription']]
+                .join(' ').toLowerCase();
+    return hay.includes(QUERY.trim().toLowerCase());
+  });
+}
+
+function bindCardActions(el, rec){
+  // chips append
+  el.querySelectorAll('.chip').forEach(ch=>{
+    ch.addEventListener('click',()=>{
+      const rx = el.querySelector('.rx');
+      const add = ch.getAttribute('data-val');
+      rx.value = (rx.value ? rx.value.trim() + '\n' : '') + add;
+    });
   });
 
-  listEl.innerHTML = items.length
-    ? items.map((r,i)=>cardTpl(r,i)).join('')
-    : `<div class="section glass"><h2>No patients match.</h2></div>`;
+  // Save (Airtable only)
+  el.querySelector('.save')?.addEventListener('click', async ()=>{
+    const payload = {
+      'Diagnosis': el.querySelector('.diag').value.trim(),
+      'Prescription': el.querySelector('.rx').value.trim(),
+      'Doctor Notes': el.querySelector('.note').value.trim(),
+      'Follow Up': el.querySelector('.fup').value || null,
+      'Status': el.querySelector('.stat').value
+    };
+    try{ await AT.update(rec.id, payload); Object.assign(rec, payload); toast('Saved'); }
+    catch{ toast('Save failed'); }
+  });
 
-  // bind actions per card
-  Array.from(listEl.querySelectorAll('.section.glass')).forEach((sec, i)=>{
-    const idx = Number(sec.dataset.idx);
-    const rec = items[i];
+  // Mark seen/pending (Airtable updates if enabled)
+  el.querySelector('.seen').addEventListener('click', async ()=>{
+    const current = el.querySelector('.stat').value;
+    const next = current==='Seen' ? 'Pending' : 'Seen';
+    try{
+      if(BACKEND==='airtable') await AT.update(rec.id, { 'Status': next });
+      el.querySelector('.stat').value = next;
+      rec['Status'] = next;
+      el.querySelector('.seen').textContent = next==='Seen'?'Mark Pending':'Mark Seen';
+      toast('Status updated');
+    }catch{ toast('Update failed'); }
+  });
 
-    // quick chips -> append to Rx
-    sec.querySelectorAll('.chip').forEach(ch=>{
-      ch.addEventListener('click',()=>{
-        const rx = sec.querySelector('.rx');
-        const add = ch.getAttribute('data-val');
-        rx.value = (rx.value ? rx.value.trim() + '\n' : '') + add;
-      });
-    });
-
-    // Save
-    sec.querySelector('.save')?.addEventListener('click', async ()=>{
-      const payload = {
-        'Diagnosis': sec.querySelector('.diag').value.trim(),
-        'Prescription': sec.querySelector('.rx').value.trim(),
-        'Doctor Notes': sec.querySelector('.note').value.trim(),
-        'Follow Up': sec.querySelector('.fup').value || null,
-        'Status': sec.querySelector('.stat').value
-      };
-      try{
-        await AT.update(rec.id, payload);
-        toast('Saved');
-        // also update local copy so filters keep working
-        Object.assign(rec, payload);
-      }catch{ toast('Save failed'); }
-    });
-
-    // Mark seen/pending
-    sec.querySelector('.seen').addEventListener('click', async ()=>{
-      const current = sec.querySelector('.stat').value;
-      const next = current==='Seen' ? 'Pending' : 'Seen';
-      try{
-        if(BACKEND==='airtable') await AT.update(rec.id, { 'Status': next });
-        sec.querySelector('.stat').value = next;
-        rec['Status'] = next;
-        sec.querySelector('.seen').textContent = next==='Seen'?'Mark Pending':'Mark Seen';
-        toast('Status updated');
-      }catch{ toast('Update failed'); }
-    });
-
-    // WhatsApp Rx
-    sec.querySelector('.wa').addEventListener('click', ()=>{
-      const msg = `Prescription for ${rec['Patient Name']||''}
+  // WhatsApp Rx
+  el.querySelector('.wa').addEventListener('click', ()=>{
+    const msg = `Prescription for ${rec['Patient Name']||''}
 Token: ${rec['Token']||''}
 Time: ${rec['Slot Time']||''}
-Diagnosis: ${sec.querySelector('.diag').value.trim()}
+Diagnosis: ${el.querySelector('.diag').value.trim()}
 Rx:
-${sec.querySelector('.rx').value.trim()}
+${el.querySelector('.rx').value.trim()}
 
-Notes: ${sec.querySelector('.note').value.trim()}
-Follow-up: ${sec.querySelector('.fup').value||'-'}`;
-      const phone = (rec['Contact']||'').trim();
-      const base = phone ? `https://wa.me/${encodeURIComponent(phone)}?text=` : `https://wa.me/?text=`;
-      location.href = base + encodeURIComponent(msg);
-    });
+Notes: ${el.querySelector('.note').value.trim()}
+Follow-up: ${el.querySelector('.fup').value||'-'}`;
+    const phone = (rec['Contact']||'').trim();
+    const base = phone ? `https://wa.me/${encodeURIComponent(phone)}?text=` : `https://wa.me/?text=`;
+    location.href = base + encodeURIComponent(msg);
+  });
+}
+
+function render(){
+  const items = applyFilters(ALL);
+  if(!items.length){
+    document.getElementById('list').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+    return;
+  }
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('list').innerHTML = items.map(cardTpl).join('');
+  // bind
+  Array.from(document.getElementById('list').querySelectorAll('.section.glass')).forEach((sec,i)=>{
+    bindCardActions(sec, items[i]);
   });
 }
 
 function toast(t){
   let el=document.getElementById('toast');
   if(!el){ el=document.createElement('div'); el.id='toast'; el.className='debug-css'; document.body.appendChild(el); }
-  el.textContent = '✅ ' + t;
-  clearTimeout(el._t); el._t = setTimeout(()=>el.remove(), 2000);
+  el.textContent = '✅ ' + t; clearTimeout(el._t); el._t = setTimeout(()=>el.remove(), 2000);
 }
 
 /* =========================
@@ -294,31 +311,34 @@ function toast(t){
 (async ()=>{
   await loadCfg();
   try{
-    ALL = await fetchRows();
+    ALL = await loadRows();
   }catch(e){
-    listEl.innerHTML = `<div class="section glass"><h2>Couldn’t load today’s list.</h2><p class="hint">Check <span class="mono">config.json</span> and data source.</p></div>`;
+    document.getElementById('list').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('emptyState').querySelector('h2').textContent = 'Couldn’t load today’s list.';
+    document.getElementById('modeBanner').innerHTML += ' • Check <span class="mono">config.json</span>.';
     return;
   }
   render();
 
   // Filters
-  document.getElementById('fStatus').addEventListener('change', e=>{
-    FILTER_STATUS = e.target.value; render();
-  });
-  document.getElementById('q').addEventListener('input', e=>{
-    QUERY = e.target.value; render();
+  document.getElementById('fStatus').addEventListener('change', e=>{ FILTER=e.target.value; render(); });
+  document.getElementById('q').addEventListener('input', e=>{ QUERY=e.target.value; render(); });
+  document.getElementById('fDoctor').addEventListener('change', async ()=>{
+    // in Airtable mode, reload from backend for selected doctor (server side filter)
+    if(BACKEND==='airtable'){ ALL = await loadRows(); }
+    render();
   });
 
-  // Next pending
+  // Next pending jump
   document.getElementById('nextBtn').addEventListener('click', ()=>{
     QUERY=''; document.getElementById('q').value='';
-    FILTER_STATUS='Pending'; document.getElementById('fStatus').value='Pending';
+    FILTER='Pending'; document.getElementById('fStatus').value='Pending';
     render();
-    const first = listEl.querySelector('.section.glass');
+    const first = document.querySelector('#list .section.glass');
     if(first) first.scrollIntoView({behavior:'smooth', block:'start'});
   });
 
-  // SW for PWA (safe no-op if absent)
   if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
 })();
 </script>
