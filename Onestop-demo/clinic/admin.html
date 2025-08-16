@@ -7,31 +7,179 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=9">
+  <link rel="stylesheet" href="./styles.css?v=11">
 </head>
 <body>
   <div class="app-shell">
     <div class="header">
       <div class="brand-logo"></div>
-      <div><div class="title">Admin</div><div class="subtitle">Tools & settings</div></div>
+      <div><div class="title">Admin</div><div class="subtitle">Bookings • Slots • Reminders</div></div>
     </div>
 
+    <!-- NEW BOOKING -->
     <div class="section glass">
-      <h2>Quick Links</h2>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="location.href='./booking.html'">New Booking</button>
-        <button class="btn btn-secondary" onclick="location.href='./doctor.html'">Doctor Panel</button>
-        <button class="btn btn-secondary" onclick="location.href='./staff.html'">Staff</button>
-        <button class="btn btn-secondary" onclick="location.href='./reset.html'">Reset PIN</button>
+      <h2>New Booking (Admin)</h2>
+
+      <div class="row"><div class="label">Date</div>
+        <input id="b_date" type="date" class="input">
       </div>
+
+      <div class="row"><div class="label">Time Slot</div>
+        <input id="b_slot" class="input" placeholder="e.g., 09:20 AM">
+      </div>
+
+      <div class="row"><div class="label">Patient Name</div>
+        <input id="b_name" class="input" placeholder="Full name">
+      </div>
+
+      <div class="row"><div class="label">Reason</div>
+        <input id="b_reason" class="input" placeholder="Reason for visit">
+      </div>
+
+      <div class="row"><div class="label">Contact</div>
+        <input id="b_phone" class="input" placeholder="+91…">
+      </div>
+
+      <div class="row">
+        <div class="label">Auto-mark slot as Booked</div>
+        <label class="switch">
+          <input id="b_autobook" type="checkbox" checked>
+          <span class="knob"></span><span class="dot"></span>
+        </label>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn btn-primary" id="b_btn">Create & WhatsApp</button>
+        <button class="btn btn-secondary" onclick="location.href='./index.html'">Back</button>
+      </div>
+
+      <p id="b_status" class="muted" style="margin-top:10px"></p>
     </div>
 
+    <!-- QUICK REMINDER -->
     <div class="section glass">
-      <h2>PWA</h2>
-      <p class="muted">Install to home screen for app-like experience.</p>
+      <h2>Quick WhatsApp Reminder</h2>
+      <div class="row"><div class="label">Contact</div>
+        <input id="r_phone" class="input" placeholder="+91…">
+      </div>
+      <div class="row"><div class="label">Message</div>
+        <input id="r_msg" class="input" value="Reminder: Your appointment is today.">
+      </div>
+      <button class="btn btn-secondary" onclick="sendReminder()">Send</button>
     </div>
 
     <div class="footer">© 2025 Onestop Clinic</div>
   </div>
+
+<script>
+let CFG=null;
+async function loadCfg(){
+  const res=await fetch('./config.json?v='+Date.now());
+  if(!res.ok) throw 0;
+  CFG=await res.json();
+}
+
+// Airtable helpers
+const A = {
+  async listLogsByDate(date){
+    const url = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}?filterByFormula=${encodeURIComponent(`DATETIME_FORMAT({Timestamp}, 'YYYY-MM-DD')='${date}'`)}&pageSize=100`;
+    const res = await fetch(url,{headers:{Authorization:'Bearer '+CFG.airtable.apiKey}});
+    const j = await res.json();
+    return j.records||[];
+  },
+  async createLog(row){
+    const url = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    const body = JSON.stringify({ records:[{ fields: row }] });
+    const res = await fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Authorization:'Bearer '+CFG.airtable.apiKey},
+      body
+    });
+    if(!res.ok){ throw new Error('Create failed'); }
+    return res.json();
+  },
+  async markSlotBooked(date, slot){
+    if(!CFG.airtable.slotsTable) return;
+    // find slot record
+    const urlList = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.slotsTable)}?filterByFormula=${encodeURIComponent(`AND({Date}='${date}', {Time Slot}='${slot}')`)}`;
+    const lr = await fetch(urlList,{headers:{Authorization:'Bearer '+CFG.airtable.apiKey}});
+    const lj = await lr.json();
+    const rec = (lj.records||[])[0];
+    if(!rec) return;
+    // update status
+    const urlUp = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.slotsTable)}`;
+    const body = JSON.stringify({ records:[{ id:rec.id, fields:{ "Status":"Booked" } }] });
+    await fetch(urlUp,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json',Authorization:'Bearer '+CFG.airtable.apiKey},
+      body
+    });
+  }
+};
+
+function waOpen(text, phone=""){
+  const base = phone ? `https://wa.me/${encodeURIComponent(phone)}?text=` : `https://wa.me/?text=`;
+  location.href = base + encodeURIComponent(text);
+}
+
+function fmtTokenMsg({name,date,slot,token}){
+  return `Appointment confirmed ✅
+Patient: ${name}
+When: ${date} ${slot}
+Token No: ${token}`;
+}
+
+async function createBooking(){
+  const el=(id)=>document.getElementById(id);
+  const date=el('b_date').value;
+  const slot=el('b_slot').value.trim();
+  const name=el('b_name').value.trim();
+  const reason=el('b_reason').value.trim();
+  const phone=el('b_phone').value.trim();
+  const autobook=el('b_autobook').checked;
+  const setStatus=(t)=>el('b_status').textContent=t;
+
+  if(!date||!slot||!name){ setStatus('Enter date, slot, and name.'); return; }
+  setStatus('Checking tokens…');
+
+  // token = count of logs for same date + 1
+  const todays = await A.listLogsByDate(date);
+  const token = todays.length + 1;
+
+  setStatus('Saving booking…');
+  const nowISO = new Date().toISOString();
+  const row = {
+    "Timestamp": nowISO,
+    "Patient Name": name,
+    "Slot Time": slot,
+    "Reason": reason,
+    "Contact": phone,
+    "Token": token,
+    "Reminder Sent": ""
+  };
+  await A.createLog(row);
+
+  if(autobook){ try{ await A.markSlotBooked(date, slot); }catch(e){} }
+
+  setStatus(`Saved. Token #${token}. Opening WhatsApp…`);
+  waOpen(fmtTokenMsg({name,date,slot,token}), phone);
+}
+
+function sendReminder(){
+  const p=document.getElementById('r_phone').value.trim();
+  const m=document.getElementById('r_msg').value.trim();
+  if(!p){ alert('Enter contact'); return; }
+  location.href=`https://wa.me/${encodeURIComponent(p)}?text=${encodeURIComponent(m)}`;
+}
+
+(async()=>{
+  try{
+    await loadCfg();
+    document.getElementById('b_btn').addEventListener('click', createBooking);
+  }catch{
+    alert('config.json missing or invalid. Add your Airtable key/base.');
+  }
+})();
+</script>
 </body>
 </html>
