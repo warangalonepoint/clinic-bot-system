@@ -1,57 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic – Bookings</title>
-  <link rel="stylesheet" href="./styles.css?v=glass6" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#0b0f1a" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bookings · Onestop Clinic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=9">
 </head>
 <body>
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
+  <div class="app-shell">
+    <div class="header">
+      <div class="brand-logo"></div>
+      <div><div class="title">Bookings</div><div class="subtitle">Create / Confirm</div></div>
+    </div>
 
-  <header class="app-header">
-    <div class="brand">
-      <div class="logo"></div>
-      <div class="brand-text">
-        <h1>Onestop Clinic</h1>
-        <p>Booking</p>
+    <div class="section glass">
+      <h2>Select Date & Time</h2>
+      <div class="row"><div class="label">Date</div>
+        <input type="date" class="input" id="date">
+      </div>
+      <div class="row"><div class="label">Time Slot</div>
+        <select id="slot" class="input">
+          <option>09:00 AM</option><option>09:20 AM</option>
+          <option>09:40 AM</option><option>10:00 AM</option>
+        </select>
+      </div>
+      <div class="row"><div class="label">Patient Name</div>
+        <input id="name" class="input" placeholder="Full name">
+      </div>
+      <div class="row"><div class="label">Reason</div>
+        <input id="reason" class="input" placeholder="Reason for visit">
+      </div>
+      <div class="row"><div class="label">Contact</div>
+        <input id="phone" class="input" placeholder="Phone">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn btn-primary" onclick="confirmBooking()">Confirm & WhatsApp</button>
+        <button class="btn btn-secondary" onclick="location.href='./index.html'">Back</button>
       </div>
     </div>
-  </header>
 
-  <div class="banner">
-    <img src="./assets/clinic_banner.png" alt="banner">
-  </div>
-
-  <main>
-    <h2>Book an Appointment</h2>
-    <form>
-      <label for="pname">Patient Name</label>
-      <input id="pname" type="text" placeholder="John Doe" />
-
-      <label for="date">Date</label>
-      <input id="date" type="date" />
-
-      <label for="time">Time</label>
-      <input id="time" type="time" />
-
-      <button class="primary mt-10">Book</button>
-    </form>
-  </main>
-
-  <div class="dock">
-    <a href="index.html" class="icon-btn">🏠</a>
-    <a href="booking.html" class="icon-btn">📅</a>
-    <a href="admin.html" class="icon-btn">⚙️</a>
+    <div class="footer">© 2025 Onestop Clinic</div>
   </div>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
+    function confirmBooking(){
+      const n=document.getElementById('name').value.trim();
+      const s=document.getElementById('slot').value;
+      const d=document.getElementById('date').value;
+      const r=encodeURIComponent(document.getElementById('reason').value.trim());
+      const p=document.getElementById('phone').value.trim();
+      if(!n||!d){ alert('Enter name & date'); return; }
+      const msg=`Appointment confirmed for ${n}%0AWhen: ${d} ${s}%0AReason: ${r}`;
+      location.href=`https://wa.me/?text=${msg}`;
     }
   </script>
 </body>
