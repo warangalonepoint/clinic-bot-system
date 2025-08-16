@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Onestop Clinic</title>
+  <title>Onestop Clinic Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css?v=10">
+  <link rel="stylesheet" href="./styles.css?v=14">
 </head>
 <body>
   <div class="app-shell">
+
     <!-- Header -->
     <div class="header">
       <div class="brand-logo"></div>
@@ -21,163 +21,78 @@
       </div>
     </div>
 
-    <!-- Hero -->
-    <div class="hero-card glass">
-      <img src="./assets/clinic_banner.png" class="hero-img" alt="Doctor">
-    </div>
-
-    <!-- Tabs -->
+    <!-- Nav Tabs -->
     <div class="tabs">
-      <div class="tab active">Overview</div>
-      <div class="tab" onclick="location.href='./booking.html'">Quick Actions</div>
-      <div class="tab" onclick="location.href='./admin.html'">Admin</div>
+      <button class="tab active">Overview</button>
+      <button class="tab" onclick="location.href='./booking.html'">Quick Actions</button>
+      <button class="tab" onclick="location.href='./doctor.html'">Doctors</button>
+      <button class="tab" onclick="location.href='./admin.html'">Admin</button>
+      <button class="tab" onclick="location.href='./about.html'">About</button>
     </div>
 
-    <!-- Today -->
+    <!-- Today Stats -->
     <div class="section glass">
       <h2>Today</h2>
-      <div class="chart-wrap">
-        <div class="donut"><span id="todayCount">0</span></div>
+      <div class="chart-row">
+        <canvas id="chartToday" width="200" height="200"></canvas>
       </div>
-
-      <div class="row"><div class="label">Patients Seen</div><div class="value" id="patientsSeen">0</div></div>
-
-      <div class="row">
-        <div class="label">Bookings Filled</div>
-        <div class="value"><span id="bookedFilled">0</span> / <span id="capacity">50</span></div>
-      </div>
-      <div class="progress"><div class="bar" id="bookedBar" style="width:0%"></div></div>
-
-      <div class="row">
-        <div class="label">Utilization</div><div class="value" id="utilPct">0%</div>
-      </div>
-      <div class="progress"><div class="bar" id="utilBar" style="width:0%"></div></div>
-
-      <div class="row"><div class="label">Avg visit</div><div class="value">17m</div></div>
+      <div class="row"><div class="label">Patients Seen</div><div class="value" id="patientsSeen">-</div></div>
+      <div class="row"><div class="label">Bookings Filled</div><div class="value" id="bookingsFilled">-</div></div>
+      <div class="row"><div class="label">Utilization</div><div class="value" id="utilization">-</div></div>
+      <div class="row"><div class="label">Avg visit</div><div class="value" id="avgVisit">-</div></div>
     </div>
 
     <!-- Follow-ups -->
     <div class="section glass">
       <h2>Follow-ups</h2>
-      <div class="row"><div class="label">WhatsApp Reminders</div><div class="value" id="reminders">0</div></div>
-      <div class="progress"><div class="bar" id="remindersBar" style="width:0%"></div></div>
+      <div class="row"><div class="label">WhatsApp Reminders</div><div class="value" id="waReminders">-</div></div>
+      <div class="row"><div class="label">Prescription Ready</div><div class="value" id="rxReady">-</div></div>
+      <div class="row"><div class="label">Lab Results Reviewed</div><div class="value" id="labReviewed">-</div></div>
     </div>
 
-    <!-- Actions -->
-    <div class="section glass">
-      <h2>Actions</h2>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="location.href='./booking.html'">New Booking</button>
-        <button class="btn btn-secondary" onclick="location.href='./doctor.html'">Doctor Panel</button>
-        <button class="btn btn-secondary" onclick="location.href='./staff.html'">Staff</button>
-      </div>
-    </div>
-
+    <!-- Footer -->
     <div class="footer">© 2025 Onestop Clinic</div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // --- helpers
-    const todayISO = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  // Dummy numbers (replace with Airtable fetch later)
+  const stats = {
+    patientsSeen: 18,
+    bookingsFilled: "34 / 50",
+    utilization: "68%",
+    avgVisit: "17m",
+    waReminders: "27 / 40",
+    rxReady: "14 / 25",
+    labReviewed: "9 / 20"
+  };
 
-    async function loadConfig(){
-      try{
-        const res = await fetch('./config.json?v=' + Date.now());
-        if(!res.ok) throw 0;
-        return await res.json();
-      }catch{ // default CSV fallback
-        return { backend:'csv', csv:{ logs:'./logs.csv' }, capacityPerDay:50 };
-      }
+  // Inject values
+  document.getElementById("patientsSeen").textContent = stats.patientsSeen;
+  document.getElementById("bookingsFilled").textContent = stats.bookingsFilled;
+  document.getElementById("utilization").textContent = stats.utilization;
+  document.getElementById("avgVisit").textContent = stats.avgVisit;
+  document.getElementById("waReminders").textContent = stats.waReminders;
+  document.getElementById("rxReady").textContent = stats.rxReady;
+  document.getElementById("labReviewed").textContent = stats.labReviewed;
+
+  // Chart
+  const ctx = document.getElementById('chartToday').getContext('2d');
+  new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Seen','Remaining'],
+      datasets:[{
+        data:[18,32],
+        backgroundColor:['#00bcd4','#e0e0e0'],
+        borderWidth:0
+      }]
+    },
+    options:{
+      plugins:{legend:{display:false}},
+      cutout:'70%'
     }
-
-    async function getDataFromCSV(url){
-      const res = await fetch(url + '?v=' + Date.now());
-      if(!res.ok) throw new Error('CSV not found');
-      const text = await res.text();
-      const lines = text.trim().split(/\r?\n/);
-      const headers = lines.shift().split(',').map(h => h.trim());
-      const idx = (name)=> headers.findIndex(h=>h.toLowerCase()===name.toLowerCase());
-      const iTs=idx('Timestamp'), iName=idx('Patient Name'), iTime=idx('Slot Time'),
-            iReason=idx('Reason'), iContact=idx('Contact'), iToken=idx('Token'), iRem=idx('Reminder Sent');
-      return lines.map(l=>{
-        // naive CSV parse (no quoted commas). Works for our logs.
-        const c = l.split(','); 
-        return {
-          timestamp: c[iTs]||'',
-          date: (c[iTs]||'').slice(0,10),
-          name: c[iName]||'',
-          slot: c[iTime]||'',
-          reason: c[iReason]||'',
-          contact: c[iContact]||'',
-          token: c[iToken]||'',
-          reminded: (c[iRem]||'').trim()
-        };
-      });
-    }
-
-    async function getDataFromAirtable(cfg){
-      const url = `https://api.airtable.com/v0/${cfg.baseId}/${encodeURIComponent(cfg.table)}?pageSize=100&sort[0][field]=Timestamp&sort[0][direction]=desc`;
-      const res = await fetch(url, { headers:{ Authorization: 'Bearer ' + cfg.apiKey }});
-      const json = await res.json();
-      return (json.records||[]).map(r=>{
-        const f = r.fields || {};
-        const ts = (f['Timestamp'] || '').toString();
-        return {
-          timestamp: ts,
-          date: ts.slice(0,10),
-          name: f['Patient Name']||'',
-          slot: f['Slot Time']||'',
-          reason: f['Reason']||'',
-          contact: f['Contact']||'',
-          token: f['Token']||'',
-          reminded: (f['Reminder Sent']||'').toString()
-        };
-      });
-    }
-
-    function computeStats(rows, capacity){
-      const todayRows = rows.filter(r => r.date === todayISO);
-      const patientsSeen = todayRows.length;
-      const bookedFilled = rows.length;
-      const reminders = rows.filter(r => /✔|yes|true/i.test(r.reminded)).length;
-      const util = Math.min(100, Math.round((bookedFilled / (capacity||50)) * 100));
-      return { patientsSeen, bookedFilled, reminders, util };
-    }
-
-    function render(stats, capacity){
-      document.getElementById('todayCount').textContent = stats.patientsSeen;
-      document.getElementById('patientsSeen').textContent = stats.patientsSeen;
-      document.getElementById('bookedFilled').textContent = stats.bookedFilled;
-      document.getElementById('capacity').textContent = capacity;
-      document.getElementById('utilPct').textContent = stats.util + '%';
-      document.getElementById('reminders').textContent = stats.reminders;
-
-      document.getElementById('bookedBar').style.width = Math.min(100,(stats.bookedFilled/capacity)*100) + '%';
-      document.getElementById('utilBar').style.width   = stats.util + '%';
-      document.getElementById('remindersBar').style.width = Math.min(100,(stats.reminders/Math.max(1,stats.bookedFilled))*100) + '%';
-    }
-
-    (async ()=>{
-      const cfg = await loadConfig();
-      let rows = [];
-      try{
-        if(cfg.backend === 'csv'){
-          rows = await getDataFromCSV(cfg.csv.logs);
-        }else{
-          rows = await getDataFromAirtable(cfg.airtable);
-        }
-      }catch(e){
-        // try Airtable if CSV failed
-        if(cfg.airtable && cfg.airtable.apiKey){
-          try{ rows = await getDataFromAirtable(cfg.airtable); }catch(_){}
-        }
-      }
-      const capacity = (cfg.capacityPerDay||50);
-      render(computeStats(rows, capacity), capacity);
-    })();
-
-    // SW
-    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
+  });
   </script>
 </body>
 </html>
