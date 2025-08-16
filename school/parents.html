@@ -1,469 +1,216 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Parents</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body>
-  <div class="wrapper">
-    <!-- Header / Hero -->
-    <section class="accent-indigo">
-      <div class="glass header">
-        <div class="row" style="align-items:center; justify-content:space-between;">
-          <div>
-            <div class="eyebrow">View diary, homework, messages & leaves</div>
-            <div class="h1">Parents</div>
-          </div>
-          <div class="row" style="gap:12px;">
-            <a href="index.html" class="btn btn-ghost">PIN</a>
-            <button class="btn" id="themeBtn">Theme</button>
-          </div>
+<body data-theme="dark">
+  <div class="wrapper" id="parents">
+    <section class="glass header">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="h1">Parents</div>
+          <div class="sub">View diary, homework, messages & leaves</div>
         </div>
+        <div class="row">
+          <span class="badge">PIN</span>
+          <button class="btn right" onclick="toggleTheme()">Theme</button>
+        </div>
+      </div>
 
-        <!-- Tabs -->
-        <div class="row mt-16 wrap" id="tabs">
-          <button class="chip chip-indigo active" data-tab="tab-diary">Class Diary</button>
-          <button class="chip chip-blue"   data-tab="tab-homework">Homework</button>
-          <button class="chip chip-pink"   data-tab="tab-messages">Messages</button>
-          <button class="chip chip-green"  data-tab="tab-leaves">Leaves</button>
-          <button class="chip chip-cyan"   data-tab="tab-attendance">Attendance</button>
-          <button class="chip chip-purple" data-tab="tab-events">Events</button>
-          <button class="chip chip-teal"   data-tab="tab-requests">Requests</button>
-          <button class="chip chip-orange" data-tab="tab-complaints">Complaints</button>
-        </div>
+      <div class="pills mt-16" id="parents-tabs">
+        <div class="pill indigo" data-tab="diary">Class Diary</div>
+        <div class="pill indigo" data-tab="hw">Homework</div>
+        <div class="pill violet" data-tab="msg">Messages</div>
+        <div class="pill green" data-tab="leave">Leaves</div>
+        <div class="pill teal" data-tab="att">Attendance</div>
+        <div class="pill indigo" data-tab="events">Events</div>
+        <div class="pill teal" data-tab="req">Requests</div>
+        <div class="pill amber" data-tab="complaints">Complaints</div>
       </div>
     </section>
 
     <!-- Class Diary -->
-    <section class="accent-indigo panel" id="tab-diary">
-      <div class="glass">
-        <div class="h2">Today’s Class Diary</div>
-        <p class="text-dim">Teacher notes for the selected class.</p>
-        <div id="diaryList" class="stack mt-12"></div>
-      </div>
+    <section class="glass mt-24 panel" data-tab="diary">
+      <div class="h2">Today’s Class Diary</div>
+      <p class="text-dim">Teacher notes for the selected class.</p>
+      <table class="table mt-12" id="p-diary"></table>
     </section>
 
     <!-- Homework -->
-    <section class="accent-blue panel hidden" id="tab-homework">
-      <div class="glass">
-        <div class="h2">Homework</div>
-        <div id="hwList" class="stack mt-12"></div>
-      </div>
+    <section class="glass mt-24 panel" data-tab="hw">
+      <div class="h2">Homework</div>
+      <table class="table mt-12" id="p-hw"></table>
     </section>
 
     <!-- Messages -->
-    <section class="accent-pink panel hidden" id="tab-messages">
-      <div class="glass">
-        <div class="h2">Messages from Teachers</div>
-        <div id="msgList" class="stack mt-12"></div>
-      </div>
+    <section class="glass mt-24 panel" data-tab="msg">
+      <div class="h2">Messages from Teachers</div>
+      <table class="table mt-12" id="p-msg"></table>
     </section>
 
-    <!-- Leaves -->
-    <section class="accent-green panel hidden" id="tab-leaves">
-      <div class="glass">
-        <div class="h2">Apply Leave</div>
-        <form id="leaveForm" class="grid" onsubmit="return false;">
-          <div class="grid-2">
-            <input class="input" type="date" id="lvFrom" />
-            <input class="input" type="date" id="lvTo" />
-          </div>
-          <textarea class="input" id="lvReason" placeholder="Reason"></textarea>
-          <div class="row">
-            <button class="btn btn-green" id="lvSubmit">Submit</button>
-          </div>
-        </form>
-
-        <div class="divider"></div>
-
-        <div class="h3">My Leave Requests</div>
-        <div id="lvList" class="stack mt-12"></div>
+    <!-- Leaves (apply) -->
+    <section class="glass mt-24 panel" data-tab="leave">
+      <div class="h2">Apply Leave</div>
+      <div class="grid mt-12">
+        <select id="pl-subject" class="input">
+          <option value="" disabled selected>Subject</option>
+          <option>General</option><option>Maths</option><option>Science</option><option>English</option>
+        </select>
+        <select id="pl-days" class="input">
+          <option selected value="1">1 day</option>
+          <option value="2">2 days</option><option value="3">3 days</option>
+        </select>
+        <textarea id="pl-reason" placeholder="Reason" class="input"></textarea>
+        <div><button class="btn btn-teal" onclick="submitLeave()">Submit</button></div>
       </div>
+      <div class="h2 mt-24">My Leave Requests</div>
+      <table class="table mt-12" id="p-leaves"></table>
     </section>
 
     <!-- Attendance -->
-    <section class="accent-cyan panel hidden" id="tab-attendance">
-      <div class="glass">
-        <div class="h2">Attendance Summary</div>
-        <p class="text-dim">Monthly presence and quick stats.</p>
-        <div id="attSummary" class="stack mt-12"></div>
-      </div>
+    <section class="glass mt-24 panel" data-tab="att">
+      <div class="h2">Attendance</div>
+      <p class="text-dim">Last 10 records for the student.</p>
+      <table class="table mt-12" id="p-att"></table>
     </section>
 
     <!-- Events -->
-    <section class="accent-purple panel hidden" id="tab-events">
-      <div class="glass">
-        <div class="h2">Upcoming Events & Exams</div>
-        <div id="evtList" class="stack mt-12"></div>
-      </div>
+    <section class="glass mt-24 panel" data-tab="events">
+      <div class="h2">Upcoming Events & Exams</div>
+      <table class="table mt-12" id="p-events"></table>
     </section>
 
-    <!-- Requests -->
-    <section class="accent-teal panel hidden" id="tab-requests">
-      <div class="glass">
-        <div class="h2">Parent–Teacher Requests</div>
-        <form id="reqForm" class="grid" onsubmit="return false;">
-          <div class="grid-2">
-            <select class="input" id="reqType">
-              <option>Request Call</option>
-              <option>Request Meeting</option>
-              <option>Feedback</option>
-            </select>
-            <input class="input" id="reqPreferred" placeholder="Preferred time (optional)" />
-          </div>
-          <textarea class="input" id="reqMsg" placeholder="Write your request…"></textarea>
-          <div class="row">
-            <button class="btn btn-teal" id="reqSubmit">Send Request</button>
-            <button class="btn btn-ghost" id="reqExport">Export CSV</button>
-          </div>
-        </form>
-
-        <div class="divider"></div>
-        <div class="h3">My Requests</div>
-        <div id="reqList" class="stack mt-12"></div>
+    <!-- Requests (quick ask to teacher) -->
+    <section class="glass mt-24 panel" data-tab="req">
+      <div class="h2">Requests to Teacher</div>
+      <div class="grid mt-12">
+        <input id="rq-title" class="input" placeholder="Title (e.g., Extra class request)"/>
+        <textarea id="rq-msg" class="input" placeholder="Message..."></textarea>
+        <div><button class="btn btn-indigo" onclick="submitRequest()">Send Request</button></div>
       </div>
+      <table class="table mt-24" id="p-reqs"></table>
     </section>
 
     <!-- Complaints -->
-    <section class="accent-orange panel hidden" id="tab-complaints">
-      <div class="glass">
-        <div class="h2">Raise Complaint</div>
-        <form id="cmpForm" class="grid" onsubmit="return false;">
-          <div class="grid-2">
-            <select class="input" id="cmpCat">
-              <option>Transport</option>
-              <option>Discipline</option>
-              <option>Fees & Accounts</option>
-              <option>Facility</option>
-              <option>Other</option>
-            </select>
-            <input class="input" id="cmpSubject" placeholder="Short title" />
-          </div>
-          <textarea class="input" id="cmpMsg" placeholder="Describe the issue…"></textarea>
-          <div class="row">
-            <button class="btn btn-orange" id="cmpSubmit">Submit Complaint</button>
-            <button class="btn btn-ghost" id="cmpExport">Export CSV</button>
-          </div>
-        </form>
-
-        <div class="divider"></div>
-        <div class="h3">My Complaints</div>
-        <div id="cmpList" class="stack mt-12"></div>
+    <section class="glass mt-24 panel" data-tab="complaints">
+      <div class="h2">Raise a Complaint</div>
+      <div class="grid mt-12">
+        <select id="cp-type" class="input">
+          <option>Teacher</option><option>Transport</option><option>Facility</option><option>Other</option>
+        </select>
+        <textarea id="cp-text" class="input" placeholder="Describe the issue..."></textarea>
+        <div class="row">
+          <button class="btn btn-rose" onclick="submitComplaint()">Submit</button>
+          <button class="btn btn-outline" onclick="exportCSV('complaints.csv', loadArr('complaints').map(x=>[x.date,x.type,x.text,x.status]))">Export CSV</button>
+        </div>
       </div>
+      <table class="table mt-24" id="p-complaints"></table>
     </section>
 
+    <footer></footer>
   </div>
 
-  <!-- Shared UI helpers (theme, small utilities) -->
-  <script src="ui.js" type="module"></script>
-
+  <!-- inject ui.js -->
   <script>
-  // ---------------- Tabs (works even if ui.js is cached) ----------------
-  const tabsEl = document.getElementById('tabs');
-  const panels = [...document.querySelectorAll('.panel')];
-  if (tabsEl) {
-    tabsEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('.chip[data-tab]');
-      if (!btn) return;
-      const id = btn.dataset.tab;
-      // chip states
-      tabsEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      // panels
-      panels.forEach(p => p.classList.toggle('hidden', p.id !== id));
-      // remember last tab
-      localStorage.setItem('parents:lastTab', id);
-    });
-    // restore last tab
-    const last = localStorage.getItem('parents:lastTab');
-    if (last && document.getElementById(last)) {
-      tabsEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      const chip = tabsEl.querySelector(`.chip[data-tab="${last}"]`);
-      if (chip) chip.classList.add('active');
-      panels.forEach(p => p.classList.toggle('hidden', p.id !== last));
-    }
-  }
+  /* === include the ui.js helper (theme/tabs/csv/arr) === */
+  <?php /* ignore if not using PHP; copy the ui.js block here */ ?>
+  </script>
+  <!-- Actual page logic -->
+  <script>
+    // Apply theme from query if present
+    (function(){ const u=new URL(location.href); const t=u.searchParams.get('theme'); if(t) {localStorage.setItem('theme',t); document.body.dataset.theme=t;} })();
 
-  // ---------------- Theme toggle button ----------------
-  const themeBtn = document.getElementById('themeBtn');
-  if (themeBtn) {
-    themeBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-      const mode = document.body.classList.contains('dark') ? 'dark' : 'light';
-      localStorage.setItem('theme', mode);
-    });
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') document.body.classList.remove('dark');
-  }
+    // Init tabs
+    initTabs('parents','diary');
 
-  // ---------------- Utilities ----------------
-  const fmtDate = d => new Date(d).toISOString().slice(0,10);
-  const el = (tag, cls, html) => {
-    const n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (html) n.innerHTML = html;
-    return n;
-  };
-  const saveArray = (key, arr) => localStorage.setItem(key, JSON.stringify(arr));
-  const loadArray = (key, fallback=[]) => {
-    try { return JSON.parse(localStorage.getItem(key)) || fallback; }
-    catch { return fallback; }
-  };
-  const toCSV = (rows) => {
-    if (!rows.length) return '';
-    const headers = Object.keys(rows[0]);
-    const esc = s => `"${String(s ?? '').replace(/"/g,'""')}"`;
-    const lines = [headers.map(esc).join(',')];
-    for (const r of rows) lines.push(headers.map(h => esc(r[h])).join(','));
-    return lines.join('\n');
-  };
-  const download = (name, text) => {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([text], {type:'text/csv'}));
-    a.download = name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 500);
-  };
+    // ---- Fake data readers (replace with real CSV later) ----
+    const now = new Date().toISOString().slice(0,10);
+    const sampleDiary = [
+      ["Maths", now, "Fractions & examples"],
+      ["Science", now, "Plants and photosynthesis"]
+    ];
+    const sampleHW = [
+      ["Maths", "2025-08-16", "Exercise 5A — Q1–10"],
+      ["English", "2025-08-17", "Read Ch.3 — Make notes"]
+    ];
+    const events = loadArr('events');
+    if(events.length===0){
+      saveArr('events', [
+        {title:"Science Quiz", date:"2025-08-18"},
+        {title:"Parent–Teacher Meeting", date:"2025-08-22"},
+        {title:"Half-Yearly Exams Begin", date:"2025-08-29"},
+      ]);
+    }
 
-  // ---------------- Seed demo data (only if empty) ----------------
-  (function seed(){
-    if (!localStorage.getItem('classDiary')) {
-      saveArray('classDiary', [
-        {subject:'Maths', date: fmtDate(new Date()), note:'Fractions & examples'},
-        {subject:'Science', date: fmtDate(new Date()), note:'Plants and photosynthesis'}
-      ]);
+    const leaves = loadArr('leaves');
+    const reqs = loadArr('requests');
+    const complaints = loadArr('complaints');
+    const att = loadArr('attendance'); // [{date:"2025-08-10", status:"Present"}]
+
+    function renderTable(el, rows, headers){
+      const t = (headers? `<tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr>`:'') +
+                rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+      el.innerHTML = t || '<tr><td class="text-dim">No entries.</td></tr>';
     }
-    if (!localStorage.getItem('homework')) {
-      saveArray('homework', [
-        {subject:'Maths', due: fmtDate(Date.now()+86400000), title:'Exercise 5A', details:'Q1–10'},
-        {subject:'English', due: fmtDate(Date.now()+2*86400000), title:'Read Ch.3', details:'Make notes'}
-      ]);
-    }
-    if (!localStorage.getItem('messages')) {
-      saveArray('messages', [
-        {time: new Date().toLocaleString(), text:'PTM on Friday 4 PM.'}
-      ]);
-    }
-    if (!localStorage.getItem('attendance')) {
-      // last 15 school days, random presence
-      const days = [];
-      for (let i=15;i>=1;i--){
-        const d = new Date(); d.setDate(d.getDate()-i);
-        days.push({date: fmtDate(d), present: Math.random()>0.1});
-      }
-      saveArray('attendance', days);
-    }
-    if (!localStorage.getItem('events')) {
-      saveArray('events', [
-        {date: fmtDate(Date.now()+3*86400000), title:'Science Quiz'},
-        {date: fmtDate(Date.now()+7*86400000), title:'Parent–Teacher Meeting'},
-        {date: fmtDate(Date.now()+14*86400000), title:'Half-Yearly Exams Begin'}
-      ]);
-    }
+
+    renderTable(document.getElementById('p-diary'), sampleDiary, ["Subject","Date","Notes"]);
+    renderTable(document.getElementById('p-hw'), sampleHW, ["Subject","Due","Homework"]);
+    renderTable(document.getElementById('p-msg'), loadArr('broadcasts').map(b=>[b.date,b.text]), ["Date","Message"]);
+    renderTable(document.getElementById('p-events'), loadArr('events').map(e=>[e.title,e.date]), ["Event/Exam","Date"]);
+    renderTable(document.getElementById('p-reqs'), reqs.map(r=>[r.date,r.title,r.msg,r.status||"Sent"]), ["Date","Title","Message","Status"]);
+    renderTable(document.getElementById('p-complaints'), complaints.map(c=>[c.date,c.type,c.text,c.status||"Open"]), ["Date","Type","Complaint","Status"]);
+    renderTable(document.getElementById('p-leaves'), leaves.map(l=>[l.date,l.subject,l.days,l.reason,l.status||"Pending"]), ["Date","Subject","Days","Reason","Status"]);
+    renderTable(document.getElementById('p-att'), (att.slice(-10)).map(x=>[x.date,x.status]), ["Date","Status"]);
+
+    // ---- Actions ----
+    window.submitLeave = function(){
+      const subject=document.getElementById('pl-subject').value||'General';
+      const days=+document.getElementById('pl-days').value||1;
+      const reason=document.getElementById('pl-reason').value.trim();
+      if(!reason) return alert('Please enter a reason.');
+      leaves.push({date:new Date().toISOString().slice(0,10),subject,days,reason,status:"Pending"});
+      saveArr('leaves', leaves);
+      renderTable(document.getElementById('p-leaves'), leaves.map(l=>[l.date,l.subject,l.days,l.reason,l.status]), ["Date","Subject","Days","Reason","Status"]);
+      document.getElementById('pl-reason').value='';
+      alert('Leave submitted.');
+    };
+
+    window.submitRequest = function(){
+      const title=document.getElementById('rq-title').value.trim();
+      const msg=document.getElementById('rq-msg').value.trim();
+      if(!title || !msg) return alert('Fill both title and message.');
+      reqs.push({date:new Date().toLocaleString(), title, msg, status:"Sent"});
+      saveArr('requests', reqs);
+      renderTable(document.getElementById('p-reqs'), reqs.map(r=>[r.date,r.title,r.msg,r.status]), ["Date","Title","Message","Status"]);
+      document.getElementById('rq-title').value=''; document.getElementById('rq-msg').value='';
+    };
+
+    window.submitComplaint = function(){
+      const type=document.getElementById('cp-type').value;
+      const text=document.getElementById('cp-text').value.trim();
+      if(!text) return alert('Describe the issue.');
+      complaints.push({date:new Date().toLocaleString(), type, text, status:'Open'});
+      saveArr('complaints', complaints);
+      renderTable(document.getElementById('p-complaints'), complaints.map(c=>[c.date,c.type,c.text,c.status]), ["Date","Type","Complaint","Status"]);
+      document.getElementById('cp-text').value='';
+      alert('Complaint raised.');
+    };
+  </script>
+  <!-- Paste ui.js helper here -->
+  <script>
+  (function(){
+    const applyTheme=(t)=>document.body.setAttribute('data-theme',t);
+    const t=new URL(location).searchParams.get('theme')||localStorage.getItem('theme')||'dark';
+    applyTheme(t); localStorage.setItem('theme',t);
+
+    window.toggleTheme=function(){const n=document.body.getAttribute('data-theme')==='dark'?'light':'dark';localStorage.setItem('theme',n);applyTheme(n);}
+    function activateTab(containerId,tabKey){const root=document.getElementById(containerId);root.querySelectorAll('.pill[data-tab]').forEach(p=>p.dataset.active=(p.dataset.tab===tabKey)?"true":"false");document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.dataset.tab===tabKey));localStorage.setItem(containerId+':tab',tabKey);}
+    window.initTabs=function(containerId,def){const root=document.getElementById(containerId);const stored=localStorage.getItem(containerId+':tab')||def;root.querySelectorAll('.pill[data-tab]').forEach(btn=>btn.addEventListener('click',()=>activateTab(containerId,btn.dataset.tab)));activateTab(containerId,stored);}
+    window.exportCSV=function(name,rows){const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+    window.loadArr=(k)=>JSON.parse(localStorage.getItem(k)||'[]'); window.saveArr=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
   })();
-
-  // ---------------- Renderers ----------------
-  function renderDiary(){
-    const list = loadArray('classDiary');
-    const wrap = document.getElementById('diaryList'); wrap.innerHTML='';
-    if (!list.length) { wrap.append(el('div','text-dim','No entries.')); return; }
-    list.forEach((x)=>{
-      const card = el('div','card item');
-      card.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <div class="h3">${x.subject}</div>
-          <div class="text-dim">${x.date}</div>
-        </div>
-        <div class="mt-8">${x.note}</div>`;
-      wrap.append(card);
-    });
-  }
-
-  function renderHW(){
-    const list = loadArray('homework');
-    const wrap = document.getElementById('hwList'); wrap.innerHTML='';
-    if (!list.length) { wrap.append(el('div','text-dim','No homework.')); return; }
-    list.forEach((x)=>{
-      const card = el('div','card item');
-      card.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <div class="h3">${x.subject}</div>
-          <div class="text-dim">Due ${x.due}</div>
-        </div>
-        <div class="mt-8"><b>${x.title}</b> — ${x.details||''}</div>`;
-      wrap.append(card);
-    });
-  }
-
-  function renderMsgs(){
-    const list = loadArray('messages');
-    const wrap = document.getElementById('msgList'); wrap.innerHTML='';
-    if (!list.length) { wrap.append(el('div','text-dim','No messages.')); return; }
-    list.forEach((x)=>{
-      const card = el('div','card item');
-      card.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <div class="h3">Message</div>
-          <div class="text-dim">${x.time}</div>
-        </div>
-        <div class="mt-8">${x.text}</div>`;
-      wrap.append(card);
-    });
-  }
-
-  function renderLeaves(){
-    const my = loadArray('parentLeaves');
-    const wrap = document.getElementById('lvList'); wrap.innerHTML='';
-    if (!my.length) { wrap.append(el('div','text-dim','No leave requests.')); return; }
-    my.forEach((x,i)=>{
-      const card = el('div','card item');
-      card.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <div class="h3">${x.from} → ${x.to}</div>
-          <div class="badge">${x.status||'Pending'}</div>
-        </div>
-        <div class="mt-8 text-dim">${x.reason||''}</div>`;
-      wrap.append(card);
-    });
-  }
-
-  function renderAttendance(){
-    const a = loadArray('attendance');
-    const wrap = document.getElementById('attSummary'); wrap.innerHTML='';
-    if (!a.length) { wrap.append(el('div','text-dim','No attendance data.')); return; }
-    // current month
-    const now = new Date();
-    const ym = now.toISOString().slice(0,7);
-    const m = a.filter(x => (x.date||'').startsWith(ym));
-    const total = m.length || a.length;
-    const present = m.length ? m.filter(x=>x.present).length : a.filter(x=>x.present).length;
-    const pct = total ? Math.round(100*present/total) : 0;
-
-    const card = el('div','card');
-    card.innerHTML = `
-      <div class="h3">This Month</div>
-      <div class="mt-8">Present: <b>${present}</b> / ${total} days · <b>${pct}%</b></div>
-      <div class="mt-12 text-dim">Last 5 days</div>
-    `;
-    const last5 = a.slice(-5);
-    last5.forEach(x=>{
-      const row = el('div','row mt-6');
-      row.innerHTML = `<div class="text-dim" style="min-width:90px">${x.date}</div>
-                       <div class="badge ${x.present?'badge-green':'badge-pink'}">${x.present?'Present':'Absent'}</div>`;
-      card.append(row);
-    });
-    wrap.append(card);
-  }
-
-  function renderEvents(){
-    const list = loadArray('events');
-    const wrap = document.getElementById('evtList'); wrap.innerHTML='';
-    if (!list.length) { wrap.append(el('div','text-dim','No upcoming events.')); return; }
-    list.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-    list.forEach(x=>{
-      const card = el('div','card item');
-      card.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <div class="h3">${x.title}</div>
-          <div class="text-dim">${x.date}</div>
-        </div>`;
-      wrap.append(card);
-    });
-  }
-
-  function renderRequests(){
-    const list = loadArray('parentRequests');
-    const wrap = document.getElementById('reqList'); wrap.innerHTML='';
-    if (!list.length) { wrap.append(el('div','text-dim','No requests yet.')); return; }
-    list.slice().reverse().forEach(x=>{
-      const card = el('div','card item');
-      card.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <div class="h3">${x.type}</div>
-          <div class="text-dim">${x.time}</div>
-        </div>
-        <div class="mt-8">${x.msg}</div>
-        <div class="mt-8 text-dim">${x.preferred ? 'Preferred: '+x.preferred : ''}</div>`;
-      wrap.append(card);
-    });
-  }
-
-  function renderComplaints(){
-    const list = loadArray('parentComplaints');
-    const wrap = document.getElementById('cmpList'); wrap.innerHTML='';
-    if (!list.length) { wrap.append(el('div','text-dim','No complaints raised.')); return; }
-    list.slice().reverse().forEach(x=>{
-      const card = el('div','card item');
-      card.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <div class="h3">${x.subject || x.category}</div>
-          <div class="badge">${x.status || 'Open'}</div>
-        </div>
-        <div class="text-dim mt-6">${x.category}</div>
-        <div class="mt-8">${x.msg}</div>
-        <div class="text-dim mt-8">${x.time}</div>`;
-      wrap.append(card);
-    });
-  }
-
-  // ---------------- Form handlers ----------------
-  document.getElementById('lvSubmit').addEventListener('click', ()=>{
-    const from = document.getElementById('lvFrom').value;
-    const to   = document.getElementById('lvTo').value;
-    const reason = document.getElementById('lvReason').value.trim();
-    if (!from || !to) return alert('Select from & to dates');
-    const arr = loadArray('parentLeaves');
-    arr.push({from, to, reason, status:'Pending', created:new Date().toISOString()});
-    saveArray('parentLeaves', arr);
-    document.getElementById('leaveForm').reset();
-    renderLeaves();
-  });
-
-  document.getElementById('reqSubmit').addEventListener('click', ()=>{
-    const type = document.getElementById('reqType').value;
-    const preferred = document.getElementById('reqPreferred').value.trim();
-    const msg = document.getElementById('reqMsg').value.trim();
-    if (!msg) return alert('Please write your request.');
-    const arr = loadArray('parentRequests');
-    arr.push({type, preferred, msg, time:new Date().toLocaleString()});
-    saveArray('parentRequests', arr);
-    document.getElementById('reqForm').reset();
-    renderRequests();
-  });
-
-  document.getElementById('reqExport').addEventListener('click', ()=>{
-    const rows = loadArray('parentRequests');
-    if (!rows.length) return alert('No data to export.');
-    download('parent_requests.csv', toCSV(rows));
-  });
-
-  document.getElementById('cmpSubmit').addEventListener('click', ()=>{
-    const category = document.getElementById('cmpCat').value;
-    const subject  = document.getElementById('cmpSubject').value.trim();
-    const msg      = document.getElementById('cmpMsg').value.trim();
-    if (!msg) return alert('Please describe the issue.');
-    const arr = loadArray('parentComplaints');
-    arr.push({category, subject, msg, status:'Open', time:new Date().toLocaleString()});
-    saveArray('parentComplaints', arr);
-    document.getElementById('cmpForm').reset();
-    renderComplaints();
-  });
-
-  document.getElementById('cmpExport').addEventListener('click', ()=>{
-    const rows = loadArray('parentComplaints');
-    if (!rows.length) return alert('No data to export.');
-    download('parent_complaints.csv', toCSV(rows));
-  });
-
-  // ---------------- Initial renders ----------------
-  renderDiary();
-  renderHW();
-  renderMsgs();
-  renderLeaves();
-  renderAttendance();
-  renderEvents();
-  renderRequests();
-  renderComplaints();
   </script>
 </body>
 </html>
