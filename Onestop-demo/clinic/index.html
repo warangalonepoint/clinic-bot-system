@@ -97,5 +97,13 @@
     <!-- Footer -->
     <div class="footer">© 2025 Onestop Clinic</div>
   </div>
-</body>
+</body><script>
+  // tabs active state
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+</script>
 </html>
