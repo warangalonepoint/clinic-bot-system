@@ -1,12 +1,13 @@
 {
-  "backend": "csv",
-  "csv": {
-    "logs": "./logs.csv"                   // headers: Timestamp,Patient Name,Slot Time,Reason,Contact,Token,Reminder Sent
-  },
+  "backend": "airtable", 
+  "capacityPerDay": 50,
+  "doctors": ["Dr. A", "Dr. B", "Dr. C"],
   "airtable": {
-    "apiKey": "PASTE_YOUR_KEY",
-    "baseId": "app1T8WiRqZIR4xY",
-    "table": "BookingsLogs"
+    "apiKey": "PASTE_YOUR_AIRTABLE_KEY",
+    "baseId": "PASTE_BASE_ID",
+    "logsTable": "BookingsLogs",
+    "slotsTable": "AvailableSlots",
+    "attendanceTable": "StaffAttendance"
   },
-  "capacityPerDay": 50                     // for utilization
+  "csv": { "logs": "./logs.csv" }
 }
