@@ -3,282 +3,139 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic — Glass UI</title>
-
-  <!-- Styles -->
+  <title>Onestop Clinic — Dashboard</title>
   <link rel="stylesheet" href="./styles.css">
-
-  <!-- PWA (keep if you already use these) -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0b0f1a">
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0b0f1a" />
 </head>
 <body>
-  <!-- background blobs -->
-  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-
-  <div class="wrap">
-    <!-- Header -->
-    <header>
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title">Onestop C-Demo</div>
-          <small class="muted">Clinic App — Glassmorphism</small>
-        </div>
-      </div>
-      <div class="top-actions">
-        <button class="icon-btn" id="themeBtn" title="Toggle theme">🌗</button>
-        <a class="icon-btn" href="./booking.html" title="Full Booking Page">📅</a>
-        <a class="icon-btn" href="./admin.html" title="Admin">🛠️</a>
-      </div>
-    </header>
-
-    <!-- Optional banner (uses assets/clinic_banner.png) -->
-    <div class="hero">
-      <img src="./assets/clinic_banner.png" alt="Clinic banner" />
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs" id="tabs">
-      <div class="tab active" data-screen="overview">
-        <div><strong>Overview</strong></div>
-        <small>Today & stats</small>
-      </div>
-      <div class="tab" data-screen="bookings">
-        <div><strong>Bookings</strong></div>
-        <small>Slots & confirm</small>
-      </div>
-      <div class="tab" data-screen="settings">
-        <div><strong>Settings</strong></div>
-        <small>Preferences</small>
+  <!-- Banner -->
+  <header class="app-header">
+    <div class="brand">
+      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="brand-text">
+        <h1>Onestop C-Demo</h1>
+        <p>Clinic PWA</p>
       </div>
     </div>
+    <button id="themeToggle" class="icon-btn" title="Light/Dark">🌗</button>
+  </header>
 
-    <!-- OVERVIEW -->
-    <section class="screens active" id="overview">
-      <div class="grid">
-        <div class="card">
-          <div class="kpi-ring" style="--p:72%">
-            <span id="todayCount">12</span>
-          </div>
-          <div class="center muted">Bookings today</div>
-          <div class="row mt-14">
-            <div class="field">
-              <div class="muted mb-6">Tokens Used</div>
-              <div class="bar"><i style="--w:68%"></i></div>
-            </div>
-            <div class="field">
-              <div class="muted mb-6">Reminders Sent</div>
-              <div class="bar"><i style="--w:42%"></i></div>
-            </div>
-          </div>
-        </div>
+  <div class="banner">
+    <img src="./assets/clinic_banner.png" alt="Clinic banner">
+  </div>
 
-        <div class="card" style="grid-column: span 2;">
-          <div class="muted mb-10">Quick Actions</div>
-          <div class="card-list">
-            <div class="mini-card">
-              <div class="chip"></div>
-              <div>
-                <div><strong>Today’s Slots</strong></div>
-                <div class="muted">Open: <span id="openSlots">7</span> • Booked: <span id="bookedSlots">5</span></div>
-              </div>
-              <button class="icon-btn" onclick="switchTab('bookings')" title="Go to Bookings">➡️</button>
-            </div>
-            <div class="mini-card">
-              <div class="chip" style="background:linear-gradient(135deg,var(--accent2),#4bf2b9)"></div>
-              <div>
-                <div><strong>Pending Reminders</strong></div>
-                <div class="muted"><span id="pendingRem">8</span> patients</div>
-              </div>
-              <button class="icon-btn" title="Send now">📲</button>
-            </div>
-            <div class="mini-card">
-              <div class="chip" style="background:linear-gradient(135deg,#ff8bd2,var(--accent1))"></div>
-              <div>
-                <div><strong>Export Logs</strong></div>
-                <div class="muted">CSV / PDF</div>
-              </div>
-              <a class="icon-btn" href="./staff.html" title="Staff / Logs">⬇️</a>
-            </div>
+  <!-- Tabs (same pattern as school PWA) -->
+  <nav class="tabs">
+    <button class="tab active" data-screen="home">Home</button>
+    <button class="tab" data-screen="quick">Quick Actions</button>
+    <button class="tab" data-screen="about">About</button>
+  </nav>
+
+  <!-- Screens -->
+  <main>
+    <!-- HOME -->
+    <section id="home" class="screen active">
+      <div class="cards">
+        <a class="card" href="./booking.html">
+          <div class="card-ic">📅</div>
+          <div class="card-txt">
+            <h3>Bookings</h3>
+            <p>Patient slot selection & WhatsApp confirm</p>
           </div>
-        </div>
+        </a>
+
+        <a class="card" href="./doctor.html">
+          <div class="card-ic">🩺</div>
+          <div class="card-txt">
+            <h3>Doctor Panel</h3>
+            <p>Update slots, view tokens</p>
+          </div>
+        </a>
+
+        <a class="card" href="./staff.html">
+          <div class="card-ic">👥</div>
+          <div class="card-txt">
+            <h3>Staff Panel</h3>
+            <p>Attendance & reminders</p>
+          </div>
+        </a>
+
+        <a class="card" href="./admin.html">
+          <div class="card-ic">🛠️</div>
+          <div class="card-txt">
+            <h3>Admin</h3>
+            <p>Backups, settings, PIN reset</p>
+          </div>
+        </a>
       </div>
-    </section>
 
-    <!-- BOOKINGS -->
-    <section class="screens" id="bookings">
-      <div class="grid">
-        <div class="card">
-          <h3 class="h3">Create Booking</h3>
-          <div class="row">
-            <div class="field">
-              <label>Date</label>
-              <select id="dateSel"></select>
-            </div>
-            <div class="field">
-              <label>Time Slot</label>
-              <select id="slotSel"></select>
-            </div>
-          </div>
-          <div class="row mt-10">
-            <div class="field">
-              <label>Patient Name</label>
-              <input id="pName" placeholder="Full name" />
-            </div>
-            <div class="field">
-              <label>Contact</label>
-              <input id="pPhone" placeholder="+91…" />
-            </div>
-          </div>
-          <div class="field mt-10">
-            <label>Reason</label>
-            <input id="pReason" placeholder="Eg. Fever / Follow-up" />
-          </div>
-          <div class="row mt-14">
-            <button class="primary" onclick="confirmBooking()">Confirm & WhatsApp</button>
-            <button onclick="resetForm()">Reset</button>
-            <a class="ghost" href="./booking.html">Open Full Booking Page ↗</a>
-          </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="kpi" style="--p:70%"><span>12</span></div>
+          <small>Bookings Today</small>
         </div>
-
-        <div class="card">
-          <h3 class="h3">Available Slots</h3>
-          <div id="slotList"></div>
-        </div>
-
-        <div class="card">
-          <h3 class="h3">Today Summary</h3>
-          <div class="muted">Next Token: <strong id="nextToken">#13</strong></div>
-          <div class="muted mt-6">Reminders Sent</div>
+        <div class="stat">
+          <label>Reminders</label>
           <div class="bar"><i style="--w:40%"></i></div>
-          <div class="muted mt-10">Utilization</div>
+        </div>
+        <div class="stat">
+          <label>Utilization</label>
           <div class="bar"><i style="--w:62%"></i></div>
         </div>
       </div>
     </section>
 
-    <!-- SETTINGS -->
-    <section class="screens" id="settings">
-      <div class="grid">
-        <div class="card">
-          <h3 class="h3">Profile</h3>
-          <div class="list">
-            <div class="li">
-              <div>Lock with PIN</div>
-              <label class="toggle">
-                <input type="checkbox" checked />
-                <div class="t"><div class="knob"></div></div>
-              </label>
-            </div>
-            <div class="li">
-              <div>Private Profile</div>
-              <label class="toggle">
-                <input type="checkbox" />
-                <div class="t"><div class="knob"></div></div>
-              </label>
-            </div>
-            <div class="li">
-              <div>Auto-Hide Booked Slots</div>
-              <label class="toggle">
-                <input type="checkbox" checked />
-                <div class="t"><div class="knob"></div></div>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 class="h3">Budget (Demo)</h3>
-          <div class="muted">Consumables</div>
-          <div class="bar"><i style="--w:55%"></i></div>
-          <div class="muted mt-8">Equipment</div>
-          <div class="bar"><i style="--w:30%"></i></div>
-          <div class="muted mt-8">Misc</div>
-          <div class="bar"><i style="--w:70%"></i></div>
-        </div>
+    <!-- QUICK -->
+    <section id="quick" class="screen">
+      <div class="list">
+        <a class="li" href="./booking.html">➕ New Booking</a>
+        <a class="li" href="./staff.html">📲 Send WhatsApp Reminder</a>
+        <a class="li" href="./admin.html#export">⬇️ Export Logs</a>
+        <a class="li" href="./admin.html#backup">💾 Daily Backup</a>
       </div>
     </section>
 
-    <!-- Bottom dock -->
-    <div class="dock">
-      <button class="icon-btn" onclick="switchTab('overview')" title="Overview">🏠</button>
-      <button class="icon-btn" onclick="switchTab('bookings')" title="Bookings">📅</button>
-      <button class="icon-btn" onclick="switchTab('settings')" title="Settings">⚙️</button>
-    </div>
-  </div>
+    <!-- ABOUT -->
+    <section id="about" class="screen">
+      <div class="about card pad">
+        <h3>About</h3>
+        <p class="muted">Version 3 PWA • Same tab/card style as School app. Fully mobile-first. Dark by default with a clean light mode.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom dock (consistent) -->
+  <footer class="dock">
+    <a class="icon-btn" href="./index.html" title="Home">🏠</a>
+    <a class="icon-btn" href="./booking.html" title="Bookings">📅</a>
+    <a class="icon-btn" href="./admin.html" title="Admin">⚙️</a>
+  </footer>
 
   <!-- Floating WhatsApp -->
-  <a class="wa" id="waLink" href="https://wa.me/919999999999" target="_blank" rel="noopener">🟢</a>
+  <a class="wa" href="https://wa.me/919390664577" target="_blank" rel="noopener">🟢</a>
 
   <script>
-    // helpers
-    const $ = (s)=>document.querySelector(s);
-    const $$ = (s)=>document.querySelectorAll(s);
-
-    // tabs
-    function switchTab(name){
-      $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
-      $$('.screens').forEach(sc=>sc.classList.toggle('active', sc.id===name));
-      window.scrollTo({top:0,behavior:'smooth'});
-    }
-    $('#tabs').addEventListener('click', e=>{
-      const t=e.target.closest('.tab'); if(!t) return; switchTab(t.dataset.screen);
-    });
-
     // theme
-    const THEME_KEY='clinic-theme';
-    function applySavedTheme(){
-      const m=localStorage.getItem(THEME_KEY);
-      if(m==='light') document.body.classList.add('light');
-    }
-    applySavedTheme();
-    $('#themeBtn').onclick=()=>{
+    const KEY='pwa-theme';
+    const btn=document.getElementById('themeToggle');
+    if(localStorage.getItem(KEY)==='light') document.body.classList.add('light');
+    btn.onclick=()=>{
       document.body.classList.toggle('light');
-      localStorage.setItem(THEME_KEY, document.body.classList.contains('light')?'light':'dark');
+      localStorage.setItem(KEY, document.body.classList.contains('light')?'light':'dark');
     };
 
-    // demo dates & slots (swap with Airtable/CSV later)
-    const dates = (()=>{const arr=[], d=new Date(); for(let i=0;i<4;i++){const dd=new Date(d); dd.setDate(d.getDate()+i); arr.push({key: dd.toISOString().slice(0,10), label: dd.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})});} return arr;})();
-    const slotsByDate = {};
-    dates.forEach((d, idx)=>{
-      const base = ["09:00 AM","09:20 AM","09:40 AM","10:00 AM","10:20 AM","10:40 AM","11:00 AM","11:20 AM","11:40 AM","12:00 PM"];
-      slotsByDate[d.key] = base.map((t,i)=>({time:t, booked: (idx===0 && (i===2||i===5||i===8))}));
+    // tabs
+    const tabs=document.querySelectorAll('.tab');
+    const screens=document.querySelectorAll('.screen');
+    document.querySelector('.tabs').addEventListener('click',(e)=>{
+      const t=e.target.closest('.tab'); if(!t) return;
+      tabs.forEach(x=>x.classList.toggle('active', x===t));
+      screens.forEach(s=>s.classList.toggle('active', s.id===t.dataset.screen));
+      scrollTo({top:0,behavior:'smooth'});
     });
 
-    // bind selects
-    const dateSel = $('#dateSel'), slotSel = $('#slotSel'), slotList = $('#slotList');
-    dates.forEach(d=>{const o=document.createElement('option'); o.value=d.key; o.textContent=d.label; dateSel.appendChild(o);});
-    dateSel.onchange = renderSlots;
-    function renderSlots(){
-      slotSel.innerHTML=''; slotList.innerHTML='';
-      const day = dateSel.value, items = slotsByDate[day]||[];
-      items.forEach((s)=>{
-        const o=document.createElement('option'); o.value=s.time; o.textContent=s.time + (s.booked?' — BOOKED':''); o.disabled=s.booked; slotSel.appendChild(o);
-        const div=document.createElement('div'); div.className='slot'; div.dataset.booked=s.booked;
-        div.innerHTML = `<div>${s.time}</div>` + (s.booked?`<div class="muted">Booked</div>`:`<button class="icon-btn" title="Pick" onclick="pick('${s.time}')">➕</button>`);
-        slotList.appendChild(div);
-      });
-      const used = items.filter(x=>x.booked).length;
-      $('#nextToken').textContent = '#' + (used + 1);
-      $('#openSlots').textContent = items.length - used;
-      $('#bookedSlots').textContent = used;
-    }
-    function pick(time){ slotSel.value=time; }
-    function confirmBooking(){
-      const date = dateSel.value, time = slotSel.value, name = $('#pName').value.trim(), phone = $('#pPhone').value.trim(), reason = $('#pReason').value.trim();
-      if(!date || !time || !name || !phone){ alert('Fill all fields.'); return; }
-      const row = slotsByDate[date].find(s=>s.time===time); if(row) row.booked=true; renderSlots();
-      const msg = encodeURIComponent(
-        `Clinic Booking Confirmed ✅\nName: ${name}\nDate: ${new Date(date).toLocaleDateString()}\nTime: ${time}\nReason: ${reason||'-'}\nToken: ${$('#nextToken').textContent.replace('#','')}`
-      );
-      const link = `https://wa.me/${phone.replace(/\D/g,'')}?text=${msg}`;
-      window.open(link,'_blank');
-    }
-    function resetForm(){ $('#pName').value=''; $('#pPhone').value=''; $('#pReason').value=''; }
-    dateSel.value = dates[0].key; renderSlots();
-
-    // SW (optional)
+    // service worker (keep if present)
     if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
   </script>
 </body>
