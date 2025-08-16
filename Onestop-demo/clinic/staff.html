@@ -1,53 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic – Staff Panel</title>
-  <link rel="stylesheet" href="./styles.css?v=glass6" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#0b0f1a" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Staff · Onestop Clinic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=9">
 </head>
 <body>
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-
-  <header class="app-header">
-    <div class="brand">
-      <div class="logo"></div>
-      <div class="brand-text">
-        <h1>Onestop Clinic</h1>
-        <p>Staff Panel</p>
-      </div>
+  <div class="app-shell">
+    <div class="header">
+      <div class="brand-logo"></div>
+      <div><div class="title">Staff</div><div class="subtitle">Attendance & reminders</div></div>
     </div>
-  </header>
 
-  <main>
-    <h2>Mark Attendance</h2>
-    <form>
-      <label>Date</label>
-      <input type="date" />
-      <label>Staff Name</label>
-      <input type="text" placeholder="e.g. Kavya" />
-      <label>Status</label>
-      <select><option>Present</option><option>Absent</option></select>
-      <button class="primary mt-10">Save</button>
-    </form>
+    <div class="section glass">
+      <h2>Mark Attendance</h2>
+      <div class="row"><div class="label">Staff Name</div><input class="input" placeholder="Name"></div>
+      <div class="row"><div class="label">Status</div>
+        <select class="input"><option>Present</option><option>Absent</option><option>Leave</option></select>
+      </div>
+      <button class="btn btn-primary">Save</button>
+    </div>
 
-    <h2 class="mt-14">Attendance Log</h2>
-    <p>No attendance yet.</p>
-  </main>
+    <div class="section glass">
+      <h2>Send WhatsApp Reminder</h2>
+      <div class="row"><div class="label">Contact</div><input class="input" id="c" placeholder="+91..."></div>
+      <button class="btn btn-secondary" onclick="wa()">Send Reminder</button>
+    </div>
 
-  <div class="dock">
-    <a href="index.html" class="icon-btn">🏠</a>
-    <a href="booking.html" class="icon-btn">📅</a>
-    <a href="admin.html" class="icon-btn">⚙️</a>
+    <div class="footer">© 2025 Onestop Clinic</div>
   </div>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
+    function wa(){
+      const c=document.getElementById('c').value.trim();
+      if(!c){alert('Enter contact');return;}
+      location.href=`https://wa.me/${c}?text=${encodeURIComponent('Reminder: your appointment is today')}`;
     }
   </script>
 </body>
