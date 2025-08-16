@@ -1,188 +1,111 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Teacher</title>
-  <link rel="stylesheet" href="styles.css"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Teacher</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body data-theme="dark">
-  <div class="wrapper" id="teacher">
-    <section class="glass header">
-      <div class="h1">Teacher</div>
-      <div class="sub">Post diary & homework · mark attendance</div>
-      <div class="pills mt-16" id="teacher-tabs">
-        <div class="pill indigo" data-tab="setup">Class Setup</div>
-        <div class="pill indigo" data-tab="diary">Class Diary</div>
-        <div class="pill teal"   data-tab="hw">Homework</div>
-        <div class="pill amber" data-tab="att">Attendance</div>
-        <div class="pill violet" data-tab="marks">Marks</div>
-        <div class="pill teal"   data-tab="reqs">Requests</div>
-      </div>
-      <div class="row mt-12"><button class="btn right" onclick="toggleTheme()">Theme</button></div>
-    </section>
+<body class="dark">
+<div class="wrapper">
 
-    <!-- Setup -->
-    <section class="glass mt-24 panel" data-tab="setup">
-      <div class="h2">My Class</div>
-      <div class="grid mt-12">
-        <input id="t-class"  class="input" placeholder="Class e.g., 5">
-        <input id="t-sec"    class="input" placeholder="Section e.g., A">
-        <input id="t-name"   class="input" placeholder="Your Name">
-        <input id="t-subj"   class="input" placeholder="Subject e.g., Maths">
-        <div><button class="btn btn-green" onclick="saveMeta()">Save</button></div>
-      </div>
-    </section>
-
-    <!-- Diary -->
-    <section class="glass mt-24 panel" data-tab="diary">
-      <div class="h2">Post to Class Diary</div>
-      <div class="grid mt-12">
-        <input id="d-date" type="date" class="input">
-        <input id="d-subj" class="input" placeholder="Subject">
-        <textarea id="d-note" class="input" placeholder="What was taught / notes..."></textarea>
-        <div class="row">
-          <button class="btn" onclick="postDiary()">Publish</button>
-          <button class="btn btn-outline" onclick="exportCSV('diary.csv', loadArr('diary').map(x=>[x.date,x.subject,x.note]))">Export</button>
+  <section class="accent-teal">
+    <div class="glass header">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <div class="eyebrow">Post diary &amp; homework · mark attendance</div>
+          <div class="h1">Teacher</div>
         </div>
+        <button class="btn" onclick="toggleTheme()">Theme</button>
       </div>
-      <div class="h2 mt-24">Recent</div>
-      <table class="table mt-12" id="t-diary"></table>
-    </section>
 
-    <!-- Homework -->
-    <section class="glass mt-24 panel" data-tab="hw">
-      <div class="h2">Create Homework</div>
-      <div class="grid mt-12">
-        <input id="h-due" type="date" class="input">
-        <input id="h-subj" class="input" placeholder="Subject">
-        <input id="h-title" class="input" placeholder="Title e.g., Exercise 5A">
-        <textarea id="h-detail" class="input" placeholder="Details"></textarea>
-        <div class="row">
-          <button class="btn btn-teal" onclick="postHW()">Publish</button>
-          <button class="btn btn-outline" onclick="exportCSV('homework.csv', loadArr('homework').map(x=>[x.due,x.subject,x.title,x.detail]))">Export</button>
-        </div>
+      <div class="tab-row" id="tabs">
+        <button class="chip chip-indigo" data-tab="setup">Class Setup</button>
+        <button class="chip chip-blue"   data-tab="diary">Class Diary</button>
+        <button class="chip chip-teal"   data-tab="homework">Homework</button>
+        <button class="chip chip-amber"  data-tab="attendance">Attendance</button>
+        <button class="chip chip-fuchsia"data-tab="leaves">Leaves</button>
+        <button class="chip chip-violet" data-tab="requests">Requests</button>
+        <button class="chip chip-cyan"   data-tab="marks">Marks</button>
       </div>
-      <div class="h2 mt-24">Recent</div>
-      <table class="table mt-12" id="t-hw"></table>
-    </section>
+    </div>
+  </section>
 
-    <!-- Attendance -->
-    <section class="glass mt-24 panel" data-tab="att">
-      <div class="h2">Mark Attendance</div>
-      <div class="grid mt-12">
-        <input id="a-date" type="date" class="input">
-        <select id="a-status" class="input"><option>Present</option><option>Absent</option></select>
-        <div><button class="btn btn-amber" onclick="markAtt()">Add Record</button></div>
-      </div>
-      <table class="table mt-24" id="t-att"></table>
-    </section>
+  <!-- Panels -->
+  <section id="panel-setup" class="glass inner panel">
+    <div class="h1">My Class</div>
+    <form class="form-grid mt-12" data-queue="t-setup">
+      <input class="input full" placeholder="Class e.g., 5"   name="class"/>
+      <input class="input full" placeholder="Section e.g., A" name="section"/>
+      <input class="input full" placeholder="Your Name"       name="teacher"/>
+      <input class="input full" placeholder="Subject e.g., Maths" name="subject"/>
+      <button class="btn btn-indigo">Save</button>
+    </form>
+  </section>
 
-    <!-- Marks -->
-    <section class="glass mt-24 panel" data-tab="marks">
-      <div class="h2">Enter Marks (lightweight)</div>
-      <div class="grid mt-12">
-        <input id="m-title" class="input" placeholder="Test title (e.g., Unit Test 1)">
-        <input id="m-max" class="input" inputmode="numeric" placeholder="Max marks">
-        <textarea id="m-csv" class="input" placeholder="Paste CSV: student, marks ... one per line"></textarea>
-        <div class="row">
-          <button class="btn btn-violet" onclick="saveMarks()">Save</button>
-          <button class="btn btn-outline" onclick="exportCSV('marks.csv', loadArr('marks').flatMap(test => test.rows.map(r=>[test.title,test.max,r[0],r[1]])))">Export</button>
-        </div>
-      </div>
-      <table class="table mt-24" id="t-marks"></table>
-    </section>
+  <section id="panel-diary" class="glass inner panel" hidden>
+    <div class="h1">Post to Class Diary</div>
+    <form class="form-grid mt-12" data-queue="t-diary">
+      <select class="input full" name="subject">
+        <option>Maths</option><option>Science</option><option>English</option>
+      </select>
+      <textarea class="input full" name="notes" placeholder="What was taught / notes..."></textarea>
+      <button class="btn btn-blue">Post</button>
+    </form>
+  </section>
 
-    <!-- Requests from Parents (read-only for now) -->
-    <section class="glass mt-24 panel" data-tab="reqs">
-      <div class="h2">Requests</div>
-      <table class="table mt-12" id="t-reqs"></table>
-    </section>
+  <section id="panel-homework" class="glass inner panel" hidden>
+    <div class="h1">Give Homework</div>
+    <form class="form-grid mt-12" data-queue="t-homework">
+      <select class="input full" name="subject">
+        <option>Maths</option><option>Science</option><option>English</option>
+      </select>
+      <input class="input" name="due" type="date"/>
+      <textarea class="input full" name="task" placeholder="Exercise / description…"></textarea>
+      <button class="btn btn-teal">Assign</button>
+    </form>
+  </section>
 
-    <footer></footer>
-  </div>
+  <section id="panel-attendance" class="glass inner panel" hidden>
+    <div class="h1">Mark Attendance</div>
+    <form class="form-grid mt-12" data-queue="t-attendance">
+      <input class="input" type="date" name="date"/>
+      <select class="input" name="status">
+        <option>Present</option><option>Absent</option><option>Late</option>
+      </select>
+      <input class="input full" name="student" placeholder="Roll / Name"/>
+      <button class="btn btn-amber">Save</button>
+    </form>
+  </section>
 
-  <!-- ui.js helpers (inline) -->
-  <script>
-  (function(){
-    const u=new URL(location); const t=u.searchParams.get('theme')||localStorage.getItem('theme')||'dark';
-    document.body.dataset.theme=t; localStorage.setItem('theme',t);
-    window.toggleTheme=function(){const n=document.body.dataset.theme==='dark'?'light':'dark';document.body.dataset.theme=n;localStorage.setItem('theme',n);};
-    function activateTab(containerId,tabKey){const root=document.getElementById(containerId);root.querySelectorAll('.pill[data-tab]').forEach(p=>p.dataset.active=(p.dataset.tab===tabKey)?"true":"false");document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.dataset.tab===tabKey));localStorage.setItem(containerId+':tab',tabKey);}
-    window.initTabs=function(containerId,def){const root=document.getElementById(containerId);const s=localStorage.getItem(containerId+':tab')||def;root.querySelectorAll('.pill[data-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(containerId,b.dataset.tab)));activateTab(containerId,s);}
-    window.exportCSV=function(name,rows){const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
-    window.loadArr=(k)=>JSON.parse(localStorage.getItem(k)||'[]'); window.saveArr=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-  })();
-  </script>
+  <section id="panel-leaves" class="glass inner panel" hidden>
+    <div class="h1">Leave Approvals</div>
+    <div class="list mt-12">
+      <div class="item"><span>R-21 — Fever (1 day)</span><button class="btn btn-teal">Approve</button></div>
+    </div>
+  </section>
 
-  <!-- Page logic -->
-  <script>
-    initTabs('teacher','setup');
+  <section id="panel-requests" class="glass inner panel" hidden>
+    <div class="h1">Parent Requests</div>
+    <div class="list mt-12"><div class="item"><span>No requests</span></div></div>
+  </section>
 
-    const diary = loadArr('diary');
-    const homework = loadArr('homework');
-    const attendance = loadArr('attendance');
-    const marks = loadArr('marks');
-    const requests = loadArr('requests');
+  <section id="panel-marks" class="glass inner panel" hidden>
+    <div class="h1">Enter Marks</div>
+    <form class="form-grid mt-12" data-queue="t-marks">
+      <input class="input" placeholder="Exam e.g., Unit Test 1" name="exam"/>
+      <input class="input" placeholder="Roll No" name="roll"/>
+      <input class="input" placeholder="Marks / 100" name="marks" inputmode="numeric"/>
+      <button class="btn btn-cyan">Save</button>
+    </form>
+  </section>
 
-    function render(id, rows, headers){
-      const el=document.getElementById(id);
-      el.innerHTML = (headers? `<tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr>`:'')
-        + (rows.length? rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('') : `<tr><td class="text-dim">No entries.</td></tr>`);
-    }
-
-    function refresh(){
-      render('t-diary', diary.slice(-10).map(x=>[x.date,x.subject,x.note]), ["Date","Subject","Notes"]);
-      render('t-hw', homework.slice(-10).map(x=>[x.due,x.subject,x.title,x.detail]), ["Due","Subject","Title","Details"]);
-      render('t-att', attendance.slice(-12).map(x=>[x.date,x.status]), ["Date","Status"]);
-      const flat = marks.flatMap(t => t.rows.map(r=>[t.title, t.max, r[0], r[1]]));
-      render('t-marks', flat, ["Test","Max","Student","Marks"]);
-      render('t-reqs', requests.map(r=>[r.date,r.title,r.msg,r.status||"New"]), ["Date","Title","Message","Status"]);
-    }
-    refresh();
-
-    window.saveMeta=function(){
-      localStorage.setItem('t-meta', JSON.stringify({
-        cls:document.getElementById('t-class').value,
-        sec:document.getElementById('t-sec').value,
-        name:document.getElementById('t-name').value,
-        subj:document.getElementById('t-subj').value
-      }));
-      alert('Saved.');
-    };
-
-    window.postDiary=function(){
-      const date=document.getElementById('d-date').value || new Date().toISOString().slice(0,10);
-      const subject=document.getElementById('d-subj').value||'General';
-      const note=document.getElementById('d-note').value.trim();
-      if(!note) return alert('Write notes.');
-      diary.push({date,subject,note}); saveArr('diary',diary); refresh();
-      document.getElementById('d-note').value='';
-    };
-
-    window.postHW=function(){
-      const due=document.getElementById('h-due').value||new Date().toISOString().slice(0,10);
-      const subject=document.getElementById('h-subj').value||'General';
-      const title=document.getElementById('h-title').value||'Homework';
-      const detail=document.getElementById('h-detail').value||'';
-      homework.push({due,subject,title,detail}); saveArr('homework',homework); refresh();
-      document.getElementById('h-title').value=''; document.getElementById('h-detail').value='';
-    };
-
-    window.markAtt=function(){
-      const date=document.getElementById('a-date').value||new Date().toISOString().slice(0,10);
-      const status=document.getElementById('a-status').value;
-      attendance.push({date,status}); saveArr('attendance',attendance); refresh();
-    };
-
-    window.saveMarks=function(){
-      const title=document.getElementById('m-title').value||'Test';
-      const max=document.getElementById('m-max').value||'100';
-      const lines=(document.getElementById('m-csv').value||'').trim().split(/\n+/).filter(Boolean);
-      if(!lines.length) return alert('Paste CSV: name,marks per line.');
-      const rows=lines.map(l=>{const [n,m]=l.split(',');return [n?.trim()||'', (m||'').trim()]});
-      marks.push({title,max,rows}); saveArr('marks',marks); refresh();
-      document.getElementById('m-csv').value='';
-    };
-  </script>
+</div>
+<div class="toast" aria-live="polite"></div>
+<script type="module">
+  import {initTabs, bindQueueForms} from './ui.js';
+  initTabs(document); bindQueueForms(document);
+</script>
+<script type="module" src="ui.js"></script>
 </body>
 </html>
