@@ -1,195 +1,161 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Onestop Clinic — Glass UI</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Background glow shapes -->
+  <!-- Background -->
   <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
     <div class="blob b3"></div>
-    <div class="grid-lines"></div>
+    <div class="grid"></div>
   </div>
 
+  <!-- Top -->
   <header class="topbar glass">
     <div class="brand">
-      <!-- replace with your logo if you have /assets/logo.png -->
-      <div class="logo">🟣</div>
-      <div>
+      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="brand-text">
         <h1>Onestop Clinic</h1>
-        <p class="subtitle">Appointments • Logs • Staff</p>
+        <p>Premium Glass Dashboard</p>
       </div>
     </div>
-    <div class="actions">
-      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌗</button>
-    </div>
+    <button id="themeToggle" class="icon-btn" title="Toggle theme">🌗</button>
   </header>
 
-  <main class="shell">
-    <!-- Row: quick nav -->
-    <section class="cards">
-      <a class="card glass clickable" href="./bookings.html">
-        <div class="card-icon grad-purple"></div>
-        <div>
-          <h3>Bookings</h3>
-          <p>Create & manage appointments</p>
-        </div>
-      </a>
-      <a class="card glass clickable" href="./logs.html">
-        <div class="card-icon grad-cyan"></div>
-        <div>
-          <h3>Logs</h3>
-          <p>Daily summary & exports</p>
-        </div>
-      </a>
-      <a class="card glass clickable" href="./staff-panel.html">
-        <div class="card-icon grad-pink"></div>
-        <div>
-          <h3>Staff</h3>
-          <p>Attendance & roster</p>
-        </div>
-      </a>
-    </section>
+  <!-- Hero banner (optional) -->
+  <section class="hero glass">
+    <img src="./assets/banner.png" alt="banner" />
+  </section>
 
-    <!-- Row: overview widgets (glass cards like your reference) -->
-    <section class="panels">
-      <!-- Settings-like screen -->
-      <div class="panel glass tall">
-        <div class="panel-header">
-          <button class="back">‹</button>
-          <h2>Settings</h2>
-          <button class="more">⋮</button>
-        </div>
+  <!-- Quick Nav -->
+  <section class="cards">
+    <a class="card glass" href="./bookings.html">
+      <div class="pill grad-purple"></div>
+      <div><h3>Bookings</h3><p>Create & manage appointments</p></div>
+    </a>
+    <a class="card glass" href="./logs.html">
+      <div class="pill grad-cyan"></div>
+      <div><h3>Logs</h3><p>Daily summary & exports</p></div>
+    </a>
+    <a class="card glass" href="./staff-panel.html">
+      <div class="pill grad-pink"></div>
+      <div><h3>Staff</h3><p>Attendance & roster</p></div>
+    </a>
+    <a class="card glass" href="./doctor.html">
+      <div class="pill grad-orange"></div>
+      <div><h3>Doctor</h3><p>Notes & prescriptions</p></div>
+    </a>
+  </section>
 
-        <div class="avatar"></div>
+  <!-- Three glass panels like the reference -->
+  <main class="panels">
+    <!-- Settings -->
+    <div class="panel glass">
+      <div class="panel-header">
+        <button class="ghost">‹</button>
+        <h2>Settings</h2>
+        <button class="ghost">⋮</button>
+      </div>
 
-        <label class="input glass-inner">
-          <span>Clinic Username</span>
-          <input type="text" placeholder="onestop-c-demo" />
+      <div class="avatar"></div>
+
+      <label class="field glass-inner">
+        <span>Clinic Username</span>
+        <input type="text" value="onestop-c-demo" />
+      </label>
+
+      <div class="switches">
+        <label class="switch glass-inner">
+          <span>Lock with PIN</span>
+          <input type="checkbox" checked /><i></i>
         </label>
+        <label class="switch glass-inner">
+          <span>Private Mode</span>
+          <input type="checkbox" /><i></i>
+        </label>
+        <label class="switch glass-inner">
+          <span>Auto-hide booked slots</span>
+          <input type="checkbox" checked /><i></i>
+        </label>
+        <label class="switch glass-inner">
+          <span>WhatsApp notifications</span>
+          <input type="checkbox" checked /><i></i>
+        </label>
+      </div>
+    </div>
 
-        <div class="switch-list">
-          <label class="switch glass-inner">
-            <span>Lock with PIN</span>
-            <input type="checkbox" checked />
-            <i></i>
-          </label>
+    <!-- Overview -->
+    <div class="panel glass">
+      <div class="panel-header">
+        <button class="ghost">‹</button>
+        <h2>Overview</h2>
+        <button class="ghost">⋮</button>
+      </div>
 
-          <label class="switch glass-inner">
-            <span>Private Mode</span>
-            <input type="checkbox" />
-            <i></i>
-          </label>
-
-          <label class="switch glass-inner">
-            <span>Auto Hide Booked Slots</span>
-            <input type="checkbox" checked />
-            <i></i>
-          </label>
-
-          <label class="switch glass-inner">
-            <span>Notify via WhatsApp</span>
-            <input type="checkbox" checked />
-            <i></i>
-          </label>
+      <div class="donut">
+        <div class="ring"><div class="ring-core"></div></div>
+        <div class="donut-text">
+          <div class="big">42</div>
+          <div class="small">Today’s bookings</div>
         </div>
       </div>
 
-      <!-- Overview-like screen -->
-      <div class="panel glass tall">
-        <div class="panel-header">
-          <button class="back">‹</button>
-          <h2>Overview</h2>
-          <button class="more">⋮</button>
+      <div class="mini-list">
+        <div class="mini glass-inner">
+          <div class="badge grad-purple"></div>
+          <div><h4>Online</h4><p>Last hr: 12 • Total: 28</p></div>
         </div>
-
-        <div class="donut">
-          <div class="ring">
-            <div class="ring-inner"></div>
-          </div>
-          <div class="donut-text">
-            <div class="big">42</div>
-            <div class="small">Today’s bookings</div>
-          </div>
+        <div class="mini glass-inner">
+          <div class="badge grad-cyan"></div>
+          <div><h4>Walk-ins</h4><p>Queued: 7 • Served: 19</p></div>
         </div>
-
-        <div class="card-list">
-          <div class="mini-card glass-inner">
-            <div class="badge grad-purple"></div>
-            <div>
-              <h4>Online Bookings</h4>
-              <p>Speed: Fast • Last hour: 12</p>
-            </div>
-          </div>
-          <div class="mini-card glass-inner">
-            <div class="badge grad-cyan"></div>
-            <div>
-              <h4>Walk-ins</h4>
-              <p>Queued: 7 • Processed: 19</p>
-            </div>
-          </div>
-          <div class="mini-card glass-inner">
-            <div class="badge grad-pink"></div>
-            <div>
-              <h4>Reminders Sent</h4>
-              <p>WhatsApp ✓: 86%</p>
-            </div>
-          </div>
+        <div class="mini glass-inner">
+          <div class="badge grad-pink"></div>
+          <div><h4>Reminders ✓</h4><p>WhatsApp: 86%</p></div>
         </div>
       </div>
+    </div>
 
-      <!-- Debit-card style budgets => our “Capacity” -->
-      <div class="panel glass tall">
-        <div class="panel-header">
-          <button class="back">‹</button>
-          <h2>Capacity</h2>
-          <button class="more">⋮</button>
-        </div>
-
-        <ul class="meter-list">
-          <li>
-            <div class="row">
-              <span>Morning Slots</span><span>70%</span>
-            </div>
-            <div class="meter">
-              <div class="fill grad-purple" style="width:70%"></div>
-            </div>
-          </li>
-          <li>
-            <div class="row">
-              <span>Evening Slots</span><span>45%</span>
-            </div>
-            <div class="meter">
-              <div class="fill grad-cyan" style="width:45%"></div>
-            </div>
-          </li>
-          <li>
-            <div class="row">
-              <span>Tomorrow</span><span>22%</span>
-            </div>
-            <div class="meter">
-              <div class="fill grad-pink" style="width:22%"></div>
-            </div>
-          </li>
-        </ul>
-
-        <button class="cta">Start New Day</button>
+    <!-- Capacity -->
+    <div class="panel glass">
+      <div class="panel-header">
+        <button class="ghost">‹</button>
+        <h2>Capacity</h2>
+        <button class="ghost">⋮</button>
       </div>
-    </section>
+
+      <ul class="meters">
+        <li>
+          <div class="row"><span>Morning</span><span>70%</span></div>
+          <div class="meter"><div class="fill grad-purple" style="width:70%"></div></div>
+        </li>
+        <li>
+          <div class="row"><span>Evening</span><span>45%</span></div>
+          <div class="meter"><div class="fill grad-cyan" style="width:45%"></div></div>
+        </li>
+        <li>
+          <div class="row"><span>Tomorrow</span><span>22%</span></div>
+          <div class="meter"><div class="fill grad-pink" style="width:22%"></div></div>
+        </li>
+      </ul>
+
+      <button class="cta">Start New Day</button>
+    </div>
   </main>
 
-  <footer class="tabbar glass">
+  <!-- Bottom Tabs -->
+  <nav class="tabbar glass">
     <a class="tab active" href="./index.html">🏠</a>
     <a class="tab" href="./bookings.html">📅</a>
     <a class="tab" href="./logs.html">📊</a>
     <a class="tab" href="./staff-panel.html">👥</a>
-    <a class="tab" href="./settings.html">⚙️</a>
-  </footer>
+    <a class="tab" href="./doctor.html">🩺</a>
+  </nav>
 
   <script src="app.js"></script>
 </body>
