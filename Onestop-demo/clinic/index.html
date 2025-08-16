@@ -1,98 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Onestop Clinic Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Onestop Clinic · Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=14">
+  <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css?v=30">
 </head>
 <body>
-  <div class="app-shell">
+<div class="app-shell">
+  <div class="header"><div class="brand-logo"></div><div><div class="title">Onestop Clinic</div><div class="subtitle">Dashboard</div></div></div>
+  <div class="hero-card glass"><img src="./assets/clinic_banner.png" alt class="hero-img"></div>
 
-    <!-- Header -->
-    <div class="header">
-      <div class="brand-logo"></div>
-      <div>
-        <div class="title">Onestop Clinic</div>
-        <div class="subtitle">Dashboard</div>
-      </div>
-    </div>
-
-    <!-- Nav Tabs -->
-    <div class="tabs">
-      <button class="tab active">Overview</button>
-      <button class="tab" onclick="location.href='./booking.html'">Quick Actions</button>
-      <button class="tab" onclick="location.href='./doctor.html'">Doctors</button>
-      <button class="tab" onclick="location.href='./admin.html'">Admin</button>
-      <button class="tab" onclick="location.href='./about.html'">About</button>
-    </div>
-
-    <!-- Today Stats -->
-    <div class="section glass">
-      <h2>Today</h2>
-      <div class="chart-row">
-        <canvas id="chartToday" width="200" height="200"></canvas>
-      </div>
-      <div class="row"><div class="label">Patients Seen</div><div class="value" id="patientsSeen">-</div></div>
-      <div class="row"><div class="label">Bookings Filled</div><div class="value" id="bookingsFilled">-</div></div>
-      <div class="row"><div class="label">Utilization</div><div class="value" id="utilization">-</div></div>
-      <div class="row"><div class="label">Avg visit</div><div class="value" id="avgVisit">-</div></div>
-    </div>
-
-    <!-- Follow-ups -->
-    <div class="section glass">
-      <h2>Follow-ups</h2>
-      <div class="row"><div class="label">WhatsApp Reminders</div><div class="value" id="waReminders">-</div></div>
-      <div class="row"><div class="label">Prescription Ready</div><div class="value" id="rxReady">-</div></div>
-      <div class="row"><div class="label">Lab Results Reviewed</div><div class="value" id="labReviewed">-</div></div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">© 2025 Onestop Clinic</div>
+  <div class="tabs">
+    <div class="tab active">Overview</div>
+    <div class="tab" onclick="location.href='./booking.html'">Quick Actions</div>
+    <div class="tab" onclick="location.href='./doctor.html'">Doctors</div>
+    <div class="tab" onclick="location.href='./admin.html'">Admin</div>
+    <div class="tab" onclick="location.href='./staff.html'">Staff</div>
+    <div class="tab" onclick="location.href='./about.html'">About</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-  // Dummy numbers (replace with Airtable fetch later)
-  const stats = {
-    patientsSeen: 18,
-    bookingsFilled: "34 / 50",
-    utilization: "68%",
-    avgVisit: "17m",
-    waReminders: "27 / 40",
-    rxReady: "14 / 25",
-    labReviewed: "9 / 20"
-  };
+  <div class="section glass">
+    <h2>Today</h2>
+    <div style="display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))">
+      <div class="kpi"><h3>Patients Seen</h3><div id="k_seen" class="v">—</div></div>
+      <div class="kpi"><h3>Booked</h3><div class="v"><span id="k_booked">—</span> / <span id="k_capacity">—</span></div></div>
+      <div class="kpi"><h3>Utilization</h3><div id="k_util" class="v">—</div></div>
+      <div class="kpi"><h3>Reminders</h3><div id="k_rem" class="v">—</div></div>
+    </div>
+    <div class="chart-wrap" style="margin-top:14px"><canvas id="donut" width="200" height="200"></canvas></div>
+    <div id="modeBanner" class="footer" style="margin:10px 0 0"></div>
+  </div>
 
-  // Inject values
-  document.getElementById("patientsSeen").textContent = stats.patientsSeen;
-  document.getElementById("bookingsFilled").textContent = stats.bookingsFilled;
-  document.getElementById("utilization").textContent = stats.utilization;
-  document.getElementById("avgVisit").textContent = stats.avgVisit;
-  document.getElementById("waReminders").textContent = stats.waReminders;
-  document.getElementById("rxReady").textContent = stats.rxReady;
-  document.getElementById("labReviewed").textContent = stats.labReviewed;
+  <div class="section glass">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">Today’s Queue</h2>
+      <select id="fDoctor" class="input" style="max-width:180px"></select>
+      <select id="fSlot" class="input" style="max-width:180px">
+        <option value="all">All Slots</option><option value="morning">Morning (8–12)</option>
+        <option value="afternoon">Afternoon (12–4)</option><option value="evening">Evening (4–8)</option>
+      </select>
+      <select id="fStatus" class="input" style="max-width:160px">
+        <option value="Pending" selected>Pending</option><option value="Seen">Seen</option><option value="all">All</option>
+      </select>
+      <input id="q" class="input" placeholder="Search name / reason / token" style="min-width:220px;margin-left:auto">
+    </div>
+    <div id="queue" style="display:grid;gap:10px"></div>
+    <div id="queueEmpty" class="footer" style="display:none">No patients match.</div>
+  </div>
 
-  // Chart
-  const ctx = document.getElementById('chartToday').getContext('2d');
-  new Chart(ctx,{
-    type:'doughnut',
-    data:{
-      labels:['Seen','Remaining'],
-      datasets:[{
-        data:[18,32],
-        backgroundColor:['#00bcd4','#e0e0e0'],
-        borderWidth:0
-      }]
-    },
-    options:{
-      plugins:{legend:{display:false}},
-      cutout:'70%'
-    }
+  <div class="section glass">
+    <h2>Quick Actions</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="location.href='./booking.html'">New Booking</button>
+      <button class="btn btn-secondary" onclick="location.href='./doctor.html'">Doctor Panel</button>
+      <button class="btn btn-secondary" onclick="location.href='./admin.html'">Admin</button>
+      <button class="btn btn-secondary" onclick="location.href='./staff.html'">Staff</button>
+    </div>
+  </div>
+
+  <div class="footer">© 2025 Onestop Clinic</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// --- config/load ---
+let CFG=null,BACKEND='csv',CAPACITY=50,DOCTORS=[];
+async function loadCfg(){
+  try{ const r=await fetch('./config.json?v='+Date.now()); if(!r.ok) throw 0; CFG=await r.json();
+    BACKEND=(CFG.backend||'csv').toLowerCase(); CAPACITY=+CFG.capacityPerDay||50; DOCTORS=CFG.doctors||[]; }
+  catch{ CFG={backend:'csv',csv:{logs:'./logs.csv'}}; BACKEND='csv'; CAPACITY=50; DOCTORS=["All"]; }
+  document.getElementById('k_capacity').textContent=CAPACITY;
+  document.getElementById('modeBanner').textContent=(BACKEND==='airtable')?'Airtable mode • live':'CSV mode • read-only';
+  const fDoc=document.getElementById('fDoctor'); fDoc.innerHTML='<option value="all">All Doctors</option>'+DOCTORS.map(d=>`<option>${d}</option>`).join('');
+}
+// --- helpers ---
+function slotBucket(t){ // "09:20 AM" -> morning/afternoon/evening
+  const m=/(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(String(t)||''); if(!m) return 'all';
+  let h=+m[1]%12; if(m[3].toUpperCase()==='PM') h+=12;
+  if(h<12) return 'morning'; if(h<16) return 'afternoon'; return 'evening';
+}
+function DONLY(s){return (s||'').slice(0,10)}
+function parseCSV(text){
+  const rows=[];let cur=[],str='',q=false;
+  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+    if(c=='"'){ if(q&&n=='"'){str+='"';i++;} else q=!q;}
+    else if(c==','&&!q){cur.push(str);str='';}
+    else if((c=='\n'||c=='\r')&&!q){if(str!==''||cur.length){cur.push(str);rows.push(cur);cur=[];str='';}}
+    else str+=c;}
+  if(str!==''||cur.length){cur.push(str);rows.push(cur)} return rows;
+}
+function csvToObjs(text){ const r=parseCSV(text).filter(a=>a.length&&a.join('').trim()!==''); const h=r.shift().map(x=>x.trim());
+  return r.map(line=>{const o={};h.forEach((k,i)=>o[k]=(line[i]||'').trim());return o;});}
+// --- data sources ---
+const AT={headers(){return {Authorization:'Bearer '+CFG.airtable.apiKey,'Content-Type':'application/json'};},
+  async listToday(){
+    const d=new Date().toISOString().slice(0,10), base=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    const url=`${base}?filterByFormula=${encodeURIComponent("DATETIME_FORMAT({Timestamp}, 'YYYY-MM-DD')='"+d+"'")}&sort[0][field]=Slot Time&sort[0][direction]=asc&pageSize=200`;
+    const j=await (await fetch(url,{headers:this.headers()})).json(); return (j.records||[]).map(r=>({id:r.id,...r.fields}));
+  },
+  async markSeen(id,next){const u=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    await fetch(u,{method:'PATCH',headers:this.headers(),body:JSON.stringify({records:[{id,fields:{Status:next}}]})}); }
+};
+async function getRows(){
+  if(BACKEND==='airtable') return AT.listToday();
+  const url=(CFG.csv&&CFG.csv.logs)?CFG.csv.logs:'./logs.csv';
+  const txt=await (await fetch(url+'?v='+Date.now())).text(); const all=csvToObjs(txt);
+  const today=new Date().toISOString().slice(0,10);
+  return all.filter(r=>DONLY(r['Timestamp'])===today).sort((a,b)=>(a['Slot Time']||'').localeCompare(b['Slot Time']||''));
+}
+// --- render ---
+let ALL=[],FILTER='Pending',Q='',FDOC='all',FSLOT='all',CHART=null;
+function kpis(rows){
+  const seen=rows.filter(r=>(r['Status']||'Pending')==='Seen').length;
+  const booked=rows.length, rem=rows.filter(r=>/✔|yes|true/i.test(r['Reminder Sent']||'')).length;
+  const util=Math.min(100,Math.round((booked/Math.max(1,CAPACITY))*100));
+  document.getElementById('k_seen').textContent=seen;
+  document.getElementById('k_booked').textContent=booked;
+  document.getElementById('k_util').textContent=util+'%';
+  document.getElementById('k_rem').textContent=rem;
+  const ctx=document.getElementById('donut');
+  if(CHART) CHART.destroy();
+  CHART=new Chart(ctx,{type:'doughnut',data:{datasets:[{data:[seen,Math.max(0,CAPACITY-seen)],backgroundColor:['#06b6d4','#e5e7eb'],borderWidth:0}]},options:{plugins:{legend:{display:false}},cutout:'68%'}});
+  setTimeout(()=>{const c=ctx.getContext('2d');c.fillStyle='#111827';c.font='800 24px Inter,system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(String(seen),ctx.width/2,ctx.height/2);},0);
+}
+function rowHTML(r){
+  const seen=(r['Status']||'Pending')==='Seen';
+  return `<div class="rowx" data-id="${r.id||''}">
+    <div class="tag ${seen?'ok':''}">${seen?'Seen':'Pending'}</div>
+    <div><div style="font-weight:800">${r['Patient Name']||'-'} <span class="footer">(#${r['Token']||'-'} · ${r['Slot Time']||'-'} · ${r['Doctor']||'-'})</span></div>
+      <div class="footer">${r['Reason']||''}</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-secondary btn-xs" onclick="location.href='./doctor.html'">Open</button>
+      <button class="btn btn-primary btn-xs markBtn"${BACKEND==='csv'?' disabled':''}>${seen?'Mark Pending':'Mark Seen'}</button>
+    </div>
+  </div>`;
+}
+function applyFilters(src){
+  return src.filter(r=>{
+    if(FILTER!=='all' && (r['Status']||'Pending')!==FILTER) return false;
+    if(FDOC!=='all' && (r['Doctor']||'')!==FDOC) return false;
+    if(FSLOT!=='all' && slotBucket(r['Slot Time'])!==FSLOT) return false;
+    const hay=[r['Patient Name'],r['Reason'],r['Token'],r['Slot Time']].join(' ').toLowerCase();
+    return hay.includes(Q.trim().toLowerCase());
   });
-  </script>
+}
+function renderQueue(){
+  const items=applyFilters(ALL);
+  const root=document.getElementById('queue');
+  root.innerHTML=items.map(rowHTML).join('');
+  document.getElementById('queueEmpty').style.display=items.length?'none':'block';
+  root.querySelectorAll('.rowx').forEach((el,i)=>{
+    const rec=items[i]; const btn=el.querySelector('.markBtn'); if(!btn) return;
+    btn.onclick=async()=>{const next=(rec['Status']||'Pending')==='Seen'?'Pending':'Seen';
+      try{await AT.markSeen(rec.id,next); rec['Status']=next; const idx=ALL.findIndex(x=>x.id===rec.id); if(idx>-1) ALL[idx]['Status']=next; renderQueue(); kpis(ALL);}
+      catch{alert('Airtable update failed');}};
+  });
+}
+// --- boot ---
+(async()=>{
+  await loadCfg(); ALL=await getRows(); kpis(ALL); renderQueue();
+  document.getElementById('fStatus').onchange=e=>{FILTER=e.target.value; renderQueue();}
+  document.getElementById('q').oninput=e=>{Q=e.target.value; renderQueue();}
+  document.getElementById('fDoctor').onchange=e=>{FDOC=e.target.value; renderQueue();}
+  document.getElementById('fSlot').onchange=e=>{FSLOT=e.target.value; renderQueue();}
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
+})();
+</script>
 </body>
 </html>
