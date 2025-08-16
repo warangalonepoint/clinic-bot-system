@@ -1,45 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Staff · Onestop Clinic</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=9">
+  <link rel="stylesheet" href="./styles.css?v=30">
 </head>
 <body>
-  <div class="app-shell">
-    <div class="header">
-      <div class="brand-logo"></div>
-      <div><div class="title">Staff</div><div class="subtitle">Attendance & reminders</div></div>
-    </div>
+<div class="app-shell">
+  <div class="header"><div class="brand-logo"></div><div><div class="title">Staff</div><div class="subtitle">Attendance & Reminders</div></div></div>
 
-    <div class="section glass">
-      <h2>Mark Attendance</h2>
-      <div class="row"><div class="label">Staff Name</div><input class="input" placeholder="Name"></div>
-      <div class="row"><div class="label">Status</div>
-        <select class="input"><option>Present</option><option>Absent</option><option>Leave</option></select>
-      </div>
-      <button class="btn btn-primary">Save</button>
-    </div>
-
-    <div class="section glass">
-      <h2>Send WhatsApp Reminder</h2>
-      <div class="row"><div class="label">Contact</div><input class="input" id="c" placeholder="+91..."></div>
-      <button class="btn btn-secondary" onclick="wa()">Send Reminder</button>
-    </div>
-
-    <div class="footer">© 2025 Onestop Clinic</div>
+  <div class="section glass">
+    <h2>Mark Attendance</h2>
+    <div class="row"><div class="label">Staff Name</div><input id="s_name" class="input" placeholder="Name"></div>
+    <div class="row"><div class="label">Status</div><select id="s_status" class="input"><option>In</option><option>Out</option></select></div>
+    <button class="btn btn-primary" id="s_btn">Save</button>
+    <p id="s_msg" class="footer"></p>
   </div>
 
-  <script>
-    function wa(){
-      const c=document.getElementById('c').value.trim();
-      if(!c){alert('Enter contact');return;}
-      location.href=`https://wa.me/${c}?text=${encodeURIComponent('Reminder: your appointment is today')}`;
-    }
-  </script>
+  <div class="section glass">
+    <h2>Quick WhatsApp Reminder</h2>
+    <div class="row"><div class="label">Contact</div><input id="p_phone" class="input" placeholder="+91…"></div>
+    <div class="row"><div class="label">Message</div><input id="p_msg" class="input" value="Reminder: Your appointment is today."></div>
+    <button class="btn btn-secondary" id="p_btn">Send</button>
+  </div>
+
+  <div class="footer">© 2025 Onestop Clinic</div>
+</div>
+
+<script>
+let CFG=null,BACKEND='csv';
+async function loadCfg(){const r=await fetch('./config.json?v='+Date.now()); CFG=await r.json(); BACKEND=(CFG.backend||'csv').toLowerCase();}
+const AT={headers(){return {Authorization:'Bearer '+CFG.airtable.apiKey,'Content-Type':'application/json'};},
+  async create(row){const url=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.attendanceTable)}`;
+    await fetch(url,{method:'POST',headers:this.headers(),body:JSON.stringify({records:[{fields:row}]})});}
+};
+document.getElementById('s_btn').onclick=async()=>{
+  const name=document.getElementById('s_name').value.trim(); const st=document.getElementById('s_status').value;
+  if(!name){document.getElementById('s_msg').textContent='Enter name';return;}
+  if(BACKEND!=='airtable'){ localStorage.setItem('attendance-'+Date.now(), JSON.stringify({name,st})); document.getElementById('s_msg').textContent='Saved locally (CSV mode).'; return; }
+  await AT.create({"Timestamp":new Date().toISOString(),"Staff Name":name,"Status":st});
+  document.getElementById('s_msg').textContent='Saved to Airtable.';
+};
+document.getElementById('p_btn').onclick=()=>{
+  const p=document.getElementById('p_phone').value.trim(); const m=document.getElementById('p_msg').value.trim();
+  if(!p){alert('Enter contact');return;} location.href=`https://wa.me/${encodeURIComponent(p)}?text=${encodeURIComponent(m)}`;
+};
+(async()=>{await loadCfg();})();
+</script>
 </body>
 </html>
