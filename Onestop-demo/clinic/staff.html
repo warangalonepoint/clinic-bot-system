@@ -3,386 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic — Staff Panel</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <title>Onestop Clinic – Staff Panel</title>
+  <link rel="stylesheet" href="./styles.css?v=glass6" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#0b0f1a" />
 </head>
 <body>
-  <!-- Header -->
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
   <header class="app-header">
     <div class="brand">
-      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="logo"></div>
       <div class="brand-text">
-        <h1>Onestop C-Demo</h1>
+        <h1>Onestop Clinic</h1>
         <p>Staff Panel</p>
       </div>
     </div>
-    <button id="themeToggle" class="icon-btn" title="Light/Dark">🌗</button>
   </header>
 
-  <!-- Banner -->
-  <div class="banner">
-    <img src="./assets/clinic_banner.png" alt="Clinic banner">
-  </div>
+  <main>
+    <h2>Mark Attendance</h2>
+    <form>
+      <label>Date</label>
+      <input type="date" />
+      <label>Staff Name</label>
+      <input type="text" placeholder="e.g. Kavya" />
+      <label>Status</label>
+      <select><option>Present</option><option>Absent</option></select>
+      <button class="primary mt-10">Save</button>
+    </form>
 
-  <!-- Tabs -->
-  <nav class="tabs">
-    <button class="tab active" data-screen="attendance">Attendance</button>
-    <button class="tab" data-screen="reminders">Reminders</button>
-    <button class="tab" data-screen="directory">Directory</button>
-  </nav>
-
-  <main style="padding-bottom:90px">
-    <!-- ATTENDANCE -->
-    <section id="attendance" class="screen active">
-      <div class="cards" style="grid-template-columns:1fr">
-        <!-- Mark Attendance -->
-        <div class="card">
-          <h3 style="margin:0 0 8px">Mark Attendance</h3>
-          <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <div style="flex:1; min-width:180px">
-              <label>Date</label>
-              <input type="date" id="attDate" />
-            </div>
-            <div style="flex:1; min-width:180px">
-              <label>Staff Name</label>
-              <input id="attName" placeholder="e.g., Kavya" />
-            </div>
-            <div style="flex:1; min-width:160px">
-              <label>Status</label>
-              <select id="attStatus">
-                <option value="Present">Present</option>
-                <option value="Late">Late</option>
-                <option value="Half Day">Half Day</option>
-                <option value="Absent">Absent</option>
-                <option value="Leave">Leave</option>
-              </select>
-            </div>
-          </div>
-          <div style="margin-top:10px">
-            <label>Notes</label>
-            <input id="attNotes" placeholder="Optional" />
-          </div>
-          <div style="display:flex; gap:10px; margin-top:14px">
-            <button class="primary" onclick="addAttendance()">Save</button>
-            <button onclick="clearAttForm()">Reset</button>
-          </div>
-        </div>
-
-        <!-- View / Filter / Export -->
-        <div class="card">
-          <h3 style="margin:0 0 8px">Attendance Log</h3>
-          <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <div style="flex:1; min-width:140px">
-              <label>Date</label>
-              <input type="date" id="fDate" />
-            </div>
-            <div style="flex:1; min-width:140px">
-              <label>Name</label>
-              <input id="fName" placeholder="Search name" />
-            </div>
-            <div style="flex:1; min-width:140px">
-              <label>Status</label>
-              <select id="fStatus">
-                <option value="">All</option>
-                <option>Present</option>
-                <option>Late</option>
-                <option>Half Day</option>
-                <option>Absent</option>
-                <option>Leave</option>
-              </select>
-            </div>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap">
-            <button onclick="applyAttFilters()">Apply</button>
-            <button onclick="resetAttFilters()">Reset</button>
-            <button class="primary" onclick="exportAttendance()">Export CSV</button>
-          </div>
-
-          <div id="attList" class="list" style="margin-top:10px"></div>
-          <small class="muted">Tip: Click 📞 to call or 🟢 to WhatsApp the staff.</small>
-        </div>
-      </div>
-    </section>
-
-    <!-- REMINDERS -->
-    <section id="reminders" class="screen">
-      <div class="cards" style="grid-template-columns:1fr">
-        <div class="card">
-          <h3 style="margin:0 0 8px">WhatsApp Reminders</h3>
-          <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <div style="flex:1; min-width:180px">
-              <label>Recipient Number</label>
-              <input id="remPhone" placeholder="+91…" />
-            </div>
-            <div style="flex:1; min-width:220px">
-              <label>Template</label>
-              <select id="remTpl">
-                <option value="shift">Shift Reminder</option>
-                <option value="doc">Doctor arriving late</option>
-                <option value="stock">Stock / Inventory</option>
-                <option value="custom">Custom</option>
-              </select>
-            </div>
-          </div>
-          <div style="margin-top:10px">
-            <label>Message</label>
-            <textarea id="remMsg" rows="4" style="width:100%; border-radius:14px; border:1px solid var(--stroke); background:var(--surface); color:inherit; padding:10px"></textarea>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:14px">
-            <button class="primary" onclick="openWA()">Send on WhatsApp</button>
-            <button onclick="copyReminder()">Copy Text</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 style="margin:0 0 8px">Recent Patients (Demo)</h3>
-          <div id="recentPatients" class="list"></div>
-          <small class="muted">Use these for follow-up reminders. Hook to BookingsLogs later.</small>
-        </div>
-      </div>
-    </section>
-
-    <!-- DIRECTORY -->
-    <section id="directory" class="screen">
-      <div class="cards" style="grid-template-columns:1fr">
-        <div class="card">
-          <h3 style="margin:0 0 8px">Staff Directory</h3>
-          <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <div style="flex:1; min-width:180px">
-              <label>Name</label>
-              <input id="dirName" placeholder="e.g., Kavya" />
-            </div>
-            <div style="flex:1; min-width:180px">
-              <label>Role</label>
-              <input id="dirRole" placeholder="Nurse / Receptionist" />
-            </div>
-            <div style="flex:1; min-width:180px">
-              <label>Phone</label>
-              <input id="dirPhone" placeholder="+91…" />
-            </div>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap">
-            <button class="primary" onclick="addStaff()">Add</button>
-            <button onclick="exportDirectory()">Export CSV</button>
-          </div>
-
-          <div id="dirList" class="list" style="margin-top:10px"></div>
-          <small class="muted">Click 🟢 for WhatsApp or 📞 to call.</small>
-        </div>
-      </div>
-    </section>
+    <h2 class="mt-14">Attendance Log</h2>
+    <p>No attendance yet.</p>
   </main>
 
-  <!-- Dock -->
-  <footer class="dock">
-    <a class="icon-btn" href="./index.html" title="Home">🏠</a>
-    <a class="icon-btn" href="./booking.html" title="Bookings">📅</a>
-    <a class="icon-btn" href="./admin.html" title="Admin">⚙️</a>
-  </footer>
+  <div class="dock">
+    <a href="index.html" class="icon-btn">🏠</a>
+    <a href="booking.html" class="icon-btn">📅</a>
+    <a href="admin.html" class="icon-btn">⚙️</a>
+  </div>
 
-  <!-- WhatsApp Help -->
-  <a class="wa" href="https://wa.me/919390664577" target="_blank" rel="noopener">🟢</a>
-
-<script>
-  // ===== THEME =====
-  const KEY='pwa-theme';
-  if(localStorage.getItem(KEY)==='light') document.body.classList.add('light');
-  document.getElementById('themeToggle').onclick=()=>{
-    document.body.classList.toggle('light');
-    localStorage.setItem(KEY, document.body.classList.contains('light')?'light':'dark');
-  };
-
-  // ===== TABS =====
-  function openTab(name){
-    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
-    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===name));
-    scrollTo({top:0,behavior:'smooth'});
-  }
-  document.querySelector('.tabs').addEventListener('click', e=>{
-    const t=e.target.closest('.tab'); if(!t) return; openTab(t.dataset.screen);
-  });
-
-  // ===== HELPERS =====
-  const $ = s=>document.querySelector(s);
-  const pad = v=>String(v).replace(/"/g,'""');
-
-  // ===== DEMO STATE =====
-  const attendance = [];
-  const directory = [
-    {name:'Kavya', role:'Reception', phone:'+919999000111'},
-    {name:'Ramesh', role:'Nurse', phone:'+919999000222'},
-    {name:'Imran', role:'Assistant', phone:'+919999000333'}
-  ];
-  const recentPatientsDemo = [
-    {name:'Arjun', phone:'+919000100010', time:'09:40 AM', token:7},
-    {name:'Sana',  phone:'+919000100020', time:'10:00 AM', token:8},
-    {name:'Ravi',  phone:'+919000100030', time:'10:20 AM', token:9}
-  ];
-
-  // ===== ATTENDANCE =====
-  function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
-  $('#attDate').value = todayISO();
-
-  function addAttendance(){
-    const row = {
-      date: $('#attDate').value || todayISO(),
-      name: ($('#attName').value || '').trim(),
-      status: $('#attStatus').value,
-      notes: ($('#attNotes').value || '').trim(),
-      phone: (directory.find(d=>d.name.toLowerCase()===($('#attName').value||'').trim().toLowerCase())||{}).phone || ''
-    };
-    if(!row.name){ alert('Enter staff name'); return; }
-    attendance.push(row);
-    clearAttForm();
-    renderAttendance();
-  }
-  function clearAttForm(){ $('#attName').value=''; $('#attNotes').value=''; }
-
-  function applyAttFilters(){ renderAttendance(); }
-  function resetAttFilters(){ $('#fDate').value=''; $('#fName').value=''; $('#fStatus').value=''; renderAttendance(); }
-
-  function renderAttendance(){
-    const fDate=$('#fDate').value, fName=($('#fName').value||'').trim().toLowerCase(), fStatus=$('#fStatus').value;
-    const list=$('#attList'); list.innerHTML='';
-
-    attendance
-      .filter(r=>!fDate || r.date===fDate)
-      .filter(r=>!fName || r.name.toLowerCase().includes(fName))
-      .filter(r=>!fStatus || r.status===fStatus)
-      .forEach((r,idx)=>{
-        const a=document.createElement('div');
-        a.className='li';
-        a.innerHTML = `
-          <div style="display:flex; flex-direction:column">
-            <strong>${r.name}</strong>
-            <small class="muted">${r.date} • ${r.status}${r.notes?` • ${r.notes}`:''}</small>
-          </div>
-          <div style="display:flex; gap:8px">
-            ${r.phone?`<a class="icon-btn" href="tel:${r.phone.replace(/\D/g,'')}" title="Call">📞</a>`:''}
-            ${r.phone?`<a class="icon-btn" href="https://wa.me/${r.phone.replace(/\D/g,'')}" target="_blank" rel="noopener" title="WhatsApp">🟢</a>`:''}
-            <button class="icon-btn" title="Delete" onclick="delAttendance(${idx})">🗑️</button>
-          </div>
-        `;
-        list.appendChild(a);
-      });
-
-    if(!attendance.length){
-      const empty=document.createElement('div');
-      empty.className='li'; empty.textContent='No attendance yet.';
-      list.appendChild(empty);
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
     }
-  }
-  function delAttendance(i){ attendance.splice(i,1); renderAttendance(); }
-
-  function exportAttendance(){
-    const rows=[['Date','Staff Name','Status','Notes','Phone']];
-    attendance.forEach(r=>rows.push([r.date,r.name,r.status,r.notes,r.phone]));
-    const csv = rows.map(r=>r.map(p=>`"${pad(p)}"`).join(',')).join('\n');
-    downloadText(csv, `attendance_${todayISO()}.csv`);
-  }
-
-  // ===== REMINDERS =====
-  function tplText(kind){
-    switch(kind){
-      case 'shift': return 'Reminder: Your shift starts soon. Please report on time. 🕒';
-      case 'doc':   return 'Update: Doctor will arrive late today. Please manage waiting room politely.';
-      case 'stock': return 'Stock Check: Update today’s inventory in the sheet and confirm.';
-      default:      return ($('#remMsg').value||'').trim() || 'Hello.';
-    }
-  }
-  function openWA(){
-    const phone = ($('#remPhone').value||'').replace(/\D/g,'');
-    if(!phone){ alert('Enter phone'); return; }
-    const tpl = $('#remTpl').value;
-    const msg = encodeURIComponent(tplText(tpl));
-    window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');
-  }
-  function copyReminder(){
-    const tpl=$('#remTpl').value, txt=tplText(tpl);
-    navigator.clipboard.writeText(txt); toast('Message copied');
-  }
-
-  // demo recent patients
-  function renderRecentPatients(){
-    const box=$('#recentPatients'); box.innerHTML='';
-    recentPatientsDemo.forEach(p=>{
-      const a=document.createElement('div'); a.className='li';
-      a.innerHTML = `
-        <div>
-          <strong>${p.name}</strong>
-          <div class="muted">Token #${p.token} • ${p.time}</div>
-        </div>
-        <div style="display:flex; gap:8px">
-          <a class="icon-btn" href="tel:${p.phone.replace(/\D/g,'')}" title="Call">📞</a>
-          <a class="icon-btn" href="https://wa.me/${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent('Hi '+p.name+', hope you are feeling better. This is a follow-up reminder from the clinic.')}" target="_blank" rel="noopener" title="WhatsApp">🟢</a>
-        </div>
-      `;
-      box.appendChild(a);
-    });
-  }
-
-  // ===== DIRECTORY =====
-  function renderDirectory(){
-    const box=$('#dirList'); box.innerHTML='';
-    directory.forEach((d,idx)=>{
-      const a=document.createElement('div'); a.className='li';
-      a.innerHTML = `
-        <div>
-          <strong>${d.name}</strong>
-          <div class="muted">${d.role} • ${d.phone}</div>
-        </div>
-        <div style="display:flex; gap:8px">
-          <a class="icon-btn" href="tel:${d.phone.replace(/\D/g,'')}" title="Call">📞</a>
-          <a class="icon-btn" href="https://wa.me/${d.phone.replace(/\D/g,'')}" target="_blank" rel="noopener" title="WhatsApp">🟢</a>
-          <button class="icon-btn" title="Delete" onclick="delStaff(${idx})">🗑️</button>
-        </div>
-      `;
-      box.appendChild(a);
-    });
-  }
-  function addStaff(){
-    const name=($('#dirName').value||'').trim();
-    const role=($('#dirRole').value||'').trim();
-    const phone=($('#dirPhone').value||'').trim();
-    if(!name || !phone){ alert('Name and Phone required'); return; }
-    directory.push({name,role,phone});
-    $('#dirName').value=''; $('#dirRole').value=''; $('#dirPhone').value='';
-    renderDirectory();
-  }
-  function delStaff(i){ directory.splice(i,1); renderDirectory(); }
-  function exportDirectory(){
-    const rows=[['Name','Role','Phone']];
-    directory.forEach(d=>rows.push([d.name,d.role,d.phone]));
-    const csv = rows.map(r=>r.map(p=>`"${pad(p)}"`).join(',')).join('\n');
-    downloadText(csv, 'staff_directory.csv');
-  }
-
-  // ===== UTIL =====
-  function downloadText(text, filename){
-    const blob=new Blob([text],{type:'text/csv;charset=utf-8;'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
-    URL.revokeObjectURL(url);
-    toast('Download started');
-  }
-  function toast(msg){
-    const el=document.createElement('div');
-    el.textContent=msg;
-    el.style.cssText='position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;padding:8px 12px;border-radius:12px;font-size:13px;z-index:9999';
-    document.body.appendChild(el); setTimeout(()=>el.remove(),1500);
-  }
-
-  // ===== INIT =====
-  (function init(){
-    renderAttendance();
-    renderDirectory();
-    renderRecentPatients();
-  })();
-
-  // SW (optional)
-  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
-</script>
+  </script>
 </body>
 </html>
