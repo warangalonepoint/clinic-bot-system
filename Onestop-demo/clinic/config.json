@@ -1,0 +1,12 @@
+{
+  "backend": "csv",
+  "csv": {
+    "logs": "./logs.csv"                   // headers: Timestamp,Patient Name,Slot Time,Reason,Contact,Token,Reminder Sent
+  },
+  "airtable": {
+    "apiKey": "PASTE_YOUR_KEY",
+    "baseId": "app1T8WiRqZIR4xY",
+    "table": "BookingsLogs"
+  },
+  "capacityPerDay": 50                     // for utilization
+}
