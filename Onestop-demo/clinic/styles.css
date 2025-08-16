@@ -1,7 +1,6 @@
 /* ==========================================================================
-   Onestop Clinic — Glassmorphism UI (full file)
+   Onestop Clinic — Glassmorphism UI
    Dark (default) + Light mode (body.light)
-   Matches sample: deep navy bg, neon purple→cyan accents, frosted cards
    ========================================================================== */
 
 /* -------- CSS Vars (Glass defaults) -------- */
@@ -91,7 +90,6 @@ a{color:inherit; text-decoration:none}
   backdrop-filter:blur(var(--blur)) saturate(140%); -webkit-backdrop-filter:blur(var(--blur)) saturate(140%);
   box-shadow:var(--shadow); opacity:.92; position:relative;
 }
-.banner img::before{display:none} /* (kept for consistency with glass edge) */
 
 /* -------- Tabs -------- */
 .tabs{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:12px 16px}
@@ -158,7 +156,7 @@ a.ghost{
   background:rgba(255,255,255,.06); color:var(--text)
 }
 
-/* -------- Slots (booking/doctor) -------- */
+/* -------- Slots -------- */
 .slot{
   display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-radius:16px;
   background:rgba(255,255,255,.08); border:1px solid var(--stroke); margin-top:10px;
