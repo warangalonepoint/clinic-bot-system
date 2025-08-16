@@ -1,165 +1,29 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Clinic • Reset</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./styles.css">
-<meta name="theme-color" content="#111"/>
-<style>
-  main{max-width:720px;margin:16px auto;padding:16px}
-  /* Polished banner/header */
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
-  .banner{width:100%;height:180px;object-fit:cover;display:block}
-  @media(max-width:560px){.banner{height:140px}}
-  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
-  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-  /* Buttons + layout */
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-align:center;width:100%}
-  .muted{color:#666}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:520px){.grid{grid-template-columns:1fr}}
-  .pill{background:#eee;border-radius:999px;padding:6px 10px;display:inline-block}
-  textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  .ok{color:#0d7c66}
-  .err{color:#b00020}
-</style>
-</head><body>
-<main>
-  <!-- Polished banner -->
-  <div class="card hero">
-    <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
-    <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/reset.png'">
-      <div class="hero-title">Reset / Cache Tools</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Reset PIN · Onestop Clinic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=9">
+</head>
+<body>
+  <div class="app-shell">
+    <div class="header">
+      <div class="brand-logo"></div>
+      <div><div class="title">Reset PIN</div><div class="subtitle">Admin action</div></div>
     </div>
-  </div>
 
-  <!-- Actions -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 6px">Maintenance</h2>
-    <p class="muted">Use these when updates don’t show or data looks stale. Same behavior as before — only the UI got a glow-up.</p>
-    <div class="grid" style="margin-top:8px">
-      <button class="btn" id="sw_clear">Hard Refresh (SW + Cache)</button>
-      <button class="btn" id="local_clear">Clear Local Data</button>
-      <button class="btn" id="notes_clear">Clear Today’s Notes</button>
-      <button class="btn" id="tokens_clear">Clear Today’s Tokens</button>
+    <div class="section glass">
+      <div class="row"><div class="label">Current PIN</div><input class="input" type="password"></div>
+      <div class="row"><div class="label">New PIN</div><input class="input" type="password"></div>
+      <div class="row"><div class="label">Confirm PIN</div><input class="input" type="password"></div>
+      <button class="btn btn-primary">Update PIN</button>
     </div>
-    <div id="msg" style="margin-top:10px" class="ok"></div>
+
+    <div class="footer">© 2025 Onestop Clinic</div>
   </div>
-
-  <!-- Inspect keys (optional) -->
-  <div class="card" style="margin-top:12px">
-    <h3 style="margin:0 0 6px">Local Keys</h3>
-    <p class="muted">Quick peek at what’s stored on this device.</p>
-    <div class="grid">
-      <button class="btn" id="dump_keys">List Keys</button>
-      <button class="btn" id="dump_all">Export JSON</button>
-    </div>
-    <textarea id="out" rows="8" style="margin-top:10px" readonly placeholder="Keys/JSON will appear here…"></textarea>
-  </div>
-
-  <!-- Back -->
-  <div class="card" style="margin-top:12px">
-    <div class="grid">
-      <a class="btn" href="./index.html">Back to PIN</a>
-      <a class="btn" href="./admin.html">Back to Admin</a>
-    </div>
-  </div>
-</main>
-
-<script>
-// same behavior — just wrapped in nicer UI
-
-const K = {
-  services:"cl_s", appts:"cl_a", queue:"cl_q", slots:"cl_slots",
-  notes:"cl_notes", tokens:"cl_tok", seen:"cl_seen",
-  staff:"cl_staff", att:"cl_att", now:"cl_now"
-};
-const today=()=>new Date().toISOString().slice(0,10);
-const $=id=>document.getElementById(id);
-
-function ok(m){const el=$("msg"); el.className="ok"; el.textContent=m; setTimeout(()=>el.textContent="",2500);}
-function err(m){const el=$("msg"); el.className="err"; el.textContent=m; setTimeout(()=>el.textContent="",3500);}
-
-$("sw_clear").onclick=async ()=>{
-  try{
-    // unregister service workers
-    if("serviceWorker" in navigator){
-      const regs=await navigator.serviceWorker.getRegistrations();
-      for(const r of regs){ await r.unregister(); }
-    }
-    // clear CacheStorage
-    if("caches" in window){
-      const names=await caches.keys();
-      await Promise.all(names.map(n=>caches.delete(n)));
-    }
-    ok("Service worker + caches cleared. Close & reopen the app.");
-    // optional: force reload after a moment
-    setTimeout(()=>location.reload(true), 800);
-  }catch(e){ err("Could not clear SW/caches. Try manually reloading."); }
-};
-
-$("local_clear").onclick=()=>{
-  if(!confirm("Clear ALL local data on this device? (appointments, queue, slots, services, staff, etc.)")) return;
-  const keep = ["__ack"]; // nothing to keep; reserved
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(!keep.includes(k)){} // noop
-  }
-  // Wipe known prefixes/keys
-  const prefixes=[K.slots+"_"]; // per-day slots
-  const allKeys=[...Object.keys(K)];
-  // Remove static keys
-  allKeys.forEach(k=>{
-    try{ localStorage.removeItem(K[k]); }catch{}
-  });
-  // Remove per-day & dynamic
-  Object.keys(localStorage).forEach(k=>{
-    if(prefixes.some(p=>k.startsWith(p))) localStorage.removeItem(k);
-    if(k.startsWith(K.notes+"_")||k.startsWith(K.tokens+"_")||k.startsWith(K.seen+"_")||k.startsWith(K.att+"_")||k.startsWith(K.now+"_")){
-      localStorage.removeItem(k);
-    }
-  });
-  ok("Local data cleared on this device.");
-};
-
-$("notes_clear").onclick=()=>{
-  const key = `${K.notes}_${today()}`;
-  localStorage.removeItem(key);
-  ok("Today’s notes cleared.");
-};
-
-$("tokens_clear").onclick=()=>{
-  const keyTok = `${K.tokens}_${today()}`;
-  const keySeen= `${K.seen}_${today()}`;
-  localStorage.removeItem(keyTok);
-  localStorage.removeItem(keySeen);
-  localStorage.removeItem(`${K.now}_${today()}`);
-  ok("Today’s tokens/seen/now-serving cleared.");
-};
-
-// Inspect / export
-$("dump_keys").onclick=()=>{
-  const keys = [];
-  for(let i=0;i<localStorage.length;i++){ keys.push(localStorage.key(i)); }
-  $("out").value = keys.sort().join("\n");
-};
-
-$("dump_all").onclick=()=>{
-  const dump = {};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    try{ dump[k]=JSON.parse(localStorage.getItem(k)); }
-    catch{ dump[k]=localStorage.getItem(k); }
-  }
-  $("out").value = JSON.stringify(dump,null,2);
-};
-
-// PWA register (kept)
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-</script>
-</body></html>
+</body>
+</html>
