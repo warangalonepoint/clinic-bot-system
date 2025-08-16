@@ -1,16 +1,16 @@
-/* ===== LIGHT GLASSMORPHISM — MAX INTENSITY ===== */
+/* ===== LIGHT GLASSMORPHISM — FINAL ===== */
 :root{
   --bg1:#f7faff; --bg2:#eaf3ff;
   --text:#111827; --sub:#5b6475;
-  --glass:rgba(255,255,255,.58);      /* more see-thru */
-  --glass-deep:rgba(255,255,255,.42); /* for inner pieces */
-  --stroke:rgba(255,255,255,.75);     /* bright inner stroke */
-  --hair:rgba(17,24,39,.10);          /* outer line */
+  --glass:rgba(255,255,255,.58);
+  --glass-deep:rgba(255,255,255,.42);
+  --stroke:rgba(255,255,255,.75);
+  --hair:rgba(17,24,39,.10);
   --shadow:0 16px 40px rgba(17,24,39,.12), 0 4px 14px rgba(17,24,39,.06);
 
-  --p:#a855f7; --t:#06b6d4; --dp:#7c3aed; /* purple→teal */
+  --p:#a855f7; --t:#06b6d4; --dp:#7c3aed;
   --radius-xl:28px; --radius-lg:22px; --radius-md:16px;
-  --blur:26px; /* stronger blur */
+  --blur:26px;
 }
 
 *{box-sizing:border-box} html,body{height:100%}
@@ -24,10 +24,24 @@ body{
   background-attachment:fixed;
 }
 
-/* noise for real glass */
+/* soft noise for real glass */
 body:after{
   content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;
   background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAM0lEQVQYV2NkwA7+Y2BgYPAfGJmYwYgZGBhGQ4kMLAw/8cBExgY/6iQwQAzmQyGgkQxAAqFQG6gNn1pAAAAABJRU5ErkJggg==");
+  z-index:-1;
+}
+/* glowing orbs */
+body::before, body::backdrop{
+  content:""; position:fixed; border-radius:50%;
+  filter:blur(80px); opacity:.6; z-index:-2;
+}
+body::before{
+  width:420px;height:420px;top:-110px;left:-140px;
+  background:radial-gradient(circle at center,#a855f7 0%,transparent 70%);
+}
+body::backdrop{
+  width:520px;height:520px;bottom:-160px;right:-160px;
+  background:radial-gradient(circle at center,#06b6d4 0%,transparent 70%);
 }
 
 /* ===== SHELL ===== */
@@ -51,12 +65,12 @@ body:after{
 }
 .glass:before{
   content:"";position:absolute;inset:0;border-radius:inherit;
-  border:1px solid var(--stroke); /* bright inner line */
+  border:1px solid var(--stroke);
   mix-blend-mode:screen;pointer-events:none;
 }
 .glass:after{
   content:"";position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(180deg,rgba(255,255,255,.55),transparent 35%);
+  background:linear-gradient(145deg,rgba(255,255,255,.65),rgba(255,255,255,.15));
   pointer-events:none;
 }
 
@@ -78,7 +92,7 @@ body:after{
 .tab.active{
   color:#fff;border-color:transparent;
   background:linear-gradient(135deg,var(--p),var(--t));
-  box-shadow:0 14px 28px rgba(6,182,212,.28),0 8px 18px rgba(124,58,237,.28);
+  box-shadow:0 0 20px rgba(168,85,247,.5),0 0 30px rgba(6,182,212,.45);
 }
 
 /* ===== SECTION ===== */
@@ -96,7 +110,7 @@ body:after{
 }
 .donut span{position:absolute;inset:0;display:grid;place-items:center;font-weight:900}
 
-/* ===== PROGRESS (glow) ===== */
+/* ===== PROGRESS ===== */
 .progress{
   height:14px;border-radius:999px;overflow:hidden;
   background:rgba(17,24,39,.08);border:1px solid rgba(17,24,39,.06);
@@ -128,6 +142,12 @@ body:after{
 .row{display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px}
 .label{font-weight:800}
 .value{color:var(--sub);font-weight:800}
+
+/* ===== BUTTONS ===== */
+.btn{appearance:none;border:0;cursor:pointer;padding:12px 18px;border-radius:16px;font-weight:800}
+.btn-primary{color:#fff;background:linear-gradient(135deg,var(--p),var(--t));box-shadow:0 10px 20px rgba(6,182,212,.28),0 4px 12px rgba(124,58,237,.25)}
+.btn-secondary{color:var(--text);background:#fff;border:1px solid var(--hair)}
+.btn:active{transform:translateY(1px)}
 
 /* ===== FOOTER ===== */
 .footer{margin:16px 0 40px;color:var(--sub);text-align:center}
