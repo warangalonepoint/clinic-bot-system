@@ -1,294 +1,239 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Clinic • Admin</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./styles.css">
-<meta name="theme-color" content="#111"/>
-<style>
-  main{max-width:1000px;margin:16px auto;padding:16px}
-  .logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:860px){.grid{grid-template-columns:1fr}}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
-  .muted{color:#666}
-  .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-decoration:none;text-align:center}
-  input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  /* Polished banner/header */
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
-  .banner{width:100%;height:180px;object-fit:cover;display:block}
-  @media(max-width:560px){.banner{height:140px}}
-  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
-  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  /* Quick links two-per-row */
-  .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:360px){.ql-2{grid-template-columns:1fr 1fr}}
-  .iconbtn{display:inline-flex;align-items:center;gap:10px;justify-content:center}
-  .iconbtn img{width:18px;height:18px;border-radius:4px}
-</style>
-</head><body>
-<script>(function(){const r=sessionStorage.getItem("clinic_role");if(r!=="admin")location.replace("./index.html");})();</script>
-<button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
-
-<main>
-  <!-- Polished banner -->
-  <div class="card hero">
-    <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
-    <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/admin.png'">
-      <div class="hero-title">Admin Console</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Onestop Clinic — Admin</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0b0f1a" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="brand-text">
+        <h1>Onestop C-Demo</h1>
+        <p>Admin Panel</p>
+      </div>
     </div>
+    <button id="themeToggle" class="icon-btn" title="Light/Dark">🌗</button>
+  </header>
+
+  <!-- Banner -->
+  <div class="banner">
+    <img src="./assets/clinic_banner.png" alt="Clinic banner">
   </div>
 
-  <!-- Quick Links -->
-  <div class="card" style="margin-top:12px">
-    <div class="ql-2">
-      <a class="btn iconbtn" href="./doctor.html"><img src="./assets/doctor.png" onerror="this.style.display='none'">Doctor/Manager</a>
-      <a class="btn iconbtn" href="./booking.html"><img src="./assets/booking.png" onerror="this.style.display='none'">Booking Bot</a>
-      <a class="btn iconbtn" href="./staff.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Staff</a>
-      <a class="btn iconbtn" href="./index.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Back to PIN</a>
-    </div>
-  </div>
+  <!-- Page Tabs -->
+  <nav class="tabs">
+    <button class="tab active" data-screen="dashboard">Dashboard</button>
+    <button class="tab" data-screen="export">Export</button>
+    <button class="tab" data-screen="settings">Settings</button>
+  </nav>
 
-  <!-- SLOTS MANAGER -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Slots Manager</h2>
-    <div class="grid">
-      <label>Date <input id="sl_date" type="date"></label>
-      <label>Start <input id="sl_start" type="time" value="09:00"></label>
-      <label>End <input id="sl_end" type="time" value="18:00"></label>
-      <label>Slot Length (min) <input id="sl_len" type="number" min="5" value="30"></label>
-      <label>Capacity / slot <input id="sl_cap" type="number" min="1" value="1"></label>
-      <label>Breaks (comma HH:MM) <input id="sl_breaks" placeholder="13:00,13:30"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="sl_gen">Generate</button>
-      <button class="btn" id="sl_save">Save</button>
-      <button class="btn" id="sl_export">Export CSV</button>
-      <button class="btn" id="sl_clear">Clear Day</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table>
-        <thead><tr><th>#</th><th>Time</th><th>Capacity</th><th>Booked</th><th>Status</th></tr></thead>
-        <tbody id="sl_tbody"></tbody>
-      </table>
-      <div id="sl_empty" class="muted">No slots for selected date.</div>
-    </div>
-  </div>
+  <main style="padding-bottom:90px">
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="screen active">
+      <div class="cards">
+        <a class="card" href="./booking.html">
+          <div class="card-ic">📅</div>
+          <div class="card-txt">
+            <h3>Open Booking</h3>
+            <p>Create bookings & tokens</p>
+          </div>
+        </a>
 
-  <!-- WALK-INS -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Walk-in Register (Front Desk)</h2>
-    <div class="grid">
-      <label>Name <input id="q_name" placeholder="Full name"></label>
-      <label>Phone <input id="q_phone" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
-      <label>Age <input id="q_age" inputmode="numeric" maxlength="3" placeholder="Years"></label>
-      <label>Complaint <input id="q_comp" placeholder="Reason for visit"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="q_add">Add to Queue</button>
-      <button class="btn" id="q_export">Export Queue CSV</button>
-      <button class="btn" id="q_clear">Clear Local Queue</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table><thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Age</th><th>Complaint</th><th>Token*</th></tr></thead><tbody id="q_tbody"></tbody></table>
-      <div class="muted">* Token assigned automatically in Doctor view.</div>
-    </div>
-  </div>
+        <a class="card" href="./staff.html">
+          <div class="card-ic">📲</div>
+          <div class="card-txt">
+            <h3>Staff / Reminders</h3>
+            <p>View list & send WhatsApp</p>
+          </div>
+        </a>
 
-  <!-- APPOINTMENTS -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Create Appointment (Front Desk)</h2>
-    <div class="grid">
-      <label>Date <input id="a_date" type="date"></label>
-      <label>Time <select id="a_time"></select></label>
-      <label>Patient Name <input id="a_name"></label>
-      <label>Phone <input id="a_phone" inputmode="numeric" maxlength="10"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="a_add">Create Appointment</button>
-      <button class="btn" id="a_export">Export Appointments CSV</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table><thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Phone</th><th>Status</th></tr></thead><tbody id="a_tbody"></tbody></table>
-      <div id="a_empty" class="muted">No appointments.</div>
-    </div>
-  </div>
+        <a class="card" href="#export" onclick="openTab('export')">
+          <div class="card-ic">⬇️</div>
+          <div class="card-txt">
+            <h3>Export Panel</h3>
+            <p>Logs & Slots download</p>
+          </div>
+        </a>
 
-  <!-- SERVICES -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Services Master</h2>
-    <div class="grid">
-      <label>Service <input id="s_name" placeholder="Consultation"></label>
-      <label>Price (₹) <input id="s_price" inputmode="numeric" placeholder="500"></label>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="s_add">Add Service</button>
-      <button class="btn" id="s_export">Export CSV</button>
-      <button class="btn" id="s_clear">Clear Local</button>
-    </div>
-    <div style="margin-top:10px;overflow:auto">
-      <table><thead><tr><th>Name</th><th>Price</th></tr></thead><tbody id="s_tbody"></tbody></table>
-      <div id="s_empty" class="muted">No services yet.</div>
-    </div>
-  </div>
+        <a class="card" href="#settings" onclick="openTab('settings')">
+          <div class="card-ic">🔐</div>
+          <div class="card-txt">
+            <h3>PIN & Branding</h3>
+            <p>Generate JSON snippets</p>
+          </div>
+        </a>
+      </div>
+    </section>
 
-  <!-- REPORTS + PINS -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">Reports (Local)</h2>
-    <div class="grid">
-      <button class="btn" id="r_day">Today’s Summary</button>
-      <button class="btn" id="r_exportAll">Export ALL CSV</button>
-    </div>
-    <div id="r_out" style="margin-top:8px;color:#333"></div>
-  </div>
+    <!-- EXPORT -->
+    <section id="export" class="screen">
+      <div class="card" id="export-panel">
+        <h3 style="margin:0 0 8px">Export Panel</h3>
+        <p class="muted" style="margin:0 0 10px">Paste your live CSV URLs (GitHub or Airtable CSV endpoints) and use quick download.</p>
 
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px">PINs</h2>
-    <p>Loaded from <code>pins.json</code>.</p>
-    <pre id="pinsBox" style="background:#f7f7f7;padding:10px;border-radius:12px;overflow:auto"></pre>
-  </div>
-</main>
+        <div class="cards" style="grid-template-columns:1fr">
+          <div class="card" style="padding:12px">
+            <label>Logs CSV URL</label>
+            <input id="logsUrl" placeholder="https://.../logs.csv" />
+            <div style="display:flex; gap:10px; margin-top:10px">
+              <button class="primary" onclick="quickDownload('logsUrl')">Download Logs CSV</button>
+              <button onclick="copyField('logsUrl')">Copy URL</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:12px">
+            <label>Slots CSV URL</label>
+            <input id="slotsUrl" placeholder="https://.../Slots.csv" />
+            <div style="display:flex; gap:10px; margin-top:10px">
+              <button class="primary" onclick="quickDownload('slotsUrl')">Download Slots CSV</button>
+              <button onclick="copyField('slotsUrl')">Copy URL</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:12px">
+            <h4 style="margin:0 0 8px">One-click Backup (opens both)</h4>
+            <button onclick="backupBoth()">Open Logs & Slots</button>
+            <p class="muted" style="margin-top:8px">Tip: Long-press and “Download Link” on mobile if the file opens in the browser.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="screen">
+      <div class="cards" style="grid-template-columns:1fr">
+        <!-- PIN -->
+        <div class="card pad">
+          <h3 style="margin:0 0 8px">PIN JSON Generator</h3>
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <div style="flex:1; min-width:220px">
+              <label>Clinic Code</label>
+              <input id="clinicCode" placeholder="e.g., clinic1" />
+            </div>
+            <div style="flex:1; min-width:220px">
+              <label>PIN</label>
+              <input id="clinicPin" placeholder="e.g., 2525" />
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <label>Output (pins.json)</label>
+            <textarea id="pinsOut" rows="4" style="width:100%; border-radius:14px; border:1px solid var(--stroke); background:var(--surface); color:inherit; padding:10px" readonly></textarea>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:10px">
+            <button class="primary" onclick="buildPins()">Generate</button>
+            <button onclick="copyText('pinsOut')">Copy</button>
+          </div>
+          <p class="muted" style="margin-top:8px">Upload this JSON to <code>pins.json</code> in your GitHub repo.</p>
+        </div>
+
+        <!-- Branding -->
+        <div class="card pad">
+          <h3 style="margin:0 0 8px">Branding JSON Generator</h3>
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <div style="flex:1; min-width:220px">
+              <label>App Title</label>
+              <input id="brandTitle" placeholder="Onestop C-Demo" />
+            </div>
+            <div style="flex:1; min-width:220px">
+              <label>Logo Path</label>
+              <input id="brandLogo" placeholder="./assets/logo.png" />
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <label>Output (branding.json)</label>
+            <textarea id="brandOut" rows="4" style="width:100%; border-radius:14px; border:1px solid var(--stroke); background:var(--surface); color:inherit; padding:10px" readonly></textarea>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:10px">
+            <button class="primary" onclick="buildBrand()">Generate</button>
+            <button onclick="copyText('brandOut')">Copy</button>
+          </div>
+          <p class="muted" style="margin-top:8px">Upload this JSON to <code>branding.json</code> (optional; for future dynamic branding).</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dock -->
+  <footer class="dock">
+    <a class="icon-btn" href="./index.html" title="Home">🏠</a>
+    <a class="icon-btn" href="./booking.html" title="Bookings">📅</a>
+    <a class="icon-btn" href="./admin.html" title="Admin">⚙️</a>
+  </footer>
+
+  <!-- WhatsApp Help -->
+  <a class="wa" href="https://wa.me/919390664577" target="_blank" rel="noopener">🟢</a>
 
 <script>
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+  // Theme
+  const KEY='pwa-theme';
+  if(localStorage.getItem(KEY)==='light') document.body.classList.add('light');
+  document.getElementById('themeToggle').onclick=()=>{
+    document.body.classList.toggle('light');
+    localStorage.setItem(KEY, document.body.classList.contains('light')?'light':'dark');
+  };
 
-const $=id=>document.getElementById(id);
-const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
-const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const today=()=>new Date().toISOString().slice(0,10);
-const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
-
-// STORAGE KEYS
-const K={services:"cl_s",appts:"cl_a",queue:"cl_q",slots:"cl_slots"}; // slots is per-day with suffix
-
-// ---------- SLOTS MANAGER ----------
-function slKey(date){ return `${K.slots}_${date}`; }
-function parseBreaks(str){ return (str||"").split(",").map(s=>s.trim()).filter(Boolean); }
-function mins(hhmm){const [h,m]=hhmm.split(":").map(Number);return h*60+m;}
-function hhmm(m){const h=String(Math.floor(m/60)).padStart(2,"0");const mm=String(m%60).padStart(2,"0");return `${h}:${mm}`;}
-
-function loadSlots(date){ const arr=jget(slKey(date)); return Array.isArray(arr)?arr:[]; }
-function saveSlots(date,rows){ jset(slKey(date),rows); }
-
-function renderSlots(){
-  const d=$("sl_date").value||today();
-  const rows=loadSlots(d);
-  const tb=$("sl_tbody"); tb.innerHTML="";
-  if(!rows.length){ $("sl_empty").style.display="block"; return; }
-  $("sl_empty").style.display="none";
-  rows.forEach((r,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td>${r.time}</td><td>${r.cap}</td><td>${r.booked||0}</td><td>${r.status||"Open"}</td>`;
-    tb.appendChild(tr);
-  });
-}
-
-function fillTimeOptions(date){
-  const timeSel=$("a_time"); timeSel.innerHTML="";
-  const rows=loadSlots(date).filter(s=>(s.status||"Open")!=="Closed");
-  if(!rows.length){ timeSel.innerHTML='<option value="">No slots</option>'; return; }
-  rows.forEach(s=>{
-    const free = (s.booked||0) < Number(s.cap||1);
-    const label = free ? `${s.time} (free ${Number(s.cap)-(s.booked||0)})` : `${s.time} (full)`;
-    const opt=document.createElement("option");
-    opt.value=s.time; opt.textContent=label; if(!free) opt.disabled=true;
-    timeSel.appendChild(opt);
-  });
-}
-
-$("sl_gen").onclick=()=>{
-  const d=$("sl_date").value||today();
-  const start=$("sl_start").value, end=$("sl_end").value, len=+($("sl_len").value||30), cap=+($("sl_cap").value||1);
-  if(!start||!end||len<=0||cap<=0){alert("Fill start/end/length/capacity");return}
-  const bset=new Set(parseBreaks($("sl_breaks").value));
-  const out=[]; let t=mins(start), E=mins(end);
-  while(t<E){
-    const tm=hhmm(t);
-    out.push({time:tm, cap:cap, booked:0, status: bset.has(tm) ? "Closed":"Open"});
-    t+=len;
+  // Tabs
+  function openTab(name){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
+    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===name));
+    scrollTo({top:0,behavior:'smooth'});
   }
-  saveSlots(d,out); renderSlots(); fillTimeOptions(d);
-};
-$("sl_save").onclick=()=>{ const d=$("sl_date").value||today(); alert("Saved slots for "+d); };
-$("sl_export").onclick=()=>{ const d=$("sl_date").value||today(); const rows=loadSlots(d); csv(rows,["time","cap","booked","status"],`Slots_${d}.csv`); };
-$("sl_clear").onclick=()=>{ const d=$("sl_date").value||today(); if(confirm("Clear slots for "+d+" on this device?")){ localStorage.removeItem(slKey(d)); renderSlots(); fillTimeOptions(d); } };
-
-// ---------- WALK-INS ----------
-function renderQ(){
-  const rows=jget(K.queue);
-  const tb=$("q_tbody"); tb.innerHTML="";
-  rows.forEach((r,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.age}</td><td>${r.comp}</td><td>${r.token||"—"}</td>`;
-    tb.appendChild(tr);
+  document.querySelector('.tabs').addEventListener('click',(e)=>{
+    const t=e.target.closest('.tab'); if(!t) return;
+    openTab(t.dataset.screen);
   });
-}
-$("q_add").onclick=()=>{
-  const name=$("q_name").value.trim(),phone=$("q_phone").value.trim(),age=$("q_age").value.trim(),comp=$("q_comp").value.trim();
-  if(!name||phone.length!==10){alert("Enter name & 10-digit phone");return}
-  const rows=jget(K.queue); rows.push({name,phone,age,comp,ts:Date.now()}); jset(K.queue,rows); renderQ();
-};
-$("q_export").onclick=()=>csv(jget(K.queue),["name","phone","age","comp","ts"],"Queue.csv");
-$("q_clear").onclick=()=>{if(confirm("Clear queue on this device?")){localStorage.removeItem(K.queue);renderQ();}};
-renderQ();
 
-// ---------- APPOINTMENTS ----------
-function renderA(){
-  const rows=jget(K.appts);
-  const tb=$("a_tbody"); tb.innerHTML="";
-  if(!rows.length){$("a_empty").style.display="block"} else {$("a_empty").style.display="none"}
-  rows.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
-  rows.forEach(r=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${r.date}</td><td>${r.time}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.status||"Booked"}</td>`;
-    tb.appendChild(tr);
-  });
-}
-$("a_date").value=today();
-fillTimeOptions($("a_date").value);
-$("a_date").addEventListener("change", e=> fillTimeOptions(e.target.value));
-
-$("a_add").onclick=()=>{
-  const date=$("a_date").value, time=$("a_time").value, name=$("a_name").value.trim(), phone=$("a_phone").value.trim();
-  if(!date||!time||!name||phone.length!==10){alert("Fill all fields");return}
-  let slots=loadSlots(date);
-  const idx=slots.findIndex(s=>s.time===time);
-  if(idx>-1){
-    const s=slots[idx];
-    if((s.booked||0) >= Number(s.cap||1)){ alert("Slot full. Pick another."); return; }
-    s.booked=(s.booked||0)+1; slots[idx]=s; saveSlots(date,slots);
+  // Export helpers
+  function val(id){ return document.getElementById(id).value.trim(); }
+  function quickDownload(id){
+    const url = val(id);
+    if(!url){ alert('Paste a valid URL.'); return; }
+    window.open(url,'_blank');
   }
-  const rows=jget(K.appts); rows.push({date,time,name,phone,status:"Booked",ts:Date.now()}); jset(K.appts,rows);
-  renderA(); fillTimeOptions(date);
-};
-$("a_export").onclick=()=>csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");
-renderA();
+  function copyField(id){
+    const url = val(id);
+    if(!url){ alert('Nothing to copy.'); return; }
+    navigator.clipboard.writeText(url);
+    toast('URL copied');
+  }
+  function backupBoth(){
+    const a = val('logsUrl'); const b = val('slotsUrl');
+    if(a) window.open(a,'_blank'); if(b) window.open(b,'_blank');
+    if(!a && !b) alert('Add URLs first.');
+  }
 
-// ---------- REPORTS ----------
-$("r_day").onclick=()=>{
-  const d=today();
-  const ap=jget(K.appts).filter(a=>a.date===d).length;
-  const q=jget(K.queue).filter(x=>new Date(x.ts).toISOString().slice(0,10)===d).length;
-  $("r_out").textContent=`Today — Appointments: ${ap}, Walk-ins in queue: ${q}`;
-};
-$("r_exportAll").onclick=()=>{
-  csv(jget(K.appts),["date","time","name","phone","status","ts"],"Appointments.csv");
-  csv(jget(K.queue),["name","phone","age","comp","ts"],"Queue.csv");
-  csv(jget(K.services),["name","price"],"Services.csv");
-  const allKeys=Object.keys(localStorage).filter(k=>k.startsWith(K.slots+"_"));
-  let rows=[]; allKeys.forEach(k=>{const d=k.split("_").slice(-1)[0]; jget(k).forEach(s=>rows.push({date:d,...s}));});
-  if(rows.length) csv(rows,["date","time","cap","booked","status"],"Slots_All.csv");
-};
+  // Generators
+  function buildPins(){
+    const code = document.getElementById('clinicCode').value.trim() || 'clinic1';
+    const pin  = document.getElementById('clinicPin').value.trim()  || '2525';
+    const json = { [code]: { pin } };
+    document.getElementById('pinsOut').value = JSON.stringify(json, null, 2);
+    toast('pins.json ready');
+  }
+  function buildBrand(){
+    const title = document.getElementById('brandTitle').value.trim() || 'Onestop C-Demo';
+    const logo  = document.getElementById('brandLogo').value.trim()  || './assets/logo.png';
+    const json = { appTitle: title, logo };
+    document.getElementById('brandOut').value = JSON.stringify(json, null, 2);
+    toast('branding.json ready');
+  }
 
-// ---------- PINs ----------
-fetch("./pins.json",{cache:"no-store"}).then(r=>r.json()).then(p=>{$("pinsBox").textContent=JSON.stringify(p,null,2)}).catch(()=>{$("pinsBox").textContent="Could not load pins.json";});
+  // Micro toast
+  function toast(msg){
+    const el=document.createElement('div');
+    el.textContent=msg;
+    el.style.cssText='position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;padding:8px 12px;border-radius:12px;font-size:13px;z-index:9999';
+    document.body.appendChild(el); setTimeout(()=>el.remove(),1500);
+  }
 
-// init defaults
-$("sl_date").value=today(); renderSlots();
+  // SW (optional)
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
 </script>
-</body></html>
+</body>
+</html>
