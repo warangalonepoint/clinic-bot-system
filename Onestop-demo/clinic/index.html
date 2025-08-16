@@ -4,18 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Onestop Clinic</title>
-
-  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <!-- Correct CSS path -->
-  <link rel="stylesheet" href="./styles.css?v=6">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css?v=9">
 </head>
 <body>
   <div class="app-shell">
-    <!-- Header -->
     <div class="header">
       <div class="brand-logo"></div>
       <div>
@@ -24,86 +20,86 @@
       </div>
     </div>
 
-    <!-- Hero -->
     <div class="hero-card glass">
       <img src="./assets/clinic_banner.png" alt="Doctor" class="hero-img">
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
       <div class="tab active">Overview</div>
-      <div class="tab">Quick Actions</div>
-      <div class="tab">About</div>
+      <div class="tab" onclick="location.href='./booking.html'">Quick Actions</div>
+      <div class="tab" onclick="location.href='./about.html'">About</div>
     </div>
 
-    <!-- Today Section -->
     <div class="section glass">
       <h2>Today</h2>
       <div class="chart-wrap">
         <div class="donut"><span>18</span></div>
       </div>
 
-      <div class="row">
-        <div class="label">Patients Seen</div>
-        <div class="value">18</div>
-      </div>
+      <div class="row"><div class="label">Patients Seen</div><div class="value">18</div></div>
 
-      <div class="row">
-        <div class="label">Bookings Filled</div>
-        <div class="value">34 / 50</div>
-      </div>
+      <div class="row"><div class="label">Bookings Filled</div><div class="value">34 / 50</div></div>
       <div class="progress"><div class="bar" style="width:68%"></div></div>
 
-      <div class="row">
-        <div class="label">Utilization</div>
-        <div class="value">68%</div>
-      </div>
+      <div class="row"><div class="label">Utilization</div><div class="value">68%</div></div>
       <div class="progress"><div class="bar" style="width:68%"></div></div>
 
-      <div class="row">
-        <div class="label">Avg visit</div>
-        <div class="value">17m</div>
-      </div>
+      <div class="row"><div class="label">Avg visit</div><div class="value">17m</div></div>
     </div>
 
-    <!-- Follow-ups Section -->
     <div class="section glass">
       <h2>Follow-ups</h2>
-      <div class="row">
-        <div class="label">WhatsApp Reminders</div>
-        <div class="value">27 / 40</div>
-      </div>
+      <div class="row"><div class="label">WhatsApp Reminders</div>
+        <div class="value">27 / 40</div></div>
       <div class="progress"><div class="bar" style="width:68%"></div></div>
 
-      <div class="row">
-        <div class="label">Prescription Ready</div>
-        <div class="value">14 / 25</div>
-      </div>
+      <div class="row"><div class="label">Prescription Ready</div><div class="value">14 / 25</div></div>
       <div class="progress"><div class="bar" style="width:56%"></div></div>
 
-      <div class="row">
-        <div class="label">Lab Results Reviewed</div>
-        <div class="value">9 / 20</div>
-      </div>
+      <div class="row"><div class="label">Lab Results Reviewed</div><div class="value">9 / 20</div></div>
       <div class="progress"><div class="bar" style="width:45%"></div></div>
     </div>
 
-    <!-- About -->
     <div class="section glass">
-      <h2>About</h2>
-      <p class="muted">Glassmorphism PWA · Purple–Cyan gradient · Works offline via SW.</p>
+      <h2>Quick Toggles</h2>
+      <div class="row">
+        <div class="label">Private Profile</div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="knob"></span><span class="dot"></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Notify Transactions</div>
+        <label class="switch">
+          <input type="checkbox">
+          <span class="knob"></span><span class="dot"></span>
+        </label>
+      </div>
     </div>
 
-    <!-- Footer -->
+    <div class="section glass">
+      <h2>About</h2>
+      <p class="muted">Glassmorphism UI · Purple–Cyan gradient · PWA-enabled.</p>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn btn-primary" onclick="location.href='./booking.html'">Book an Appointment</button>
+        <button class="btn btn-secondary" onclick="location.href='./admin.html'">Admin</button>
+      </div>
+    </div>
+
     <div class="footer">© 2025 Onestop Clinic</div>
   </div>
-</body><script>
-  // tabs active state
-  document.querySelectorAll('.tab').forEach(t=>{
-    t.addEventListener('click',()=>{
-      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-      t.classList.add('active');
+
+  <script>
+    // make tabs selectable
+    document.querySelectorAll('.tab').forEach(t=>{
+      t.addEventListener('click',e=>{
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+      });
     });
-  });
-</script>
+    // register service worker
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
+  </script>
+</body>
 </html>
