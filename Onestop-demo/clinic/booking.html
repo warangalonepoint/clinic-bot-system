@@ -3,180 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic — Booking</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <title>Onestop Clinic – Bookings</title>
+  <link rel="stylesheet" href="./styles.css?v=glass6" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#0b0f1a" />
 </head>
 <body>
-  <!-- Header -->
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
   <header class="app-header">
     <div class="brand">
-      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="logo"></div>
       <div class="brand-text">
-        <h1>Onestop C-Demo</h1>
-        <p>Bookings</p>
+        <h1>Onestop Clinic</h1>
+        <p>Booking</p>
       </div>
     </div>
-    <button id="themeToggle" class="icon-btn" title="Light/Dark">🌗</button>
   </header>
 
-  <!-- Banner -->
   <div class="banner">
-    <img src="./assets/clinic_banner.png" alt="Clinic banner">
+    <img src="./assets/clinic_banner.png" alt="banner">
   </div>
 
-  <main style="padding-top:10px; padding-bottom:90px">
-    <!-- Create Booking -->
-    <section class="card" style="margin-bottom:12px">
-      <h3 style="margin:0 0 8px">Create Booking</h3>
+  <main>
+    <h2>Book an Appointment</h2>
+    <form>
+      <label for="pname">Patient Name</label>
+      <input id="pname" type="text" placeholder="John Doe" />
 
-      <div class="cards" style="grid-template-columns:1fr">
-        <div class="card" style="padding:12px">
-          <div style="width:100%">
-            <div style="display:flex; gap:10px">
-              <div style="flex:1">
-                <label>Date</label>
-                <select id="dateSel"></select>
-              </div>
-              <div style="flex:1">
-                <label>Time Slot</label>
-                <select id="slotSel"></select>
-              </div>
-            </div>
+      <label for="date">Date</label>
+      <input id="date" type="date" />
 
-            <div style="display:flex; gap:10px; margin-top:10px">
-              <div style="flex:1">
-                <label>Patient Name</label>
-                <input id="pName" placeholder="Full name" />
-              </div>
-              <div style="flex:1">
-                <label>Contact</label>
-                <input id="pPhone" placeholder="+91…" />
-              </div>
-            </div>
+      <label for="time">Time</label>
+      <input id="time" type="time" />
 
-            <div style="margin-top:10px">
-              <label>Reason</label>
-              <input id="pReason" placeholder="Eg. Fever / Follow-up" />
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:14px">
-              <button class="primary" onclick="confirmBooking()">Confirm & WhatsApp</button>
-              <button onclick="resetForm()">Reset</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Slots + Summary -->
-    <section class="cards" style="grid-template-columns:1fr; margin-top:0">
-      <div class="card">
-        <div style="width:100%">
-          <h3 style="margin:0 0 8px">Available Slots</h3>
-          <div id="slotList"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 style="margin:0 0 8px">Today Summary</h3>
-        <div class="stats" style="margin:0">
-          <div class="stat">
-            <div class="kpi" style="--p:70%"><span id="kpiCount">12</span></div>
-            <small>Bookings Today</small>
-          </div>
-          <div class="stat">
-            <label>Next Token</label>
-            <div style="margin-top:6px; font-weight:700">#<span id="nextToken">1</span></div>
-          </div>
-          <div class="stat">
-            <label>Utilization</label>
-            <div class="bar"><i style="--w:62%"></i></div>
-            <small class="muted">Open: <span id="openSlots">0</span> • Booked: <span id="bookedSlots">0</span></small>
-          </div>
-        </div>
-      </div>
-    </section>
+      <button class="primary mt-10">Book</button>
+    </form>
   </main>
 
-  <!-- Dock -->
-  <footer class="dock">
-    <a class="icon-btn" href="./index.html" title="Home">🏠</a>
-    <a class="icon-btn" href="./booking.html" title="Bookings">📅</a>
-    <a class="icon-btn" href="./admin.html" title="Admin">⚙️</a>
-  </footer>
+  <div class="dock">
+    <a href="index.html" class="icon-btn">🏠</a>
+    <a href="booking.html" class="icon-btn">📅</a>
+    <a href="admin.html" class="icon-btn">⚙️</a>
+  </div>
 
-  <!-- Floating WhatsApp -->
-  <a class="wa" id="waTemplate" href="https://wa.me/919390664577" target="_blank" rel="noopener">🟢</a>
-
-<script>
-  // Theme
-  const KEY='pwa-theme';
-  if(localStorage.getItem(KEY)==='light') document.body.classList.add('light');
-  document.getElementById('themeToggle').onclick=()=>{
-    document.body.classList.toggle('light');
-    localStorage.setItem(KEY, document.body.classList.contains('light')?'light':'dark');
-  };
-
-  // Helpers
-  const $ = (s)=>document.querySelector(s);
-
-  // Demo dates (today + next 3). Replace with CSV/Airtable later.
-  const dates = (()=>{const arr=[], d=new Date(); for(let i=0;i<4;i++){const dd=new Date(d); dd.setDate(d.getDate()+i); arr.push({key: dd.toISOString().slice(0,10), label: dd.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})});} return arr;})();
-  const slotsByDate = {};
-  dates.forEach((d, idx)=>{
-    const base = ["09:00 AM","09:20 AM","09:40 AM","10:00 AM","10:20 AM","10:40 AM","11:00 AM","11:20 AM","11:40 AM","12:00 PM"];
-    slotsByDate[d.key] = base.map((t,i)=>({time:t, booked: (idx===0 && (i===2||i===5||i===8))}));
-  });
-
-  const dateSel = $('#dateSel'), slotSel = $('#slotSel'), slotList = $('#slotList');
-
-  // Fill dates
-  dates.forEach(d=>{const o=document.createElement('option'); o.value=d.key; o.textContent=d.label; dateSel.appendChild(o);});
-  dateSel.onchange = renderSlots;
-
-  function renderSlots(){
-    slotSel.innerHTML=''; slotList.innerHTML='';
-    const day = dateSel.value, items = slotsByDate[day]||[];
-
-    items.forEach(s=>{
-      const o=document.createElement('option'); o.value=s.time; o.textContent=s.time + (s.booked?' — BOOKED':''); o.disabled=s.booked; slotSel.appendChild(o);
-
-      const div=document.createElement('div'); div.className='slot'; div.dataset.booked=s.booked;
-      div.innerHTML = `<div>${s.time}</div>` + (s.booked?`<div class="muted">Booked</div>`:`<button class="icon-btn" title="Pick">➕</button>`);
-      if(!s.booked) div.querySelector('button').onclick=()=>{slotSel.value=s.time;};
-      slotList.appendChild(div);
-    });
-
-    const used = items.filter(x=>x.booked).length;
-    $('#nextToken').textContent = used + 1;
-    $('#openSlots').textContent = items.length - used;
-    $('#bookedSlots').textContent = used;
-    $('#kpiCount').textContent = used;
-  }
-
-  function confirmBooking(){
-    const date = dateSel.value, time = slotSel.value, name = $('#pName').value.trim(), phone = $('#pPhone').value.trim(), reason = $('#pReason').value.trim();
-    if(!date || !time || !name || !phone){ alert('Fill all fields.'); return; }
-    // mark as booked in demo data
-    const row = slotsByDate[date].find(s=>s.time===time); if(row){ row.booked=true; renderSlots(); }
-
-    // WhatsApp link
-    const token = $('#nextToken').textContent;
-    const msg = encodeURIComponent(
-      `Clinic Booking Confirmed ✅\nName: ${name}\nDate: ${new Date(date).toLocaleDateString()}\nTime: ${time}\nReason: ${reason||'-'}\nToken: ${token}\n\nReply OK to confirm arrival.`
-    );
-    const link = `https://wa.me/${phone.replace(/\D/g,'')}?text=${msg}`;
-    window.open(link,'_blank');
-  }
-  function resetForm(){ $('#pName').value=''; $('#pPhone').value=''; $('#pReason').value=''; }
-
-  // init
-  dateSel.value = dates[0].key; renderSlots();
-
-  // optional SW
-  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
-</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </body>
 </html>
