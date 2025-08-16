@@ -1,73 +1,86 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>School PWA</title>
-<link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>School PWA</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body class="dark">
-<div class="wrapper">
+  <div class="wrapper">
 
-  <section class="accent-violet">
-    <div class="glass header">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div>
-          <div class="h1">School PWA</div>
-          <div class="text-dim">Neon Glass · Dark/Light</div>
+    <!-- Header (NO quick links) -->
+    <section class="accent-violet">
+      <div class="glass header">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div>
+            <div class="h1">School PWA</div>
+            <div class="text-dim">Neon Glass · Dark/Light</div>
+          </div>
+          <button class="btn" onclick="toggleTheme()">Theme</button>
         </div>
-        <button class="btn" onclick="toggleTheme()">Theme</button>
       </div>
+    </section>
 
-      <div class="tab-row mt-12">
-        <a class="chip chip-indigo" href="parents.html">Parents</a>
-        <a class="chip chip-blue"   href="teacher.html">Teacher</a>
-        <a class="chip chip-teal"   href="coordinator.html">Coordinator</a>
-        <a class="chip chip-fuchsia"href="admin.html">Admin</a>
+    <!-- PIN -->
+    <section class="accent-cyan">
+      <div class="glass inner">
+        <div class="h1">Enter PIN</div>
+        <p class="text-dim">You’ll be routed to your role automatically.</p>
+
+        <form id="pin-form" class="form-grid mt-12">
+          <input id="pin-input" class="input full" inputmode="numeric" maxlength="8"
+                 placeholder="4–8 digit PIN" autocomplete="one-time-code"/>
+          <button id="pin-go" class="btn btn-indigo" type="submit">Continue</button>
+        </form>
+
+        <div id="pin-msg" class="text-dim mt-12"></div>
+        <div id="pin-info" class="mt-12 text-dim" style="font-size:12px"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="accent-cyan">
-    <div class="glass inner">
-      <div class="h1">Enter PIN</div>
-      <p class="text-dim">You’ll be routed to your role automatically.</p>
-      <form id="pin-form" class="form-grid mt-12" onsubmit="return false;">
-        <input id="pin-input" class="input full" inputmode="numeric" maxlength="8" placeholder="4–8 digit PIN"/>
-        <button id="pin-go" class="btn btn-indigo">Continue</button>
-      </form>
-      <div id="pin-msg" class="text-dim mt-12"></div>
-      <div id="pin-info" class="mt-12"></div>
-    </div>
-  </section>
+  </div>
 
-</div>
+  <!-- One module block handles everything -->
+  <script type="module">
+    import { showLoadedPins } from './ui.js'; // also boots theme
 
-<script type="module">
-  import {showLoadedPins} from './ui.js';
+    // -------- Load pins.json with robust fallback
+    let pinMap = { "1111":"parents", "2222":"teacher", "3333":"coordinator", "4444":"admin" };
 
-  // Basic router using pins.json (fallback included)
-  let pinMap = {"1111":"parents","2222":"teacher","3333":"coordinator","4444":"admin"};
-  fetch('pins.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{
-    if(j) pinMap=j; showLoadedPins(Object.keys(pinMap));
-  }).catch(()=>{});
+    try {
+      const r = await fetch(new URL('pins.json', location.href), { cache:'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        if (j && typeof j === 'object') pinMap = j;
+      }
+      const keys = Object.keys(pinMap);
+      showLoadedPins(keys);
+    } catch (e) {
+      document.getElementById('pin-info').textContent = 'Using fallback PINs (pins.json not found).';
+    }
 
-  const input = document.getElementById('pin-input');
-  const msg = document.getElementById('pin-msg');
-  const go  = document.getElementById('pin-go');
+    // -------- Wire up form
+    const $ = (id)=>document.getElementById(id);
+    const input = $('pin-input');
+    const msg   = $('pin-msg');
+    const form  = $('pin-form');
 
-  function route(){
-    const pin=(input.value||'').trim();
-    if(!pin){ msg.textContent='Enter a PIN.'; return; }
-    const role = pinMap[pin];
-    if(!role){ msg.textContent='Unknown PIN. Please try again.'; return; }
-    const theme = localStorage.getItem('theme')||'dark';
-    location.href = `${role}.html?t=${Date.now()}&theme=${theme}`;
-  }
+    function route(e){
+      e?.preventDefault();
+      const pin = (input.value || '').trim();
+      if (!pin) { msg.textContent = 'Enter a PIN.'; return; }
 
-  go.addEventListener('click', route);
-  document.getElementById('pin-form').addEventListener('submit', route);
-</script>
-<script type="module" src="ui.js"></script>
+      const role = pinMap[pin];
+      if (!role) { msg.textContent = 'Unknown PIN. Please try again.'; return; }
+
+      const theme = localStorage.getItem('theme') || 'dark';
+      const url = `${role}.html?t=${Date.now()}&theme=${theme}`;
+      try { location.href = url; } catch { msg.textContent = 'Navigation blocked by browser.'; }
+    }
+
+    form.addEventListener('submit', route);
+  </script>
+  <script type="module" src="ui.js"></script>
 </body>
 </html>
