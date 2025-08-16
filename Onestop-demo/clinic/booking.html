@@ -1,61 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Bookings · Onestop Clinic</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=9">
+  <link rel="stylesheet" href="./styles.css?v=30">
 </head>
 <body>
-  <div class="app-shell">
-    <div class="header">
-      <div class="brand-logo"></div>
-      <div><div class="title">Bookings</div><div class="subtitle">Create / Confirm</div></div>
-    </div>
+<div class="app-shell">
+  <div class="header"><div class="brand-logo"></div><div><div class="title">Bookings</div><div class="subtitle">Create / Filter</div></div></div>
 
-    <div class="section glass">
-      <h2>Select Date & Time</h2>
-      <div class="row"><div class="label">Date</div>
-        <input type="date" class="input" id="date">
-      </div>
-      <div class="row"><div class="label">Time Slot</div>
-        <select id="slot" class="input">
-          <option>09:00 AM</option><option>09:20 AM</option>
-          <option>09:40 AM</option><option>10:00 AM</option>
-        </select>
-      </div>
-      <div class="row"><div class="label">Patient Name</div>
-        <input id="name" class="input" placeholder="Full name">
-      </div>
-      <div class="row"><div class="label">Reason</div>
-        <input id="reason" class="input" placeholder="Reason for visit">
-      </div>
-      <div class="row"><div class="label">Contact</div>
-        <input id="phone" class="input" placeholder="Phone">
-      </div>
-      <div style="display:flex;gap:10px;margin-top:10px">
-        <button class="btn btn-primary" onclick="confirmBooking()">Confirm & WhatsApp</button>
-        <button class="btn btn-secondary" onclick="location.href='./index.html'">Back</button>
-      </div>
+  <div class="section glass">
+    <h2>New Booking</h2>
+    <div class="row"><div class="label">Date</div><input id="date" type="date" class="input"></div>
+    <div class="row"><div class="label">Doctor</div><select id="doctor" class="input"></select></div>
+    <div class="row"><div class="label">Time Slot</div><input id="slot" class="input" placeholder="e.g., 09:20 AM"></div>
+    <div class="row"><div class="label">Patient Name</div><input id="name" class="input" placeholder="Full name"></div>
+    <div class="row"><div class="label">Contact</div><input id="phone" class="input" placeholder="+91…"></div>
+    <div class="row"><div class="label">Reason</div><input id="reason" class="input" placeholder="Reason for visit"></div>
+    <div class="row"><div class="label">Auto-mark slot “Booked”</div>
+      <label class="switch"><input id="autobook" type="checkbox" checked><span class="knob"></span><span class="dot"></span></label>
     </div>
-
-    <div class="footer">© 2025 Onestop Clinic</div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn btn-primary" id="btnCreate">Create & WhatsApp</button>
+      <button class="btn btn-secondary" onclick="location.href='./index.html'">Back</button>
+    </div>
+    <p id="status" class="footer"></p>
   </div>
 
-  <script>
-    function confirmBooking(){
-      const n=document.getElementById('name').value.trim();
-      const s=document.getElementById('slot').value;
-      const d=document.getElementById('date').value;
-      const r=encodeURIComponent(document.getElementById('reason').value.trim());
-      const p=document.getElementById('phone').value.trim();
-      if(!n||!d){ alert('Enter name & date'); return; }
-      const msg=`Appointment confirmed for ${n}%0AWhen: ${d} ${s}%0AReason: ${r}`;
-      location.href=`https://wa.me/?text=${msg}`;
-    }
-  </script>
+  <div class="section glass">
+    <h2>Filter Existing Bookings</h2>
+    <div class="row"><div class="label">Date</div><input id="fDate" type="date" class="input"></div>
+    <div class="row"><div class="label">Doctor</div><select id="fDoctor" class="input"></select></div>
+    <div class="row"><div class="label">Status</div>
+      <select id="fStatus" class="input"><option value="all">All</option><option>Pending</option><option>Seen</option></select>
+    </div>
+    <button class="btn btn-secondary" id="btnLoad">Load</button>
+    <div id="list" style="margin-top:12px"></div>
+  </div>
+
+  <div class="footer">© 2025 Onestop Clinic</div>
+</div>
+
+<script>
+let CFG=null,BACKEND='csv',DOCTORS=[];
+async function loadCfg(){const r=await fetch('./config.json?v='+Date.now()); CFG=await r.json(); BACKEND=(CFG.backend||'csv').toLowerCase(); DOCTORS=CFG.doctors||[];}
+const AT={headers(){return {Authorization:'Bearer '+CFG.airtable.apiKey,'Content-Type':'application/json'};},
+  async countForDate(date){const base=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    const url=`${base}?filterByFormula=${encodeURIComponent(`DATETIME_FORMAT({Date}, 'YYYY-MM-DD')='${date}'`)}&pageSize=1`;
+    const j=await (await fetch(url,{headers:this.headers()})).json(); return (j.records||[]).length;},
+  async create(row){const url=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    await fetch(url,{method:'POST',headers:this.headers(),body:JSON.stringify({records:[{fields:row}]})});},
+  async markSlotBooked(date,doctor,slot){if(!CFG.airtable.slotsTable) return;
+    const base=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.slotsTable)}`;
+    const q=`AND({Date}='${date}',{Doctor}='${doctor}',{Time Slot}='${slot}')`;
+    const j=await (await fetch(`${base}?filterByFormula=${encodeURIComponent(q)}`,{headers:this.headers()})).json();
+    const rec=(j.records||[])[0]; if(!rec) return;
+    await fetch(base,{method:'PATCH',headers:this.headers(),body:JSON.stringify({records:[{id:rec.id,fields:{Status:'Booked'}}]})});},
+  async list(date,doctor){const base=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    let f=[]; if(date) f.push(`DATETIME_FORMAT({Date}, 'YYYY-MM-DD')='${date}'`); if(doctor&&doctor!=='all') f.push(`{Doctor}='${doctor}'`);
+    const q=f.length?`?filterByFormula=${encodeURIComponent(f.length>1?`AND(${f.join(',')})`:f[0])}`:''; 
+    const url=`${base}${q}${q?'&':'?'}sort[0][field]=Slot Time&sort[0][direction]=asc&pageSize=200`;
+    const j=await (await fetch(url,{headers:this.headers()})).json(); return j.records||[];}
+};
+function wamsg({name,date,slot,token,doctor}){return `Appointment confirmed ✅%0A${name}%0A${date} ${slot}%0ADoctor: ${doctor}%0AToken: ${token}`;}
+
+function fillDoctors(sel){sel.innerHTML=DOCTORS.map(d=>`<option>${d}</option>`).join('');}
+function status(t){document.getElementById('status').textContent=t;}
+
+document.getElementById('btnCreate').onclick=async()=>{
+  const date=document.getElementById('date').value, doctor=document.getElementById('doctor').value,
+        slot=document.getElementById('slot').value.trim(), name=document.getElementById('name').value.trim(),
+        phone=document.getElementById('phone').value.trim(), reason=document.getElementById('reason').value.trim(),
+        autobook=document.getElementById('autobook').checked;
+  if(!date||!doctor||!slot||!name){ status('Fill date, doctor, slot, name'); return; }
+  if(BACKEND!=='airtable'){ const msg=wamsg({name,date,slot,token:'—',doctor}); location.href=`https://wa.me/${encodeURIComponent(phone)}?text=${msg}`; return; }
+  status('Assigning token…'); const cnt=await AT.countForDate(date); const token=cnt+1;
+  status('Saving…'); await AT.create({"Timestamp":new Date().toISOString(),"Date":date,"Doctor":doctor,"Slot Time":slot,"Patient Name":name,"Contact":phone,"Reason":reason,"Token":token,"Status":"Pending"});
+  if(autobook){ try{ await AT.markSlotBooked(date,doctor,slot);}catch{} }
+  status(`Saved. Token #${token}. Opening WhatsApp…`);
+  location.href=`https://wa.me/${encodeURIComponent(phone)}?text=${wamsg({name,date,slot,token,doctor})}`;
+};
+
+document.getElementById('btnLoad').onclick=async()=>{
+  if(BACKEND!=='airtable'){ document.getElementById('list').innerHTML='<div class="footer">CSV mode: use dashboard filters</div>'; return; }
+  const d=document.getElementById('fDate').value; const doc=document.getElementById('fDoctor').value;
+  const stat=document.getElementById('fStatus').value;
+  const recs=await AT.list(d,doc);
+  const items=(recs||[]).filter(r=>stat==='all'?true:(r.fields['Status']||'Pending')===stat).map(r=>{
+    const f=r.fields; return `<div class="rowx"><div class="tag ${f['Status']==='Seen'?'ok':''}">${f['Status']||'Pending'}</div>
+      <div><b>${f['Patient Name']||'-'}</b> <span class="footer">(#${f['Token']||'-'} · ${f['Slot Time']||'-'} · ${f['Doctor']||'-'})</span>
+      <div class="footer">${f['Reason']||''}</div></div></div>`;}).join('');
+  document.getElementById('list').innerHTML=items||'<div class="footer">No results</div>';
+};
+
+(async()=>{ await loadCfg(); fillDoctors(document.getElementById('doctor')); 
+  document.getElementById('fDoctor').innerHTML='<option value="all">All Doctors</option>'+DOCTORS.map(d=>`<option>${d}</option>`).join('');
+})();
+</script>
 </body>
 </html>
