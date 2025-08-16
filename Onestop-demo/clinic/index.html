@@ -1,175 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic – Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Onestop Clinic</title>
 
-  <!-- Glass CSS (cache-busted) -->
-  <link rel="stylesheet" href="./styles.css?v=glass6" />
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#0b0f1a" />
+  <!-- Correct CSS path -->
+  <link rel="stylesheet" href="./styles.css?v=6">
 </head>
 <body>
-  <!-- Glowy background blobs -->
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-
-  <!-- Header -->
-  <header class="app-header">
-    <div class="brand">
-      <div class="logo"></div>
-      <div class="brand-text">
-        <h1>Onestop Clinic</h1>
-        <p>Dashboard</p>
+  <div class="app-shell">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand-logo"></div>
+      <div>
+        <div class="title">Onestop Clinic</div>
+        <div class="subtitle">Dashboard</div>
       </div>
     </div>
-  </header>
 
-  <!-- Banner -->
-  <div class="banner">
-    <img src="./assets/clinic_banner.png" alt="banner">
-  </div>
+    <!-- Hero -->
+    <div class="hero-card glass">
+      <img src="./assets/clinic_banner.png" alt="Doctor" class="hero-img">
+    </div>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" data-screen="overview">Overview</div>
-    <div class="tab" data-screen="quick">Quick Actions</div>
-    <div class="tab" data-screen="about">About</div>
-  </div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active">Overview</div>
+      <div class="tab">Quick Actions</div>
+      <div class="tab">About</div>
+    </div>
 
-  <main>
-    <!-- ===== OVERVIEW ===== -->
-    <section id="overview" class="screen active">
-      <div class="cards">
-        <!-- KPI Card -->
-        <div class="card">
-          <h3 class="h3">Today</h3>
-          <div class="grid">
-            <div class="stat">
-              <div class="kpi" style="--p:72%"><span id="kpiPatients">18</span></div>
-              <div class="center muted mt-6">Patients Seen</div>
-            </div>
-            <div class="stat">
-              <label>Bookings Filled</label>
-              <div class="bar"><i style="--w:68%"></i></div>
-              <small class="muted">Booked: <b>34</b> / 50</small>
-            </div>
-            <div class="stat">
-              <label>Utilization</label>
-              <div class="bar"><i style="--w:62%"></i></div>
-              <small class="muted">Avg visit: 17m</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Progress Bars (sample-style) -->
-        <div class="card">
-          <h3 class="h3">Follow-ups</h3>
-          <div class="list">
-            <div class="li">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <strong>WhatsApp Reminders</strong><span class="muted">27/40</span>
-              </div>
-              <div class="bar"><i style="--w:68%"></i></div>
-            </div>
-            <div class="li">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <strong>Prescription Ready</strong><span class="muted">14/25</span>
-              </div>
-              <div class="bar"><i style="--w:56%"></i></div>
-            </div>
-            <div class="li">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <strong>Lab Results Reviewed</strong><span class="muted">9/20</span>
-              </div>
-              <div class="bar"><i style="--w:45%"></i></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Nav Cards -->
-        <a class="card" href="./booking.html">
-          <div class="card-ic">📅</div>
-          <div class="card-txt">
-            <h3>Bookings</h3>
-            <p>Create/confirm appointments</p>
-          </div>
-        </a>
-        <a class="card" href="./doctor.html">
-          <div class="card-ic">🩺</div>
-          <div class="card-txt">
-            <h3>Doctor Panel</h3>
-            <p>Manage slots & tokens</p>
-          </div>
-        </a>
-        <a class="card" href="./staff.html">
-          <div class="card-ic">👥</div>
-          <div class="card-txt">
-            <h3>Staff & Reminders</h3>
-            <p>Attendance + WhatsApp follow-ups</p>
-          </div>
-        </a>
-        <a class="card" href="./admin.html">
-          <div class="card-ic">⚙️</div>
-          <div class="card-txt">
-            <h3>Admin</h3>
-            <p>Exports, pins, branding</p>
-          </div>
-        </a>
+    <!-- Today Section -->
+    <div class="section glass">
+      <h2>Today</h2>
+      <div class="chart-wrap">
+        <div class="donut"><span>18</span></div>
       </div>
-    </section>
 
-    <!-- ===== QUICK ACTIONS ===== -->
-    <section id="quick" class="screen">
-      <div class="cards">
-        <a class="card" href="./booking.html">➕ New Booking</a>
-        <a class="card" href="./staff.html">📲 Send WhatsApp Reminders</a>
-        <a class="card" href="./admin.html#export">⬇️ Export Logs/Slots</a>
+      <div class="row">
+        <div class="label">Patients Seen</div>
+        <div class="value">18</div>
       </div>
-    </section>
 
-    <!-- ===== ABOUT ===== -->
-    <section id="about" class="screen">
-      <div class="card">
-        <h3 class="h3">About</h3>
-        <p class="muted">Glassmorphism PWA · Neon purple→cyan palette · Works offline via SW.</p>
+      <div class="row">
+        <div class="label">Bookings Filled</div>
+        <div class="value">34 / 50</div>
       </div>
-    </section>
-  </main>
+      <div class="progress"><div class="bar" style="width:68%"></div></div>
 
-  <!-- Bottom Dock -->
-  <div class="dock">
-    <a href="index.html" class="icon-btn">🏠</a>
-    <a href="booking.html" class="icon-btn">📅</a>
-    <a href="admin.html" class="icon-btn">⚙️</a>
+      <div class="row">
+        <div class="label">Utilization</div>
+        <div class="value">68%</div>
+      </div>
+      <div class="progress"><div class="bar" style="width:68%"></div></div>
+
+      <div class="row">
+        <div class="label">Avg visit</div>
+        <div class="value">17m</div>
+      </div>
+    </div>
+
+    <!-- Follow-ups Section -->
+    <div class="section glass">
+      <h2>Follow-ups</h2>
+      <div class="row">
+        <div class="label">WhatsApp Reminders</div>
+        <div class="value">27 / 40</div>
+      </div>
+      <div class="progress"><div class="bar" style="width:68%"></div></div>
+
+      <div class="row">
+        <div class="label">Prescription Ready</div>
+        <div class="value">14 / 25</div>
+      </div>
+      <div class="progress"><div class="bar" style="width:56%"></div></div>
+
+      <div class="row">
+        <div class="label">Lab Results Reviewed</div>
+        <div class="value">9 / 20</div>
+      </div>
+      <div class="progress"><div class="bar" style="width:45%"></div></div>
+    </div>
+
+    <!-- About -->
+    <div class="section glass">
+      <h2>About</h2>
+      <p class="muted">Glassmorphism PWA · Purple–Cyan gradient · Works offline via SW.</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">© 2025 Onestop Clinic</div>
   </div>
-
-  <script>
-    // Tabs
-    document.querySelector('.tabs').addEventListener('click', (e)=>{
-      const t = e.target.closest('.tab'); if(!t) return;
-      document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x===t));
-      document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===t.dataset.screen));
-      scrollTo({top:0, behavior:'smooth'});
-    });
-
-    // Optional: fake-animate KPIs on load (pure JS, no libs)
-    (function animateBars(){
-      document.querySelectorAll('.bar > i').forEach(i=>{
-        const w = i.style.getPropertyValue('--w');
-        i.style.setProperty('--w','0%');
-        setTimeout(()=>i.style.setProperty('--w', w), 20);
-      });
-    })();
-
-    // PWA SW
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
-    }
-  </script>
 </body>
 </html>
