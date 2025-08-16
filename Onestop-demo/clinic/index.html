@@ -1,81 +1,285 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Clinic • PIN</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./styles.css">
-<meta name="theme-color" content="#111"/>
-<style>
-  main{max-width:720px;margin:16px auto;padding:16px}
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  /* Polished banner/header */
-  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
-  .banner{width:100%;height:180px;object-fit:cover;display:block}
-  @media(max-width:560px){.banner{height:140px}}
-  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
-  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Onestop Clinic — Glass UI</title>
 
-  /* Quick links: black buttons, two per row */
-  .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:360px){.ql-2{grid-template-columns:1fr 1fr}}
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;text-align:center;text-decoration:none}
-  .iconbtn{display:flex;align-items:center;justify-content:center;gap:10px}
-  .iconbtn img{width:22px;height:22px;border-radius:6px}
+  <!-- Styles -->
+  <link rel="stylesheet" href="./styles.css">
 
-  input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  .muted{color:#666}
-</style>
-</head><body>
-<main>
-  <!-- Polished banner -->
-  <div class="card hero">
-    <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
-    <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/admin.png'">
-      <div class="hero-title">Onestop Clinic</div>
+  <!-- PWA (keep if you already use these) -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f1a">
+</head>
+<body>
+  <!-- background blobs -->
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">Onestop C-Demo</div>
+          <small class="muted">Clinic App — Glassmorphism</small>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" title="Toggle theme">🌗</button>
+        <a class="icon-btn" href="./booking.html" title="Full Booking Page">📅</a>
+        <a class="icon-btn" href="./admin.html" title="Admin">🛠️</a>
+      </div>
+    </header>
+
+    <!-- Optional banner (uses assets/clinic_banner.png) -->
+    <div class="hero">
+      <img src="./assets/clinic_banner.png" alt="Clinic banner" />
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-screen="overview">
+        <div><strong>Overview</strong></div>
+        <small>Today & stats</small>
+      </div>
+      <div class="tab" data-screen="bookings">
+        <div><strong>Bookings</strong></div>
+        <small>Slots & confirm</small>
+      </div>
+      <div class="tab" data-screen="settings">
+        <div><strong>Settings</strong></div>
+        <small>Preferences</small>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section class="screens active" id="overview">
+      <div class="grid">
+        <div class="card">
+          <div class="kpi-ring" style="--p:72%">
+            <span id="todayCount">12</span>
+          </div>
+          <div class="center muted">Bookings today</div>
+          <div class="row mt-14">
+            <div class="field">
+              <div class="muted mb-6">Tokens Used</div>
+              <div class="bar"><i style="--w:68%"></i></div>
+            </div>
+            <div class="field">
+              <div class="muted mb-6">Reminders Sent</div>
+              <div class="bar"><i style="--w:42%"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="grid-column: span 2;">
+          <div class="muted mb-10">Quick Actions</div>
+          <div class="card-list">
+            <div class="mini-card">
+              <div class="chip"></div>
+              <div>
+                <div><strong>Today’s Slots</strong></div>
+                <div class="muted">Open: <span id="openSlots">7</span> • Booked: <span id="bookedSlots">5</span></div>
+              </div>
+              <button class="icon-btn" onclick="switchTab('bookings')" title="Go to Bookings">➡️</button>
+            </div>
+            <div class="mini-card">
+              <div class="chip" style="background:linear-gradient(135deg,var(--accent2),#4bf2b9)"></div>
+              <div>
+                <div><strong>Pending Reminders</strong></div>
+                <div class="muted"><span id="pendingRem">8</span> patients</div>
+              </div>
+              <button class="icon-btn" title="Send now">📲</button>
+            </div>
+            <div class="mini-card">
+              <div class="chip" style="background:linear-gradient(135deg,#ff8bd2,var(--accent1))"></div>
+              <div>
+                <div><strong>Export Logs</strong></div>
+                <div class="muted">CSV / PDF</div>
+              </div>
+              <a class="icon-btn" href="./staff.html" title="Staff / Logs">⬇️</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOOKINGS -->
+    <section class="screens" id="bookings">
+      <div class="grid">
+        <div class="card">
+          <h3 class="h3">Create Booking</h3>
+          <div class="row">
+            <div class="field">
+              <label>Date</label>
+              <select id="dateSel"></select>
+            </div>
+            <div class="field">
+              <label>Time Slot</label>
+              <select id="slotSel"></select>
+            </div>
+          </div>
+          <div class="row mt-10">
+            <div class="field">
+              <label>Patient Name</label>
+              <input id="pName" placeholder="Full name" />
+            </div>
+            <div class="field">
+              <label>Contact</label>
+              <input id="pPhone" placeholder="+91…" />
+            </div>
+          </div>
+          <div class="field mt-10">
+            <label>Reason</label>
+            <input id="pReason" placeholder="Eg. Fever / Follow-up" />
+          </div>
+          <div class="row mt-14">
+            <button class="primary" onclick="confirmBooking()">Confirm & WhatsApp</button>
+            <button onclick="resetForm()">Reset</button>
+            <a class="ghost" href="./booking.html">Open Full Booking Page ↗</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="h3">Available Slots</h3>
+          <div id="slotList"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="h3">Today Summary</h3>
+          <div class="muted">Next Token: <strong id="nextToken">#13</strong></div>
+          <div class="muted mt-6">Reminders Sent</div>
+          <div class="bar"><i style="--w:40%"></i></div>
+          <div class="muted mt-10">Utilization</div>
+          <div class="bar"><i style="--w:62%"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screens" id="settings">
+      <div class="grid">
+        <div class="card">
+          <h3 class="h3">Profile</h3>
+          <div class="list">
+            <div class="li">
+              <div>Lock with PIN</div>
+              <label class="toggle">
+                <input type="checkbox" checked />
+                <div class="t"><div class="knob"></div></div>
+              </label>
+            </div>
+            <div class="li">
+              <div>Private Profile</div>
+              <label class="toggle">
+                <input type="checkbox" />
+                <div class="t"><div class="knob"></div></div>
+              </label>
+            </div>
+            <div class="li">
+              <div>Auto-Hide Booked Slots</div>
+              <label class="toggle">
+                <input type="checkbox" checked />
+                <div class="t"><div class="knob"></div></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="h3">Budget (Demo)</h3>
+          <div class="muted">Consumables</div>
+          <div class="bar"><i style="--w:55%"></i></div>
+          <div class="muted mt-8">Equipment</div>
+          <div class="bar"><i style="--w:30%"></i></div>
+          <div class="muted mt-8">Misc</div>
+          <div class="bar"><i style="--w:70%"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom dock -->
+    <div class="dock">
+      <button class="icon-btn" onclick="switchTab('overview')" title="Overview">🏠</button>
+      <button class="icon-btn" onclick="switchTab('bookings')" title="Bookings">📅</button>
+      <button class="icon-btn" onclick="switchTab('settings')" title="Settings">⚙️</button>
     </div>
   </div>
 
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 6px">Enter PIN</h2>
-    <p class="muted" style="margin-bottom:8px">You’ll be routed automatically.</p>
-    <form id="pinForm">
-      <input id="pin" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="4–8 digit PIN">
-      <button class="btn" style="margin-top:10px;width:100%">Continue</button>
-    </form>
-    <div id="msg" class="muted" style="margin-top:8px"></div>
-  </div>
+  <!-- Floating WhatsApp -->
+  <a class="wa" id="waLink" href="https://wa.me/919999999999" target="_blank" rel="noopener">🟢</a>
 
-  <div class="card" style="margin-top:12px">
-    <h3 style="margin:0 0 8px">Quick Access</h3>
-    <div class="ql-2">
-      <a class="btn iconbtn" href="./booking.html"><img src="./assets/booking.png" onerror="this.style.display='none'">Booking Bot</a>
-      <a class="btn iconbtn" href="./admin.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Admin</a>
-      <a class="btn iconbtn" href="./doctor.html"><img src="./assets/doctor.png" onerror="this.style.display='none'">Doctor/Manager</a>
-      <a class="btn iconbtn" href="./reset.html"><img src="./assets/reset.png" onerror="this.style.display='none'">Reset Cache</a>
-    </div>
-  </div>
-</main>
+  <script>
+    // helpers
+    const $ = (s)=>document.querySelector(s);
+    const $$ = (s)=>document.querySelectorAll(s);
 
-<script>
-// Map role → page
-const rolePage={doctor:"./doctor.html", admin:"./admin.html"};
-async function loadPins(){const r=await fetch("./pins.json",{cache:"no-store"});if(!r.ok)throw 0;return r.json();}
-document.getElementById("pinForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const pin=document.getElementById("pin").value.trim(); const msg=document.getElementById("msg");
-  msg.textContent="Checking…";
-  try{
-    const pins=await loadPins(); let matched=null;
-    for(const [role,val] of Object.entries(pins)){ if(String(val)===pin){ matched=role; break; } }
-    if(!matched){ msg.textContent="Invalid PIN."; return; }
-    sessionStorage.setItem("clinic_role",matched);
-    sessionStorage.setItem("clinic_login_at",String(Date.now()));
-    location.replace(rolePage[matched]||"./index.html");
-  }catch{ msg.textContent="Error loading PINs."; }
-});
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-</script>
-</body></html>
+    // tabs
+    function switchTab(name){
+      $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
+      $$('.screens').forEach(sc=>sc.classList.toggle('active', sc.id===name));
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    $('#tabs').addEventListener('click', e=>{
+      const t=e.target.closest('.tab'); if(!t) return; switchTab(t.dataset.screen);
+    });
+
+    // theme
+    const THEME_KEY='clinic-theme';
+    function applySavedTheme(){
+      const m=localStorage.getItem(THEME_KEY);
+      if(m==='light') document.body.classList.add('light');
+    }
+    applySavedTheme();
+    $('#themeBtn').onclick=()=>{
+      document.body.classList.toggle('light');
+      localStorage.setItem(THEME_KEY, document.body.classList.contains('light')?'light':'dark');
+    };
+
+    // demo dates & slots (swap with Airtable/CSV later)
+    const dates = (()=>{const arr=[], d=new Date(); for(let i=0;i<4;i++){const dd=new Date(d); dd.setDate(d.getDate()+i); arr.push({key: dd.toISOString().slice(0,10), label: dd.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})});} return arr;})();
+    const slotsByDate = {};
+    dates.forEach((d, idx)=>{
+      const base = ["09:00 AM","09:20 AM","09:40 AM","10:00 AM","10:20 AM","10:40 AM","11:00 AM","11:20 AM","11:40 AM","12:00 PM"];
+      slotsByDate[d.key] = base.map((t,i)=>({time:t, booked: (idx===0 && (i===2||i===5||i===8))}));
+    });
+
+    // bind selects
+    const dateSel = $('#dateSel'), slotSel = $('#slotSel'), slotList = $('#slotList');
+    dates.forEach(d=>{const o=document.createElement('option'); o.value=d.key; o.textContent=d.label; dateSel.appendChild(o);});
+    dateSel.onchange = renderSlots;
+    function renderSlots(){
+      slotSel.innerHTML=''; slotList.innerHTML='';
+      const day = dateSel.value, items = slotsByDate[day]||[];
+      items.forEach((s)=>{
+        const o=document.createElement('option'); o.value=s.time; o.textContent=s.time + (s.booked?' — BOOKED':''); o.disabled=s.booked; slotSel.appendChild(o);
+        const div=document.createElement('div'); div.className='slot'; div.dataset.booked=s.booked;
+        div.innerHTML = `<div>${s.time}</div>` + (s.booked?`<div class="muted">Booked</div>`:`<button class="icon-btn" title="Pick" onclick="pick('${s.time}')">➕</button>`);
+        slotList.appendChild(div);
+      });
+      const used = items.filter(x=>x.booked).length;
+      $('#nextToken').textContent = '#' + (used + 1);
+      $('#openSlots').textContent = items.length - used;
+      $('#bookedSlots').textContent = used;
+    }
+    function pick(time){ slotSel.value=time; }
+    function confirmBooking(){
+      const date = dateSel.value, time = slotSel.value, name = $('#pName').value.trim(), phone = $('#pPhone').value.trim(), reason = $('#pReason').value.trim();
+      if(!date || !time || !name || !phone){ alert('Fill all fields.'); return; }
+      const row = slotsByDate[date].find(s=>s.time===time); if(row) row.booked=true; renderSlots();
+      const msg = encodeURIComponent(
+        `Clinic Booking Confirmed ✅\nName: ${name}\nDate: ${new Date(date).toLocaleDateString()}\nTime: ${time}\nReason: ${reason||'-'}\nToken: ${$('#nextToken').textContent.replace('#','')}`
+      );
+      const link = `https://wa.me/${phone.replace(/\D/g,'')}?text=${msg}`;
+      window.open(link,'_blank');
+    }
+    function resetForm(){ $('#pName').value=''; $('#pPhone').value=''; $('#pReason').value=''; }
+    dateSel.value = dates[0].key; renderSlots();
+
+    // SW (optional)
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+  </script>
+</body>
+</html>
