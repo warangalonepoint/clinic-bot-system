@@ -1,161 +1,182 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Clinic • Booking</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./styles.css">
-<meta name="theme-color" content="#111"/>
-<style>
-  main{max-width:720px;margin:16px auto;padding:16px}
-  /* Polished banner/header */
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-  .hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
-  .banner{width:100%;height:180px;object-fit:cover;display:block}
-  @media(max-width:560px){.banner{height:140px}}
-  .hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
-  .logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-  .hero,.logo,.hero-title{animation:fade .35s ease-out both}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-  /* Form + buttons */
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:560px){.grid{grid-template-columns:1fr}}
-  input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-  .btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;width:100%;text-align:center;text-decoration:none}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  .muted{color:#666}
-  .ok{color:#0d7c66}
-
-  /* Quick links: black buttons, two per row */
-  .ql-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:360px){.ql-2{grid-template-columns:1fr 1fr}}
-  .iconbtn{display:flex;align-items:center;gap:10px;justify-content:center}
-  .iconbtn img{width:22px;height:22px;border-radius:6px}
-</style>
-</head><body>
-<main>
-  <!-- Polished banner -->
-  <div class="card hero">
-    <img class="banner" src="./assets/clinic_banner.png" alt="Clinic">
-    <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" onerror="this.src='./assets/booking.png'">
-      <div class="hero-title">Book an Appointment</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Onestop Clinic — Booking</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0b0f1a" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="brand-text">
+        <h1>Onestop C-Demo</h1>
+        <p>Bookings</p>
+      </div>
     </div>
+    <button id="themeToggle" class="icon-btn" title="Light/Dark">🌗</button>
+  </header>
+
+  <!-- Banner -->
+  <div class="banner">
+    <img src="./assets/clinic_banner.png" alt="Clinic banner">
   </div>
 
-  <!-- Booking form -->
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 6px">Choose slot & confirm</h2>
-    <p class="muted" style="margin-bottom:8px">Only free, open slots are shown. You’ll get a WhatsApp confirmation.</p>
-    <div class="grid">
-      <label>Date <input id="d" type="date"></label>
-      <label>Time Slot <select id="t"></select></label>
-      <label>Name <input id="n" placeholder="Full name"></label>
-      <label>Phone <input id="p" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn" id="book">Confirm Booking</button>
-    </div>
-    <div id="ok" class="ok" style="margin-top:10px"></div>
-    <div id="waWrap" class="row" style="margin-top:8px;display:none">
-      <a id="waBtn" class="btn iconbtn" target="_blank" rel="noopener">
-        <img src="./assets/booking.png" onerror="this.style.display='none'">Open WhatsApp
-      </a>
-    </div>
-    <div id="hint" class="muted" style="margin-top:8px;display:none">
-      Tip: Add this to Home Screen to book even faster next time.
-    </div>
-  </div>
+  <main style="padding-top:10px; padding-bottom:90px">
+    <!-- Create Booking -->
+    <section class="card" style="margin-bottom:12px">
+      <h3 style="margin:0 0 8px">Create Booking</h3>
 
-  <!-- Tools -->
-  <div class="card" style="margin-top:12px">
-    <div class="ql-2">
-      <a class="btn iconbtn" href="./index.html"><img src="./assets/admin.png" onerror="this.style.display='none'">Back to PIN</a>
-      <a class="btn iconbtn" href="./doctor.html"><img src="./assets/doctor.png" onerror="this.style.display='none'">Doctor View</a>
-    </div>
-  </div>
-</main>
+      <div class="cards" style="grid-template-columns:1fr">
+        <div class="card" style="padding:12px">
+          <div style="width:100%">
+            <div style="display:flex; gap:10px">
+              <div style="flex:1">
+                <label>Date</label>
+                <select id="dateSel"></select>
+              </div>
+              <div style="flex:1">
+                <label>Time Slot</label>
+                <select id="slotSel"></select>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:10px">
+              <div style="flex:1">
+                <label>Patient Name</label>
+                <input id="pName" placeholder="Full name" />
+              </div>
+              <div style="flex:1">
+                <label>Contact</label>
+                <input id="pPhone" placeholder="+91…" />
+              </div>
+            </div>
+
+            <div style="margin-top:10px">
+              <label>Reason</label>
+              <input id="pReason" placeholder="Eg. Fever / Follow-up" />
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:14px">
+              <button class="primary" onclick="confirmBooking()">Confirm & WhatsApp</button>
+              <button onclick="resetForm()">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slots + Summary -->
+    <section class="cards" style="grid-template-columns:1fr; margin-top:0">
+      <div class="card">
+        <div style="width:100%">
+          <h3 style="margin:0 0 8px">Available Slots</h3>
+          <div id="slotList"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px">Today Summary</h3>
+        <div class="stats" style="margin:0">
+          <div class="stat">
+            <div class="kpi" style="--p:70%"><span id="kpiCount">12</span></div>
+            <small>Bookings Today</small>
+          </div>
+          <div class="stat">
+            <label>Next Token</label>
+            <div style="margin-top:6px; font-weight:700">#<span id="nextToken">1</span></div>
+          </div>
+          <div class="stat">
+            <label>Utilization</label>
+            <div class="bar"><i style="--w:62%"></i></div>
+            <small class="muted">Open: <span id="openSlots">0</span> • Booked: <span id="bookedSlots">0</span></small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dock -->
+  <footer class="dock">
+    <a class="icon-btn" href="./index.html" title="Home">🏠</a>
+    <a class="icon-btn" href="./booking.html" title="Bookings">📅</a>
+    <a class="icon-btn" href="./admin.html" title="Admin">⚙️</a>
+  </footer>
+
+  <!-- Floating WhatsApp -->
+  <a class="wa" id="waTemplate" href="https://wa.me/919390664577" target="_blank" rel="noopener">🟢</a>
 
 <script>
-// Register SW
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+  // Theme
+  const KEY='pwa-theme';
+  if(localStorage.getItem(KEY)==='light') document.body.classList.add('light');
+  document.getElementById('themeToggle').onclick=()=>{
+    document.body.classList.toggle('light');
+    localStorage.setItem(KEY, document.body.classList.contains('light')?'light':'dark');
+  };
 
-// ------- CONFIG -------
-const CLINIC_WA_NUMBER = "918686019709"; // your number baked in
+  // Helpers
+  const $ = (s)=>document.querySelector(s);
 
-// ------- Storage & utils -------
-const K={slots:"cl_slots", appts:"cl_a"};
-const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
-const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const today=()=>new Date().toISOString().slice(0,10);
-
-function slKey(date){return `${K.slots}_${date}`;}
-function loadSlots(date){const arr=jget(slKey(date)); return Array.isArray(arr)?arr:[];}
-function saveSlots(date,rows){jset(slKey(date),rows);}
-
-function fillTimeOptions(date){
-  const sel=document.getElementById("t"); sel.innerHTML="";
-  const slots=loadSlots(date).filter(s=>(s.status||"Open")!=="Closed");
-  if(!slots.length){ sel.innerHTML = '<option value="">No slots for this date</option>'; return; }
-  slots.forEach(s=>{
-    const free=(s.booked||0) < Number(s.cap||1);
-    const opt=document.createElement("option");
-    opt.value=s.time;
-    opt.textContent = free ? `${s.time} (free ${Number(s.cap)-(s.booked||0)})` : `${s.time} (full)`;
-    if(!free) opt.disabled=true;
-    sel.appendChild(opt);
+  // Demo dates (today + next 3). Replace with CSV/Airtable later.
+  const dates = (()=>{const arr=[], d=new Date(); for(let i=0;i<4;i++){const dd=new Date(d); dd.setDate(d.getDate()+i); arr.push({key: dd.toISOString().slice(0,10), label: dd.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})});} return arr;})();
+  const slotsByDate = {};
+  dates.forEach((d, idx)=>{
+    const base = ["09:00 AM","09:20 AM","09:40 AM","10:00 AM","10:20 AM","10:40 AM","11:00 AM","11:20 AM","11:40 AM","12:00 PM"];
+    slotsByDate[d.key] = base.map((t,i)=>({time:t, booked: (idx===0 && (i===2||i===5||i===8))}));
   });
-}
 
-function init(){
-  const d=document.getElementById("d");
-  d.value=today();
-  fillTimeOptions(d.value);
-  d.addEventListener("change", ()=>fillTimeOptions(d.value));
-}
-init();
+  const dateSel = $('#dateSel'), slotSel = $('#slotSel'), slotList = $('#slotList');
 
-function waLink({date,time,name,phone}){
-  if(!CLINIC_WA_NUMBER) return "";
-  const txt = `Hi Clinic, I booked an appointment for ${date} at ${time}. Name: ${name}, Phone: ${phone}.`;
-  return `https://wa.me/${CLINIC_WA_NUMBER}?text=${encodeURIComponent(txt)}`;
-}
+  // Fill dates
+  dates.forEach(d=>{const o=document.createElement('option'); o.value=d.key; o.textContent=d.label; dateSel.appendChild(o);});
+  dateSel.onchange = renderSlots;
 
-document.getElementById("book").onclick=()=>{
-  const date=d.value, time=t.value, name=n.value.trim(), phone=p.value.trim();
-  if(!date||!time||!name||phone.length!==10){ alert("Fill all fields (10-digit phone)."); return; }
+  function renderSlots(){
+    slotSel.innerHTML=''; slotList.innerHTML='';
+    const day = dateSel.value, items = slotsByDate[day]||[];
 
-  // capacity check + increment
-  const key=slKey(date); let slots=jget(key); const i=slots.findIndex(s=>s.time===time);
-  if(i>-1){
-    const s=slots[i]; const cap=Number(s.cap||1), booked=Number(s.booked||0);
-    if(booked>=cap){ alert("That slot just became full. Pick another."); fillTimeOptions(date); return; }
-    slots[i]={...s, booked: booked+1}; jset(key,slots);
+    items.forEach(s=>{
+      const o=document.createElement('option'); o.value=s.time; o.textContent=s.time + (s.booked?' — BOOKED':''); o.disabled=s.booked; slotSel.appendChild(o);
+
+      const div=document.createElement('div'); div.className='slot'; div.dataset.booked=s.booked;
+      div.innerHTML = `<div>${s.time}</div>` + (s.booked?`<div class="muted">Booked</div>`:`<button class="icon-btn" title="Pick">➕</button>`);
+      if(!s.booked) div.querySelector('button').onclick=()=>{slotSel.value=s.time;};
+      slotList.appendChild(div);
+    });
+
+    const used = items.filter(x=>x.booked).length;
+    $('#nextToken').textContent = used + 1;
+    $('#openSlots').textContent = items.length - used;
+    $('#bookedSlots').textContent = used;
+    $('#kpiCount').textContent = used;
   }
 
-  // save appointment (Doctor page will assign token automatically)
-  const appts=jget(K.appts);
-  appts.push({date,time,name,phone,status:"Booked",ts:Date.now()});
-  jset(K.appts, appts);
+  function confirmBooking(){
+    const date = dateSel.value, time = slotSel.value, name = $('#pName').value.trim(), phone = $('#pPhone').value.trim(), reason = $('#pReason').value.trim();
+    if(!date || !time || !name || !phone){ alert('Fill all fields.'); return; }
+    // mark as booked in demo data
+    const row = slotsByDate[date].find(s=>s.time===time); if(row){ row.booked=true; renderSlots(); }
 
-  // UI feedback
-  ok.textContent = `Booked ✅ ${date} @ ${time}. Show this at reception. Token will be assigned on arrival.`;
-  hint.style.display = "block";
-
-  // WhatsApp (optional)
-  const link = waLink({date,time,name,phone});
-  if(link){
-    waWrap.style.display = "flex";
-    waBtn.href = link;
-  }else{
-    waWrap.style.display = "none";
+    // WhatsApp link
+    const token = $('#nextToken').textContent;
+    const msg = encodeURIComponent(
+      `Clinic Booking Confirmed ✅\nName: ${name}\nDate: ${new Date(date).toLocaleDateString()}\nTime: ${time}\nReason: ${reason||'-'}\nToken: ${token}\n\nReply OK to confirm arrival.`
+    );
+    const link = `https://wa.me/${phone.replace(/\D/g,'')}?text=${msg}`;
+    window.open(link,'_blank');
   }
+  function resetForm(){ $('#pName').value=''; $('#pPhone').value=''; $('#pReason').value=''; }
 
-  // Refresh time options with updated capacity
-  fillTimeOptions(date);
+  // init
+  dateSel.value = dates[0].key; renderSlots();
 
-  // Clear name field only
-  n.value="";
-};
+  // optional SW
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
 </script>
-</body></html>
+</body>
+</html>
