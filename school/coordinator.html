@@ -1,173 +1,93 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Coordinator Panel</title>
-  <link rel="stylesheet" href="styles.css"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Coordinator</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body data-theme="dark">
-  <div class="wrapper" id="coord">
-    <section class="glass header">
-      <div class="h1">Coordinator Panel</div>
-      <div class="sub">Manage timetable and broadcast</div>
-      <div class="pills mt-16" id="coord-tabs">
-        <div class="pill indigo" data-tab="setup">Class Setup</div>
-        <div class="pill indigo" data-tab="tt">Timetable</div>
-        <div class="pill violet" data-tab="bc">Broadcast</div>
-        <div class="pill teal"   data-tab="events">Events</div>
-        <div class="pill amber" data-tab="complaints">Complaints</div>
-        <div class="pill green" data-tab="data">Data</div>
-      </div>
-      <div class="row mt-12"><button class="btn right" onclick="toggleTheme()">Theme</button></div>
-    </section>
+<body class="dark">
+<div class="wrapper">
 
-    <!-- Setup -->
-    <section class="glass mt-24 panel" data-tab="setup">
-      <div class="h2">Choose Class</div>
-      <div class="grid mt-12">
-        <input id="c-class" class="input" placeholder="Class e.g., 5">
-        <input id="c-sec"   class="input" placeholder="Section e.g., A">
-        <div><button class="btn" onclick="saveCMeta()">Save Meta</button></div>
-      </div>
-    </section>
-
-    <!-- Timetable -->
-    <section class="glass mt-24 panel" data-tab="tt">
-      <div class="h2">Add / Replace Period</div>
-      <div class="grid mt-12">
-        <select id="tt-day" class="input"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select>
-        <input id="tt-period" class="input" placeholder="Period # 1–12">
-        <input id="tt-subj" class="input" placeholder="Subject">
-        <input id="tt-teacher" class="input" placeholder="Teacher name">
-        <input id="tt-room" class="input" placeholder="Room (optional)">
-        <div><button class="btn btn-teal" onclick="addTT()">Add / Update</button></div>
-      </div>
-
-      <div class="h2 mt-24">Class Timetable</div>
-      <div class="row mt-12">
-        <button class="btn btn-outline" onclick="exportCSV('timetable.csv', loadArr('timetable').map(x=>[x.day,x.period,x.subject,x.teacher,x.room]))">Export CSV</button>
-        <label class="pill" style="cursor:pointer">
-          <input type="file" id="tt-import" style="display:none" accept=".json" onchange="importJSONFromFile(this,'timetable',()=>renderTT())">
-          Import JSON
-        </label>
-      </div>
-      <table class="table mt-12" id="tt-table"></table>
-    </section>
-
-    <!-- Broadcast -->
-    <section class="glass mt-24 panel" data-tab="bc">
-      <div class="h2">Broadcast to Parents</div>
-      <div class="grid mt-12">
-        <textarea id="bc-msg" class="input" placeholder="Message..."></textarea>
-        <div class="row">
-          <button class="btn violet" onclick="sendBC()">Send</button>
-          <button class="btn btn-outline" onclick="exportCSV('broadcasts.csv', loadArr('broadcasts').map(b=>[b.date,b.text]))">Export CSV</button>
+  <section class="accent-cyan">
+    <div class="glass header">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <div class="eyebrow">Manage timetable and broadcast</div>
+          <div class="h1">Coordinator Panel</div>
         </div>
+        <button class="btn" onclick="toggleTheme()">Theme</button>
       </div>
-      <table class="table mt-24" id="bc-table"></table>
-      <div class="row mt-12"><span class="badge">Tip</span><span class="text-dim">Long-press to copy a message on mobile.</span></div>
-    </section>
 
-    <!-- Events -->
-    <section class="glass mt-24 panel" data-tab="events">
-      <div class="h2">Events / Exams</div>
-      <div class="grid mt-12">
-        <input id="ev-title" class="input" placeholder="Title">
-        <input id="ev-date"  type="date" class="input">
-        <div><button class="btn btn-green" onclick="addEvent()">Add</button></div>
+      <div class="tab-row" id="tabs">
+        <button class="chip chip-indigo" data-tab="setup">Class Setup</button>
+        <button class="chip chip-blue"   data-tab="timetable">Timetable</button>
+        <button class="chip chip-fuchsia"data-tab="broadcast">Broadcast</button>
+        <button class="chip chip-violet" data-tab="events">Events</button>
+        <button class="chip chip-amber"  data-tab="complaints">Complaints</button>
+        <button class="chip chip-teal"   data-tab="data">Data</button>
       </div>
-      <table class="table mt-24" id="ev-table"></table>
-    </section>
+    </div>
+  </section>
 
-    <!-- Complaints triage -->
-    <section class="glass mt-24 panel" data-tab="complaints">
-      <div class="h2">Complaints (from Parents)</div>
-      <table class="table mt-12" id="co-complaints"></table>
-    </section>
+  <section id="panel-setup" class="glass inner panel">
+    <div class="h1">Choose Class</div>
+    <form class="form-grid mt-12" data-queue="c-scope">
+      <input class="input full" placeholder="Class e.g., 5" name="class"/>
+      <input class="input full" placeholder="Section e.g., A" name="section"/>
+      <button class="btn btn-indigo">Save Meta</button>
+    </form>
+  </section>
 
-    <!-- Data -->
-    <section class="glass mt-24 panel" data-tab="data">
-      <div class="h2">Local-only demo tools</div>
-      <div class="row mt-12">
-        <button class="btn btn-outline" onclick="exportAll()">Backup (JSON)</button>
-        <label class="pill" style="cursor:pointer">
-          <input type="file" id="restore" accept=".json" style="display:none"
-                 onchange="importJSONFromFile(this,'__backup__',ok=>ok&&restoreAll())">
-          Restore
-        </label>
-      </div>
-    </section>
+  <section id="panel-timetable" class="glass inner panel" hidden>
+    <div class="h1">Add / Replace Period</div>
+    <form class="form-grid mt-12" data-queue="c-tt">
+      <select class="input" name="day"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select>
+      <input class="input" name="period" placeholder="Period # 1–12"/>
+      <input class="input full" name="subject" placeholder="Subject"/>
+      <input class="input" name="teacher" placeholder="Teacher name"/>
+      <input class="input" name="room" placeholder="Room (optional)"/>
+      <button class="btn btn-blue full">Add / Update</button>
+    </form>
+    <div class="mt-12 text-dim">Class Timetable — no entries yet.</div>
+  </section>
 
-    <footer></footer>
-  </div>
+  <section id="panel-broadcast" class="glass inner panel" hidden>
+    <div class="h1">Broadcast to Parents</div>
+    <form class="form-grid mt-12" data-queue="c-broadcast">
+      <textarea class="input full" name="msg" placeholder="Message..."></textarea>
+      <button class="btn btn-fuchsia">Send</button>
+    </form>
+  </section>
 
-  <!-- helpers (inline) -->
-  <script>
-  (function(){
-    const t=new URL(location).searchParams.get('theme')||localStorage.getItem('theme')||'dark';
-    document.body.dataset.theme=t; localStorage.setItem('theme',t);
-    window.toggleTheme=function(){const n=document.body.dataset.theme==='dark'?'light':'dark';document.body.dataset.theme=n;localStorage.setItem('theme',n);};
-    function activateTab(containerId,tabKey){const root=document.getElementById(containerId);root.querySelectorAll('.pill[data-tab]').forEach(p=>p.dataset.active=(p.dataset.tab===tabKey)?"true":"false");document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.dataset.tab===tabKey));localStorage.setItem(containerId+':tab',tabKey);}
-    window.initTabs=function(containerId,def){const root=document.getElementById(containerId);const s=localStorage.getItem(containerId+':tab')||def;root.querySelectorAll('.pill[data-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(containerId,b.dataset.tab)));activateTab(containerId,s);}
-    window.exportCSV=function(name,rows){const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
-    window.loadArr=(k)=>JSON.parse(localStorage.getItem(k)||'[]'); window.saveArr=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-    window.importJSONFromFile=function(input,key,cb){const f=input.files&&input.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{localStorage.setItem(key,rd.result);cb&&cb(true);}catch(e){cb&&cb(false);}};rd.readAsText(f);};
-  })();
-  </script>
+  <section id="panel-events" class="glass inner panel" hidden>
+    <div class="h1">Events</div>
+    <form class="form-grid mt-12" data-queue="c-event">
+      <input class="input" name="title" placeholder="Event Title"/>
+      <input class="input" type="date" name="date"/>
+      <button class="btn btn-violet">Add</button>
+    </form>
+  </section>
 
-  <!-- page logic -->
-  <script>
-    initTabs('coord','setup');
+  <section id="panel-complaints" class="glass inner panel" hidden>
+    <div class="h1">Complaints Inbox</div>
+    <div class="list mt-12"><div class="item"><span>None</span></div></div>
+  </section>
 
-    const tt = loadArr('timetable');
-    const broadcasts = loadArr('broadcasts');
-    const events = loadArr('events');
-    const complaints = loadArr('complaints');
+  <section id="panel-data" class="glass inner panel" hidden>
+    <div class="h1">Data Tools</div>
+    <div class="row mt-12">
+      <button class="btn btn-amber">Backup (JSON)</button>
+      <button class="btn btn-teal">Restore</button>
+    </div>
+  </section>
 
-    function render(id, rows, headers){
-      const el=document.getElementById(id);
-      el.innerHTML = (headers? `<tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr>`:'')
-        + (rows.length? rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('') : `<tr><td class="text-dim">No entries.</td></tr>`);
-    }
-
-    function renderTT(){ render('tt-table', tt.map(x=>[x.day,x.period,x.subject,x.teacher,x.room]), ["Day","Period","Subject","Teacher","Room"]); }
-    renderTT();
-    render('bc-table', broadcasts.slice(-10).map(b=>[b.date,b.text]), ["Date","Message"]);
-    render('ev-table', events.map(e=>[e.title,e.date]), ["Event","Date"]);
-    render('co-complaints', complaints.map(c=>[c.date,c.type,c.text,c.status||'Open']), ["Date","Type","Text","Status"]);
-
-    window.saveCMeta=function(){ localStorage.setItem('c-meta', JSON.stringify({cls:document.getElementById('c-class').value,sec:document.getElementById('c-sec').value})); alert('Saved.'); };
-    window.addTT=function(){
-      const d=document.getElementById('tt-day').value, p=document.getElementById('tt-period').value;
-      const s=document.getElementById('tt-subj').value, t=document.getElementById('tt-teacher').value, r=document.getElementById('tt-room').value;
-      if(!p||!s) return alert('Period and subject required.');
-      const idx=tt.findIndex(x=>x.day===d&&x.period===p); const row={day:d,period:p,subject:s,teacher:t,room:r};
-      if(idx>=0) tt[idx]=row; else tt.push(row); saveArr('timetable', tt); renderTT();
-    };
-    window.sendBC=function(){
-      const text=(document.getElementById('bc-msg').value||'').trim(); if(!text) return alert('Enter message');
-      broadcasts.push({date:new Date().toLocaleString(), text}); saveArr('broadcasts', broadcasts);
-      document.getElementById('bc-msg').value=''; render('bc-table', broadcasts.slice(-10).map(b=>[b.date,b.text]), ["Date","Message"]);
-    };
-    window.addEvent=function(){
-      const title=(document.getElementById('ev-title').value||'').trim(); const date=document.getElementById('ev-date').value;
-      if(!title||!date) return alert('Fill both fields.'); events.push({title,date}); saveArr('events',events);
-      render('ev-table', events.map(e=>[e.title,e.date]), ["Event","Date"]); document.getElementById('ev-title').value='';
-    };
-
-    window.exportAll=function(){
-      const dump = {};
-      ['diary','homework','attendance','marks','requests','complaints','broadcasts','timetable','events','leaves'].forEach(k=>dump[k]=loadArr(k));
-      const blob = new Blob([JSON.stringify(dump)], {type:'application/json'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-    };
-    window.restoreAll=function(){
-      try{
-        const j = JSON.parse(localStorage.getItem('__backup__')||'{}');
-        Object.entries(j).forEach(([k,v])=>saveArr(k,v));
-        alert('Restored. Reloading…'); location.reload();
-      }catch(e){ alert('Invalid backup.'); }
-    };
-  </script>
+</div>
+<div class="toast" aria-live="polite"></div>
+<script type="module">
+  import {initTabs, bindQueueForms} from './ui.js';
+  initTabs(document); bindQueueForms(document);
+</script>
+<script type="module" src="ui.js"></script>
 </body>
 </html>
