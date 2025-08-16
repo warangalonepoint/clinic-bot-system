@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Doctor Panel · Onestop Clinic</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=12">
+  <link rel="stylesheet" href="./styles.css?v=13">
 </head>
 <body>
   <div class="app-shell">
     <div class="header">
       <div class="brand-logo"></div>
-      <div><div class="title">Doctor Panel</div><div class="subtitle">Today’s Patients & Notes</div></div>
+      <div>
+        <div class="title">Doctor Panel</div>
+        <div class="subtitle">Today’s Patients & Notes</div>
+      </div>
     </div>
 
-    <!-- Filters -->
+    <!-- Filter -->
     <div class="section glass">
       <h2>Filter</h2>
       <div class="row">
@@ -29,63 +32,60 @@
       </div>
     </div>
 
-    <!-- Patient list -->
+    <!-- List renders here -->
     <div id="list"></div>
 
     <div class="footer">© 2025 Onestop Clinic</div>
   </div>
 
 <script>
-/* ===== Config ===== */
+/* expects config.json { airtable: { apiKey, baseId, logsTable } } */
 let CFG=null;
 async function loadCfg(){
-  const res=await fetch('./config.json?v='+Date.now());
-  if(!res.ok) throw new Error('config.json missing');
-  CFG=await res.json();
+  const r=await fetch('./config.json?v='+Date.now());
+  if(!r.ok) throw new Error('config.json missing');
+  CFG=await r.json();
 }
 
-/* ===== Airtable helpers ===== */
 const AT = {
-  headers:{ get(){ return { Authorization:'Bearer '+CFG.airtable.apiKey, 'Content-Type':'application/json' };}},
+  headers(){ return { Authorization:'Bearer '+CFG.airtable.apiKey, 'Content-Type':'application/json' } },
   async today(){
-    const today = new Date().toISOString().slice(0,10);
-    const url = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`
-      + `?filterByFormula=${encodeURIComponent(`DATETIME_FORMAT({Timestamp}, 'YYYY-MM-DD')='${today}'`)}`
-      + `&sort[0][field]=Slot Time&sort[0][direction]=asc&pageSize=100`;
-    const r = await fetch(url,{headers:this.headers()}); const j=await r.json();
-    return (j.records||[]).map(rec=>({id:rec.id, ...rec.fields}));
+    const d=new Date().toISOString().slice(0,10);
+    const url=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`
+      +`?filterByFormula=${encodeURIComponent("DATETIME_FORMAT({Timestamp}, 'YYYY-MM-DD')='"+d+"'")}`
+      +`&sort[0][field]=Slot Time&sort[0][direction]=asc&pageSize=100`;
+    const j=await (await fetch(url,{headers:this.headers()})).json();
+    return (j.records||[]).map(x=>({id:x.id, ...x.fields}));
   },
   async update(id, fields){
-    const url = `https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
-    const body = JSON.stringify({ records:[{ id, fields }] });
-    const r = await fetch(url,{method:'PATCH', headers:this.headers(), body});
-    if(!r.ok) throw new Error('Update failed');
-    return r.json();
+    const url=`https://api.airtable.com/v0/${CFG.airtable.baseId}/${encodeURIComponent(CFG.airtable.logsTable)}`;
+    const body=JSON.stringify({records:[{id,fields}]});
+    const r=await fetch(url,{method:'PATCH',headers:this.headers(),body});
+    if(!r.ok) throw 0;
   }
 };
 
-/* ===== UI ===== */
-function cardTpl(r){
-  const status = r['Status'] || 'Pending';
-  const seen = status==='Seen';
-  const fup = r['Follow Up'] ? String(r['Follow Up']).slice(0,10) : '';
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function card(rec){
+  const status=rec['Status']||'Pending';
+  const fup=rec['Follow Up']?String(rec['Follow Up']).slice(0,10):'';
   return `
-  <div class="section glass" data-id="${r.id}" data-status="${status}">
-    <h2>#${r['Token']||'-'} • ${r['Patient Name']||''} <span class="muted">(${r['Slot Time']||''})</span></h2>
+  <div class="section glass" data-id="${rec.id}">
+    <h2>#${rec['Token']||'-'} • ${esc(rec['Patient Name'])} <span class="muted">(${esc(rec['Slot Time'])})</span></h2>
 
-    <div class="row"><div class="label">Reason</div><div class="value">${r['Reason']||'-'}</div></div>
-    <div class="row"><div class="label">Contact</div><div class="value">${r['Contact']||'-'}</div></div>
+    <div class="row"><div class="label">Reason</div><div class="value">${esc(rec['Reason'])||'-'}</div></div>
+    <div class="row"><div class="label">Contact</div><div class="value">${esc(rec['Contact'])||'-'}</div></div>
 
     <div class="row"><div class="label">Diagnosis</div>
-      <input class="input diag" placeholder="e.g., Viral fever" value="${esc(r['Diagnosis']||'')}">
+      <input class="input diag" placeholder="e.g., Viral fever" value="${esc(rec['Diagnosis'])}">
     </div>
 
     <div class="row"><div class="label">Prescription</div>
-      <textarea class="input rx" rows="3" placeholder="Rx...">${esc(r['Prescription']||'')}</textarea>
+      <textarea class="input rx" rows="3" placeholder="Rx...">${esc(rec['Prescription'])}</textarea>
     </div>
 
     <div class="row"><div class="label">Doctor Notes</div>
-      <textarea class="input note" rows="3" placeholder="Notes...">${esc(r['Doctor Notes']||'')}</textarea>
+      <textarea class="input note" rows="3" placeholder="Notes...">${esc(rec['Doctor Notes'])}</textarea>
     </div>
 
     <div class="row"><div class="label">Follow Up</div>
@@ -101,85 +101,70 @@ function cardTpl(r){
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
       <button class="btn btn-primary save">Save</button>
-      <button class="btn btn-secondary seen">${seen?'Mark Pending':'Mark Seen'}</button>
+      <button class="btn btn-secondary seen">${status==='Seen'?'Mark Pending':'Mark Seen'}</button>
       <button class="btn btn-secondary wa">WhatsApp Rx</button>
     </div>
   </div>`;
 }
 
-function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-
-function bindCardActions(el, rec){
-  const q = sel => el.querySelector(sel);
-  q('.save').addEventListener('click', async ()=>{
+function bind(section, rec){
+  const $=sel=>section.querySelector(sel);
+  $('.save').onclick=async()=>{
     try{
-      await AT.update(rec.id, {
-        'Diagnosis': q('.diag').value.trim(),
-        'Prescription': q('.rx').value.trim(),
-        'Doctor Notes': q('.note').value.trim(),
-        'Follow Up': q('.fup').value || null,
-        'Status': q('.stat').value
+      await AT.update(rec.id,{
+        'Diagnosis': $('.diag').value.trim(),
+        'Prescription': $('.rx').value.trim(),
+        'Doctor Notes': $('.note').value.trim(),
+        'Follow Up': $('.fup').value||null,
+        'Status': $('.stat').value
       });
       toast('Saved');
-    }catch{ toast('Save failed'); }
-  });
-
-  q('.seen').addEventListener('click', async ()=>{
+    }catch{toast('Save failed');}
+  };
+  $('.seen').onclick=async()=>{
     try{
-      const newStatus = (q('.stat').value==='Seen') ? 'Pending' : 'Seen';
-      await AT.update(rec.id, { 'Status': newStatus });
-      q('.stat').value = newStatus;
-      q('.seen').textContent = (newStatus==='Seen') ? 'Mark Pending' : 'Mark Seen';
+      const next=($('.stat').value==='Seen')?'Pending':'Seen';
+      await AT.update(rec.id,{'Status':next});
+      $('.stat').value=next;
+      $('.seen').textContent=next==='Seen'?'Mark Pending':'Mark Seen';
       toast('Status updated');
-    }catch{ toast('Update failed'); }
-  });
-
-  q('.wa').addEventListener('click', ()=>{
-    const msg = `Prescription for ${rec['Patient Name']||''}
+    }catch{toast('Update failed');}
+  };
+  $('.wa').onclick=()=>{
+    const msg=`Prescription for ${rec['Patient Name']||''}
 Token: ${rec['Token']||''}
-Diagnosis: ${q('.diag').value.trim()}
-Rx: ${q('.rx').value.trim()}
-Notes: ${q('.note').value.trim()}
-Follow-up: ${q('.fup').value||'-'}`;
-    const phone = (rec['Contact']||'').trim();
-    const base = phone ? `https://wa.me/${encodeURIComponent(phone)}?text=` : `https://wa.me/?text=`;
-    location.href = base + encodeURIComponent(msg);
-  });
+Diagnosis: ${$('.diag').value.trim()}
+Rx: ${$('.rx').value.trim()}
+Notes: ${$('.note').value.trim()}
+Follow-up: ${$('.fup').value||'-'}`;
+    const phone=(rec['Contact']||'').trim();
+    const base=phone?`https://wa.me/${encodeURIComponent(phone)}?text=`:`https://wa.me/?text=`;
+    location.href=base+encodeURIComponent(msg);
+  };
 }
 
 function toast(t){
-  let el = document.getElementById('toast');
-  if(!el){ el = document.createElement('div'); el.id='toast'; el.className='debug-css'; document.body.appendChild(el); }
-  el.textContent = '✅ ' + t; setTimeout(()=>{ el.remove(); }, 2000);
+  let el=document.getElementById('toast');
+  if(!el){el=document.createElement('div');el.id='toast';el.className='debug-css';document.body.appendChild(el);}
+  el.textContent='✅ '+t; setTimeout(()=>el.remove(),2000);
 }
 
-/* ===== Render + Filter ===== */
 let ALL=[];
-function renderList(){
-  const f = document.getElementById('fStatus').value;
-  const root = document.getElementById('list');
-  const items = ALL
-    .filter(r => f==='all' ? true : (r['Status']||'Pending')===f)
-    .map(cardTpl).join('');
-  root.innerHTML = items || `<div class="section glass"><h2>No records</h2></div>`;
-  // bind
-  Array.from(root.querySelectorAll('.section.glass')).forEach((sec,i)=>{
-    bindCardActions(sec, ALL.filter(r => f==='all'?true:(r['Status']||'Pending')===f)[i]);
-  });
+async function boot(){
+  await loadCfg();
+  if(!CFG?.airtable?.apiKey){ alert('Add Airtable key/base/table in config.json'); return; }
+  ALL=await AT.today();
+  render();
+  document.getElementById('fStatus').onchange=render;
 }
-
-/* ===== Boot ===== */
-(async()=>{
-  try{
-    await loadCfg();
-    if(!CFG?.airtable?.apiKey){ alert('Add Airtable key in config.json'); return; }
-    ALL = await AT.today();
-    renderList();
-    document.getElementById('fStatus').addEventListener('change', renderList);
-  }catch(e){
-    alert('Failed to load doctor panel. Check config.json and Airtable.');
-  }
-})();
+function render(){
+  const f=document.getElementById('fStatus').value;
+  const root=document.getElementById('list');
+  const items=ALL.filter(r=>f==='all'?true:(r['Status']||'Pending')===f);
+  root.innerHTML = items.length? items.map(card).join('') : `<div class="section glass"><h2>No patients</h2></div>`;
+  Array.from(root.querySelectorAll('.section.glass')).forEach((sec,i)=>bind(sec, items[i]));
+}
+boot();
 </script>
 </body>
 </html>
