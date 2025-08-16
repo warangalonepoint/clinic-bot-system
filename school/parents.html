@@ -1,216 +1,124 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Parents</title>
-  <link rel="stylesheet" href="styles.css"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Parents</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body data-theme="dark">
-  <div class="wrapper" id="parents">
-    <section class="glass header">
-      <div class="row" style="justify-content:space-between">
+<body class="dark">
+<div class="wrapper">
+
+  <!-- Header + tabs -->
+  <section class="accent-violet">
+    <div class="glass header">
+      <div class="row" style="justify-content:space-between;align-items:center">
         <div>
+          <div class="eyebrow">View diary, homework, messages & leaves</div>
           <div class="h1">Parents</div>
-          <div class="sub">View diary, homework, messages & leaves</div>
         </div>
         <div class="row">
-          <span class="badge">PIN</span>
-          <button class="btn right" onclick="toggleTheme()">Theme</button>
+          <button class="btn" onclick="toggleTheme()">Theme</button>
         </div>
       </div>
 
-      <div class="pills mt-16" id="parents-tabs">
-        <div class="pill indigo" data-tab="diary">Class Diary</div>
-        <div class="pill indigo" data-tab="hw">Homework</div>
-        <div class="pill violet" data-tab="msg">Messages</div>
-        <div class="pill green" data-tab="leave">Leaves</div>
-        <div class="pill teal" data-tab="att">Attendance</div>
-        <div class="pill indigo" data-tab="events">Events</div>
-        <div class="pill teal" data-tab="req">Requests</div>
-        <div class="pill amber" data-tab="complaints">Complaints</div>
+      <div class="tab-row" id="tabs">
+        <button class="chip chip-indigo" data-tab="diary">Class Diary</button>
+        <button class="chip chip-blue"   data-tab="homework">Homework</button>
+        <button class="chip chip-fuchsia"data-tab="messages">Messages</button>
+        <button class="chip chip-teal"   data-tab="leaves">Leaves</button>
+        <button class="chip chip-violet" data-tab="attendance">Attendance</button>
+        <button class="chip chip-cyan"   data-tab="events">Events</button>
+        <button class="chip chip-teal"   data-tab="requests">Requests</button>
+        <button class="chip chip-amber"  data-tab="complaints">Complaints</button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Class Diary -->
-    <section class="glass mt-24 panel" data-tab="diary">
-      <div class="h2">Today’s Class Diary</div>
-      <p class="text-dim">Teacher notes for the selected class.</p>
-      <table class="table mt-12" id="p-diary"></table>
-    </section>
+  <!-- Panels -->
+  <section id="panel-diary" class="glass inner panel">
+    <div class="h1">Today’s Class Diary</div>
+    <p class="text-dim">Teacher notes for the selected class.</p>
+    <div class="list mt-12">
+      <div class="item"><strong>Maths</strong><span class="text-dim">2025-08-15</span><span>Fractions & examples</span></div>
+      <div class="item"><strong>Science</strong><span class="text-dim">2025-08-15</span><span>Plants and photosynthesis</span></div>
+    </div>
+  </section>
 
-    <!-- Homework -->
-    <section class="glass mt-24 panel" data-tab="hw">
-      <div class="h2">Homework</div>
-      <table class="table mt-12" id="p-hw"></table>
-    </section>
+  <section id="panel-homework" class="glass inner panel" hidden>
+    <div class="h1">Homework</div>
+    <div class="list mt-12">
+      <div class="item"><strong>Maths</strong><span class="text-dim">Due 2025-08-16</span><span>Exercise 5A — Q1–10</span></div>
+      <div class="item"><strong>English</strong><span class="text-dim">Due 2025-08-17</span><span>Read Ch.3 — Make notes</span></div>
+    </div>
+  </section>
 
-    <!-- Messages -->
-    <section class="glass mt-24 panel" data-tab="msg">
-      <div class="h2">Messages from Teachers</div>
-      <table class="table mt-12" id="p-msg"></table>
-    </section>
+  <section id="panel-messages" class="glass inner panel" hidden>
+    <div class="h1">Messages from Teachers</div>
+    <div class="list mt-12">
+      <div class="item"><span>15/08/2025, 15:25</span><span>PTM on Friday 4 PM.</span></div>
+    </div>
+  </section>
 
-    <!-- Leaves (apply) -->
-    <section class="glass mt-24 panel" data-tab="leave">
-      <div class="h2">Apply Leave</div>
-      <div class="grid mt-12">
-        <select id="pl-subject" class="input">
-          <option value="" disabled selected>Subject</option>
-          <option>General</option><option>Maths</option><option>Science</option><option>English</option>
-        </select>
-        <select id="pl-days" class="input">
-          <option selected value="1">1 day</option>
-          <option value="2">2 days</option><option value="3">3 days</option>
-        </select>
-        <textarea id="pl-reason" placeholder="Reason" class="input"></textarea>
-        <div><button class="btn btn-teal" onclick="submitLeave()">Submit</button></div>
-      </div>
-      <div class="h2 mt-24">My Leave Requests</div>
-      <table class="table mt-12" id="p-leaves"></table>
-    </section>
+  <section id="panel-leaves" class="glass inner panel" hidden>
+    <div class="h1">Apply Leave</div>
+    <form class="form-grid mt-12" data-queue="parent-leave">
+      <select name="subject" class="input full">
+        <option value="">Subject</option>
+        <option>Fever</option><option>Family Function</option>
+      </select>
+      <select name="days" class="input full">
+        <option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option>
+      </select>
+      <textarea name="reason" class="input full" placeholder="Reason"></textarea>
+      <button class="btn btn-indigo">Submit</button>
+    </form>
+    <div class="mt-12 text-dim">My Leave Requests — none.</div>
+  </section>
 
-    <!-- Attendance -->
-    <section class="glass mt-24 panel" data-tab="att">
-      <div class="h2">Attendance</div>
-      <p class="text-dim">Last 10 records for the student.</p>
-      <table class="table mt-12" id="p-att"></table>
-    </section>
+  <section id="panel-attendance" class="glass inner panel" hidden>
+    <div class="h1">Attendance</div>
+    <div class="list mt-12">
+      <div class="item"><span>Aug 15</span><span class="text-dim">Present</span></div>
+      <div class="item"><span>Aug 14</span><span class="text-dim">Present</span></div>
+    </div>
+  </section>
 
-    <!-- Events -->
-    <section class="glass mt-24 panel" data-tab="events">
-      <div class="h2">Upcoming Events & Exams</div>
-      <table class="table mt-12" id="p-events"></table>
-    </section>
+  <section id="panel-events" class="glass inner panel" hidden>
+    <div class="h1">Upcoming Events & Exams</div>
+    <div class="list mt-12">
+      <div class="item"><strong>Science Quiz</strong><span class="text-dim">2025-08-18</span></div>
+      <div class="item"><strong>Parent-Teacher Meeting</strong><span class="text-dim">2025-08-22</span></div>
+      <div class="item"><strong>Half-Yearly Exams Begin</strong><span class="text-dim">2025-08-29</span></div>
+    </div>
+  </section>
 
-    <!-- Requests (quick ask to teacher) -->
-    <section class="glass mt-24 panel" data-tab="req">
-      <div class="h2">Requests to Teacher</div>
-      <div class="grid mt-12">
-        <input id="rq-title" class="input" placeholder="Title (e.g., Extra class request)"/>
-        <textarea id="rq-msg" class="input" placeholder="Message..."></textarea>
-        <div><button class="btn btn-indigo" onclick="submitRequest()">Send Request</button></div>
-      </div>
-      <table class="table mt-24" id="p-reqs"></table>
-    </section>
+  <section id="panel-requests" class="glass inner panel" hidden>
+    <div class="h1">Requests</div>
+    <form class="form-grid mt-12" data-queue="parent-request">
+      <input class="input full" name="title" placeholder="Request title"/>
+      <textarea class="input full" name="details" placeholder="Details"></textarea>
+      <button class="btn btn-teal">Send</button>
+    </form>
+  </section>
 
-    <!-- Complaints -->
-    <section class="glass mt-24 panel" data-tab="complaints">
-      <div class="h2">Raise a Complaint</div>
-      <div class="grid mt-12">
-        <select id="cp-type" class="input">
-          <option>Teacher</option><option>Transport</option><option>Facility</option><option>Other</option>
-        </select>
-        <textarea id="cp-text" class="input" placeholder="Describe the issue..."></textarea>
-        <div class="row">
-          <button class="btn btn-rose" onclick="submitComplaint()">Submit</button>
-          <button class="btn btn-outline" onclick="exportCSV('complaints.csv', loadArr('complaints').map(x=>[x.date,x.type,x.text,x.status]))">Export CSV</button>
-        </div>
-      </div>
-      <table class="table mt-24" id="p-complaints"></table>
-    </section>
+  <section id="panel-complaints" class="glass inner panel" hidden>
+    <div class="h1">Raise Complaints</div>
+    <form class="form-grid mt-12" data-queue="parent-complaint">
+      <input class="input full" name="topic" placeholder="Topic"/>
+      <textarea class="input full" name="desc" placeholder="Describe the issue…"></textarea>
+      <button class="btn btn-amber">Submit</button>
+    </form>
+  </section>
 
-    <footer></footer>
-  </div>
+</div>
 
-  <!-- inject ui.js -->
-  <script>
-  /* === include the ui.js helper (theme/tabs/csv/arr) === */
-  <?php /* ignore if not using PHP; copy the ui.js block here */ ?>
-  </script>
-  <!-- Actual page logic -->
-  <script>
-    // Apply theme from query if present
-    (function(){ const u=new URL(location.href); const t=u.searchParams.get('theme'); if(t) {localStorage.setItem('theme',t); document.body.dataset.theme=t;} })();
+<div class="toast" aria-live="polite"></div>
 
-    // Init tabs
-    initTabs('parents','diary');
-
-    // ---- Fake data readers (replace with real CSV later) ----
-    const now = new Date().toISOString().slice(0,10);
-    const sampleDiary = [
-      ["Maths", now, "Fractions & examples"],
-      ["Science", now, "Plants and photosynthesis"]
-    ];
-    const sampleHW = [
-      ["Maths", "2025-08-16", "Exercise 5A — Q1–10"],
-      ["English", "2025-08-17", "Read Ch.3 — Make notes"]
-    ];
-    const events = loadArr('events');
-    if(events.length===0){
-      saveArr('events', [
-        {title:"Science Quiz", date:"2025-08-18"},
-        {title:"Parent–Teacher Meeting", date:"2025-08-22"},
-        {title:"Half-Yearly Exams Begin", date:"2025-08-29"},
-      ]);
-    }
-
-    const leaves = loadArr('leaves');
-    const reqs = loadArr('requests');
-    const complaints = loadArr('complaints');
-    const att = loadArr('attendance'); // [{date:"2025-08-10", status:"Present"}]
-
-    function renderTable(el, rows, headers){
-      const t = (headers? `<tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr>`:'') +
-                rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
-      el.innerHTML = t || '<tr><td class="text-dim">No entries.</td></tr>';
-    }
-
-    renderTable(document.getElementById('p-diary'), sampleDiary, ["Subject","Date","Notes"]);
-    renderTable(document.getElementById('p-hw'), sampleHW, ["Subject","Due","Homework"]);
-    renderTable(document.getElementById('p-msg'), loadArr('broadcasts').map(b=>[b.date,b.text]), ["Date","Message"]);
-    renderTable(document.getElementById('p-events'), loadArr('events').map(e=>[e.title,e.date]), ["Event/Exam","Date"]);
-    renderTable(document.getElementById('p-reqs'), reqs.map(r=>[r.date,r.title,r.msg,r.status||"Sent"]), ["Date","Title","Message","Status"]);
-    renderTable(document.getElementById('p-complaints'), complaints.map(c=>[c.date,c.type,c.text,c.status||"Open"]), ["Date","Type","Complaint","Status"]);
-    renderTable(document.getElementById('p-leaves'), leaves.map(l=>[l.date,l.subject,l.days,l.reason,l.status||"Pending"]), ["Date","Subject","Days","Reason","Status"]);
-    renderTable(document.getElementById('p-att'), (att.slice(-10)).map(x=>[x.date,x.status]), ["Date","Status"]);
-
-    // ---- Actions ----
-    window.submitLeave = function(){
-      const subject=document.getElementById('pl-subject').value||'General';
-      const days=+document.getElementById('pl-days').value||1;
-      const reason=document.getElementById('pl-reason').value.trim();
-      if(!reason) return alert('Please enter a reason.');
-      leaves.push({date:new Date().toISOString().slice(0,10),subject,days,reason,status:"Pending"});
-      saveArr('leaves', leaves);
-      renderTable(document.getElementById('p-leaves'), leaves.map(l=>[l.date,l.subject,l.days,l.reason,l.status]), ["Date","Subject","Days","Reason","Status"]);
-      document.getElementById('pl-reason').value='';
-      alert('Leave submitted.');
-    };
-
-    window.submitRequest = function(){
-      const title=document.getElementById('rq-title').value.trim();
-      const msg=document.getElementById('rq-msg').value.trim();
-      if(!title || !msg) return alert('Fill both title and message.');
-      reqs.push({date:new Date().toLocaleString(), title, msg, status:"Sent"});
-      saveArr('requests', reqs);
-      renderTable(document.getElementById('p-reqs'), reqs.map(r=>[r.date,r.title,r.msg,r.status]), ["Date","Title","Message","Status"]);
-      document.getElementById('rq-title').value=''; document.getElementById('rq-msg').value='';
-    };
-
-    window.submitComplaint = function(){
-      const type=document.getElementById('cp-type').value;
-      const text=document.getElementById('cp-text').value.trim();
-      if(!text) return alert('Describe the issue.');
-      complaints.push({date:new Date().toLocaleString(), type, text, status:'Open'});
-      saveArr('complaints', complaints);
-      renderTable(document.getElementById('p-complaints'), complaints.map(c=>[c.date,c.type,c.text,c.status]), ["Date","Type","Complaint","Status"]);
-      document.getElementById('cp-text').value='';
-      alert('Complaint raised.');
-    };
-  </script>
-  <!-- Paste ui.js helper here -->
-  <script>
-  (function(){
-    const applyTheme=(t)=>document.body.setAttribute('data-theme',t);
-    const t=new URL(location).searchParams.get('theme')||localStorage.getItem('theme')||'dark';
-    applyTheme(t); localStorage.setItem('theme',t);
-
-    window.toggleTheme=function(){const n=document.body.getAttribute('data-theme')==='dark'?'light':'dark';localStorage.setItem('theme',n);applyTheme(n);}
-    function activateTab(containerId,tabKey){const root=document.getElementById(containerId);root.querySelectorAll('.pill[data-tab]').forEach(p=>p.dataset.active=(p.dataset.tab===tabKey)?"true":"false");document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.dataset.tab===tabKey));localStorage.setItem(containerId+':tab',tabKey);}
-    window.initTabs=function(containerId,def){const root=document.getElementById(containerId);const stored=localStorage.getItem(containerId+':tab')||def;root.querySelectorAll('.pill[data-tab]').forEach(btn=>btn.addEventListener('click',()=>activateTab(containerId,btn.dataset.tab)));activateTab(containerId,stored);}
-    window.exportCSV=function(name,rows){const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
-    window.loadArr=(k)=>JSON.parse(localStorage.getItem(k)||'[]'); window.saveArr=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-  })();
-  </script>
+<script type="module">
+  import {initTabs, bindQueueForms} from './ui.js';
+  initTabs(document); bindQueueForms(document);
+</script>
+<script type="module" src="ui.js"></script>
 </body>
 </html>
