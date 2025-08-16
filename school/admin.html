@@ -1,448 +1,100 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin · School PWA</title>
-  <link rel="stylesheet" href="styles.css" />
-
-  <style>
-    /* Page-local polish & fallbacks (safe if styles.css is stale) */
-    .tab-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
-    .chip{cursor:pointer;user-select:none}
-    .chip.is-active{box-shadow:0 0 0 2px var(--ring) inset, 0 8px 24px rgba(0,0,0,.18)}
-    .panel{margin-top:16px}
-    .kpi{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
-    .kpi .box{padding:12px;border-radius:14px;background:var(--glass-2);border:1px solid var(--ring);backdrop-filter:var(--blur)}
-    .list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
-    .row-right{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-    .stack{display:grid;gap:10px}
-    .two{display:grid;gap:12px;grid-template-columns:1fr; }
-    @media (min-width:720px){ .two{grid-template-columns:1fr 1fr;} }
-    .muted{opacity:.8}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-
 <body class="dark">
-  <div class="wrapper">
+<div class="wrapper">
 
-    <!-- HEADER -->
-    <section class="accent-indigo">
-      <div class="glass header">
-        <div class="row" style="justify-content:space-between;align-items:center">
-          <div>
-            <div class="eyebrow muted">Scope, broadcast, leaves, data, backup</div>
-            <div class="h1">Admin</div>
-          </div>
-
-          <div class="row" style="gap:12px;align-items:center">
-            <a class="btn btn-ghost" href="index.html">PIN</a>
-            <button id="theme-btn" class="btn">Theme</button>
-          </div>
+  <section class="accent-plum">
+    <div class="glass header">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <div class="eyebrow">Scope, broadcast, leaves, data, backup</div>
+          <div class="h1">Admin</div>
         </div>
-
-        <!-- Tabs -->
-        <div class="tab-row">
-          <button class="chip chip-indigo is-active" data-tab="scope">Scope</button>
-          <button class="chip chip-blue" data-tab="broadcast">Broadcast</button>
-          <button class="chip chip-fuchsia" data-tab="leaves">Leaves</button>
-          <button class="chip chip-teal" data-tab="data">Data</button>
-          <button class="chip chip-amber" data-tab="backup">Backup</button>
-          <button class="chip chip-violet" data-tab="events">Events</button>
-          <button class="chip chip-cyan" data-tab="complaints">Complaints</button>
-        </div>
+        <button class="btn" onclick="toggleTheme()">Theme</button>
       </div>
-    </section>
 
-    <!-- SCOPE -->
-    <section id="tab-scope" class="panel accent-plum">
-      <div class="glass">
-        <div class="h2">Class Scope</div>
-        <div class="stack mt-12">
-          <input id="scope-class" class="input" placeholder="Class eg, 5">
-          <input id="scope-section" class="input" placeholder="Section eg, A">
-          <button id="scope-save" class="btn btn-blue">Save</button>
-          <div id="scope-msg" class="text-dim"></div>
-        </div>
+      <div class="tab-row" id="tabs">
+        <button class="chip chip-indigo" data-tab="scope">Scope</button>
+        <button class="chip chip-blue"   data-tab="broadcast">Broadcast</button>
+        <button class="chip chip-fuchsia"data-tab="leaves">Leaves</button>
+        <button class="chip chip-teal"   data-tab="data">Data</button>
+        <button class="chip chip-amber"  data-tab="backup">Backup</button>
+        <button class="chip chip-violet" data-tab="events">Events</button>
+        <button class="chip chip-cyan"   data-tab="complaints">Complaints</button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- BROADCAST -->
-    <section id="tab-broadcast" class="panel accent-teal" hidden>
-      <div class="glass">
-        <div class="h2">Broadcast to Parents</div>
-        <textarea id="bc-text" class="input" rows="3" placeholder="Message..."></textarea>
-        <div class="row-right mt-10">
-          <button id="bc-send" class="btn btn-blue">Send</button>
-        </div>
-        <div class="list" id="bc-list"></div>
-      </div>
-    </section>
+  <section id="panel-scope" class="glass inner panel">
+    <div class="h1">Class Scope</div>
+    <form class="form-grid mt-12" data-queue="a-scope">
+      <input class="input full" placeholder="Class eg, 5" name="class"/>
+      <input class="input full" placeholder="Section eg, A" name="section"/>
+      <button class="btn btn-indigo">Save</button>
+    </form>
+  </section>
 
-    <!-- LEAVES -->
-    <section id="tab-leaves" class="panel accent-fuchsia" hidden>
-      <div class="glass">
-        <div class="h2">Leave Requests</div>
-        <div class="list" id="leaves-list">
-          <div class="text-dim">No pending requests.</div>
-        </div>
-      </div>
-    </section>
+  <section id="panel-broadcast" class="glass inner panel" hidden>
+    <div class="h1">Broadcast to Parents</div>
+    <form class="form-grid mt-12" data-queue="a-broadcast">
+      <textarea class="input full" name="msg" placeholder="Message..."></textarea>
+      <button class="btn btn-blue">Send</button>
+    </form>
+    <div class="mt-12 text-dim">No broadcasts.</div>
+  </section>
 
-    <!-- DATA -->
-    <section id="tab-data" class="panel accent-teal" hidden>
-      <div class="glass">
-        <div class="h2">Data Tools</div>
-        <div class="kpi">
-          <div class="box">
-            <div class="muted">Students</div>
-            <div id="kpi-students" class="h3">0</div>
-          </div>
-          <div class="box">
-            <div class="muted">Teachers</div>
-            <div id="kpi-teachers" class="h3">0</div>
-          </div>
-        </div>
+  <section id="panel-leaves" class="glass inner panel" hidden>
+    <div class="h1">Leave Requests</div>
+    <div class="list mt-12">
+      <div class="item"><span>No pending requests.</span></div>
+    </div>
+  </section>
 
-        <div class="two mt-12">
-          <div class="glass inner">
-            <div class="h3">Download sample CSV</div>
-            <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:8px">
-              <a class="btn btn-ghost" href="students.csv" download>Students.csv</a>
-              <a class="btn btn-ghost" href="teachers.csv" download>Teachers.csv</a>
-              <a class="btn btn-ghost" href="ClassDairy.csv" download>Timetable.csv</a>
-            </div>
-          </div>
+  <section id="panel-data" class="glass inner panel" hidden>
+    <div class="h1">Data</div>
+    <div class="row mt-12">
+      <button class="btn btn-teal">Students.csv</button>
+      <button class="btn btn-teal">Teachers.csv</button>
+      <button class="btn btn-teal">Timetable.csv</button>
+    </div>
+  </section>
 
-          <div class="glass inner">
-            <div class="h3">Import CSV (local only)</div>
-            <input id="csv-file" class="input" type="file" accept=".csv" />
-            <div class="text-dim mt-6">Counts update after successful import.</div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <section id="panel-backup" class="glass inner panel" hidden>
+    <div class="h1">Quick Backup / Restore</div>
+    <div class="row mt-12">
+      <button class="btn btn-amber">Backup</button>
+      <button class="btn btn-indigo">Restore</button>
+    </div>
+  </section>
 
-    <!-- BACKUP / RESTORE -->
-    <section id="tab-backup" class="panel accent-amber" hidden>
-      <div class="glass">
-        <div class="h2">Quick Backup / Restore</div>
-        <div class="row" style="gap:10px;flex-wrap:wrap;margin-top:8px">
-          <button id="backup-btn" class="btn btn-amber">Backup</button>
-          <label class="btn btn-ghost">
-            Restore
-            <input id="restore-file" type="file" accept="application/json" hidden>
-          </label>
-        </div>
-        <div class="text-dim mt-8" id="backup-msg"></div>
-      </div>
-    </section>
+  <section id="panel-events" class="glass inner panel" hidden>
+    <div class="h1">Events</div>
+    <form class="form-grid mt-12" data-queue="a-event">
+      <input class="input" name="title" placeholder="Event Title"/>
+      <input class="input" type="date" name="date"/>
+      <button class="btn btn-violet">Add</button>
+    </form>
+  </section>
 
-    <!-- EVENTS -->
-    <section id="tab-events" class="panel accent-violet" hidden>
-      <div class="glass">
-        <div class="h2">Events & Exams</div>
-        <div class="two mt-10">
-          <div class="glass inner">
-            <div class="stack">
-              <input id="ev-title" class="input" placeholder="Title eg, Parent–Teacher Meeting">
-              <input id="ev-date" class="input" type="date">
-              <button id="ev-add" class="btn btn-blue">Add / Update</button>
-            </div>
-          </div>
-          <div class="glass inner">
-            <div class="h3">Upcoming</div>
-            <div class="list" id="ev-list"></div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <section id="panel-complaints" class="glass inner panel" hidden>
+    <div class="h1">Complaints</div>
+    <div class="list mt-12">
+      <div class="item"><span>No complaints</span></div>
+    </div>
+  </section>
 
-    <!-- COMPLAINTS -->
-    <section id="tab-complaints" class="panel accent-cyan" hidden>
-      <div class="glass">
-        <div class="h2">Complaints from Parents</div>
-        <div id="c-list" class="list">
-          <div class="text-dim">No complaints.</div>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- Page-local script: tabs, theme, and demo storage wiring -->
-  <script>
-  (function(){
-    // ---------- THEME ----------
-    const body = document.body;
-    const themeBtn = document.getElementById('theme-btn');
-    const qs = new URLSearchParams(location.search);
-    const initialTheme = qs.get('theme') || localStorage.getItem('theme') || 'dark';
-    body.classList.remove('dark','light'); body.classList.add(initialTheme);
-    localStorage.setItem('theme', initialTheme);
-    themeBtn.addEventListener('click', () => {
-      const next = body.classList.contains('dark') ? 'light' : 'dark';
-      body.classList.remove('dark','light'); body.classList.add(next);
-      localStorage.setItem('theme', next);
-    });
-
-    // ---------- TABS ----------
-    const chips = [...document.querySelectorAll('.chip[data-tab]')];
-    const sections = {
-      scope: document.getElementById('tab-scope'),
-      broadcast: document.getElementById('tab-broadcast'),
-      leaves: document.getElementById('tab-leaves'),
-      data: document.getElementById('tab-data'),
-      backup: document.getElementById('tab-backup'),
-      events: document.getElementById('tab-events'),
-      complaints: document.getElementById('tab-complaints'),
-    };
-    function showTab(name){
-      Object.entries(sections).forEach(([key,el]) => el.hidden = key !== name);
-      chips.forEach(c => c.classList.toggle('is-active', c.dataset.tab === name));
-      localStorage.setItem('admin:lastTab', name);
-    }
-    chips.forEach(chip => chip.addEventListener('click', () => showTab(chip.dataset.tab)));
-    showTab(localStorage.getItem('admin:lastTab') || 'scope');
-
-    // ---------- SIMPLE STORE (localStorage) ----------
-    const store = {
-      get(k, d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch{ return d; } },
-      set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
-    };
-
-    // ---------- SCOPE ----------
-    const scopeKey = 'school.scope';
-    const scopeClass = document.getElementById('scope-class');
-    const scopeSection = document.getElementById('scope-section');
-    const scopeSave = document.getElementById('scope-save');
-    const scopeMsg = document.getElementById('scope-msg');
-    (function loadScope(){
-      const v = store.get(scopeKey, {cls:'', sec:''});
-      scopeClass.value = v.cls || '';
-      scopeSection.value = v.sec || '';
-    })();
-    scopeSave.addEventListener('click', ()=>{
-      store.set(scopeKey, {cls: scopeClass.value.trim(), sec: scopeSection.value.trim()});
-      scopeMsg.textContent = 'Saved.';
-      setTimeout(()=>scopeMsg.textContent='',1500);
-    });
-
-    // ---------- BROADCAST ----------
-    const bcKey = 'school.broadcasts';
-    const bcText = document.getElementById('bc-text');
-    const bcSend = document.getElementById('bc-send');
-    const bcList = document.getElementById('bc-list');
-    function renderBroadcasts(){
-      const arr = store.get(bcKey, []);
-      bcList.innerHTML = '';
-      if(!arr.length){ bcList.innerHTML = '<div class="text-dim">No broadcasts.</div>'; return; }
-      arr.slice().reverse().forEach((m,idx)=>{
-        const card = document.createElement('div');
-        card.className = 'glass inner';
-        card.innerHTML = `
-          <div class="row" style="justify-content:space-between;gap:8px;align-items:center">
-            <div>
-              <div class="muted">${new Date(m.ts).toLocaleString()}</div>
-              <div>${m.text.replace(/</g,'&lt;')}</div>
-            </div>
-            <button class="btn btn-ghost" data-del="${m.ts}">Delete</button>
-          </div>`;
-        bcList.appendChild(card);
-      });
-    }
-    bcSend.addEventListener('click', ()=>{
-      const t = bcText.value.trim();
-      if(!t) return;
-      const arr = store.get(bcKey, []);
-      arr.push({ts: Date.now(), text: t});
-      store.set(bcKey, arr);
-      bcText.value = '';
-      renderBroadcasts();
-    });
-    bcList.addEventListener('click', (e)=>{
-      const ts = e.target?.dataset?.del;
-      if(!ts) return;
-      const arr = store.get(bcKey, []).filter(x=> String(x.ts)!==String(ts));
-      store.set(bcKey, arr);
-      renderBroadcasts();
-    });
-    renderBroadcasts();
-
-    // ---------- LEAVES (demo inbox from parents page) ----------
-    // Expected shape: {id, student, from, to, reason, status}
-    const leavesKey = 'school.leaves';
-    const leavesList = document.getElementById('leaves-list');
-    function renderLeaves(){
-      const arr = store.get(leavesKey, []);
-      leavesList.innerHTML = '';
-      if(!arr.length){ leavesList.innerHTML = '<div class="text-dim">No pending requests.</div>'; return; }
-      arr.slice().reverse().forEach(l=>{
-        const card = document.createElement('div');
-        card.className = 'glass inner';
-        card.innerHTML = `
-          <div class="row" style="justify-content:space-between;gap:10px;align-items:center">
-            <div>
-              <div class="h4">${(l.student||'Student')}</div>
-              <div class="muted">${l.from} → ${l.to}</div>
-              <div class="mt-4">${(l.reason||'').replace(/</g,'&lt;')}</div>
-            </div>
-            <div class="row" style="gap:8px">
-              <button class="btn btn-ghost" data-act="deny" data-id="${l.id}">Deny</button>
-              <button class="btn btn-blue" data-act="approve" data-id="${l.id}">Approve</button>
-            </div>
-          </div>`;
-        leavesList.appendChild(card);
-      });
-    }
-    leavesList.addEventListener('click', (e)=>{
-      const act = e.target?.dataset?.act;
-      const id = e.target?.dataset?.id;
-      if(!act || !id) return;
-      const arr = store.get(leavesKey, []);
-      const i = arr.findIndex(x=> String(x.id)===String(id));
-      if(i>-1){ arr[i].status = act; store.set(leavesKey, arr); renderLeaves(); }
-    });
-    renderLeaves();
-
-    // ---------- DATA (CSV import demo) ----------
-    const csvFile = document.getElementById('csv-file');
-    const kpiStudents = document.getElementById('kpi-students');
-    const kpiTeachers = document.getElementById('kpi-teachers');
-    function refreshKpis(){
-      const s = store.get('school.students', []);
-      const t = store.get('school.teachers', []);
-      kpiStudents.textContent = s.length;
-      kpiTeachers.textContent = t.length;
-    }
-    csvFile.addEventListener('change', async (e)=>{
-      const f = e.target.files[0]; if(!f) return;
-      const text = await f.text();
-      const rows = text.split(/\r?\n/).filter(Boolean);
-      // naive detect by headers
-      const header = rows[0].toLowerCase();
-      const data = rows.slice(1).map(r=>r.split(','));
-      if(header.includes('admission') || header.includes('roll')) {
-        store.set('school.students', data);
-      } else if(header.includes('teacher') || header.includes('subject')) {
-        store.set('school.teachers', data);
-      }
-      refreshKpis();
-      e.target.value = '';
-    });
-    refreshKpis();
-
-    // ---------- BACKUP / RESTORE ----------
-    const backupBtn = document.getElementById('backup-btn');
-    const restoreFile = document.getElementById('restore-file');
-    const backupMsg = document.getElementById('backup-msg');
-    backupBtn.addEventListener('click', ()=>{
-      const dump = {};
-      Object.keys(localStorage).forEach(k=>{
-        if(k.startsWith('school.')) dump[k]=localStorage.getItem(k);
-      });
-      const blob = new Blob([JSON.stringify(dump,null,2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'school-backup.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-      backupMsg.textContent = 'Backup downloaded.';
-      setTimeout(()=>backupMsg.textContent='',1600);
-    });
-    restoreFile.addEventListener('change', async (e)=>{
-      const f = e.target.files[0]; if(!f) return;
-      try{
-        const json = JSON.parse(await f.text());
-        Object.entries(json).forEach(([k,v])=>{
-          if(k.startsWith('school.')) localStorage.setItem(k, v);
-        });
-        backupMsg.textContent = 'Restored. Reloading...';
-        setTimeout(()=>location.reload(), 600);
-      }catch{
-        backupMsg.textContent = 'Invalid file.';
-        setTimeout(()=>backupMsg.textContent='',1600);
-      }
-    });
-
-    // ---------- EVENTS ----------
-    const evKey = 'school.events';
-    const evTitle = document.getElementById('ev-title');
-    const evDate  = document.getElementById('ev-date');
-    const evAdd   = document.getElementById('ev-add');
-    const evList  = document.getElementById('ev-list');
-    function renderEvents(){
-      const arr = store.get(evKey, []);
-      evList.innerHTML = '';
-      if(!arr.length){ evList.innerHTML = '<div class="text-dim">No upcoming events.</div>'; return; }
-      arr.sort((a,b)=>(a.date>b.date?1:-1)).forEach(ev=>{
-        const card = document.createElement('div');
-        card.className = 'glass inner';
-        card.innerHTML = `
-          <div class="row" style="justify-content:space-between;gap:10px;align-items:center">
-            <div><div class="h4">${(ev.title||'').replace(/</g,'&lt;')}</div>
-            <div class="muted">${ev.date}</div></div>
-            <div class="row" style="gap:8px">
-              <button class="btn btn-ghost" data-del="${ev.id}">Delete</button>
-            </div>
-          </div>`;
-        evList.appendChild(card);
-      });
-    }
-    evAdd.addEventListener('click', ()=>{
-      const t = evTitle.value.trim();
-      const d = evDate.value;
-      if(!t || !d) return;
-      const arr = store.get(evKey, []);
-      // Update if title & date exist; else add
-      const i = arr.findIndex(x=> x.title===t && x.date===d);
-      if(i>-1) arr[i] = {...arr[i], title:t, date:d};
-      else arr.push({id: Date.now(), title:t, date:d});
-      store.set(evKey, arr); evTitle.value=''; evDate.value='';
-      renderEvents();
-    });
-    evList.addEventListener('click', (e)=>{
-      const del = e.target?.dataset?.del; if(!del) return;
-      const arr = store.get(evKey, []).filter(x=> String(x.id)!==String(del));
-      store.set(evKey, arr); renderEvents();
-    });
-    renderEvents();
-
-    // ---------- COMPLAINTS ----------
-    // Parents page should push here: {id, by, category, text, ts, status}
-    const cKey = 'school.complaints';
-    const cList = document.getElementById('c-list');
-    function renderComplaints(){
-      const arr = store.get(cKey, []);
-      cList.innerHTML = '';
-      if(!arr.length){ cList.innerHTML = '<div class="text-dim">No complaints.</div>'; return; }
-      arr.slice().reverse().forEach(c=>{
-        const card = document.createElement('div');
-        card.className = 'glass inner';
-        card.innerHTML = `
-          <div class="row" style="justify-content:space-between;gap:10px;align-items:center">
-            <div>
-              <div class="h4">${(c.category||'General')} · <span class="muted">${(c.by||'Parent')}</span></div>
-              <div class="muted">${new Date(c.ts||Date.now()).toLocaleString()}</div>
-              <div class="mt-4">${(c.text||'').replace(/</g,'&lt;')}</div>
-            </div>
-            <div class="row" style="gap:8px">
-              <button class="btn btn-ghost" data-cid="${c.id}" data-act="archive">Archive</button>
-              <button class="btn btn-blue" data-cid="${c.id}" data-act="resolve">Resolve</button>
-            </div>
-          </div>`;
-        cList.appendChild(card);
-      });
-    }
-    cList.addEventListener('click', (e)=>{
-      const id = e.target?.dataset?.cid, act = e.target?.dataset?.act;
-      if(!id || !act) return;
-      const arr = store.get(cKey, []);
-      const i = arr.findIndex(x=> String(x.id)===String(id));
-      if(i>-1) { arr[i].status = act; store.set(cKey, arr); renderComplaints(); }
-    });
-    renderComplaints();
-  })();
-  </script>
+</div>
+<div class="toast" aria-live="polite"></div>
+<script type="module">
+  import {initTabs, bindQueueForms} from './ui.js';
+  initTabs(document); bindQueueForms(document);
+</script>
+<script type="module" src="ui.js"></script>
 </body>
 </html>
