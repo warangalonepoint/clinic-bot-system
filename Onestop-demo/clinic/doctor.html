@@ -3,324 +3,43 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onestop Clinic — Doctor Panel</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <title>Onestop Clinic – Doctor Panel</title>
+  <link rel="stylesheet" href="./styles.css?v=glass6" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#0b0f1a" />
 </head>
 <body>
-  <!-- Header -->
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
   <header class="app-header">
     <div class="brand">
-      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <div class="logo"></div>
       <div class="brand-text">
-        <h1>Onestop C-Demo</h1>
+        <h1>Onestop Clinic</h1>
         <p>Doctor Panel</p>
       </div>
     </div>
-    <button id="themeToggle" class="icon-btn" title="Light/Dark">🌗</button>
   </header>
 
-  <!-- Banner -->
-  <div class="banner">
-    <img src="./assets/clinic_banner.png" alt="Clinic banner">
-  </div>
-
-  <!-- Tabs -->
-  <nav class="tabs">
-    <button class="tab active" data-screen="slots">Slots</button>
-    <button class="tab" data-screen="tokens">Tokens</button>
-    <button class="tab" data-screen="profile">Profile</button>
-  </nav>
-
-  <main style="padding-bottom:90px">
-    <!-- SLOTS -->
-    <section id="slots" class="screen active">
-      <div class="cards" style="grid-template-columns:1fr">
-        <!-- Manage Slots -->
-        <div class="card">
-          <div style="width:100%">
-            <h3 style="margin:0 0 8px">Manage Slots</h3>
-
-            <div style="display:flex; gap:10px; flex-wrap:wrap">
-              <div style="flex:1; min-width:220px">
-                <label>Date</label>
-                <select id="dateSel"></select>
-              </div>
-              <div style="flex:1; min-width:220px">
-                <label>New Time Slot</label>
-                <input id="timeInput" placeholder="e.g., 10:20 AM" />
-              </div>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap">
-              <button class="primary" onclick="addSlot()">Add Slot</button>
-              <button onclick="autoFill()">Auto-Fill 9–12 (20m)</button>
-              <button onclick="clearDay()">Clear Day</button>
-              <button onclick="copyCSV()">Copy CSV</button>
-            </div>
-
-            <div style="margin-top:12px">
-              <h4 style="margin:0 0 6px">Day’s Slots</h4>
-              <div id="slotList"></div>
-              <small class="muted">Tap toggle to mark Booked/Available. (Demo only — wire to Airtable/CSV later.)</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Publish -->
-        <div class="card">
-          <h3 style="margin:0 0 8px">Quick Publish</h3>
-          <div class="list">
-            <a class="li" href="#" id="previewLink" target="_blank" rel="noopener">🔍 Preview Public Booking</a>
-            <a class="li" href="./booking.html">📅 Open Booking Page</a>
-            <a class="li" href="./admin.html#export">⬇️ Export / Backup</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TOKENS -->
-    <section id="tokens" class="screen">
-      <div class="cards">
-        <div class="card">
-          <h3 style="margin:0 0 8px">Today</h3>
-          <div class="stats" style="margin:0">
-            <div class="stat">
-              <div class="kpi" style="--p:68%"><span id="tokCount">0</span></div>
-              <small>Tokens Used</small>
-            </div>
-            <div class="stat">
-              <label>Queue Status</label>
-              <div class="bar"><i id="tokBar" style="--w:0%"></i></div>
-              <small class="muted">Next token: <b>#<span id="nextToken">1</span></b></small>
-            </div>
-            <div class="stat">
-              <label>Reminders</label>
-              <div class="bar"><i style="--w:40%"></i></div>
-              <small class="muted">WhatsApp follow-ups</small>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 style="margin:0 0 8px">Booked Patients (Demo)</h3>
-          <div id="bookedList" class="list"></div>
-          <small class="muted">This mirrors bookings for the selected date. Real data will come from Airtable/CSV.</small>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROFILE -->
-    <section id="profile" class="screen">
-      <div class="cards" style="grid-template-columns:1fr">
-        <div class="card">
-          <h3 style="margin:0 0 8px">Availability</h3>
-          <div class="list">
-            <div class="li">
-              <span>Accepting Patients</span>
-              <label class="toggle">
-                <input id="availToggle" type="checkbox" checked />
-                <div class="t"><div class="knob"></div></div>
-              </label>
-            </div>
-            <div class="li">
-              <span>Default Slot Length</span>
-              <select id="slotLen" style="max-width:140px">
-                <option value="10">10 min</option>
-                <option value="15">15 min</option>
-                <option value="20" selected>20 min</option>
-                <option value="30">30 min</option>
-              </select>
-            </div>
-            <div class="li">
-              <span>WhatsApp Number</span>
-              <input id="waNumber" placeholder="+91…" style="max-width:200px" />
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 style="margin:0 0 8px">Actions</h3>
-          <div class="list">
-            <a class="li" href="./booking.html">📋 View Booking Form</a>
-            <a class="li" href="./admin.html#export">💾 Export Logs/Slots</a>
-            <a class="li" href="./index.html">🏠 Back to Dashboard</a>
-          </div>
-        </div>
-      </div>
-    </section>
+  <main>
+    <h2>Doctor Schedule</h2>
+    <div class="slot">9:00 AM – Available</div>
+    <div class="slot">10:00 AM – Booked</div>
+    <div class="slot">11:00 AM – Available</div>
   </main>
 
-  <!-- Dock -->
-  <footer class="dock">
-    <a class="icon-btn" href="./index.html" title="Home">🏠</a>
-    <a class="icon-btn" href="./booking.html" title="Bookings">📅</a>
-    <a class="icon-btn" href="./admin.html" title="Admin">⚙️</a>
-  </footer>
+  <div class="dock">
+    <a href="index.html" class="icon-btn">🏠</a>
+    <a href="booking.html" class="icon-btn">📅</a>
+    <a href="admin.html" class="icon-btn">⚙️</a>
+  </div>
 
-  <!-- WhatsApp Help -->
-  <a class="wa" id="waHelp" href="https://wa.me/919390664577" target="_blank" rel="noopener">🟢</a>
-
-<script>
-  // ===== THEME =====
-  const KEY='pwa-theme';
-  if(localStorage.getItem(KEY)==='light') document.body.classList.add('light');
-  document.getElementById('themeToggle').onclick=()=>{
-    document.body.classList.toggle('light');
-    localStorage.setItem(KEY, document.body.classList.contains('light')?'light':'dark');
-  };
-
-  // ===== TABS =====
-  function openTab(name){
-    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
-    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===name));
-    scrollTo({top:0,behavior:'smooth'});
-  }
-  document.querySelector('.tabs').addEventListener('click', e=>{
-    const t=e.target.closest('.tab'); if(!t) return;
-    openTab(t.dataset.screen);
-  });
-
-  // ===== DEMO STATE (swap with Airtable/CSV) =====
-  const $ = s=>document.querySelector(s);
-  const dates = (()=>{const arr=[], d=new Date(); for(let i=0;i<4;i++){const dd=new Date(d); dd.setDate(d.getDate()+i); arr.push({key: dd.toISOString().slice(0,10), label: dd.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})});} return arr;})();
-  const slotsByDate = {};
-  const bookedByDate = {};
-  dates.forEach((d,idx)=>{
-    const base = ["09:00 AM","09:20 AM","09:40 AM","10:00 AM","10:20 AM","10:40 AM","11:00 AM","11:20 AM","11:40 AM","12:00 PM"];
-    slotsByDate[d.key] = base.map((t,i)=>({time:t, booked:(idx===0 && (i===2||i===5||i===8))}));
-    bookedByDate[d.key] = base.map((t,i)=> (idx===0 && (i===2||i===5||i===8)) ? {name:`Patient ${i+1}`, time:t, token:i+1} : null).filter(Boolean);
-  });
-
-  const dateSel = $('#dateSel');
-  dates.forEach(d=>{const o=document.createElement('option'); o.value=d.key; o.textContent=d.label; dateSel.appendChild(o);});
-
-  // ===== SLOTS UI =====
-  function renderSlots(){
-    const day = dateSel.value, items = slotsByDate[day]||[];
-    const holder = $('#slotList'); holder.innerHTML='';
-    items.forEach((s,idx)=>{
-      const row = document.createElement('div');
-      row.className='slot';
-      row.dataset.booked = s.booked;
-      row.innerHTML = `
-        <div style="display:flex; gap:10px; align-items:center">
-          <strong>${s.time}</strong>
-          <small class="muted">${s.booked?'Booked':'Available'}</small>
-        </div>
-        <div style="display:flex; gap:8px">
-          <button class="icon-btn" title="Toggle" aria-label="toggle">🔁</button>
-          <button class="icon-btn" title="Delete" aria-label="delete">🗑️</button>
-        </div>
-      `;
-      row.querySelectorAll('button')[0].onclick=()=>{
-        s.booked=!s.booked;
-        if(s.booked){
-          // add demo booked row
-          (bookedByDate[day] ||= []).push({name:`Walk-in ${idx+1}`, time:s.time, token: (bookedByDate[day].length||0)+1});
-        }else{
-          // remove demo booked row
-          bookedByDate[day] = (bookedByDate[day]||[]).filter(b=>b.time!==s.time);
-        }
-        renderSlots(); renderTokens();
-      };
-      row.querySelectorAll('button')[1].onclick=()=>{
-        items.splice(idx,1); renderSlots();
-      };
-      holder.appendChild(row);
-    });
-    updatePreviewLink();
-  }
-
-  function addSlot(){
-    const raw = $('#timeInput').value.trim();
-    if(!raw) return alert('Enter a time like 10:20 AM');
-    const day = dateSel.value;
-    const exists = (slotsByDate[day]||[]).some(s=>s.time===raw);
-    if(exists) return alert('Slot already exists.');
-    (slotsByDate[day] ||= []).push({time:raw, booked:false});
-    $('#timeInput').value='';
-    renderSlots();
-  }
-
-  function clearDay(){
-    const day = dateSel.value;
-    if(!confirm('Clear all slots for this day?')) return;
-    slotsByDate[day] = [];
-    bookedByDate[day] = [];
-    renderSlots(); renderTokens();
-  }
-
-  function autoFill(){
-    const day = dateSel.value;
-    const len = parseInt($('#slotLen').value||'20',10);
-    const start = toMinutes(9,0), end = toMinutes(12,0);
-    const arr=[];
-    for(let m=start; m<=end; m+=len){
-      arr.push({time: fromMinutes(m), booked:false});
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
     }
-    slotsByDate[day] = arr;
-    renderSlots();
-  }
-
-  function toMinutes(h,m){return h*60+m}
-  function fromMinutes(mins){
-    let h=Math.floor(mins/60), m=mins%60, ap='AM';
-    if(h===0){h=12; ap='AM'} else if(h===12){ap='PM'} else if(h>12){h-=12; ap='PM'}
-    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} ${ap}`;
-  }
-
-  function copyCSV(){
-    const day = dateSel.value, items = slotsByDate[day]||[];
-    const rows = [['Date','Time Slot','Status']];
-    items.forEach(s=>rows.push([day, s.time, s.booked?'Booked':'Available']));
-    const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
-    navigator.clipboard.writeText(csv).then(()=>toast('Slots CSV copied'));
-  }
-
-  function updatePreviewLink(){
-    // placeholder: normally this would point to public-booking.html?date=...
-    const day = dateSel.value;
-    const link = `./booking.html#${day}`;
-    const a = document.getElementById('previewLink'); a.href = link;
-  }
-
-  // ===== TOKENS UI =====
-  function renderTokens(){
-    const day = dateSel.value;
-    const list = $('#bookedList'); list.innerHTML='';
-    const rows = bookedByDate[day] || [];
-    rows.forEach(b=>{
-      const a=document.createElement('a');
-      a.className='li';
-      a.textContent = `#${b.token} — ${b.time} — ${b.name}`;
-      list.appendChild(a);
-    });
-    $('#tokCount').textContent = rows.length;
-    $('#nextToken').textContent = rows.length + 1;
-    document.getElementById('tokBar').style.setProperty('--w', Math.min(100, rows.length*10)+'%');
-  }
-
-  // ===== INIT =====
-  (function init(){
-    dateSel.innerHTML='';
-    dates.forEach(d=>{const o=document.createElement('option'); o.value=d.key; o.textContent=d.label; dateSel.appendChild(o);});
-    dateSel.onchange=()=>{renderSlots(); renderTokens();};
-    dateSel.value = dates[0].key;
-    renderSlots(); renderTokens();
-  })();
-
-  // ===== TOAST =====
-  function toast(msg){
-    const el=document.createElement('div');
-    el.textContent=msg;
-    el.style.cssText='position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;padding:8px 12px;border-radius:12px;font-size:13px;z-index:9999';
-    document.body.appendChild(el); setTimeout(()=>el.remove(),1500);
-  }
-
-  // SW (optional)
-  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
-</script>
+  </script>
 </body>
 </html>
