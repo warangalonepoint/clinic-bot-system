@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reset Service Worker</title>
+  <style>
+    body{margin:0;display:grid;place-items:center;height:100vh;font:16px system-ui;background:#0b0f1a;color:#e8ebf5}
+    .box{max-width:520px;padding:20px;border:1px solid #445; border-radius:14px;background:#131a2a}
+    button{padding:10px 14px;border-radius:10px;border:0;background:#7c3aed;color:#fff;font-weight:600}
+    pre{white-space:pre-wrap;background:#0e1422;padding:12px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>One-time Reset</h2>
+    <p>This will unregister ALL service workers for this origin and delete all caches. Then reload your dashboard.</p>
+    <button id="do">Reset Now</button>
+    <pre id="log"></pre>
+  </div>
+  <script>
+    const log = (m)=>document.getElementById('log').textContent += m + "\n";
+    document.getElementById('do').onclick = async () => {
+      try{
+        if('serviceWorker' in navigator){
+          const regs = await navigator.serviceWorker.getRegistrations();
+          log(`Found ${regs.length} SW registrations`);
+          for(const r of regs){ await r.unregister(); log('Unregistered: '+ (r.scope||'')); }
+        }
+        if('caches' in window){
+          const keys = await caches.keys();
+          log(`Found ${keys.length} caches`);
+          for(const k of keys){ await caches.delete(k); log('Deleted cache: '+k); }
+        }
+        // also wipe our CSS/JS cache by version bump on next load
+        setTimeout(()=>location.href = './index.html?v=' + Date.now(), 700);
+      }catch(e){ log('Error: '+e.message) }
+    };
+  </script>
+</body>
+</html>
