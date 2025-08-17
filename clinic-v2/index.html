@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Onestop Clinic — Glass UI</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=glass3" />
 </head>
 <body>
-  <!-- Background -->
+  <!-- Background blobs + subtle grid -->
   <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -15,10 +15,10 @@
     <div class="grid"></div>
   </div>
 
-  <!-- Top -->
+  <!-- Topbar -->
   <header class="topbar glass">
     <div class="brand">
-      <img class="logo" src="./assets/logo.png" alt="logo" onerror="this.style.display='none'">
+      <img class="logo" src="./assets/logo.png" alt="" onerror="this.style.display='none'">
       <div class="brand-text">
         <h1>Onestop Clinic</h1>
         <p>Premium Glass Dashboard</p>
@@ -27,14 +27,14 @@
     <button id="themeToggle" class="icon-btn" title="Toggle theme">🌗</button>
   </header>
 
-  <!-- Hero banner (optional) -->
-  <section class="hero glass">
-    <img src="./assets/banner.png" alt="banner" />
+  <!-- Hero Banner (GLASS) -->
+  <section class="hero">
+    <img class="banner" src="./assets/banner.png" alt="Clinic Doctor Banner"/>
   </section>
 
-  <!-- Quick Nav -->
+  <!-- Quick nav cards -->
   <section class="cards">
-    <a class="card glass" href="./bookings.html">
+    <a class="card glass" href="./booking.html">
       <div class="pill grad-purple"></div>
       <div><h3>Bookings</h3><p>Create & manage appointments</p></div>
     </a>
@@ -42,7 +42,7 @@
       <div class="pill grad-cyan"></div>
       <div><h3>Logs</h3><p>Daily summary & exports</p></div>
     </a>
-    <a class="card glass" href="./staff-panel.html">
+    <a class="card glass" href="./staff.html">
       <div class="pill grad-pink"></div>
       <div><h3>Staff</h3><p>Attendance & roster</p></div>
     </a>
@@ -52,14 +52,12 @@
     </a>
   </section>
 
-  <!-- Three glass panels like the reference -->
+  <!-- Three demo panels (feel like the reference) -->
   <main class="panels">
     <!-- Settings -->
     <div class="panel glass">
       <div class="panel-header">
-        <button class="ghost">‹</button>
-        <h2>Settings</h2>
-        <button class="ghost">⋮</button>
+        <button class="ghost">‹</button><h2>Settings</h2><button class="ghost">⋮</button>
       </div>
 
       <div class="avatar"></div>
@@ -70,31 +68,17 @@
       </label>
 
       <div class="switches">
-        <label class="switch glass-inner">
-          <span>Lock with PIN</span>
-          <input type="checkbox" checked /><i></i>
-        </label>
-        <label class="switch glass-inner">
-          <span>Private Mode</span>
-          <input type="checkbox" /><i></i>
-        </label>
-        <label class="switch glass-inner">
-          <span>Auto-hide booked slots</span>
-          <input type="checkbox" checked /><i></i>
-        </label>
-        <label class="switch glass-inner">
-          <span>WhatsApp notifications</span>
-          <input type="checkbox" checked /><i></i>
-        </label>
+        <label class="switch glass-inner"><span>Lock with PIN</span><input type="checkbox" checked /><i></i></label>
+        <label class="switch glass-inner"><span>Private Mode</span><input type="checkbox" /><i></i></label>
+        <label class="switch glass-inner"><span>Auto-hide booked slots</span><input type="checkbox" checked /><i></i></label>
+        <label class="switch glass-inner"><span>WhatsApp notifications</span><input type="checkbox" checked /><i></i></label>
       </div>
     </div>
 
     <!-- Overview -->
     <div class="panel glass">
       <div class="panel-header">
-        <button class="ghost">‹</button>
-        <h2>Overview</h2>
-        <button class="ghost">⋮</button>
+        <button class="ghost">‹</button><h2>Overview</h2><button class="ghost">⋮</button>
       </div>
 
       <div class="donut">
@@ -106,57 +90,37 @@
       </div>
 
       <div class="mini-list">
-        <div class="mini glass-inner">
-          <div class="badge grad-purple"></div>
-          <div><h4>Online</h4><p>Last hr: 12 • Total: 28</p></div>
-        </div>
-        <div class="mini glass-inner">
-          <div class="badge grad-cyan"></div>
-          <div><h4>Walk-ins</h4><p>Queued: 7 • Served: 19</p></div>
-        </div>
-        <div class="mini glass-inner">
-          <div class="badge grad-pink"></div>
-          <div><h4>Reminders ✓</h4><p>WhatsApp: 86%</p></div>
-        </div>
+        <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>Online</h4><p>Last hr: 12 • Total: 28</p></div></div>
+        <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>Walk-ins</h4><p>Queued: 7 • Served: 19</p></div></div>
+        <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>Reminders ✓</h4><p>WhatsApp: 86%</p></div></div>
       </div>
     </div>
 
     <!-- Capacity -->
     <div class="panel glass">
       <div class="panel-header">
-        <button class="ghost">‹</button>
-        <h2>Capacity</h2>
-        <button class="ghost">⋮</button>
+        <button class="ghost">‹</button><h2>Capacity</h2><button class="ghost">⋮</button>
       </div>
 
       <ul class="meters">
-        <li>
-          <div class="row"><span>Morning</span><span>70%</span></div>
-          <div class="meter"><div class="fill grad-purple" style="width:70%"></div></div>
-        </li>
-        <li>
-          <div class="row"><span>Evening</span><span>45%</span></div>
-          <div class="meter"><div class="fill grad-cyan" style="width:45%"></div></div>
-        </li>
-        <li>
-          <div class="row"><span>Tomorrow</span><span>22%</span></div>
-          <div class="meter"><div class="fill grad-pink" style="width:22%"></div></div>
-        </li>
+        <li><div class="row"><span>Morning</span><span>70%</span></div><div class="meter"><div class="fill grad-purple" style="width:70%"></div></div></li>
+        <li><div class="row"><span>Evening</span><span>45%</span></div><div class="meter"><div class="fill grad-cyan" style="width:45%"></div></div></li>
+        <li><div class="row"><span>Tomorrow</span><span>22%</span></div><div class="meter"><div class="fill grad-pink" style="width:22%"></div></div></li>
       </ul>
 
       <button class="cta">Start New Day</button>
     </div>
   </main>
 
-  <!-- Bottom Tabs -->
+  <!-- Bottom tabs -->
   <nav class="tabbar glass">
     <a class="tab active" href="./index.html">🏠</a>
-    <a class="tab" href="./bookings.html">📅</a>
+    <a class="tab" href="./booking.html">📅</a>
     <a class="tab" href="./logs.html">📊</a>
-    <a class="tab" href="./staff-panel.html">👥</a>
+    <a class="tab" href="./staff.html">👥</a>
     <a class="tab" href="./doctor.html">🩺</a>
   </nav>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=glass3" defer></script>
 </body>
 </html>
