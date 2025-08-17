@@ -1,19 +1,10 @@
 /* ===== Root ===== */
-:root{
-  --text:#e8ebf5; --muted:#aab2c5;
-  --glass:rgba(255,255,255,.12); --glass-2:rgba(255,255,255,.20);
-  --border:rgba(255,255,255,.22);
-  --radius-lg:24px; --radius-md:18px;
-  --shadow:0 12px 36px rgba(0,0,0,.45);
-}
-
+:root{ --text:#e8ebf5; --muted:#aab2c5; --glass:rgba(255,255,255,.12); --glass-2:rgba(255,255,255,.20);
+  --border:rgba(255,255,255,.22); --radius-lg:24px; --radius-md:18px; --shadow:0 12px 36px rgba(0,0,0,.45); }
 *{box-sizing:border-box} html,body{height:100%}
-body{
-  margin:0; font:15px/1.45 Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
-  background: radial-gradient(1200px 800px at 10% 10%, #1b1242 0%, #0b0f1a 60%, #070a12 100%);
-  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; overflow-x:hidden;
-  padding-bottom:96px;
-}
+body{ margin:0; font:15px/1.45 Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
+  background: radial-gradient(1200px 800px at 10% 10%, #1b1242 0%, #0b0f1a 60%, #070a12 100%); -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility; overflow-x:hidden; padding-bottom:96px; }
 
 /* background ornaments */
 .bg .blob{position:fixed; filter:blur(32px); opacity:.9; z-index:-2;}
@@ -22,8 +13,7 @@ body{
 .b3{width:420px;height:420px;border-radius:50%; background:radial-gradient(circle at 40% 60%, #ff7ad6, #cc3db2 55%, transparent 72%); bottom:-160px;left:20%;}
 .grid{position:fixed; inset:0; z-index:-1; opacity:.16; pointer-events:none;
   background: repeating-linear-gradient( to right, transparent 0 44px, rgba(255,255,255,.06) 44px 45px),
-              repeating-linear-gradient( to bottom, transparent 0 44px, rgba(255,255,255,.06) 44px 45px);
-}
+              repeating-linear-gradient( to bottom, transparent 0 44px, rgba(255,255,255,.06) 44px 45px);}
 
 /* glass utils */
 .glass{ background:var(--glass); -webkit-backdrop-filter: blur(18px) saturate(1.1); backdrop-filter: blur(18px) saturate(1.1);
@@ -39,13 +29,16 @@ body{
 .brand-text h1{margin:0;font-size:18px} .brand-text p{margin:2px 0 0;color:var(--muted);font-size:12px}
 .icon-btn{border:0;background:transparent;color:var(--text);font-size:18px;width:40px;height:40px;border-radius:12px;cursor:pointer}
 .icon-btn:hover{background:rgba(255,255,255,.08)}
+.top-actions{display:flex; gap:10px; align-items:center}
+.doc-switch{display:flex; gap:8px; align-items:center; padding:6px 10px;}
+.doc-switch span{font-size:12px;color:var(--muted)}
+.doc-switch select{border:0;outline:0;background:transparent;color:var(--text);padding:6px 8px;border-radius:10px}
 
 /* banner */
 .hero{ width:min(1100px,calc(100% - 24px)); margin:6px auto 10px;}
 .banner{ width:100%; display:block; border-radius:var(--radius-lg);
   box-shadow: 0 10px 36px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.16) inset,
-              0 12px 48px rgba(124,58,237,.20), 0 -6px 32px rgba(34,211,238,.18);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+              0 12px 48px rgba(124,58,237,.20), 0 -6px 32px rgba(34,211,238,.18); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 
 /* grid + common UI */
 .panels{ width:min(1100px,calc(100% - 24px)); margin:0 auto; display:grid; gap:16px; }
@@ -53,8 +46,7 @@ body{
 .panel{ padding:14px; min-height:420px; display:flex; flex-direction:column; }
 .panel-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
 .panel-header h2{margin:0;font-size:16px}
-.avatar{ width:92px;height:92px;border-radius:28px;margin:10px auto 10px;
-  background:linear-gradient(145deg,#9c8cff,#7c6bff); box-shadow:0 18px 44px rgba(124,58,237,.35);}
+.avatar{ width:92px;height:92px;border-radius:28px;margin:10px auto 10px; background:linear-gradient(145deg,#9c8cff,#7c6bff); box-shadow:0 18px 44px rgba(124,58,237,.35);}
 .field{display:flex;flex-direction:column;gap:6px;padding:12px}
 .field span{color:var(--muted);font-size:12px}
 .field input, .field select, .field textarea{border:0;outline:0;padding:12px 14px;border-radius:12px;color:var(--text);background:rgba(255,255,255,.08)}
@@ -105,11 +97,10 @@ body{
 /* ---- TABS (pure CSS via :target) ---- */
 .tabs{min-height:52vh}
 .tabpage{display:none}
-.tabpage.default{display:block}                 /* default (no hash) */
-.tabpage:target{display:block}                  /* show targeted one */
-:target ~ .tabbar a[href="#overview"]{ }        /* (placeholder for future styling) */
+.tabpage.default{display:block}  /* show overview when no hash */
+.tabpage:target{display:block}
 
-/* Tabbar */
+/* tabbar */
 .tabbar{ position:fixed; left:50%; transform:translateX(-50%); bottom:12px; width:min(560px,calc(100% - 24px));
   display:flex; justify-content:space-between; padding:10px;}
 .tab{width:46px;height:38px;border-radius:12px;display:grid;place-items:center;color:var(--text);text-decoration:none}
