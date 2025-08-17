@@ -3,19 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Onestop Clinic — Glass UI</title>
-  <link rel="stylesheet" href="styles.css?v=glass3" />
+  <title>Onestop Clinic — Glass Tabs</title>
+  <link rel="stylesheet" href="styles.css?v=tabs1" />
 </head>
 <body>
-  <!-- Background blobs + subtle grid -->
+  <!-- background -->
   <div class="bg">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-    <div class="blob b3"></div>
-    <div class="grid"></div>
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid"></div>
   </div>
 
-  <!-- Topbar -->
+  <!-- topbar -->
   <header class="topbar glass">
     <div class="brand">
       <img class="logo" src="./assets/logo.png" alt="" onerror="this.style.display='none'">
@@ -27,100 +24,222 @@
     <button id="themeToggle" class="icon-btn" title="Toggle theme">🌗</button>
   </header>
 
-  <!-- Hero Banner (GLASS) -->
-  <section class="hero">
-    <img class="banner" src="./assets/banner.png" alt="Clinic Doctor Banner"/>
-  </section>
+  <!-- banner -->
+  <section class="hero"><img class="banner" src="./assets/banner.png" alt="Clinic banner"></section>
 
-  <!-- Quick nav cards -->
-  <section class="cards">
-    <a class="card glass" href="./booking.html">
-      <div class="pill grad-purple"></div>
-      <div><h3>Bookings</h3><p>Create & manage appointments</p></div>
-    </a>
-    <a class="card glass" href="./logs.html">
-      <div class="pill grad-cyan"></div>
-      <div><h3>Logs</h3><p>Daily summary & exports</p></div>
-    </a>
-    <a class="card glass" href="./staff.html">
-      <div class="pill grad-pink"></div>
-      <div><h3>Staff</h3><p>Attendance & roster</p></div>
-    </a>
-    <a class="card glass" href="./doctor.html">
-      <div class="pill grad-orange"></div>
-      <div><h3>Doctor</h3><p>Notes & prescriptions</p></div>
-    </a>
-  </section>
+  <!-- TAB CONTENT WRAPPER -->
+  <main id="tabs" class="tabs">
+    <!-- ===== Overview ===== -->
+    <section id="tab-overview" class="tabpage active" role="tabpanel" aria-labelledby="nav-home">
+      <div class="panels">
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Settings</h2><div></div></div>
+          <div class="avatar"></div>
+          <label class="field glass-inner"><span>Clinic Username</span><input type="text" value="onestop-c-demo"></label>
+          <div class="switches">
+            <label class="switch glass-inner"><span>Lock with PIN</span><input type="checkbox" checked><i></i></label>
+            <label class="switch glass-inner"><span>Private Mode</span><input type="checkbox"><i></i></label>
+            <label class="switch glass-inner"><span>Auto-hide booked slots</span><input type="checkbox" checked><i></i></label>
+            <label class="switch glass-inner"><span>WhatsApp notifications</span><input type="checkbox" checked><i></i></label>
+          </div>
+        </div>
 
-  <!-- Three demo panels (feel like the reference) -->
-  <main class="panels">
-    <!-- Settings -->
-    <div class="panel glass">
-      <div class="panel-header">
-        <button class="ghost">‹</button><h2>Settings</h2><button class="ghost">⋮</button>
-      </div>
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Overview</h2><div></div></div>
+          <div class="donut">
+            <div class="ring"><div class="ring-core"></div></div>
+            <div class="donut-text"><div class="big">42</div><div class="small">Today’s bookings</div></div>
+          </div>
+          <div class="mini-list">
+            <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>Online</h4><p>Last hr: 12 • Total: 28</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>Walk-ins</h4><p>Queued: 7 • Served: 19</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>Reminders ✓</h4><p>WhatsApp: 86%</p></div></div>
+          </div>
+        </div>
 
-      <div class="avatar"></div>
-
-      <label class="field glass-inner">
-        <span>Clinic Username</span>
-        <input type="text" value="onestop-c-demo" />
-      </label>
-
-      <div class="switches">
-        <label class="switch glass-inner"><span>Lock with PIN</span><input type="checkbox" checked /><i></i></label>
-        <label class="switch glass-inner"><span>Private Mode</span><input type="checkbox" /><i></i></label>
-        <label class="switch glass-inner"><span>Auto-hide booked slots</span><input type="checkbox" checked /><i></i></label>
-        <label class="switch glass-inner"><span>WhatsApp notifications</span><input type="checkbox" checked /><i></i></label>
-      </div>
-    </div>
-
-    <!-- Overview -->
-    <div class="panel glass">
-      <div class="panel-header">
-        <button class="ghost">‹</button><h2>Overview</h2><button class="ghost">⋮</button>
-      </div>
-
-      <div class="donut">
-        <div class="ring"><div class="ring-core"></div></div>
-        <div class="donut-text">
-          <div class="big">42</div>
-          <div class="small">Today’s bookings</div>
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Capacity</h2><div></div></div>
+          <ul class="meters">
+            <li><div class="row"><span>Morning</span><span>70%</span></div><div class="meter"><div class="fill grad-purple" style="width:70%"></div></div></li>
+            <li><div class="row"><span>Evening</span><span>45%</span></div><div class="meter"><div class="fill grad-cyan" style="width:45%"></div></div></li>
+            <li><div class="row"><span>Tomorrow</span><span>22%</span></div><div class="meter"><div class="fill grad-pink" style="width:22%"></div></div></li>
+          </ul>
+          <button class="cta">Start New Day</button>
         </div>
       </div>
+    </section>
 
-      <div class="mini-list">
-        <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>Online</h4><p>Last hr: 12 • Total: 28</p></div></div>
-        <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>Walk-ins</h4><p>Queued: 7 • Served: 19</p></div></div>
-        <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>Reminders ✓</h4><p>WhatsApp: 86%</p></div></div>
+    <!-- ===== Bookings ===== -->
+    <section id="tab-bookings" class="tabpage" role="tabpanel" aria-labelledby="nav-bookings">
+      <div class="panels">
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>New Booking</h2><div></div></div>
+          <form class="form">
+            <label class="field glass-inner"><span>Full Name</span><input type="text" placeholder="Patient name" required></label>
+            <label class="field glass-inner"><span>Phone</span><input type="tel" placeholder="+91 9xx-xxx-xxxx" required></label>
+            <div class="row-2">
+              <label class="field glass-inner"><span>Doctor</span>
+                <select><option>Dr. A. Sharma</option><option>Dr. B. Rao</option><option>Dr. C. Mehta</option></select>
+              </label>
+              <label class="field glass-inner"><span>Date</span><input type="date"></label>
+            </div>
+            <div class="row-2">
+              <label class="field glass-inner"><span>Slot</span>
+                <select><option>09:00–09:15</option><option>09:15–09:30</option><option>10:00–10:15</option></select>
+              </label>
+              <label class="field glass-inner"><span>Reason</span><input type="text" placeholder="Follow-up / new consult"></label>
+            </div>
+            <label class="field glass-inner"><span>Notes</span><textarea rows="3" placeholder="Anything the doctor should know"></textarea></label>
+            <button class="cta" type="submit">Create Booking</button>
+          </form>
+        </div>
+
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Today’s Queue</h2><div></div></div>
+          <div class="list">
+            <div class="item glass-inner"><div><strong>#21</strong> • Riya K • Dr. Sharma</div><span class="badge-pill">Pending</span></div>
+            <div class="item glass-inner"><div><strong>#22</strong> • Manoj P • Dr. Rao</div><span class="badge-pill">Checked-in</span></div>
+            <div class="item glass-inner"><div><strong>#23</strong> • Anika S • Dr. Mehta</div><span class="badge-pill">In-room</span></div>
+            <div class="item glass-inner"><div><strong>#24</strong> • Farhan A • Dr. Sharma</div><span class="badge-pill">Done</span></div>
+          </div>
+        </div>
+
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Shortcuts</h2><div></div></div>
+          <div class="cards tight">
+            <button class="card glass" data-tab="logs"><div class="pill grad-cyan"></div><div><h3>Daily Logs</h3><p>See summary</p></div></button>
+            <button class="card glass" data-tab="staff"><div class="pill grad-pink"></div><div><h3>Roster</h3><p>Who’s on duty</p></div></button>
+            <button class="card glass" data-tab="doctor"><div class="pill grad-orange"></div><div><h3>Doctor Panel</h3><p>Write notes</p></div></button>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Capacity -->
-    <div class="panel glass">
-      <div class="panel-header">
-        <button class="ghost">‹</button><h2>Capacity</h2><button class="ghost">⋮</button>
+    <!-- ===== Logs ===== -->
+    <section id="tab-logs" class="tabpage" role="tabpanel" aria-labelledby="nav-logs">
+      <div class="panels">
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>KPIs</h2><div></div></div>
+          <div class="kpis">
+            <div class="kpi glass-inner"><h3>Patients Seen</h3><div class="row"><span>28 / 50</span><span>56%</span></div><div class="meter small"><div class="fill grad-purple" style="width:56%"></div></div></div>
+            <div class="kpi glass-inner"><h3>Reminders</h3><div class="row"><span>86%</span><span>WhatsApp</span></div><div class="meter small"><div class="fill grad-cyan" style="width:86%"></div></div></div>
+            <div class="kpi glass-inner"><h3>No-shows</h3><div class="row"><span>4</span><span>8%</span></div><div class="meter small"><div class="fill grad-pink" style="width:8%"></div></div></div>
+            <div class="kpi glass-inner"><h3>Avg. Wait</h3><div class="row"><span>11m</span><span>OK</span></div><div class="meter small"><div class="fill grad-orange" style="width:45%"></div></div></div>
+          </div>
+        </div>
+
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Activity Log</h2><div></div></div>
+          <div class="mini-list">
+            <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>09:12</h4><p>Booking created • Riya K (Dr. Sharma)</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>09:35</h4><p>Reminder sent • Token #21</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>10:05</h4><p>No-show marked • Token #18</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-orange"></div><div><h4>10:40</h4><p>Consult completed • Token #16</p></div></div>
+          </div>
+        </div>
+
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Exports</h2><div></div></div>
+          <div class="export">
+            <button class="cta" onclick="alert('Mock: Export CSV')">Export CSV</button>
+            <button class="cta" onclick="alert('Mock: Export PDF')">Export PDF</button>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <ul class="meters">
-        <li><div class="row"><span>Morning</span><span>70%</span></div><div class="meter"><div class="fill grad-purple" style="width:70%"></div></div></li>
-        <li><div class="row"><span>Evening</span><span>45%</span></div><div class="meter"><div class="fill grad-cyan" style="width:45%"></div></div></li>
-        <li><div class="row"><span>Tomorrow</span><span>22%</span></div><div class="meter"><div class="fill grad-pink" style="width:22%"></div></div></li>
-      </ul>
+    <!-- ===== Staff ===== -->
+    <section id="tab-staff" class="tabpage" role="tabpanel" aria-labelledby="nav-staff">
+      <div class="panels">
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Today’s Roster</h2><div></div></div>
+          <div class="team">
+            <div class="member glass-inner"><div class="ava grad-purple"></div><div><strong>Dr. A. Sharma</strong><div class="role">General Physician</div></div></div>
+            <div class="member glass-inner"><div class="ava grad-cyan"></div><div><strong>Dr. B. Rao</strong><div class="role">Pediatrics</div></div></div>
+            <div class="member glass-inner"><div class="ava grad-pink"></div><div><strong>Dr. C. Mehta</strong><div class="role">Dermatology</div></div></div>
+            <div class="member glass-inner"><div class="ava grad-orange"></div><div><strong>Nurse Priya</strong><div class="role">Triage</div></div></div>
+          </div>
+        </div>
 
-      <button class="cta">Start New Day</button>
-    </div>
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Attendance</h2><div></div></div>
+          <div class="switches">
+            <label class="switch glass-inner"><span>Dr. A. Sharma</span><input type="checkbox" checked><i></i></label>
+            <label class="switch glass-inner"><span>Dr. B. Rao</span><input type="checkbox" checked><i></i></label>
+            <label class="switch glass-inner"><span>Dr. C. Mehta</span><input type="checkbox"><i></i></label>
+            <label class="switch glass-inner"><span>Nurse Priya</span><input type="checkbox" checked><i></i></label>
+          </div>
+        </div>
+
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Actions</h2><div></div></div>
+          <div class="cards tight">
+            <button class="card glass" data-tab="bookings"><div class="pill grad-purple"></div><div><h3>New Booking</h3><p>Quick add</p></div></button>
+            <button class="card glass" data-tab="logs"><div class="pill grad-cyan"></div><div><h3>Export Logs</h3><p>CSV / PDF</p></div></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Doctor ===== -->
+    <section id="tab-doctor" class="tabpage" role="tabpanel" aria-labelledby="nav-doctor">
+      <div class="panels split">
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Consultation</h2><div></div></div>
+          <form class="form">
+            <label class="field glass-inner"><span>Search Patient</span><input type="text" placeholder="Name / Token / Phone"></label>
+            <label class="field glass-inner"><span>Chief Complaint</span><input type="text" placeholder="e.g., fever, cough"></label>
+            <label class="field glass-inner"><span>History / Exam</span><textarea rows="4" placeholder="Findings, notes"></textarea></label>
+            <label class="field glass-inner"><span>Diagnosis</span><input type="text" placeholder="Provisional / Differential"></label>
+            <div class="rx glass-inner">
+              <strong style="margin-bottom:4px">Prescription</strong>
+              <div class="rx-row"><label class="field"><span>Drug</span><input type="text" placeholder="Amoxicillin 500mg"></label><label class="field"><span>Dosage</span><input type="text" placeholder="1–0–1"></label></div>
+              <div class="rx-row"><label class="field"><span>Duration</span><input type="text" placeholder="5 days"></label><label class="field"><span>Notes</span><input type="text" placeholder="After food"></label></div>
+            </div>
+            <div class="row" style="margin-top:6px;justify-content:flex-end;gap:10px">
+              <button type="button" class="ghost small" onclick="alert('Mock: Save Draft')">Save Draft</button>
+              <button type="submit" class="cta">Finalize & Print</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>Vitals & History</h2><div></div></div>
+          <div class="mini-list history">
+            <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>Vitals</h4><p>BP 118/74 • HR 78 • Temp 37.1°C • SpO₂ 98%</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>Allergies</h4><p>NKDA</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>Past Rx</h4><p>Azithromycin (Apr) • Cetirizine (May)</p></div></div>
+            <div class="mini glass-inner"><div class="badge grad-orange"></div><div><h4>Next Review</h4><p>In 7–10 days</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Settings ===== -->
+    <section id="tab-settings" class="tabpage" role="tabpanel" aria-labelledby="nav-settings">
+      <div class="panels">
+        <div class="panel glass">
+          <div class="panel-header"><div></div><h2>App Settings</h2><div></div></div>
+          <div class="switches">
+            <label class="switch glass-inner"><span>Compact layout</span><input type="checkbox" id="compactToggle"><i></i></label>
+            <label class="switch glass-inner"><span>Haptics</span><input type="checkbox" checked><i></i></label>
+            <label class="switch glass-inner"><span>Show banner</span><input type="checkbox" id="bannerToggle" checked><i></i></label>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- Bottom tabs -->
-  <nav class="tabbar glass">
-    <a class="tab active" href="./index.html">🏠</a>
-    <a class="tab" href="./booking.html">📅</a>
-    <a class="tab" href="./logs.html">📊</a>
-    <a class="tab" href="./staff.html">👥</a>
-    <a class="tab" href="./doctor.html">🩺</a>
+  <!-- sticky tabbar -->
+  <nav class="tabbar glass" role="tablist">
+    <button id="nav-home"     class="tab active" data-tab="overview" aria-controls="tab-overview" aria-selected="true">🏠</button>
+    <button id="nav-bookings" class="tab"        data-tab="bookings" aria-controls="tab-bookings">📅</button>
+    <button id="nav-logs"     class="tab"        data-tab="logs"     aria-controls="tab-logs">📊</button>
+    <button id="nav-staff"    class="tab"        data-tab="staff"    aria-controls="tab-staff">👥</button>
+    <button id="nav-doctor"   class="tab"        data-tab="doctor"   aria-controls="tab-doctor">🩺</button>
+    <button id="nav-settings" class="tab"        data-tab="settings" aria-controls="tab-settings">⚙️</button>
   </nav>
 
-  <script src="app.js?v=glass3" defer></script>
+  <script src="app.js?v=tabs1" defer></script>
 </body>
 </html>
