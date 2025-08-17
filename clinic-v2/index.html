@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Onestop Clinic — Glass Tabs</title>
-  <link rel="stylesheet" href="styles.css?v=tabs2" />
+  <title>Onestop Clinic — Multi-Doctor Glass Tabs</title>
+  <link rel="stylesheet" href="styles.css?v=md1" />
 </head>
 <body>
   <!-- Background -->
@@ -16,19 +16,31 @@
   <header class="topbar glass">
     <div class="brand">
       <img class="logo" src="./assets/logo.png" alt="" onerror="this.style.display='none'">
-      <div class="brand-text"><h1>Onestop Clinic</h1><p>Premium Glass Dashboard</p></div>
+      <div class="brand-text">
+        <h1>Onestop Clinic</h1>
+        <p>Premium Glass Dashboard</p>
+      </div>
     </div>
-    <button id="themeToggle" class="icon-btn" title="Toggle theme">🌗</button>
+
+    <div class="top-actions">
+      <!-- Doctor switcher (live) -->
+      <div class="doc-switch glass-inner">
+        <span>Doctor</span>
+        <select id="doctorSelect"></select>
+      </div>
+      <button id="themeToggle" class="icon-btn" title="Toggle theme">🌗</button>
+    </div>
   </header>
 
-  <!-- Banner (only on Overview) -->
+  <!-- Banner (only shown on Overview) -->
   <section class="hero"><img class="banner" src="./assets/banner.png" alt="Clinic banner"></section>
 
-  <!-- TAB PAGES (hash-based) -->
+  <!-- TABS (hash-based; no JS required) -->
   <main class="tabs">
     <!-- ===== Overview ===== -->
     <section id="overview" class="tabpage default">
       <div class="panels">
+        <!-- Settings -->
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Settings</h2><div></div></div>
           <div class="avatar"></div>
@@ -41,26 +53,20 @@
           </div>
         </div>
 
+        <!-- KPI donut -->
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Overview</h2><div></div></div>
           <div class="donut">
             <div class="ring"><div class="ring-core"></div></div>
-            <div class="donut-text"><div class="big">42</div><div class="small">Today’s bookings</div></div>
+            <div class="donut-text"><div id="todayBookings" class="big">0</div><div class="small">Today’s bookings</div></div>
           </div>
-          <div class="mini-list">
-            <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>Online</h4><p>Last hr: 12 • Total: 28</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>Walk-ins</h4><p>Queued: 7 • Served: 19</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>Reminders ✓</h4><p>WhatsApp: 86%</p></div></div>
-          </div>
+          <div id="overviewStats" class="mini-list"></div>
         </div>
 
+        <!-- Capacity -->
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Capacity</h2><div></div></div>
-          <ul class="meters">
-            <li><div class="row"><span>Morning</span><span>70%</span></div><div class="meter"><div class="fill grad-purple" style="width:70%"></div></div></li>
-            <li><div class="row"><span>Evening</span><span>45%</span></div><div class="meter"><div class="fill grad-cyan" style="width:45%"></div></div></li>
-            <li><div class="row"><span>Tomorrow</span><span>22%</span></div><div class="meter"><div class="fill grad-pink" style="width:22%"></div></div></li>
-          </ul>
+          <ul class="meters" id="capacityMeters"></ul>
           <button class="cta">Start New Day</button>
         </div>
       </div>
@@ -69,38 +75,39 @@
     <!-- ===== Bookings ===== -->
     <section id="bookings" class="tabpage">
       <div class="panels">
+        <!-- New booking -->
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>New Booking</h2><div></div></div>
-          <form class="form">
-            <label class="field glass-inner"><span>Full Name</span><input type="text" placeholder="Patient name" required></label>
-            <label class="field glass-inner"><span>Phone</span><input type="tel" placeholder="+91 9xx-xxx-xxxx" required></label>
+          <form id="bookingForm" class="form">
+            <label class="field glass-inner"><span>Full Name</span><input id="bkName" type="text" placeholder="Patient name" required></label>
+            <label class="field glass-inner"><span>Phone</span><input id="bkPhone" type="tel" placeholder="+91 9xx-xxx-xxxx" required></label>
+
             <div class="row-2">
               <label class="field glass-inner"><span>Doctor</span>
-                <select><option>Dr. A. Sharma</option><option>Dr. B. Rao</option><option>Dr. C. Mehta</option></select>
+                <select id="bkDoctor"></select>
               </label>
-              <label class="field glass-inner"><span>Date</span><input type="date"></label>
+              <label class="field glass-inner"><span>Date</span><input id="bkDate" type="date"></label>
             </div>
+
             <div class="row-2">
               <label class="field glass-inner"><span>Slot</span>
-                <select><option>09:00–09:15</option><option>09:15–09:30</option><option>10:00–10:15</option></select>
+                <select id="bkSlot"></select>
               </label>
-              <label class="field glass-inner"><span>Reason</span><input type="text" placeholder="Follow-up / new consult"></label>
+              <label class="field glass-inner"><span>Reason</span><input id="bkReason" type="text" placeholder="Follow-up / new consult"></label>
             </div>
-            <label class="field glass-inner"><span>Notes</span><textarea rows="3" placeholder="Anything the doctor should know"></textarea></label>
+
+            <label class="field glass-inner"><span>Notes</span><textarea id="bkNotes" rows="3" placeholder="Anything the doctor should know"></textarea></label>
             <button class="cta" type="submit">Create Booking</button>
           </form>
         </div>
 
+        <!-- Queue -->
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Today’s Queue</h2><div></div></div>
-          <div class="list">
-            <div class="item glass-inner"><div><strong>#21</strong> • Riya K • Dr. Sharma</div><span class="badge-pill">Pending</span></div>
-            <div class="item glass-inner"><div><strong>#22</strong> • Manoj P • Dr. Rao</div><span class="badge-pill">Checked-in</span></div>
-            <div class="item glass-inner"><div><strong>#23</strong> • Anika S • Dr. Mehta</div><span class="badge-pill">In-room</span></div>
-            <div class="item glass-inner"><div><strong>#24</strong> • Farhan A • Dr. Sharma</div><span class="badge-pill">Done</span></div>
-          </div>
+          <div id="queueList" class="list"></div>
         </div>
 
+        <!-- Shortcuts -->
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Shortcuts</h2><div></div></div>
           <div class="cards tight">
@@ -117,22 +124,12 @@
       <div class="panels">
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>KPIs</h2><div></div></div>
-          <div class="kpis">
-            <div class="kpi glass-inner"><h3>Patients Seen</h3><div class="row"><span>28 / 50</span><span>56%</span></div><div class="meter small"><div class="fill grad-purple" style="width:56%"></div></div></div>
-            <div class="kpi glass-inner"><h3>Reminders</h3><div class="row"><span>86%</span><span>WhatsApp</span></div><div class="meter small"><div class="fill grad-cyan" style="width:86%"></div></div></div>
-            <div class="kpi glass-inner"><h3>No-shows</h3><div class="row"><span>4</span><span>8%</span></div><div class="meter small"><div class="fill grad-pink" style="width:8%"></div></div></div>
-            <div class="kpi glass-inner"><h3>Avg. Wait</h3><div class="row"><span>11m</span><span>OK</span></div><div class="meter small"><div class="fill grad-orange" style="width:45%"></div></div></div>
-          </div>
+          <div id="kpiGrid" class="kpis"></div>
         </div>
 
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Activity Log</h2><div></div></div>
-          <div class="mini-list">
-            <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>09:12</h4><p>Booking created • Riya K (Dr. Sharma)</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>09:35</h4><p>Reminder sent • Token #21</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>10:05</h4><p>No-show marked • Token #18</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-orange"></div><div><h4>10:40</h4><p>Consult completed • Token #16</p></div></div>
-          </div>
+          <div id="activityList" class="mini-list"></div>
         </div>
 
         <div class="panel glass">
@@ -150,22 +147,12 @@
       <div class="panels">
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Today’s Roster</h2><div></div></div>
-          <div class="team">
-            <div class="member glass-inner"><div class="ava grad-purple"></div><div><strong>Dr. A. Sharma</strong><div class="role">General Physician</div></div></div>
-            <div class="member glass-inner"><div class="ava grad-cyan"></div><div><strong>Dr. B. Rao</strong><div class="role">Pediatrics</div></div></div>
-            <div class="member glass-inner"><div class="ava grad-pink"></div><div><strong>Dr. C. Mehta</strong><div class="role">Dermatology</div></div></div>
-            <div class="member glass-inner"><div class="ava grad-orange"></div><div><strong>Nurse Priya</strong><div class="role">Triage</div></div></div>
-          </div>
+          <div id="roster" class="team"></div>
         </div>
 
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Attendance</h2><div></div></div>
-          <div class="switches">
-            <label class="switch glass-inner"><span>Dr. A. Sharma</span><input type="checkbox" checked><i></i></label>
-            <label class="switch glass-inner"><span>Dr. B. Rao</span><input type="checkbox" checked><i></i></label>
-            <label class="switch glass-inner"><span>Dr. C. Mehta</span><input type="checkbox"><i></i></label>
-            <label class="switch glass-inner"><span>Nurse Priya</span><input type="checkbox" checked><i></i></label>
-          </div>
+          <div id="attendance" class="switches"></div>
         </div>
       </div>
     </section>
@@ -176,7 +163,10 @@
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Consultation</h2><div></div></div>
           <form class="form">
-            <label class="field glass-inner"><span>Search Patient</span><input type="text" placeholder="Name / Token / Phone"></label>
+            <label class="field glass-inner"><span>Active Doctor</span>
+              <select id="docPanelDoctor"></select>
+            </label>
+            <label class="field glass-inner"><span>Search Patient</span><input id="docSearch" type="text" placeholder="Name / Token / Phone"></label>
             <label class="field glass-inner"><span>Chief Complaint</span><input type="text" placeholder="e.g., fever, cough"></label>
             <label class="field glass-inner"><span>History / Exam</span><textarea rows="4" placeholder="Findings, notes"></textarea></label>
             <label class="field glass-inner"><span>Diagnosis</span><input type="text" placeholder="Provisional / Differential"></label>
@@ -194,12 +184,7 @@
 
         <div class="panel glass">
           <div class="panel-header"><div></div><h2>Vitals & History</h2><div></div></div>
-          <div class="mini-list history">
-            <div class="mini glass-inner"><div class="badge grad-cyan"></div><div><h4>Vitals</h4><p>BP 118/74 • HR 78 • Temp 37.1°C • SpO₂ 98%</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-purple"></div><div><h4>Allergies</h4><p>NKDA</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-pink"></div><div><h4>Past Rx</h4><p>Azithromycin (Apr) • Cetirizine (May)</p></div></div>
-            <div class="mini glass-inner"><div class="badge grad-orange"></div><div><h4>Next Review</h4><p>In 7–10 days</p></div></div>
-          </div>
+          <div id="history" class="mini-list history"></div>
         </div>
       </div>
     </section>
@@ -219,7 +204,7 @@
     </section>
   </main>
 
-  <!-- Sticky Tabbar (links = no JS required) -->
+  <!-- Sticky Tabbar (pure anchor links) -->
   <nav class="tabbar glass">
     <a class="tab" href="#overview" aria-label="Overview">🏠</a>
     <a class="tab" href="#bookings" aria-label="Bookings">📅</a>
@@ -229,6 +214,6 @@
     <a class="tab" href="#settings" aria-label="Settings">⚙️</a>
   </nav>
 
-  <script src="app.js?v=tabs2" defer></script>
+  <script src="app.js?v=md1" defer></script>
 </body>
 </html>
