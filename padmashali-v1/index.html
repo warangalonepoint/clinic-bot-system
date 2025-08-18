@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Padmashali Community — V1</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -42,9 +40,7 @@
       </div>
       <div class="tile glass-lite" style="margin-top:10px">
         <div class="tile-title" data-i18n="login.pin">Enter PIN</div>
-        <input id="pinInput" inputmode="numeric" maxlength="6"
-          data-i18n-ph="login.pinPh" placeholder="••••"
-          class="field" />
+        <input id="pinInput" inputmode="numeric" maxlength="6" class="field" data-i18n-ph="login.pinPh" placeholder="••••" />
       </div>
       <div class="row" style="margin-top:12px">
         <button id="loginBtn" class="btn" data-i18n="login.btn">Login</button>
@@ -56,7 +52,7 @@
     </div>
   </section>
 
-  <!-- TABBAR (scrollable chips on mobile, no wrap) -->
+  <!-- TABS -->
   <nav id="tabbar" class="tabbar glass" style="display:none">
     <button class="tab-btn active" data-target="home"><span class="dot"></span><span data-i18n="tab.home">Home</span></button>
     <button class="tab-btn" data-target="directory"><span class="dot"></span><span data-i18n="tab.directory">Directory</span></button>
@@ -69,7 +65,6 @@
 
   <!-- APP -->
   <main id="app" class="panels" style="display:none">
-    <!-- HOME -->
     <section id="home" class="tab-panel" data-active="true">
       <div class="stack">
         <div class="card glass">
@@ -87,15 +82,13 @@
       </div>
     </section>
 
-    <!-- DIRECTORY -->
     <section id="directory" class="tab-panel">
       <div class="card glass">
         <h3 data-i18n="dir.title">Member Directory</h3>
         <div class="grid two gap-12">
           <div class="tile glass-lite">
             <div class="tile-title" data-i18n="dir.search">Search</div>
-            <input id="dirQuery" class="field"
-              placeholder="Name / Profession / City" data-i18n-ph="dir.searchPh" />
+            <input id="dirQuery" class="field" placeholder="Name / Profession / City" data-i18n-ph="dir.searchPh" />
           </div>
           <div class="tile glass-lite">
             <div class="tile-title" data-i18n="dir.profession">Profession</div>
@@ -109,7 +102,6 @@
       </div>
     </section>
 
-    <!-- EVENTS -->
     <section id="events" class="tab-panel">
       <div class="card glass">
         <h3 data-i18n="events.title">Upcoming Events</h3>
@@ -117,7 +109,6 @@
       </div>
     </section>
 
-    <!-- HALLS -->
     <section id="halls" class="tab-panel">
       <div class="card glass">
         <h3 data-i18n="halls.title">Book Community Halls</h3>
@@ -146,8 +137,7 @@
           </div>
           <div class="tile glass-lite">
             <div class="tile-title" data-i18n="halls.purpose">Purpose</div>
-            <input id="hallPurpose" class="field" data-i18n-ph="halls.purposePh"
-              placeholder="e.g., Engagement, Thread Ceremony" />
+            <input id="hallPurpose" class="field" data-i18n-ph="halls.purposePh" placeholder="e.g., Engagement, Thread Ceremony" />
           </div>
         </div>
         <div class="row mt-12">
@@ -158,7 +148,6 @@
       </div>
     </section>
 
-    <!-- FEES -->
     <section id="fees" class="tab-panel">
       <div class="card glass">
         <h3 data-i18n="fees.title">Membership Fee</h3>
@@ -185,7 +174,6 @@
       </div>
     </section>
 
-    <!-- LOAN -->
     <section id="loan" class="tab-panel">
       <div class="card glass">
         <h3 data-i18n="loan.title">Loan / Financial Help Request</h3>
@@ -221,7 +209,6 @@
       </div>
     </section>
 
-    <!-- MANAGE -->
     <section id="manage" class="tab-panel">
       <div class="card glass">
         <h3 data-i18n="manage.title">Manage (Admins & Committee)</h3>
@@ -230,10 +217,9 @@
     </section>
   </main>
 
-  <footer class="app-footer">
-    <small>© Padmashali Community — V1</small>
-  </footer>
+  <footer class="app-footer"><small>© Padmashali Community — V1</small></footer>
 
-  <script src="app.js"></script>
+  <!-- cache-busted script -->
+  <script src="app.js?v=3"></script>
 </body>
 </html>
