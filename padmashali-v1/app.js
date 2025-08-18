@@ -23,7 +23,7 @@ const I18N = {
       'halls.title':'సమాజ హాళ్ల బుకింగ్','halls.selectHall':'హాల్ ఎంపిక','halls.timeSlot':'సమయ స్లాట్','halls.purpose':'ఉద్దేశ్యం','halls.purposePh':'ఉదా: నిశ్చితార్థం, ఉపనయనం','halls.check':'అందుబాటులో ఉందా?','halls.book':'బుకింగ్ అభ్యర్థన పంపండి',
       'fees.title':'సభ్యత్వ ఫీజు','fees.desc':'వార్షిక / లైఫ్‌టైమ్ ఫీజు చెల్లించండి. రసీదులు వాట్సాప్‌లో పంపబడతాయి.','fees.annual':'వార్షిక','fees.lifetime':'లైఫ్‌టైమ్','fees.custom':'అనుకూల మొత్తం','fees.payBtn':'యూపీఐ ద్వారా చెల్లించండి','fees.amountPh':'మొత్తం (₹)','fees.pay':'చెల్లించండి',
       'loan.title':'ఋణం / ఆర్థిక సహాయం అభ్యర్థన','loan.submit':'అభ్యర్థన పంపండి','loan.whatsapp':'వాట్సాప్ ద్వారా పంపండి','loan.namePh':'అభ్యర్థి పేరు','loan.phonePh':'10 అంకెల మొబైల్','loan.amountPh':'ఉదా: 25000','loan.purposePh':'మెడికల్ / ఎడ్యుకేషన్ / బిజినెస్ / ఇతర','loan.notesPh':'మీ అవసరాన్ని సంక్షిప్తంగా వ్రాయండి',
-      'manage.title':'నిర్వహణ (అడ్మిన్ & కమిటీ)','manage.desc':'తర్వాత: హాల్ బుకింగ్స్ అప్రూవ్, ఫీజు వెరిఫై, లోన్ అభ్యర్థనలు సమీక్ష.',
+      'manage.title':'నిర్వహణ (అడ్మిన్ & కమitee)','manage.desc':'తర్వాత: హాల్ బుకింగ్స్ అప్రూవ్, ఫీజు వెరిఫై, లోన్ అభ్యర్థనలు సమీక్ష.',
       'login.title':'లాగిన్','login.member':'సభ్యుడు','login.committee':'కమిటీ','login.admin':'అడ్మిన్','login.pin':'PIN ఇవ్వండి','login.pinPh':'••••','login.btn':'లాగిన్',
       'common.date':'తేదీ','common.name':'పూర్తి పేరు','common.phone':'ఫోన్','common.amount':'మొత్తం (₹)','common.purpose':'ఉద్దేశ్యం','common.notes':'గమనికలు',
       '_opt.h1':'హాల్ 1','_opt.h2':'హాల్ 2','_opt.m':'ఉదయం (8–12)','_opt.a':'మధ్యాహ్నం (1–5)','_opt.e':'సాయంత్రం (6–10)','_opt.f':'రోజంతా'}
@@ -99,7 +99,7 @@ document.getElementById('logoutBtn')?.addEventListener('click', logout);
 if(activeRole){ applyRole(activeRole); } else { logout(); }
 loginBtn?.addEventListener('click', ()=>{
   const ok = PINS[roleSel] && pinInput.value.trim() === PINS[roleSel];
-  if(!ok){ loginMsg.textContent = (curLang==='te'?'తప్పు PIN':'Invalid PIN'); return; }
+  if(!ok){ loginMsg.textContent = (curLang===LANGS.TE ? 'తప్పు PIN' : 'Invalid PIN'); return; }
   loginMsg.textContent=''; applyRole(roleSel);
 });
 
@@ -131,7 +131,6 @@ const events = [
 ];
 
 /* ===== Renderers ===== */
-// News
 const newsList = document.getElementById('newsList');
 function renderNews(){
   if(!newsList) return;
@@ -145,7 +144,6 @@ function renderNews(){
 }
 renderNews();
 
-// Directory
 const dirList = document.getElementById('dirList');
 const dirQuery = document.getElementById('dirQuery');
 const dirRole = document.getElementById('dirRole');
@@ -166,7 +164,6 @@ function renderDir(){
 }
 renderDir(); dirQuery?.addEventListener('input',renderDir); dirRole?.addEventListener('change',renderDir);
 
-// Events
 const eventList = document.getElementById('eventList');
 function renderEvents(){
   if(!eventList) return;
@@ -182,28 +179,25 @@ function renderEvents(){
 }
 renderEvents();
 
-// Halls
 document.getElementById('hallDate')?.setAttribute('value', new Date().toISOString().slice(0,10));
 const hallMsg = document.getElementById('hallMsg');
-document.getElementById('hallCheck')?.addEventListener('click', ()=>{ hallMsg.textContent = (curLang==='te'?'అందుబాటులో ఉంది అనిపిస్తుంది':'Looks available'); });
+document.getElementById('hallCheck')?.addEventListener('click', ()=>{ hallMsg.textContent = (curLang===LANGS.TE?'అందుబాటులో ఉంది అనిపిస్తుంది':'Looks available'); });
 document.getElementById('hallBook')?.addEventListener('click', ()=>{
   const hall = document.getElementById('hallSel').value;
   const date = document.getElementById('hallDate').value;
   const time = document.getElementById('hallTime').value;
   const purpose = document.getElementById('hallPurpose').value || '—';
-  if(!date){ hallMsg.textContent = (curLang==='te'?'తేదీ ఎంపిక చేయండి':'Pick a date'); return; }
+  if(!date){ hallMsg.textContent = (curLang===LANGS.TE?'తేదీ ఎంపిక చేయండి':'Pick a date'); return; }
   const msg=`Hall Booking Request%0AHall:${hall}%0ADate:${date}%0ATime:${time}%0APurpose:${encodeURIComponent(purpose)}`;
   window.open(`https://wa.me/919999999999?text=${msg}`,'_blank');
-  hallMsg.textContent = (curLang==='te'?'వాట్సాప్‌కి పంపబడింది':'Request sent via WhatsApp');
+  hallMsg.textContent = (curLang===LANGS.TE?'వాట్సాప్‌కి పంపబడింది':'Request sent via WhatsApp');
 });
 
-// Fees
 document.getElementById('feePay')?.addEventListener('click', ()=>{
   const v = Math.max(1, parseInt((document.getElementById('feeAmt').value||'0'),10));
   location.href = `upi://pay?pa=padmashali@upi&pn=Padmashali%20Trust&am=${v}&cu=INR`;
 });
 
-// Loan
 const lrName = document.getElementById('lrName'), lrPhone = document.getElementById('lrPhone'),
       lrAmt = document.getElementById('lrAmt'), lrPurpose = document.getElementById('lrPurpose'),
       lrNotes = document.getElementById('lrNotes'), lrMsg = document.getElementById('lrMsg'),
@@ -217,9 +211,9 @@ function loanText(){
 }
 document.getElementById('lrSubmit')?.addEventListener('click', ()=>{
   if(!(lrName.value&&lrPhone.value&&lrAmt.value)){
-    lrMsg.textContent = (curLang==='te'?'పేరు, ఫోన్, మొత్తం తప్పనిసరి':'Name, Phone, Amount are required'); return;
+    lrMsg.textContent = (curLang===LANGS.TE?'పేరు, ఫోన్, మొత్తం తప్పనిసరి':'Name, Phone, Amount are required'); return;
   }
-  lrMsg.textContent = (curLang==='te'?'స్థానికంగా సేవ్‌ైంది.':'Saved locally.');
+  lrMsg.textContent = (curLang===LANGS.TE?'స్థానికంగా సేవ్‌ైంది.':'Saved locally.');
   lrWA.setAttribute('href', `https://wa.me/919999999999?text=${loanText()}`);
 });
 lrWA?.setAttribute('href', `https://wa.me/919999999999?text=${loanText()}`);
