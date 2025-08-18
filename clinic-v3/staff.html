@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Staff — Glass UI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-1"></div><div class="bg-orb orb-2"></div><div class="bg-orb orb-3"></div>
+
+  <header class="app-header glass">
+    <div class="brand">
+      <img src="assets/logo.png" class="logo" alt="Logo">
+      <div class="titles"><h1>Staff</h1><p class="sub">attendance • roster • quick ping</p></div>
+    </div>
+    <nav class="actions">
+      <a class="icon-btn" href="index.html" title="Home">🏠</a>
+      <a class="icon-btn" href="bookings.html" title="Bookings">📆</a>
+      <a class="icon-btn" href="logs.html" title="Logs">📑</a>
+      <a class="icon-btn" href="doctor.html" title="Doctor">🩺</a>
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
+        <svg id="sun" viewBox="0 0 24 24" class="icon"><path d="M12 4V2M12 22v-2M4 12H2m20 0h-2M5 5l-1.4-1.4M20.4 20.4 19 19M5 19l-1.4 1.4M20.4 3.6 19 5M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg id="moon" viewBox="0 0 24 24" class="icon hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79Z" fill="currentColor"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main class="panels">
+    <section class="tab-panel" data-active="true">
+      <div class="grid">
+        <div class="card glass">
+          <h3>Today</h3>
+          <div class="grid two">
+            <div class="tile glass-lite">
+              <div class="tile-title">Present</div>
+              <div class="tile-num" id="presentNum">0</div>
+            </div>
+            <div class="tile glass-lite">
+              <div class="tile-title">Absent</div>
+              <div class="tile-num" id="absentNum">0</div>
+            </div>
+          </div>
+          <div class="list" id="staffList"></div>
+        </div>
+
+        <div class="card glass">
+          <h3>Quick Add</h3>
+          <div class="grid two">
+            <div class="glass-lite tile">
+              <div class="tile-title">Name</div>
+              <input id="sName" placeholder="Staff name" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+            </div>
+            <div class="glass-lite tile">
+              <div class="tile-title">Role</div>
+              <input id="sRole" placeholder="Role" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px"><button id="addStaff" class="btn">Add</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <a class="fab-whatsapp" id="waFab" href="#" aria-label="WhatsApp"></a>
+  <footer class="app-footer"><small>© Onestop — Staff</small></footer>
+
+  <script src="app.js"></script>
+  <script>
+    const seed = [
+      {name:"Rohit", role:"Reception", phone:"9100000011", present:true},
+      {name:"Meera", role:"Nurse", phone:"9100000012", present:true},
+      {name:"Asha", role:"Pharmacy", phone:"9100000013", present:false},
+      {name:"Imran", role:"Helper", phone:"9100000014", present:true},
+    ];
+    const list = document.getElementById('staffList');
+
+    function rowFor(s){
+      const li = document.createElement('div');
+      li.className = 'list-item glass-lite';
+      li.innerHTML = `
+        <div>
+          <div class="title">${s.name} — ${s.role}</div>
+          <div class="sub">${s.present?'Present':'Absent'}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="switch"><input type="checkbox" ${s.present?'checked':''}><span>Present</span></label>
+          <a class="chip" href="tel:${s.phone}">Call</a>
+          <a class="chip" href="https://wa.me/${s.phone}?text=Please%20report%20to%20duty" target="_blank">Ping</a>
+        </div>`;
+      li.querySelector('input').onchange = (e)=>{ s.present = e.target.checked; render(); };
+      return li;
+    }
+
+    function render(){
+      list.innerHTML=''; seed.forEach(s=>list.appendChild(rowFor(s)));
+      const present = seed.filter(s=>s.present).length;
+      document.getElementById('presentNum').textContent=present;
+      document.getElementById('absentNum').textContent=seed.length-present;
+    }
+    render();
+
+    document.getElementById('addStaff').onclick = ()=>{
+      const n = document.getElementById('sName').value.trim();
+      const r = document.getElementById('sRole').value.trim();
+      if(!n || !r) return alert('Enter name & role');
+      seed.push({name:n, role:r, phone:'9100000099', present:true}); render();
+      document.getElementById('sName').value=''; document.getElementById('sRole').value='';
+    };
+
+    document.getElementById('waFab').href = 'https://wa.me/919999999999?text=Send%20today%27s%20roster';
+  </script>
+</body>
+</html>
