@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Onestop App — Glass UI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- App Shell -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <header class="app-header glass">
+    <div class="brand">
+      <img src="assets/logo.png" alt="Logo" class="logo" />
+      <div class="titles">
+        <h1>Onestop Demo</h1>
+        <p class="sub">glassmorphism system UI</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
+        <!-- moon/sun switches via JS -->
+        <svg id="sun" viewBox="0 0 24 24" class="icon"><path d="M12 4V2M12 22v-2M4 12H2m20 0h-2M5 5l-1.4-1.4M20.4 20.4 19 19M5 19l-1.4 1.4M20.4 3.6 19 5M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg id="moon" viewBox="0 0 24 24" class="icon hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79Z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Tab Bar -->
+  <nav class="tabbar glass">
+    <button class="tab-btn active" data-target="home">
+      <span class="dot"></span> Home
+    </button>
+    <button class="tab-btn" data-target="bookings">
+      <span class="dot"></span> Bookings
+    </button>
+    <button class="tab-btn" data-target="logs">
+      <span class="dot"></span> Logs
+    </button>
+    <button class="tab-btn" data-target="staff">
+      <span class="dot"></span> Staff
+    </button>
+  </nav>
+
+  <!-- Panels -->
+  <main class="panels">
+    <!-- HOME -->
+    <section id="home" class="tab-panel" data-active="true">
+      <div class="grid">
+        <div class="card glass">
+          <h3>Overview</h3>
+          <div class="ring">
+            <div class="ring-inner">
+              <span class="ring-top">Balance</span>
+              <strong>₹ 1,24,500</strong>
+              <span class="ring-sub">Updated just now</span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="pill">Credit</div>
+            <div class="pill">Debit</div>
+            <div class="pill">Work</div>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <h3>Quick Actions</h3>
+          <div class="toggles">
+            <label class="switch">
+              <input type="checkbox" checked />
+              <span>Private Profile</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" />
+              <span>Lock with Passcode</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" checked />
+              <span>Auto Sync</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOOKINGS -->
+    <section id="bookings" class="tab-panel">
+      <div class="card glass">
+        <h3>Bookings</h3>
+        <p class="muted">Wire this panel to your real flow later.</p>
+        <div class="list">
+          <div class="list-item glass-lite">
+            <div>
+              <div class="title">Today · 11:30 AM</div>
+              <div class="sub">Consultation — Token #12</div>
+            </div>
+            <button class="btn">Confirm</button>
+          </div>
+          <div class="list-item glass-lite">
+            <div>
+              <div class="title">Today · 12:00 PM</div>
+              <div class="sub">Follow-up — Token #13</div>
+            </div>
+            <button class="btn btn-ghost">Waitlist</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGS -->
+    <section id="logs" class="tab-panel">
+      <div class="card glass">
+        <h3>Logs</h3>
+        <div class="progress">
+          <div class="label">Today</div>
+          <div class="bar">
+            <span style="width: 62%"></span>
+          </div>
+          <div class="value">62% filled</div>
+        </div>
+        <div class="list compact">
+          <div class="list-item glass-lite">
+            <div>
+              <div class="title">Token #10 — Rahul</div>
+              <div class="sub">11:00 AM • Fever</div>
+            </div>
+            <button class="chip">Reminder</button>
+          </div>
+          <div class="list-item glass-lite">
+            <div>
+              <div class="title">Token #11 — Sana</div>
+              <div class="sub">11:15 AM • BP Check</div>
+            </div>
+            <button class="chip success">Done</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAFF -->
+    <section id="staff" class="tab-panel">
+      <div class="card glass">
+        <h3>Staff</h3>
+        <div class="grid two">
+          <div class="tile glass-lite">
+            <div class="tile-title">Attendance</div>
+            <div class="tile-num">7 / 8</div>
+          </div>
+          <div class="tile glass-lite">
+            <div class="tile-title">Reminders Sent</div>
+            <div class="tile-num">12</div>
+          </div>
+        </div>
+        <div class="list compact">
+          <div class="list-item glass-lite">
+            <div>
+              <div class="title">Rohit</div>
+              <div class="sub">Duty: Reception</div>
+            </div>
+            <button class="chip">Ping</button>
+          </div>
+          <div class="list-item glass-lite">
+            <div>
+              <div class="title">Meera</div>
+              <div class="sub">Duty: Nursing</div>
+            </div>
+            <button class="chip">Ping</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating WhatsApp -->
+  <a class="fab-whatsapp" href="https://wa.me/919999999999?text=Hi%20Onestop%2C%20I%20want%20a%20demo" target="_blank" rel="noopener" aria-label="WhatsApp us">
+    <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M20.52 3.48A11.9 11.9 0 0 0 12 .5C5.73.5.88 5.34.88 11.61c0 2.04.52 4.02 1.5 5.79L.5 23.5l6.28-1.82a11.1 11.1 0 0 0 5.22 1.33h.01c6.27 0 11.12-4.85 11.12-11.12 0-2.97-1.16-5.76-3.61-8.41ZM12 21.02h-.01a9.5 9.5 0 0 1-4.84-1.33l-.35-.2-3.73 1.08 1-3.64-.23-.37A9.43 9.43 0 0 1 2.5 11.6C2.5 6.2 6.6 2.1 12 2.1c2.55 0 4.94.99 6.74 2.8a9.46 9.46 0 0 1 2.78 6.71c0 5.4-4.1 9.41-9.52 9.41Zm5.46-7.08c-.3-.15-1.76-.86-2.03-.96-.27-.1-.46-.15-.66.15-.2.3-.77.96-.95 1.16-.18.2-.35.23-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.6.13-.13.3-.35.44-.53.15-.17.2-.3.3-.5.1-.2.05-.38-.03-.53-.08-.15-.66-1.6-.9-2.19-.23-.55-.46-.48-.65-.49l-.56-.01c-.2 0-.53.08-.81.38-.28.3-1.07 1.05-1.07 2.57 0 1.52 1.1 2.98 1.26 3.18.15.2 2.16 3.3 5.22 4.51.73.31 1.3.5 1.74.64.73.23 1.4.2 1.93.12.59-.09 1.76-.72 2.01-1.42.25-.7.25-1.3.18-1.42-.08-.12-.28-.2-.58-.35Z"/></svg>
+  </a>
+
+  <footer class="app-footer">
+    <small>© Onestop — Glass Theme v1</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
