@@ -1,0 +1,197 @@
+/* ========== Glassmorphism Design System ========== */
+:root{
+  --bg:#0f1120;                 /* dark navy backdrop */
+  --text:#e9ecff;
+  --muted:#b9bfe3;
+
+  /* gradient palette from your reference */
+  --grad-1: linear-gradient(135deg,#8a6cff 0%, #39e6e6 100%);
+  --grad-2: linear-gradient(135deg,#8a6cff 0%, #d66bff 100%);
+  --accent:#b177ff;
+  --accent-2:#40d7ff;
+
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-stroke: rgba(255,255,255,0.35);
+  --blur: 18px;
+
+  --radius-xl: 22px;
+  --radius-lg: 16px;
+
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+:root.light{
+  --bg:#f6f7fb;
+  --text:#232537;
+  --muted:#677099;
+  --glass-bg: rgba(255,255,255,0.65);
+  --glass-stroke: rgba(255,255,255,0.8);
+  --shadow: 0 10px 22px rgba(26,33,60,.12);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  color:var(--text);
+  background: radial-gradient(1200px 600px at 15% -10%, #3f2a63 0%, transparent 60%),
+              radial-gradient(900px 600px at 110% 10%, #1b2b57 0%, transparent 60%),
+              var(--bg);
+  overflow-x:hidden;
+}
+
+/* Orbs for subtle depth */
+.bg-orb{
+  position:fixed; inset:auto;
+  width:420px; height:420px; border-radius:50%;
+  filter: blur(80px); opacity:.35; z-index:-1;
+}
+.orb-1{ top:-120px; left:-120px; background: radial-gradient(circle at 30% 30%, #8a6cff, transparent 60%);}
+.orb-2{ right:-140px; top:90px; background: radial-gradient(circle at 50% 50%, #39e6e6, transparent 60%);}
+.orb-3{ left:40%; bottom:-160px; background: radial-gradient(circle at 50% 50%, #d66bff, transparent 60%);}
+
+/* Layout */
+.app-header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin:20px auto 14px; padding:14px 16px; width:min(1100px, 96%);
+  border-radius:var(--radius-xl);
+}
+.brand{display:flex; gap:14px; align-items:center}
+.logo{width:44px; height:44px; border-radius:14px; object-fit:cover; box-shadow:var(--shadow)}
+.titles h1{font-size:20px; margin:0}
+.sub{margin:2px 0 0; font-size:12px; color:var(--muted)}
+
+.actions{display:flex; gap:8px}
+.icon-btn{
+  display:grid; place-items:center;
+  width:40px; height:40px; border-radius:12px; border:1px solid var(--glass-stroke);
+  background:var(--glass-bg); backdrop-filter: blur(var(--blur));
+  color:var(--text); cursor:pointer;
+}
+.icon{width:20px; height:20px}
+.hidden{display:none}
+
+/* Glass generic */
+.glass{
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-stroke);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+}
+.glass-lite{
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.22);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+}
+
+/* Tabs */
+.tabbar{
+  display:flex; gap:8px; padding:8px; margin:0 auto 12px; width:min(1100px,96%);
+  position:sticky; top:8px; z-index:5;
+}
+.tab-btn{
+  flex:1; padding:10px 14px; border-radius:14px; border:1px solid var(--glass-stroke);
+  background:var(--glass-bg); color:var(--text); cursor:pointer; font-weight:600;
+  display:flex; align-items:center; gap:10px; justify-content:center;
+}
+.tab-btn .dot{
+  width:8px; height:8px; border-radius:999px; background:linear-gradient(135deg,#8a6cff,#39e6e6);
+  box-shadow:0 0 8px #8a6cff88;
+}
+.tab-btn.active{background:linear-gradient(135deg,rgba(138,108,255,.18),rgba(57,230,230,.18)); border-color:transparent}
+
+/* Panels */
+.panels{width:min(1100px,96%); margin:0 auto 100px;}
+.tab-panel{display:none; animation:fade .35s ease}
+.tab-panel[data-active="true"]{display:block}
+@keyframes fade{from{opacity:.4; transform:translateY(4px)} to{opacity:1; transform:none}}
+
+.grid{display:grid; grid-template-columns:1fr; gap:16px}
+.grid.two{grid-template-columns:repeat(2,1fr)}
+@media (min-width:900px){ .grid{grid-template-columns:1.25fr 1fr} }
+
+.card{padding:16px}
+.card h3{margin:6px 0 14px; font-size:18px}
+
+/* Ring widget */
+.ring{
+  height:180px; border-radius:22px; position:relative; margin-bottom:14px;
+  background:linear-gradient(135deg, rgba(138,108,255,.25), rgba(57,230,230,.18));
+  display:grid; place-items:center;
+}
+.ring::before{
+  content:""; position:absolute; inset:-1px;
+  border-radius:inherit; padding:2px;
+  background:var(--grad-2); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.ring-inner{ text-align:center }
+.ring-top{font-size:12px; color:var(--muted)}
+.ring-inner strong{font-size:28px; display:block; margin:6px 0}
+.ring-sub{font-size:12px; color:var(--muted)}
+
+/* Pills + switches */
+.row{display:flex; gap:8px; flex-wrap:wrap}
+.pill{
+  padding:8px 12px; border-radius:12px; color:#fff;
+  background:var(--grad-1); border:1px solid rgba(255,255,255,.3);
+  box-shadow: 0 8px 18px rgba(138,108,255,.22);
+}
+
+.toggles{display:grid; gap:10px}
+.switch{display:flex; align-items:center; gap:10px; font-weight:600}
+.switch input{appearance:none; width:44px; height:24px; border-radius:999px; background:#4b4d66; position:relative; outline:none; cursor:pointer; border:1px solid rgba(255,255,255,.25)}
+.switch input:checked{background:linear-gradient(135deg,#39e6e6,#8a6cff)}
+.switch input::after{
+  content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+  background:white; transition:transform .2s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.switch input:checked::after{ transform: translateX(20px); }
+.switch span{color:var(--text)}
+
+/* Lists */
+.list{display:grid; gap:10px}
+.list.compact .title{font-size:14px}
+.list-item{
+  padding:12px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.title{font-weight:700}
+.sub{font-size:12px}
+
+/* Buttons */
+.btn, .btn-ghost, .chip{
+  border-radius:12px; padding:8px 12px; border:1px solid transparent; cursor:pointer; font-weight:700;
+}
+.btn{ color:#141627; background:var(--grad-1) ; }
+.btn-ghost{ background:transparent; border-color:rgba(255,255,255,.28); color:var(--text)}
+.chip{ background:var(--glass-bg); border-color:var(--glass-stroke); color:var(--text)}
+.chip.success{ background:linear-gradient(135deg,#39e6e6, #8a6cff); color:#141627}
+
+/* Progress */
+.progress{display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:10px}
+.progress .label{font-size:12px; color:var(--muted)}
+.progress .bar{height:14px; border-radius:999px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); overflow:hidden}
+.progress .bar span{display:block; height:100%; background:var(--grad-2)}
+
+/* Tiles */
+.tile{padding:14px}
+.tile-title{font-size:12px; color:var(--muted)}
+.tile-num{font-size:22px; font-weight:800}
+
+/* Footer + FAB */
+.app-footer{ text-align:center; padding:40px 12px 60px; color:var(--muted) }
+
+.fab-whatsapp{
+  position:fixed; right:18px; bottom:18px;
+  width:54px; height:54px; border-radius:16px; display:grid; place-items:center;
+  color:#fff; background:linear-gradient(135deg,#30d780,#14b37c); box-shadow:0 12px 28px rgba(20,179,124,.35);
+  border:1px solid rgba(255,255,255,.35);
+}
+
+/* Utility */
+.muted{color:var(--muted)}
