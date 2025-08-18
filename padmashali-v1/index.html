@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Padmashali Community — V1</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -13,13 +15,14 @@
   <!-- header -->
   <header class="app-header glass">
     <div class="brand">
-      <img src="assets/logo.png" class="logo" alt="Logo">
+      <img src="assets/logo.png" class="logo" alt="Logo" />
       <div class="titles">
-        <h1>Padmashali Community</h1>
-        <p class="sub">unity • seva • growth</p>
+        <h1 data-i18n="app.title">Padmashali Community</h1>
+        <p class="sub" data-i18n="app.tagline">unity • seva • growth</p>
       </div>
     </div>
     <div class="actions">
+      <button id="langBtn" class="icon-btn" title="Switch language">తెలుగు</button>
       <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
         <svg id="sun" viewBox="0 0 24 24" class="icon"><path d="M12 4V2M12 22v-2M4 12H2m20 0h-2M5 5l-1.4-1.4M20.4 20.4 19 19M5 19l-1.4 1.4M20.4 3.6 19 5M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <svg id="moon" viewBox="0 0 24 24" class="icon hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79Z" fill="currentColor"/></svg>
@@ -28,56 +31,57 @@
     </div>
   </header>
 
-  <!-- LOGIN PANEL -->
+  <!-- LOGIN -->
   <section id="login" class="panels" data-auth="false">
-    <div class="card glass" style="max-width:520px;margin:auto">
-      <h3>Login</h3>
+    <div class="card glass" style="max-width:560px;margin:auto">
+      <h3 data-i18n="login.title">Login</h3>
       <div class="grid three">
-        <button class="tab-mini active" data-role="member">Member</button>
-        <button class="tab-mini" data-role="committee">Committee</button>
-        <button class="tab-mini" data-role="admin">Admin</button>
+        <button class="tab-mini active" data-role="member"  data-i18n="login.member">Member</button>
+        <button class="tab-mini"        data-role="committee" data-i18n="login.committee">Committee</button>
+        <button class="tab-mini"        data-role="admin"     data-i18n="login.admin">Admin</button>
       </div>
-      <div class="glass-lite tile" style="margin-top:10px">
-        <div class="tile-title">Enter PIN</div>
-        <input id="pinInput" inputmode="numeric" placeholder="••••"
-               style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+      <div class="tile glass-lite" style="margin-top:10px">
+        <div class="tile-title" data-i18n="login.pin">Enter PIN</div>
+        <input id="pinInput" inputmode="numeric" maxlength="6"
+          data-i18n-ph="login.pinPh" placeholder="••••"
+          class="field" />
       </div>
       <div class="row" style="margin-top:12px">
-        <button id="loginBtn" class="btn">Login</button>
+        <button id="loginBtn" class="btn" data-i18n="login.btn">Login</button>
         <span class="muted" id="loginMsg"></span>
       </div>
-      <div class="muted" style="margin-top:8px;font-size:12px">
+      <div class="muted tiny" style="margin-top:8px">
         Demo PINs — Member: <b>1111</b> • Committee: <b>5555</b> • Admin: <b>9999</b>
       </div>
     </div>
   </section>
 
-  <!-- APP NAV (TABS) -->
+  <!-- TABBAR (scrollable chips on mobile, no wrap) -->
   <nav id="tabbar" class="tabbar glass" style="display:none">
-    <button class="tab-btn active" data-target="home"><span class="dot"></span> Home</button>
-    <button class="tab-btn" data-target="directory"><span class="dot"></span> Directory</button>
-    <button class="tab-btn" data-target="events"><span class="dot"></span> Events</button>
-    <button class="tab-btn" data-target="halls"><span class="dot"></span> Book Halls</button>
-    <button class="tab-btn" data-target="fees"><span class="dot"></span> Fees</button>
-    <button class="tab-btn" data-target="loan"><span class="dot"></span> Loan Request</button>
-    <button class="tab-btn admin-only" data-target="manage"><span class="dot"></span> Manage</button>
+    <button class="tab-btn active" data-target="home"><span class="dot"></span><span data-i18n="tab.home">Home</span></button>
+    <button class="tab-btn" data-target="directory"><span class="dot"></span><span data-i18n="tab.directory">Directory</span></button>
+    <button class="tab-btn" data-target="events"><span class="dot"></span><span data-i18n="tab.events">Events</span></button>
+    <button class="tab-btn" data-target="halls"><span class="dot"></span><span data-i18n="tab.halls">Book Halls</span></button>
+    <button class="tab-btn" data-target="fees"><span class="dot"></span><span data-i18n="tab.fees">Fees</span></button>
+    <button class="tab-btn" data-target="loan"><span class="dot"></span><span data-i18n="tab.loan">Loan Request</span></button>
+    <button class="tab-btn admin-only" data-target="manage"><span class="dot"></span><span data-i18n="tab.manage">Manage</span></button>
   </nav>
 
-  <!-- APP SCREENS -->
+  <!-- APP -->
   <main id="app" class="panels" style="display:none">
     <!-- HOME -->
     <section id="home" class="tab-panel" data-active="true">
-      <div class="grid">
+      <div class="stack">
         <div class="card glass">
-          <h3>Community News</h3>
+          <h3 data-i18n="home.news">Community News</h3>
           <div id="newsList" class="list"></div>
         </div>
         <div class="card glass">
-          <h3>Quick Links</h3>
+          <h3 data-i18n="home.quick">Quick Links</h3>
           <div class="row">
-            <a class="pill" target="_blank" href="https://wa.me/919999999999?text=Jai%20Padmashali">WhatsApp Group</a>
-            <button class="pill" onclick="goTab('events')">Upcoming Events</button>
-            <button class="pill" onclick="goTab('fees')">Pay Membership</button>
+            <a class="pill" target="_blank" href="https://wa.me/919999999999?text=Jai%20Padmashali" data-i18n="home.whatsapp">WhatsApp Group</a>
+            <button class="pill" onclick="goTab('events')" data-i18n="home.upcoming">Upcoming Events</button>
+            <button class="pill" onclick="goTab('fees')" data-i18n="home.pay">Pay Membership</button>
           </div>
         </div>
       </div>
@@ -86,20 +90,18 @@
     <!-- DIRECTORY -->
     <section id="directory" class="tab-panel">
       <div class="card glass">
-        <h3>Member Directory</h3>
-        <div class="grid two">
-          <div class="glass-lite tile">
-            <div class="tile-title">Search</div>
-            <input id="dirQuery" placeholder="Name / Profession / City"
-                   style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+        <h3 data-i18n="dir.title">Member Directory</h3>
+        <div class="grid two gap-12">
+          <div class="tile glass-lite">
+            <div class="tile-title" data-i18n="dir.search">Search</div>
+            <input id="dirQuery" class="field"
+              placeholder="Name / Profession / City" data-i18n-ph="dir.searchPh" />
           </div>
-          <div class="glass-lite tile">
-            <div class="tile-title">Profession</div>
-            <select id="dirRole"
-                    style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
-              <option value="">All</option>
-              <option>Weaver</option><option>Business</option><option>Student</option>
-              <option>IT</option><option>Healthcare</option>
+          <div class="tile glass-lite">
+            <div class="tile-title" data-i18n="dir.profession">Profession</div>
+            <select id="dirRole" class="field">
+              <option value="">{ALL}</option>
+              <option>Weaver</option><option>Business</option><option>Student</option><option>IT</option><option>Healthcare</option>
             </select>
           </div>
         </div>
@@ -110,132 +112,127 @@
     <!-- EVENTS -->
     <section id="events" class="tab-panel">
       <div class="card glass">
-        <h3>Upcoming Events</h3>
+        <h3 data-i18n="events.title">Upcoming Events</h3>
         <div id="eventList" class="list"></div>
       </div>
     </section>
 
-    <!-- HALL BOOKING -->
+    <!-- HALLS -->
     <section id="halls" class="tab-panel">
       <div class="card glass">
-        <h3>Book Community Halls</h3>
-        <div class="grid two">
-          <div class="glass-lite tile">
-            <div class="tile-title">Select Hall</div>
-            <select id="hallSel" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+        <h3 data-i18n="halls.title">Book Community Halls</h3>
+        <div class="grid two gap-12">
+          <div class="tile glass-lite">
+            <div class="tile-title" data-i18n="halls.selectHall">Select Hall</div>
+            <select id="hallSel" class="field">
               <option>Hall 1</option>
               <option>Hall 2</option>
             </select>
           </div>
-          <div class="glass-lite tile">
-            <div class="tile-title">Date</div>
-            <input id="hallDate" type="date" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+          <div class="tile glass-lite">
+            <div class="tile-title" data-i18n="common.date">Date</div>
+            <input id="hallDate" type="date" class="field" />
           </div>
         </div>
-        <div class="grid two" style="margin-top:10px">
-          <div class="glass-lite tile">
-            <div class="tile-title">Time Slot</div>
-            <select id="hallTime" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+        <div class="grid two gap-12">
+          <div class="tile glass-lite">
+            <div class="tile-title" data-i18n="halls.timeSlot">Time Slot</div>
+            <select id="hallTime" class="field">
               <option>Morning (8–12)</option>
               <option>Afternoon (1–5)</option>
               <option>Evening (6–10)</option>
               <option>Full Day</option>
             </select>
           </div>
-          <div class="glass-lite tile">
-            <div class="tile-title">Purpose</div>
-            <input id="hallPurpose" placeholder="e.g., Engagement, Thread Ceremony"
-                   style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+          <div class="tile glass-lite">
+            <div class="tile-title" data-i18n="halls.purpose">Purpose</div>
+            <input id="hallPurpose" class="field" data-i18n-ph="halls.purposePh"
+              placeholder="e.g., Engagement, Thread Ceremony" />
           </div>
         </div>
-        <div class="row" style="margin-top:12px">
-          <button id="hallCheck" class="btn-ghost">Check Availability</button>
-          <button id="hallBook" class="btn">Send Booking Request</button>
+        <div class="row mt-12">
+          <button id="hallCheck" class="btn-ghost" data-i18n="halls.check">Check Availability</button>
+          <button id="hallBook" class="btn" data-i18n="halls.book">Send Booking Request</button>
         </div>
-        <div id="hallMsg" class="muted" style="margin-top:8px"></div>
+        <div id="hallMsg" class="muted tiny mt-8"></div>
       </div>
     </section>
 
     <!-- FEES -->
     <section id="fees" class="tab-panel">
       <div class="card glass">
-        <h3>Membership Fee</h3>
-        <p class="muted">Pay annual / lifetime fee. Receipts will be shared on WhatsApp.</p>
-        <div class="grid two" style="margin-top:8px">
+        <h3 data-i18n="fees.title">Membership Fee</h3>
+        <p class="muted" data-i18n="fees.desc">Pay annual / lifetime fee. Receipts will be shared on WhatsApp.</p>
+        <div class="grid two gap-12">
           <div class="tile glass-lite">
-            <div class="tile-title">Annual</div><div class="tile-num">₹500</div>
-            <a class="btn" href="upi://pay?pa=padmashali@upi&pn=Padmashali%20Trust&am=500&cu=INR">Pay via UPI</a>
+            <div class="tile-title" data-i18n="fees.annual">Annual</div>
+            <div class="tile-num">₹500</div>
+            <a class="btn" href="upi://pay?pa=padmashali@upi&pn=Padmashali%20Trust&am=500&cu=INR" data-i18n="fees.payBtn">Pay via UPI</a>
           </div>
           <div class="tile glass-lite">
-            <div class="tile-title">Lifetime</div><div class="tile-num">₹5000</div>
-            <a class="btn" href="upi://pay?pa=padmashali@upi&pn=Padmashali%20Trust&am=5000&cu=INR">Pay via UPI</a>
+            <div class="tile-title" data-i18n="fees.lifetime">Lifetime</div>
+            <div class="tile-num">₹5000</div>
+            <a class="btn" href="upi://pay?pa=padmashali@upi&pn=Padmashali%20Trust&am=5000&cu=INR" data-i18n="fees.payBtn">Pay via UPI</a>
           </div>
         </div>
-        <div class="glass-lite tile" style="margin-top:10px">
-          <div class="tile-title">Custom Amount</div>
+        <div class="tile glass-lite mt-10">
+          <div class="tile-title" data-i18n="fees.custom">Custom Amount</div>
           <div class="row">
-            <input id="feeAmt" type="number" placeholder="Amount (₹)"
-              style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
-            <a id="feePay" class="btn">Pay</a>
+            <input id="feeAmt" class="field" data-i18n-ph="fees.amountPh" placeholder="Amount (₹)" />
+            <a id="feePay" class="btn" data-i18n="fees.pay">Pay</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- LOAN REQUEST (FORM) -->
+    <!-- LOAN -->
     <section id="loan" class="tab-panel">
       <div class="card glass">
-        <h3>Loan / Financial Help Request</h3>
-        <div class="grid two">
+        <h3 data-i18n="loan.title">Loan / Financial Help Request</h3>
+        <div class="grid two gap-12">
           <div class="tile glass-lite">
-            <div class="tile-title">Full Name</div>
-            <input id="lrName" placeholder="Applicant name"
-              style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+            <div class="tile-title" data-i18n="common.name">Full Name</div>
+            <input id="lrName" class="field" data-i18n-ph="loan.namePh" placeholder="Applicant name" />
           </div>
           <div class="tile glass-lite">
-            <div class="tile-title">Phone</div>
-            <input id="lrPhone" inputmode="tel" placeholder="10-digit number"
-              style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+            <div class="tile-title" data-i18n="common.phone">Phone</div>
+            <input id="lrPhone" class="field" inputmode="tel" data-i18n-ph="loan.phonePh" placeholder="10-digit number" />
           </div>
         </div>
-        <div class="grid two" style="margin-top:10px">
+        <div class="grid two gap-12">
           <div class="tile glass-lite">
-            <div class="tile-title">Amount (₹)</div>
-            <input id="lrAmt" type="number" placeholder="e.g., 25000"
-              style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+            <div class="tile-title" data-i18n="common.amount">Amount (₹)</div>
+            <input id="lrAmt" class="field" type="number" data-i18n-ph="loan.amountPh" placeholder="e.g., 25000" />
           </div>
           <div class="tile glass-lite">
-            <div class="tile-title">Purpose</div>
-            <input id="lrPurpose" placeholder="Medical / Education / Business / Other"
-              style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+            <div class="tile-title" data-i18n="common.purpose">Purpose</div>
+            <input id="lrPurpose" class="field" data-i18n-ph="loan.purposePh" placeholder="Medical / Education / Business / Other" />
           </div>
         </div>
-        <div class="glass-lite tile" style="margin-top:10px">
-          <div class="tile-title">Notes</div>
-          <textarea id="lrNotes" rows="4" placeholder="Explain your need briefly"
-            style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)"></textarea>
+        <div class="tile glass-lite">
+          <div class="tile-title" data-i18n="common.notes">Notes</div>
+          <textarea id="lrNotes" rows="4" class="field" data-i18n-ph="loan.notesPh" placeholder="Explain your need briefly"></textarea>
         </div>
-        <div class="row" style="margin-top:12px">
-          <button id="lrSubmit" class="btn">Submit Request</button>
-          <a id="lrWA" class="btn-ghost" target="_blank">Send via WhatsApp</a>
+        <div class="row mt-12">
+          <button id="lrSubmit" class="btn" data-i18n="loan.submit">Submit Request</button>
+          <a id="lrWA" class="btn-ghost" target="_blank" data-i18n="loan.whatsapp">Send via WhatsApp</a>
         </div>
-        <div id="lrMsg" class="muted" style="margin-top:8px"></div>
+        <div id="lrMsg" class="muted tiny mt-8"></div>
       </div>
     </section>
 
-    <!-- MANAGE (Admins/Committee only) -->
+    <!-- MANAGE -->
     <section id="manage" class="tab-panel">
       <div class="card glass">
-        <h3>Manage (Admins & Committee)</h3>
-        <p class="muted">Future: approve hall bookings, verify fee payments, review loan requests.</p>
+        <h3 data-i18n="manage.title">Manage (Admins & Committee)</h3>
+        <p class="muted" data-i18n="manage.desc">Future: approve hall bookings, verify fee payments, review loan requests.</p>
       </div>
     </section>
   </main>
 
-  <!-- FAB -->
-  <a class="fab-whatsapp" href="https://wa.me/919999999999?text=Jai%20Padmashali" target="_blank" aria-label="WhatsApp"></a>
-
-  <footer class="app-footer"><small>© Padmashali Community — V1</small></footer>
+  <footer class="app-footer">
+    <small>© Padmashali Community — V1</small>
+  </footer>
 
   <script src="app.js"></script>
 </body>
