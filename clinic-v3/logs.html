@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Logs — Glass UI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-1"></div><div class="bg-orb orb-2"></div><div class="bg-orb orb-3"></div>
+
+  <header class="app-header glass">
+    <div class="brand">
+      <img src="assets/logo.png" class="logo" alt="Logo">
+      <div class="titles"><h1>Logs</h1><p class="sub">daily bookings + reminders</p></div>
+    </div>
+    <nav class="actions">
+      <a class="icon-btn" href="index.html" title="Home">🏠</a>
+      <a class="icon-btn" href="bookings.html" title="Bookings">📆</a>
+      <a class="icon-btn" href="staff.html" title="Staff">👥</a>
+      <a class="icon-btn" href="doctor.html" title="Doctor">🩺</a>
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
+        <svg id="sun" viewBox="0 0 24 24" class="icon"><path d="M12 4V2M12 22v-2M4 12H2m20 0h-2M5 5l-1.4-1.4M20.4 20.4 19 19M5 19l-1.4 1.4M20.4 3.6 19 5M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg id="moon" viewBox="0 0 24 24" class="icon hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79Z" fill="currentColor"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main class="panels">
+    <section class="tab-panel" data-active="true">
+      <div class="card glass">
+        <h3>Filters</h3>
+        <div class="grid two">
+          <div class="glass-lite tile">
+            <div class="tile-title">Date</div>
+            <input id="fDate" type="date" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+          </div>
+          <div class="glass-lite tile">
+            <div class="tile-title">Search</div>
+            <input id="fQuery" placeholder="Name / reason" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--text)">
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button id="btnExport" class="btn">Export CSV</button>
+          <button id="btnClear" class="btn-ghost">Clear</button>
+        </div>
+      </div>
+
+      <div class="card glass">
+        <h3>Today’s Log</h3>
+        <div class="progress">
+          <div class="label" id="sumLabel">0 bookings</div>
+          <div class="bar"><span id="sumBar" style="width:0%"></span></div>
+          <div class="value" id="sumValue">0%</div>
+        </div>
+        <div id="logList" class="list compact"></div>
+      </div>
+    </section>
+  </main>
+
+  <a class="fab-whatsapp" id="waFab" href="#" aria-label="WhatsApp"></a>
+  <footer class="app-footer"><small>© Onestop — Logs</small></footer>
+
+  <script src="app.js"></script>
+  <script>
+    // Demo data (swap with Airtable/CSV later)
+    const data = [
+      {time:"10:30 AM", name:"Rahul", reason:"Fever", contact:"9100000001", token:10, reminded:false, date:new Date().toISOString().slice(0,10)},
+      {time:"10:45 AM", name:"Sana", reason:"BP Check", contact:"9100000002", token:11, reminded:true,  date:new Date().toISOString().slice(0,10)},
+      {time:"11:00 AM", name:"Kiran", reason:"Consult", contact:"9100000003", token:12, reminded:false, date:new Date().toISOString().slice(0,10)},
+    ];
+
+    const list = document.getElementById('logList');
+    const q = document.getElementById('fQuery');
+    const d = document.getElementById('fDate');
+    d.valueAsDate = new Date();
+
+    function render(){
+      const term = (q.value||'').toLowerCase();
+      const day = d.value || new Date().toISOString().slice(0,10);
+      list.innerHTML='';
+      const filtered = data.filter(x =>
+        x.date===day && (x.name.toLowerCase().includes(term) || x.reason.toLowerCase().includes(term))
+      );
+      filtered.forEach(x=>{
+        const row = document.createElement('div'); row.className='list-item glass-lite';
+        const status = x.reminded ? 'chip success' : 'chip';
+        row.innerHTML = `
+          <div>
+            <div class="title">Token #${x.token} — ${x.name}</div>
+            <div class="sub">${x.time} • ${x.reason}</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="${status}" data-phone="${x.contact}">${x.reminded?'Sent':'Reminder'}</button>
+            <a class="chip" href="tel:${x.contact}">Call</a>
+          </div>`;
+        row.querySelector('button').onclick = (e)=>{
+          const msg = encodeURIComponent(`Hi ${x.name}, reminder for your appointment at ${x.time} (Token #${x.token}).`);
+          window.open(`https://wa.me/${x.contact}?text=${msg}`,'_blank');
+          x.reminded = true; render();
+        };
+        list.appendChild(row);
+      });
+      // summary
+      const pct = Math.round((filtered.filter(x=>x.reminded).length / Math.max(filtered.length,1))*100);
+      document.getElementById('sumLabel').textContent = `${filtered.length} bookings`;
+      document.getElementById('sumValue').textContent = `${pct}% reminded`;
+      document.getElementById('sumBar').style.width = pct+'%';
+    }
+    render();
+    q.oninput = render; d.onchange = render;
+
+    document.getElementById('btnClear').onclick = ()=>{ q.value=''; d.valueAsDate=new Date(); render(); };
+    document.getElementById('btnExport').onclick = ()=>{
+      const rows = [['Date','Time','Name','Reason','Contact','Token','Reminded'],
+        ...Array.from(list.children).map(li=>{
+          const t = li.querySelector('.title').textContent; // "Token #10 — Rahul"
+          const sub = li.querySelector('.sub').textContent; // "11:00 AM • Fever"
+          const name = t.split('—')[1].trim();
+          const token = t.match(/#(\d+)/)[1];
+          const time = sub.split('•')[0].trim();
+          const reason = sub.split('•')[1].trim();
+          const phone = li.querySelector('a').getAttribute('href').replace('tel:','');
+          const reminded = li.querySelector('button').textContent==='Sent' ? 'Yes' : 'No';
+          return [d.value,time,name,reason,phone,token,reminded];
+        })
+      ];
+      const csv = rows.map(r=>r.map(x=>`"${(x+'').replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='logs.csv'; a.click();
+    };
+
+    document.getElementById('waFab').href = 'https://wa.me/919999999999?text=Hi%2C%20send%20today%27s%20logs';
+  </script>
+</body>
+</html>
