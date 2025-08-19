@@ -1,103 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Padmashali Community</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Padmashali Community — V1</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="header glass">
-    <img src="assets/logo.png" alt="Padmashali Logo" class="logo" />
-    <div class="title">
-      <h1>Padmashali Community</h1>
-      <p>unity · seva · growth</p>
+
+  <!-- ===== LOGIN (shows first) ===== -->
+  <section id="login" class="login-wrap">
+    <div class="card glass login-card">
+      <div class="login-brand">
+        <img src="assets/logo.png" class="logo" alt="Logo" />
+        <div>
+          <h2 data-i18n="login.title">Login</h2>
+          <p class="tiny muted">Padmashali Community</p>
+        </div>
+      </div>
+
+      <div class="grid three">
+        <button class="tab-mini active" data-role="member"   data-i18n="login.member">Member</button>
+        <button class="tab-mini"        data-role="committee" data-i18n="login.committee">Committee</button>
+        <button class="tab-mini"        data-role="admin"     data-i18n="login.admin">Admin</button>
+      </div>
+
+      <label class="tile-title mt-10" data-i18n="login.pin">Enter PIN</label>
+      <input id="pinInput" class="field" inputmode="numeric" maxlength="6" data-i18n-ph="login.pinPh" placeholder="••••" />
+
+      <div class="row mt-12">
+        <button id="loginBtn" class="btn" data-i18n="login.btn">Login</button>
+        <span id="loginMsg" class="tiny muted"></span>
+      </div>
+
+      <div class="tiny muted mt-8">
+        Demo PINs — <b data-i18n="login.member">Member</b>: <b>1111</b> ·
+        <b data-i18n="login.committee">Committee</b>: <b>5555</b> ·
+        <b data-i18n="login.admin">Admin</b>: <b>9999</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APP HEADER (hidden until login) ===== -->
+  <header id="appHeader" class="app-header glass hide">
+    <div class="brand">
+      <img src="assets/logo.png" class="logo" alt="Logo" />
+      <div class="titles">
+        <h1 data-i18n="app.title">Padmashali Community</h1>
+        <p class="sub" data-i18n="app.tagline">unity • seva • growth</p>
+      </div>
     </div>
     <div class="actions">
-      <button id="lang-toggle">తెలుగు</button>
-      <button id="theme-toggle">☀️</button>
+      <button id="langBtn" class="icon-btn">తెలుగు</button>
+      <button id="themeToggle" class="icon-btn" aria-label="Theme">☀️</button>
+      <button id="logoutBtn" class="icon-btn" aria-label="Logout">↩️</button>
     </div>
   </header>
 
-  <!-- BANNER -->
-  <div class="banner glass">
+  <!-- ===== BANNER (no crop) ===== -->
+  <section id="banner" class="banner glass hide">
     <img src="assets/banner.png" alt="Lord Shiva & Parvathi" />
-  </div>
+  </section>
 
-  <!-- NAVIGATION -->
-  <nav class="nav glass">
-    <button class="tab-btn active" data-tab="home">Home</button>
-    <button class="tab-btn" data-tab="directory">Directory</button>
-    <button class="tab-btn" data-tab="events">Events</button>
-    <button class="tab-btn" data-tab="bookhalls">Book Halls</button>
-    <button class="tab-btn" data-tab="fees">Fees</button>
-    <button class="tab-btn" data-tab="loan">Loan Request</button>
-    <button class="tab-btn" data-tab="manage">Manage</button>
+  <!-- ===== TABS ===== -->
+  <nav id="tabbar" class="tabs glass hide">
+    <button class="tab-btn active" data-tab="home"      data-i18n="tab.home">Home</button>
+    <button class="tab-btn"        data-tab="directory" data-i18n="tab.directory">Directory</button>
+    <button class="tab-btn"        data-tab="events"    data-i18n="tab.events">Events</button>
+    <button class="tab-btn"        data-tab="halls"     data-i18n="tab.halls">Book Halls</button>
+    <button class="tab-btn"        data-tab="fees"      data-i18n="tab.fees">Fees</button>
+    <button class="tab-btn"        data-tab="loan"      data-i18n="tab.loan">Loan Request</button>
+    <button class="tab-btn admin-only" data-tab="manage" data-i18n="tab.manage">Manage</button>
   </nav>
 
-  <!-- CONTENT -->
-  <main id="content">
+  <!-- ===== CONTENT ===== -->
+  <main id="content" class="hide">
     <section id="home" class="tab-content active">
-      <h2>Welcome</h2>
-      <div class="card">Community News</div>
+      <h2 data-i18n="home.title">Welcome</h2>
+      <div class="card glass">
+        <h3 data-i18n="home.news">Community News</h3>
+        <div id="newsList" class="list"></div>
+      </div>
     </section>
 
     <section id="directory" class="tab-content">
-      <h2>Member Directory</h2>
-      <div class="card">Coming soon…</div>
+      <h2 data-i18n="dir.title">Member Directory</h2>
+      <div class="card glass">
+        <label class="tile-title" data-i18n="dir.search">Search</label>
+        <input id="dirQuery" class="field" data-i18n-ph="dir.searchPh" placeholder="Name / Profession / City" />
+        <div id="dirList" class="list mt-10"></div>
+      </div>
     </section>
 
     <section id="events" class="tab-content">
-      <h2>Events</h2>
-      <div class="card">Upcoming events here…</div>
+      <h2 data-i18n="events.title">Upcoming Events</h2>
+      <div id="eventList" class="list"></div>
     </section>
 
-    <section id="bookhalls" class="tab-content">
-      <h2>Book Community Halls</h2>
-      <div class="card">
-        <label>Select Hall
-          <select><option>Hall 1</option><option>Hall 2</option></select>
-        </label>
-        <label>Date <input type="date"></label>
-        <label>Time Slot
-          <select>
-            <option>Morning (8–12)</option>
-            <option>Afternoon (12–4)</option>
-            <option>Evening (4–8)</option>
-          </select>
-        </label>
-        <label>Purpose <input type="text" placeholder="Engagement, Birthday…"></label>
-        <button>Check Availability</button>
-        <button class="primary">Send Booking Request</button>
+    <section id="halls" class="tab-content">
+      <h2 data-i18n="halls.title">Book Community Halls</h2>
+      <div class="card glass">
+        <div class="grid two">
+          <div>
+            <label class="tile-title" data-i18n="halls.selectHall">Select Hall</label>
+            <select id="hallSel" class="field">
+              <option>Hall 1</option><option>Hall 2</option>
+            </select>
+          </div>
+          <div>
+            <label class="tile-title" data-i18n="common.date">Date</label>
+            <input id="hallDate" type="date" class="field" />
+          </div>
+        </div>
+        <div class="grid two">
+          <div>
+            <label class="tile-title" data-i18n="halls.timeSlot">Time Slot</label>
+            <select id="hallTime" class="field">
+              <option>Morning (8–12)</option>
+              <option>Afternoon (1–5)</option>
+              <option>Evening (6–10)</option>
+              <option>Full Day</option>
+            </select>
+          </div>
+          <div>
+            <label class="tile-title" data-i18n="halls.purpose">Purpose</label>
+            <input id="hallPurpose" class="field" data-i18n-ph="halls.purposePh" placeholder="e.g., Engagement, Thread Ceremony" />
+          </div>
+        </div>
+        <div class="row mt-12">
+          <button id="hallCheck" class="btn-ghost" data-i18n="halls.check">Check Availability</button>
+          <button id="hallBook" class="btn" data-i18n="halls.book">Send Booking Request</button>
+        </div>
+        <div id="hallMsg" class="muted tiny mt-8"></div>
       </div>
     </section>
 
     <section id="fees" class="tab-content">
-      <h2>Fees</h2>
-      <div class="card">Member fee collection section.</div>
+      <h2 data-i18n="fees.title">Membership Fee</h2>
+      <div class="card glass">
+        <p class="muted" data-i18n="fees.desc">Pay annual / lifetime fee. Receipts will be shared on WhatsApp.</p>
+      </div>
     </section>
 
     <section id="loan" class="tab-content">
-      <h2>Loan Request</h2>
-      <div class="card">
-        <label>Name <input type="text"></label>
-        <label>Amount <input type="number"></label>
-        <label>Reason <textarea></textarea></label>
-        <button class="primary">Submit Loan Request</button>
+      <h2 data-i18n="loan.title">Loan / Financial Help Request</h2>
+      <div class="card glass">
+        <div class="grid two">
+          <div>
+            <label class="tile-title" data-i18n="common.name">Full Name</label>
+            <input id="lrName" class="field" data-i18n-ph="loan.namePh" placeholder="Applicant name" />
+          </div>
+          <div>
+            <label class="tile-title" data-i18n="common.phone">Phone</label>
+            <input id="lrPhone" class="field" inputmode="tel" data-i18n-ph="loan.phonePh" placeholder="10-digit number" />
+          </div>
+        </div>
+        <div class="grid two">
+          <div>
+            <label class="tile-title" data-i18n="common.amount">Amount (₹)</label>
+            <input id="lrAmt" class="field" type="number" data-i18n-ph="loan.amountPh" placeholder="e.g., 25000" />
+          </div>
+          <div>
+            <label class="tile-title" data-i18n="common.purpose">Purpose</label>
+            <input id="lrPurpose" class="field" data-i18n-ph="loan.purposePh" placeholder="Medical / Education / Business / Other" />
+          </div>
+        </div>
+        <label class="tile-title" data-i18n="common.notes">Notes</label>
+        <textarea id="lrNotes" rows="4" class="field" data-i18n-ph="loan.notesPh" placeholder="Explain your need briefly"></textarea>
+        <div class="row mt-12">
+          <button id="lrSubmit" class="btn" data-i18n="loan.submit">Submit Request</button>
+          <a id="lrWA" class="btn-ghost" target="_blank" data-i18n="loan.whatsapp">Send via WhatsApp</a>
+        </div>
+        <div id="lrMsg" class="muted tiny mt-8"></div>
       </div>
     </section>
 
     <section id="manage" class="tab-content">
-      <h2>Management</h2>
-      <div class="card">Committee controls here.</div>
+      <h2 data-i18n="manage.title">Manage (Admins & Committee)</h2>
+      <p class="muted" data-i18n="manage.desc">Approve hall bookings, verify fee payments, review loan requests.</p>
     </section>
   </main>
 
-  <footer>
-    © Padmashali Community — V1
-  </footer>
+  <footer class="app-footer"><small>© Padmashali Community — V1</small></footer>
 
-  <script src="app.js"></script>
+  <!-- Core app (login + tabs + i18n) -->
+  <script src="app.js?v=8"></script>
 </body>
 </html>
