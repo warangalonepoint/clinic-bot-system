@@ -113,5 +113,56 @@
   </main>
   <footer class="app-footer"><small>© Padmashali Community — V1</small></footer>
   <script type="module" src="js/main.js?v=5"></script>
-</body>
+<script>
+(() => {
+  const PINS = { member: '1111', committee: '5555', admin: '9999' };
+  let role = 'member';
+
+  // role selection
+  document.querySelectorAll('.tab-mini').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-mini').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      role = b.dataset.role;
+    });
+  });
+
+  const pinEl   = document.getElementById('pinInput');
+  const btn     = document.getElementById('loginBtn');
+  const msg     = document.getElementById('loginMsg');
+
+  function tryLogin(){
+    const pin = (pinEl.value || '').trim();
+    if (pin === PINS[role]) {
+      localStorage.setItem('pdm-role', role);
+      // show app UI if it exists on page
+      const show = id => { const el = document.getElementById(id); if (el) el.classList.remove('hide'); };
+      const hide = id => { const el = document.getElementById(id); if (el) el.classList.add('hide'); };
+      show('appHeader'); show('banner'); show('tabbar'); show('content'); hide('login');
+      document.querySelectorAll('.admin-only').forEach(el=>{
+        el.style.display = (role === 'admin' || role === 'committee') ? '' : 'none';
+      });
+      msg.textContent = '';
+    } else {
+      msg.textContent = 'Invalid PIN';
+    }
+  }
+
+  btn.addEventListener('click', tryLogin);
+  pinEl.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') tryLogin(); });
+
+  // auto-login if stored
+  const saved = localStorage.getItem('pdm-role');
+  if (saved) {
+    role = saved;
+    // reveal app without typing again
+    const show = id => { const el = document.getElementById(id); if (el) el.classList.remove('hide'); };
+    const hide = id => { const el = document.getElementById(id); if (el) el.classList.add('hide'); };
+    show('appHeader'); show('banner'); show('tabbar'); show('content'); hide('login');
+    document.querySelectorAll('.admin-only').forEach(el=>{
+      el.style.display = (saved === 'admin' || saved === 'committee') ? '' : 'none';
+    });
+  }
+})();
+</script></body>
 </html>
