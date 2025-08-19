@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Padmashali Community — V1</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f1120">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css?v=5" />
+</head>
+<body>
+  <header id="appHeader" class="app-header glass hide">
+    <div class="brand">
+      <img src="assets/logo.png" class="logo" alt="Logo" />
+      <div class="titles">
+        <h1 data-i18n="app.title">Padmashali Community</h1>
+        <p class="sub" data-i18n="app.tagline">unity • seva • growth</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="langBtn" class="icon-btn">తెలుగు</button>
+      <button id="themeToggle" class="icon-btn">☀️</button>
+      <button id="logoutBtn" class="icon-btn">↩️</button>
+    </div>
+  </header>
+  <section id="login" class="login-wrap">
+    <div class="card glass login-card">
+      <div class="login-brand">
+        <img src="assets/logo.png" class="logo" alt="Logo" />
+        <div><h2 data-i18n="login.title">Login</h2></div>
+      </div>
+      <div class="grid three">
+        <button class="tab-mini active" data-role="member"  data-i18n="login.member">Member</button>
+        <button class="tab-mini"        data-role="committee" data-i18n="login.committee">Committee</button>
+        <button class="tab-mini"        data-role="admin"     data-i18n="login.admin">Admin</button>
+      </div>
+      <label class="tile-title mt-10" data-i18n="login.pin">Enter PIN</label>
+      <input id="pinInput" class="field" inputmode="numeric" maxlength="6" placeholder="••••" />
+      <div class="row mt-12">
+        <button id="loginBtn" class="btn" data-i18n="login.btn">Login</button>
+        <span id="loginMsg" class="muted tiny"></span>
+      </div>
+      <div class="muted tiny mt-8">Demo PINs — Member: <b>1111</b> • Committee: <b>5555</b> • Admin: <b>9999</b></div>
+    </div>
+  </section>
+  <section id="banner" class="banner glass hide">
+    <img src="assets/banner.png" alt="Lord Shiva & Parvathi" />
+  </section>
+  <nav id="tabbar" class="tabs glass hide">
+    <button class="tab-btn active" data-tab="home"      data-i18n="tab.home">Home</button>
+    <button class="tab-btn"        data-tab="directory" data-i18n="tab.directory">Directory</button>
+    <button class="tab-btn"        data-tab="events"    data-i18n="tab.events">Events</button>
+    <button class="tab-btn"        data-tab="halls"     data-i18n="tab.halls">Book Halls</button>
+    <button class="tab-btn"        data-tab="fees"      data-i18n="tab.fees">Fees</button>
+    <button class="tab-btn"        data-tab="loan"      data-i18n="tab.loan">Loan Request</button>
+    <button class="tab-btn admin-only" data-tab="manage" data-i18n="tab.manage">Manage</button>
+  </nav>
+  <main id="content" class="hide">
+    <section id="home" class="tab-content active">
+      <h2 data-i18n="home.title">Welcome</h2>
+      <div class="card glass">
+        <h3 data-i18n="home.news">Community News</h3>
+        <div id="newsList" class="list"></div>
+      </div>
+    </section>
+    <section id="directory" class="tab-content">
+      <h2 data-i18n="dir.title">Member Directory</h2>
+      <div class="card glass">
+        <input id="dirQuery" class="field" placeholder="Name / Profession / City"/>
+        <div id="dirList" class="list mt-10"></div>
+      </div>
+    </section>
+    <section id="events" class="tab-content">
+      <h2 data-i18n="events.title">Upcoming Events</h2>
+      <div id="eventList" class="list"></div>
+    </section>
+    <section id="halls" class="tab-content">
+      <h2 data-i18n="halls.title">Book Community Halls</h2>
+      <div class="card glass">
+        <input id="hallDate" type="date" class="field" />
+        <input id="hallPurpose" class="field" placeholder="Purpose"/>
+        <div class="row mt-12">
+          <button id="hallCheck" class="btn-ghost">Check Availability</button>
+          <button id="hallBook" class="btn">Send Booking Request</button>
+        </div>
+        <div id="hallMsg" class="muted tiny mt-8"></div>
+      </div>
+    </section>
+    <section id="fees" class="tab-content">
+      <h2>Membership Fee</h2>
+      <div class="card glass">
+        <p>Pay annual or lifetime fee</p>
+      </div>
+    </section>
+    <section id="loan" class="tab-content">
+      <h2>Loan / Financial Help Request</h2>
+      <div class="card glass">
+        <input id="lrName" class="field" placeholder="Name" />
+        <input id="lrPhone" class="field" placeholder="Phone" />
+        <input id="lrAmt" class="field" placeholder="Amount" />
+        <textarea id="lrNotes" rows="3" class="field" placeholder="Notes"></textarea>
+        <div class="row mt-12">
+          <button id="lrSubmit" class="btn">Submit</button>
+        </div>
+      </div>
+    </section>
+    <section id="manage" class="tab-content">
+      <h2>Manage</h2>
+      <p>Committee/Admin only</p>
+    </section>
+  </main>
+  <footer class="app-footer"><small>© Padmashali Community — V1</small></footer>
+  <script type="module" src="js/main.js?v=5"></script>
+</body>
+</html>
