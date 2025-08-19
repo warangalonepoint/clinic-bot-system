@@ -1,48 +1,65 @@
-// --- Simple helpers ---
-const $ = (s,sc=document)=>sc.querySelector(s);
-const $$ = (s,sc=document)=>[...sc.querySelectorAll(s)];
+// tiny helpers
+const $=(s,sc=document)=>sc.querySelector(s);
+const $$=(s,sc=document)=>[...sc.querySelectorAll(s)];
 
-// --- i18n (English/Telugu) ---
-let LANG = localStorage.getItem('pdm-lang') || 'en';
-let DICT = {};
-async function loadLang(code){
-  const res = await fetch(`locales/${code}.json`);
-  DICT = await res.json(); LANG = code;
-  localStorage.setItem('pdm-lang', LANG);
-  applyI18n();
-}
-function applyI18n(){
-  $$('[data-i18n]').forEach(el=>{
-    const k = el.dataset.i18n; if(DICT[k]) el.textContent = DICT[k];
+// PINs
+const PINS={ member:'1111', committee:'5555', admin:'9999' };
+let ROLE='member';
+
+// ===== role gating =====
+function applyRoleGate(role){
+  // show/hide gated nodes
+  $$('.role-gate').forEach(el=>{
+    const roles=(el.getAttribute('data-roles')||'').split(',').map(x=>x.trim());
+    const show=roles.includes(role);
+    el.classList.toggle('hide', !show);
   });
-  $$('[data-i18n-ph]').forEach(el=>{
-    const k = el.dataset.i18nPh; if(DICT[k]) el.setAttribute('placeholder', DICT[k]);
+
+  // show/hide gated tabs
+  const tabs=$$('.tab-btn');
+  tabs.forEach(btn=>{
+    const gate=btn.classList.contains('role-gate') ? (btn.getAttribute('data-roles')||'') : '';
+    if(gate){
+      const roles=gate.split(',').map(x=>x.trim());
+      const show=roles.includes(role);
+      btn.style.display = show ? '' : 'none';
+    }else{
+      btn.style.display = '';
+    }
   });
-  const hallSel = $('#hallSel');
-  if(hallSel && DICT['_opt.h1']) {
-    hallSel.options[0].text = DICT['_opt.h1'];
-    hallSel.options[1].text = DICT['_opt.h2'];
+
+  // if current active tab is hidden, jump to the first visible
+  let activeBtn=$('.tab-btn.active');
+  if(!activeBtn || activeBtn.style.display==='none'){
+    const firstVisible=tabs.find(b=>b.style.display!=='none') || tabs[0];
+    if(firstVisible) switchTab(firstVisible.dataset.tab);
   }
-  const hallTime = $('#hallTime');
-  if(hallTime && DICT['_opt.m']) {
-    hallTime.options[0].text=DICT['_opt.m'];
-    hallTime.options[1].text=DICT['_opt.a'];
-    hallTime.options[2].text=DICT['_opt.e'];
-    hallTime.options[3].text=DICT['_opt.f'];
-  }
-  // Button label
-  const lb = $('#langBtn'); if(lb) lb.textContent = (LANG==='te'?'English':'తెలుగు');
+
+  // role badge
+  const label = role==="member" ? "Member" : role==="committee" ? "Committee" : "Admin";
+  $('#roleBadge').textContent = label;
 }
 
-// --- Login (PINs) ---
-const PINS = { member:'1111', committee:'5555', admin:'9999' };
-let ROLE = 'member';
+// ===== tabs =====
+function switchTab(id){
+  $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  $$('.tab-content').forEach(v=>v.classList.toggle('active', v.id===id));
+}
+function initTabs(){
+  $$('.tab-btn').forEach(b=>{
+    b.addEventListener('click',()=>switchTab(b.dataset.tab));
+  });
+  // activate first visible by default
+  const firstVisible = $$('.tab-btn').find(b=>b.style.display!=='none') || $('.tab-btn');
+  if(firstVisible) switchTab(firstVisible.dataset.tab);
+}
 
+// ===== login / logout =====
 function showApp(role){
   ['appHeader','banner','tabbar','content'].forEach(id=>$('#'+id)?.classList.remove('hide'));
   $('#login')?.classList.add('hide');
-  $$('.admin-only').forEach(el=> el.style.display = (role==='admin'||role==='committee')?'':'none');
-  localStorage.setItem('pdm-role', role);
+  ROLE=role; localStorage.setItem('pdm-role', role);
+  applyRoleGate(role);
 }
 function showLogin(){
   ['appHeader','banner','tabbar','content'].forEach(id=>$('#'+id)?.classList.add('hide'));
@@ -50,69 +67,55 @@ function showLogin(){
   localStorage.removeItem('pdm-role');
   $('#pinInput').value=''; $('#loginMsg').textContent='';
 }
-
 function initLogin(){
   $$('.tab-mini').forEach(btn=>{
     btn.addEventListener('click',()=>{
       $$('.tab-mini').forEach(x=>x.classList.remove('active'));
-      btn.classList.add('active'); ROLE = btn.dataset.role;
+      btn.classList.add('active'); ROLE=btn.dataset.role;
     });
   });
   $('#loginBtn')?.addEventListener('click',()=>{
-    const pin = $('#pinInput').value.trim();
+    const pin=$('#pinInput').value.trim();
     if(pin===PINS[ROLE]) showApp(ROLE);
-    else $('#loginMsg').textContent = (LANG==='te'?'తప్పు PIN':'Invalid PIN');
+    else $('#loginMsg').textContent='Invalid PIN';
   });
   $('#logoutBtn')?.addEventListener('click', showLogin);
 
-  const saved = localStorage.getItem('pdm-role');
+  const saved=localStorage.getItem('pdm-role');
   if(saved) showApp(saved); else showLogin();
 }
 
-// --- Tabs ---
-function initTabs(){
-  const btns = $$('.tab-btn');
-  const views = $$('.tab-content');
-  function activate(id){
-    btns.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
-    views.forEach(v=>v.classList.toggle('active', v.id===id));
-  }
-  btns.forEach(b=>b.addEventListener('click', ()=>activate(b.dataset.tab)));
-  if(btns[0]) activate(btns[0].dataset.tab);
-}
-
-// --- Halls (basic actions) ---
+// ===== small demo actions =====
 function initHalls(){
-  const d = $('#hallDate'); if(d) d.value = new Date().toISOString().slice(0,10);
-  $('#hallCheck')?.addEventListener('click', ()=> $('#hallMsg').textContent = (LANG==='te'?'అందుబాటులో ఉండేలా కనిపిస్తోంది':'Looks available'));
-  $('#hallBook')?.addEventListener('click', ()=>{
-    const msg = encodeURIComponent('Hall booking request from app');
+  const d=$('#hallDate'); if(d) d.value=new Date().toISOString().slice(0,10);
+  $('#hallCheck')?.addEventListener('click',()=> $('#hallMsg').textContent='Looks available');
+  $('#hallBook')?.addEventListener('click',()=>{
+    const msg=encodeURIComponent('Hall booking request from app');
     window.open(`https://wa.me/919999999999?text=${msg}`,'_blank');
   });
 }
-
-// --- Loan form quick validate ---
 function initLoan(){
-  $('#lrSubmit')?.addEventListener('click', ()=>{
-    const ok = $('#lrName').value && $('#lrPhone').value && $('#lrAmt').value;
-    $('#lrMsg').textContent = ok ? '✓ Submitted (demo)' : (LANG==='te'?'పేరు, ఫోన్, మొత్తం కావాలి':'Name, phone, amount required');
+  $('#lrSubmit')?.addEventListener('click',()=>{
+    const ok=$('#lrName').value && $('#lrPhone').value && $('#lrAmt').value;
+    $('#lrMsg').textContent = ok ? '✓ Submitted (demo)' : 'Name, phone, amount required';
   });
 }
 
-// --- Lang + Theme ---
+// ===== language + theme (demo) =====
 function initGlobal(){
-  $('#langBtn')?.addEventListener('click', async ()=>{
-    await loadLang(LANG==='en'?'te':'en');
+  $('#langBtn')?.addEventListener('click',()=>{
+    const cur=$('#langBtn').textContent.trim();
+    $('#langBtn').textContent = (cur==='తెలుగు') ? 'English' : 'తెలుగు';
+    // (hook your i18n here if needed)
   });
-  $('#themeToggle')?.addEventListener('click', (e)=>{
+  $('#themeToggle')?.addEventListener('click',(e)=>{
     document.body.classList.toggle('light');
     e.currentTarget.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
   });
 }
 
-// --- Bootstrap ---
-(async function start(){
-  await loadLang(LANG);
+// ===== boot =====
+(function start(){
   initLogin();
   initTabs();
   initHalls();
