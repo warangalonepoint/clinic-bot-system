@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Padmashali Community</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/tabs.js"></script>
+  <script defer src="js/i18n.js"></script>
+</head>
+<body>
+  <div id="login-screen" class="card glass">
+    <img src="assets/logo.png" alt="Logo" class="logo" />
+    <h2>Login</h2>
+    <div class="role-tabs">
+      <button onclick="setRole('member')">Member</button>
+      <button onclick="setRole('committee')">Committee</button>
+      <button onclick="setRole('admin')">Admin</button>
+    </div>
+    <input type="password" id="pin" placeholder="Enter PIN" />
+    <button onclick="login()">Login</button>
+    <p class="demo">Demo PINs — Member: 1111 · Committee: 5555 · Admin: 9999</p>
+  </div>
 
+  <div id="app" class="hidden">
+    <header class="glass">
+      <img src="assets/logo.png" alt="Logo" class="logo" />
+      <div>
+        <h1 data-i18n="title">Padmashali Community</h1>
+        <p data-i18n="motto">unity • seva • growth</p>
+      </div>
+      <button onclick="toggleLang()" id="lang-btn">తెలుగు</button>
+    </header>
+
+    <div class="banner glass">
+      <img src="assets/banner.png" alt="Banner" />
+    </div>
+
+    <nav class="tabs glass">
+      <button data-tab="home" class="active">Home</button>
+      <button data-tab="directory">Directory</button>
+      <button data-tab="events">Events</button>
+      <button data-tab="halls">Book Halls</button>
+      <button data-tab="fees">Fees</button>
+      <button data-tab="loan">Loan Request</button>
+      <button data-tab="manage" class="restricted">Manage</button>
+    </nav>
+
+    <main id="content" class="glass">
+      <h2 id="tab-title">Welcome</h2>
+      <div id="tab-content">Community News</div>
+    </main>
+  </div>
+</body>
+</html>
