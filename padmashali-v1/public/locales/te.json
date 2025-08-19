@@ -1,1 +1,66 @@
-{"app.title":"పద్మశాలి కమ్యూనిటీ"}
+{
+  "app.title": "పద్మశాలి కమ్యూనిటీ",
+  "app.tagline": "ఐక్యత • సేవ • అభివృద్ధి",
+
+  "login.title": "లాగిన్",
+  "login.member": "సభ్యుడు",
+  "login.committee": "కమిటీ",
+  "login.admin": "అడ్మిన్",
+  "login.pin": "PIN ఇవ్వండి",
+  "login.pinPh": "••••",
+  "login.btn": "లాగిన్",
+
+  "tab.home": "హోమ్",
+  "tab.directory": "సభ్యుల జాబితా",
+  "tab.events": "కార్యక్రమాలు",
+  "tab.halls": "హాల్ బుకింగ్",
+  "tab.fees": "ఫీజులు",
+  "tab.loan": "ఋణ అభ్యర్థన",
+  "tab.manage": "నిర్వహణ",
+
+  "home.title": "స్వాగతం",
+  "home.news": "సంస్థ వార్తలు",
+
+  "dir.title": "సభ్యుల జాబితా",
+  "dir.search": "వెతకండి",
+  "dir.searchPh": "పేరు / వృత్తి / నగరం",
+
+  "events.title": "రాబోయే కార్యక్రమాలు",
+
+  "halls.title": "సమాజ హాళ్ల బుకింగ్",
+  "halls.selectHall": "హాల్ ఎంపిక",
+  "halls.timeSlot": "సమయ స్లాట్",
+  "halls.purpose": "ఉద్దేశ్యం",
+  "halls.purposePh": "ఉదా: నిశ్చితార్థం, ఉపనయనం",
+  "halls.check": "అందుబాటులో ఉందా?",
+  "halls.book": "బుకింగ్ అభ్యర్థన పంపండి",
+
+  "fees.title": "సభ్యత్వ ఫీజు",
+  "fees.desc": "వార్షిక/లైఫ్‌టైమ్ ఫీజు చెల్లించండి. రసీదులు వాట్సాప్ ద్వారా పంపబడతాయి.",
+
+  "loan.title": "ఋణం / ఆర్థిక సహాయం అభ్యర్థన",
+  "loan.submit": "అభ్యర్థన పంపండి",
+  "loan.whatsapp": "వాట్సాప్ ద్వారా పంపండి",
+  "loan.namePh": "అభ్యర్థి పేరు",
+  "loan.phonePh": "10 అంకెల మొబైల్",
+  "loan.amountPh": "ఉదా: 25000",
+  "loan.purposePh": "మెడికల్ / ఎడ్యుకేషన్ / బిజినెస్ / ఇతర",
+  "loan.notesPh": "మీ అవసరాన్ని సంక్షిప్తంగా వ్రాయండి",
+
+  "manage.title": "నిర్వహణ (అడ్మిన్ & కమిటీ)",
+  "manage.desc": "హాల్ బుకింగ్స్ అప్రూవల్, ఫీజు వెరిఫై, లోన్ అభ్యర్థనలు.",
+
+  "_opt.h1": "హాల్ 1",
+  "_opt.h2": "హాల్ 2",
+  "_opt.m": "ఉదయం (8–12)",
+  "_opt.a": "మధ్యాహ్నం (1–5)",
+  "_opt.e": "సాయంత్రం (6–10)",
+  "_opt.f": "రోజంతా",
+
+  "common.date": "తేదీ",
+  "common.name": "పూర్తి పేరు",
+  "common.phone": "ఫోన్",
+  "common.amount": "మొత్తం (₹)",
+  "common.purpose": "ఉద్దేశ్యం",
+  "common.notes": "గమనికలు"
+}
