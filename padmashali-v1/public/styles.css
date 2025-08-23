@@ -30,8 +30,9 @@ body.dark {
 /* === Header / Banner === */
 .pc-banner {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;   /* stack vertically */
+  align-items: flex-start;
+  gap: 6px;
   padding: 12px;
   background: var(--card);
   border-radius: 12px;
@@ -52,13 +53,22 @@ body.dark {
 }
 
 .pc-title {
-  font-weight: 600;
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 1.5rem;   /* larger */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.muted[data-i18n="tagline"] {
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
 .pc-right {
   display: flex;
   gap: 8px;
+  margin-top: 4px;   /* pills on their own row */
 }
 
 .pc-pill {
