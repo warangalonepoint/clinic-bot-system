@@ -1,89 +1,45 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Events</title>
-<link rel="stylesheet" href="styles.css?v=18">
-<script src="i18n.js?v=18"></script>
-<script src="theme.js?v=18" defer></script>
-<script src="banner.js?v=18" defer></script>
-<script src="app.js?v=18" defer></script>
-</head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Events</title>
+  <link rel="stylesheet" href="styles.css?v=16">
+  <script src="i18n.js?v=16"></script>
+  <script src="theme.js?v=16" defer></script>
+  <script src="banner.js?v=16" defer></script>
+</head>
+<body>
 <div class="wrap">
   <div id="app-banner"></div>
 
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <h2>🎉 <span data-i18n="events">Events</span></h2>
-      <div>
-        <button class="ghost btn" onclick="history.back()" data-i18n="home">Home</button>
-      </div>
-    </div>
+    <div class="pc-title" data-i18n="events_title">Events</div>
+    <div class="pc-tagline" data-i18n="events_sub">View & RSVP</div>
+
+    <div id="list" style="margin-top:12px"></div>
   </div>
 
-  <div class="card">
-    <b>Upcoming</b>
-    <div id="list" style="margin-top:8px;display:grid;gap:12px"></div>
-    <p id="empty" class="muted" style="display:none">No upcoming events.</p>
-  </div>
-
-  <div class="card">
-    <b>My RSVPs</b>
-    <ul id="my" style="margin:8px 0 0 16px"></ul>
-    <p id="myEmpty" class="muted" style="display:none">No RSVPs yet.</p>
-  </div>
-
-  <footer>© Padmashali Community — V1</footer>
+  <div class="footer">© Padmashali Community — V1</div>
 </div>
 <script>
-const S=JSON.parse(localStorage.getItem('pc_session')||'null'); if(!S){location.href='index.html';}
-const UID=localStorage.getItem('pc_uid');
-const EK='pc_events';
-const RK=`pc_rsvps_${UID}`;
-function getEvents(){return JSON.parse(localStorage.getItem(EK)||'[]');}
-function setEvents(v){localStorage.setItem(EK,JSON.stringify(v));}
-function rsvps(){return JSON.parse(localStorage.getItem(RK)||'[]');}
-function setRsvps(v){localStorage.setItem(RK,JSON.stringify(v));}
-function fmt(dt){return new Date(dt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});}
-
-function seed(){
-  if(getEvents().length) return;
-  const now=Date.now();
-  setEvents([
-    {id:'E1',title:'Community Meet',when:now+86400000,location:'Warangal',desc:'Monthly gathering'},
-    {id:'E2',title:'Annadanam',when:now+3*86400000+3600000,location:'Hanamkonda',desc:'Seva program'}
-  ]);
-}
+const events=[
+ {title:"Monthly Seva Meet",date:"2025-09-05",place:"Warangal Hall A",desc:"Planning & volunteering."},
+ {title:"Health Camp",date:"2025-09-15",place:"Kazipet Clinic",desc:"Free checkups."}
+];
 function render(){
-  const list=getEvents().filter(e=>e.when>=Date.now()).sort((a,b)=>a.when-b.when);
-  const L=document.getElementById('list'); L.innerHTML='';
-  document.getElementById('empty').style.display=list.length?'none':'block';
-  const mySet=new Set(rsvps());
-  list.forEach(e=>{
-    const card=document.createElement('div'); card.className='glass tile';
-    card.innerHTML=`
-      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <div><b>${e.title}</b><div class="muted">${fmt(e.when)} • ${e.location||''}</div><div>${e.desc||''}</div></div>
-        <div>
-          <button class="btn" onclick="toggleRSVP('${e.id}')">${mySet.has(e.id)?'Cancel RSVP':'RSVP'}</button>
-        </div>
-      </div>`;
-    L.appendChild(card);
-  });
-
-  // my rsvps list
-  const all=getEvents().reduce((m,e)=>{m[e.id]=e;return m;},{}); 
-  const mine=rsvps().map(id=>all[id]).filter(Boolean).sort((a,b)=>a.when-b.when);
-  const MY=document.getElementById('my'); MY.innerHTML='';
-  document.getElementById('myEmpty').style.display=mine.length?'none':'block';
-  mine.forEach(e=>{
-    const li=document.createElement('li'); li.textContent=`${e.title} — ${fmt(e.when)} @ ${e.location||''}`;
-    MY.appendChild(li);
-  });
+  list.innerHTML=events.map((e,i)=>`
+    <div class="link-card">
+      <div class="link-title">${e.title}</div>
+      <div class="link-sub">${e.date} • ${e.place}</div>
+      <div style="margin-top:8px">${e.desc}</div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="pill" onclick="rsvp(${i},'yes')">RSVP Yes</button>
+        <button class="pill" onclick="rsvp(${i},'no')">RSVP No</button>
+      </div>
+    </div>`).join('');
 }
-function toggleRSVP(id){
-  const set=new Set(rsvps());
-  if(set.has(id)) set.delete(id); else set.add(id);
-  setRsvps([...set]); render();
-}
-seed(); render();
+function rsvp(i,v){ alert(`Saved: ${events[i].title} — ${v.toUpperCase()}`); }
+render();
 </script>
-</body></html>
+</body>
+</html>
