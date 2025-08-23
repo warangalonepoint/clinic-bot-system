@@ -1,1 +1,8 @@
-{"home":"హోమ్","directory":"డైరెక్టరీ","events":"ఈవెంట్స్","bookHalls":"హాల్స్ బుక్ చేయండి","fees":"ఫీజులు","loanRequest":"ఋణ అభ్యర్థన","manage":"నిర్వహించు"}
+{
+  "directory_title":"డైరెక్టరీ","directory_sub":"సభ్యులు & కాంటాక్ట్స్ శోధన",
+  "events_title":"ఈవెంట్స్","events_sub":"చూడండి & RSVP",
+  "halls_title":"హాల్ బుకింగ్","halls_sub":"స్లాట్స్ అభ్యర్థించండి",
+  "fees_title":"ఫీజులు","fees_sub":"చెల్లింపులు & హిస్టరీ",
+  "loans_title":"లోన్ రిక్వెస్ట్","loans_sub":"అప్లై & స్టేటస్",
+  "logout":"లాగ్ అవుట్","app_title":"Padmashali Community","tagline":"unity • seva • growth"
+}
