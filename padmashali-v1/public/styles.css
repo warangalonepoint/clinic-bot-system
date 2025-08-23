@@ -64,3 +64,11 @@ html[data-theme="light"] .pc-pill{ color:#0b1220; }
 html[data-theme="light"] .pc-pill { color: #0b1220; }
 .pc-header .pc-title { font-size: 1.25rem; }
 @media (min-width: 480px) { .pc-header .pc-title { font-size: 1.45rem; } }
+/* pills visible and consistent */
+.pc-pill { color: inherit; font-weight: 600; min-width: 88px; justify-content: center; }
+html[data-theme="light"] .pc-pill { color: #0b1220; }
+
+/* keep title on one line, ellipsis if very tight */
+.one-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-header .pc-title { font-size: 1.25rem; line-height: 1.1; }
+@media (min-width: 480px) { .pc-header .pc-title { font-size: 1.45rem; } }
