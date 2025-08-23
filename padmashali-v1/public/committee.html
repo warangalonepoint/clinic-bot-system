@@ -1,31 +1,43 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Padmashali Community</title>
-<link rel="stylesheet" href="styles.css?v=18">
-<script src="i18n.js?v=18"></script>
-<script src="theme.js?v=18" defer></script>
-<script src="banner.js?v=18" defer></script>
-<script src="app.js?v=18" defer></script>
-</head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Committee Hub</title>
+
+  <link rel="stylesheet" href="styles.css?v=16">
+  <script src="i18n.js?v=16"></script>
+  <script src="theme.js?v=16" defer></script>
+  <script src="banner.js?v=16" defer></script>
+  <script src="app.js?v=16" defer></script>
+</head>
+<body>
 <div class="wrap">
   <div id="app-banner"></div>
-  <div class="card" style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="ghost btn" onclick="logout()" data-i18n="logout">Logout</button>
+
+  <div class="card glass">
+    <a class="link-card" href="directory.html">
+      <div class="link-title" data-i18n="directory_title">Directory</div>
+      <div class="link-sub" data-i18n="directory_sub">Search members & contacts</div>
+    </a>
+    <a class="link-card" href="events-manage.html">
+      <div class="link-title" data-i18n="events_manage_title">Events</div>
+      <div class="link-sub" data-i18n="events_manage_sub">Create & manage</div>
+    </a>
+    <a class="link-card" href="hall-approvals.html">
+      <div class="link-title" data-i18n="approvals_title">Approvals</div>
+      <div class="link-sub" data-i18n="approvals_sub">Hall / Loan approvals</div>
+    </a>
+    <a class="link-card" href="loan-review.html">
+      <div class="link-title" data-i18n="loan_desk_title">Loan Desk</div>
+      <div class="link-sub" data-i18n="loan_desk_sub">Review & decisions</div>
+    </a>
+    <a class="link-card" href="fees-manage.html">
+      <div class="link-title" data-i18n="finance_title">Finance</div>
+      <div class="link-sub" data-i18n="finance_sub">Fees & ledger</div>
+    </a>
   </div>
-  <div class="card">
-    <div class="grid">
-      <div class="tile"><a href="directory.html"><b data-i18n="directory">Directory</b><div class="muted" data-i18n="dir_sub">Search members & contacts</div></a></div>
-      <div class="tile"><b data-i18n="approvals">Approvals</b><div class="muted">Hall / Loan approvals</div><div style="margin-top:8px"><a href="hall-approvals.html" data-i18n="open">Open</a></div></div>
-      <div class="tile"><b data-i18n="events">Events</b><div class="muted" data-i18n="events_sub_manage">Create & manage</div><div style="margin-top:8px"><a href="events-manage.html" data-i18n="open">Open</a> &nbsp;|&nbsp; <a href="events.html">View</a></div></div>
-      <div class="tile"><b data-i18n="loan_desk">Loan Desk</b><div class="muted" data-i18n="loan_desk_sub">Review & decisions</div><div style="margin-top:8px"><a href="loan-review.html" data-i18n="open">Open</a></div></div>
-      <div class="tile"><b data-i18n="finance">Finance</b><div class="muted" data-i18n="finance_sub">Fees & ledger</div><div style="margin-top:8px"><a href="fees-manage.html" data-i18n="open">Open</a></div></div>
-    </div>
-  </div>
-  <footer>© Padmashali Community — V1</footer>
+
+  <div class="footer">© Padmashali Community — V1</div>
 </div>
-<script>
-const s=JSON.parse(localStorage.getItem("pc_session")||"null");
-if(!s || (s.role!=='committee' && s.role!=='admin')) location.href='index.html';
-function logout(){ localStorage.removeItem('pc_session'); location.href='index.html'; }
-</script>
-</body></html>
+</body>
+</html>
