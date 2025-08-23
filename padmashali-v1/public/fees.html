@@ -1,45 +1,36 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fees</title>
-  <link rel="stylesheet" href="styles.css?v=16">
-  <script src="i18n.js?v=16"></script>
-  <script src="theme.js?v=16" defer></script>
-  <script src="banner.js?v=16" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Padmashali — Fees</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-theme')||'light');</script>
 </head>
 <body>
-<div class="wrap">
-  <div id="app-banner"></div>
-
-  <div class="card">
-    <div class="pc-title" data-i18n="fees_title">Fees</div>
-    <div class="pc-tagline" data-i18n="fees_sub">Pay & history</div>
-
-    <div style="display:flex;gap:10px;margin-top:12px">
-      <input class="input" id="amt" type="number" placeholder="Amount">
-      <button class="btn" onclick="pay()">Pay (Offline)</button>
+  <div class="wrap"></div>
+  <div class="wrap">
+    <div class="section card glass" style="padding:16px">
+      <h3 style="margin:0 0 10px">Pay Fees</h3>
+      <div class="row">
+        <input class="input" placeholder="Amount">
+        <button class="btn">Pay</button>
+      </div>
     </div>
 
-    <div id="hist" style="margin-top:14px"></div>
-  </div>
+    <div class="section card glass" style="padding:16px">
+      <h3 style="margin:0 0 10px">Payment History</h3>
+      <div class="tiles">
+        <div class="tile"><strong>₹500</strong> <span class="muted"> • Aug 18, 2025 • UPI</span></div>
+        <div class="tile"><strong>₹300</strong> <span class="muted"> • Jun 05, 2025 • Cash</span></div>
+      </div>
+    </div>
 
-  <div class="footer">© Padmashali Community — V1</div>
-</div>
-<script>
-function pay(){
-  const n=Number(amt.value||0); if(!n) return;
-  const list=JSON.parse(localStorage.getItem('pc_fees')||'[]');
-  list.push({ts:Date.now(),amt:n});
-  localStorage.setItem('pc_fees',JSON.stringify(list)); amt.value='';
-  render();
-}
-function render(){
-  const list=JSON.parse(localStorage.getItem('pc_fees')||'[]').reverse();
-  hist.innerHTML=list.map(r=>`<div class="link-card"><div class="link-title">₹${r.amt}</div>
-    <div class="link-sub">${new Date(r.ts).toLocaleString()}</div></div>`).join('') || '<div class="pc-tagline">No payments yet.</div>';
-}
-render();
-</script>
+    <div class="footer">© Padmashali Community — V1</div>
+  </div>
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+  <script src="banner.js"></script>
 </body>
 </html>
