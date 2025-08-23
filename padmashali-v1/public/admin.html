@@ -1,58 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Padmashali Community — Admin</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Padmashali — Admin</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-theme')||'light');</script>
 </head>
 <body>
+  <div class="wrap"></div>
+
   <div class="wrap">
-    <div id="app-banner"></div>
-
-    <div class="hero card">
-      <img class="hero-img" src="assets/hero.png" alt="Hero"/>
-    </div>
-
-    <div class="section">
+    <div class="section tiles">
       <a class="tile" href="directory.html">
-        <h3 data-i18n="directory">Directory</h3>
-        <div class="sub" data-i18n="directory_sub">Search members & contacts</div>
+        <h3 data-i18n="directory_title">Directory</h3>
+        <p data-i18n="directory_sub">Search members & contacts</p>
       </a>
 
       <a class="tile" href="events-manage.html">
-        <h3 data-i18n="events_manage">Events</h3>
-        <div class="sub" data-i18n="events_manage_sub">Create & manage</div>
+        <h3 data-i18n="events_title">Events</h3>
+        <p>Create & manage • View</p>
       </a>
 
       <a class="tile" href="hall-approvals.html">
-        <h3 data-i18n="approvals">Approvals</h3>
-        <div class="sub" data-i18n="approvals_sub">Hall / Loan approvals</div>
-      </a>
-
-      <a class="tile" href="fees-manage.html">
-        <h3 data-i18n="finance">Finance</h3>
-        <div class="sub" data-i18n="finance_sub">Fees & ledger</div>
+        <h3 data-i18n="approvals_title">Approvals</h3>
+        <p data-i18n="approvals_sub">Hall / Loan approvals</p>
       </a>
 
       <a class="tile" href="loan-review.html">
-        <h3 data-i18n="loan_desk">Loan Desk</h3>
-        <div class="sub" data-i18n="loan_desk_sub">Review & decisions</div>
+        <h3 data-i18n="loan_desk_title">Loan Desk</h3>
+        <p data-i18n="loan_desk_sub">Review & decisions</p>
       </a>
 
-      <div class="card">
+      <a class="tile" href="fees-manage.html">
+        <h3 data-i18n="finance_title">Finance</h3>
+        <p data-i18n="finance_sub">Fees & ledger</p>
+      </a>
+
+      <div class="tile">
         <h3 data-i18n="reset_sessions">Reset Sessions</h3>
-        <p class="muted" data-i18n="reset_sessions_sub">Clears localStorage & sessions for safety.</p>
-        <button class="btn danger" onclick="resetSessions()" data-i18n="reset">Reset</button>
+        <p class="muted">Clears localStorage & sessions for safety.</p>
+        <div class="row" style="margin-top:8px">
+          <button class="pill pill-danger" onclick="localStorage.clear(); location.href='index.html'">Reset</button>
+        </div>
       </div>
     </div>
-
-    <footer class="muted center">© Padmashali Community — V1</footer>
+    <div class="footer">© Padmashali Community — V1</div>
   </div>
 
   <script src="theme.js"></script>
   <script src="i18n.js"></script>
-  <script src="banner.js"></script>
   <script src="app.js"></script>
+  <script src="banner.js"></script>
 </body>
 </html>
