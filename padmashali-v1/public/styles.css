@@ -46,3 +46,17 @@ html[data-theme="light"] body{ background:#f5f7fb; color:#0b1220 }
 html[data-theme="light"] .glass{ background:rgba(255,255,255,.55); border-color:rgba(0,0,0,.06); box-shadow:0 8px 24px rgba(0,0,0,.10) }
 html[data-theme="light"] .ghost,.pc-pill,.badge,.input,.table tr{ background:rgba(255,255,255,.72); border-color:rgba(0,0,0,.08) }
 html[data-theme="light"] .pc-logo{ background:#fff; border-color:rgba(0,0,0,.08) }
+/* --- fixes --- */
+.pc-pill{ color: inherit; font-weight: 600; min-width: 88px; justify-content:center }
+html[data-theme="light"] .pc-pill{ color:#0b1220; }
+.pc-right{ display:flex; gap:8px; align-items:center }
+
+/* tighter wrap padding to avoid early overflow */
+.wrap{ padding:12px }
+
+/* table overflow handling (mobile) */
+.table-container{ overflow-x:auto; }
+@media (max-width: 480px){
+  .table{ table-layout: fixed; width: 700px; }   /* force horizontal scroll inside container */
+  .card{ overflow: hidden; }                      /* keep soft corners while table scrolls */
+}
