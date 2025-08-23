@@ -1,1 +1,10 @@
-{"home":"Home","directory":"Directory","events":"Events","bookHalls":"Book Halls","fees":"Fees","loanRequest":"Loan Request","manage":"Manage"}
+"directory_title": "Directory",
+"directory_sub": "Search members & contacts",
+"events_title": "Events",
+"events_sub": "View & RSVP",
+"halls_title": "Book Halls",
+"halls_sub": "Request slots",
+"fees_title": "Fees",
+"fees_sub": "Pay & history",
+"loans_title": "Loan Request",
+"loans_sub": "Apply & status"
