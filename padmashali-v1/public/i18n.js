@@ -1,38 +1,80 @@
-const I18N = {
-  en:{app_title:"Padmashali Community",tagline:"unity • seva • growth",
-    enter_pin:"Enter your PIN",continue:"Continue",invalid_pin:"Invalid PIN. Try again.",
-    members_hint:"Members: 1111 · Committee: 5555 · Admin: 9999",
-    home:"Home",logout:"Logout",open:"Open",
-    directory:"Directory",dir_sub:"Search members & contacts",
-    events:"Events",events_sub_view:"View & RSVP",events_sub_manage:"Create & manage",
-    book_halls:"Book Halls",book_halls_sub:"Request slots",
-    fees:"Fees",fees_sub_member:"Pay & history",
-    finance:"Finance",finance_sub:"Fees & ledger",
-    loan_request:"Loan Request",loan_request_sub:"Apply & status",
-    loan_desk:"Loan Desk",loan_desk_sub:"Review & decisions",
-    approvals:"Approvals"},
-  te:{app_title:"పద్మశాలీ కమ్యూనిటీ",tagline:"ఏకత్వం • సేవ • అభివృద్ధి",
-    enter_pin:"మీ పిన్ నమోదు చేయండి",continue:"కొనసాగించండి",invalid_pin:"తప్పు పిన్. మళ్లీ ప్రయత్నించండి.",
-    members_hint:"సభ్యులు: 1111 · కమిటీ: 5555 · అడ్మిన్: 9999",
-    home:"హోమ్",logout:"లాగ్ అవుట్",open:"ఓపెన్",
-    directory:"డైరెక్టరీ",dir_sub:"సభ్యులు & కాంటాక్టుల శోధన",
-    events:"ఈవెంట్స్",events_sub_view:"చూడండి & RSVP",events_sub_manage:"సృష్టించండి & నిర్వహించండి",
-    book_halls:"హాల్ బుకింగ్",book_halls_sub:"స్లాట్స్ అభ్యర్థించండి",
-    fees:"ఫీజులు",fees_sub_member:"చెల్లింపులు & హిస్టరీ",
-    finance:"ఫైనాన్స్",finance_sub:"ఫీజులు & లెడ్జర్",
-    loan_request:"లోన్ రిక్వెస్ట్",loan_request_sub:"అప్లై & స్టేటస్",
-    loan_desk:"లోన్ డెస్క్",loan_desk_sub:"రివ్యూ & నిర్ణయాలు",
-    approvals:"అప్రూవల్స్"}
-};
-function getLang(){return localStorage.getItem("pc_lang")||"en";}
-function setLang(code){localStorage.setItem("pc_lang",code);applyI18n();}
-function t(k){const L=getLang();return (I18N[L]&&I18N[L][k])||I18N.en[k]||k;}
-function applyI18n(){
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const key=el.getAttribute("data-i18n");
-    if(/^(INPUT|TEXTAREA)$/.test(el.tagName)) el.placeholder=t(key); else el.textContent=t(key);
-  });
-  const pill=document.getElementById("lang-pill"); if(pill) pill.textContent=(getLang()==="te"?"తెలుగు":"English");
-  if(document.title.match(/Padmashali|పద్మశాలీ/)) document.title=t("app_title");
-}
-document.addEventListener("DOMContentLoaded",applyI18n);
+// i18n (English / Telugu) for v16
+(function(){
+  const KEY = 'pc-lang';
+  const dict = {
+    en: {
+      app_title: "Padmashali Community",
+      tagline: "unity • seva • growth",
+      english: "English",
+      telugu: "తెలుగు",
+      logout: "Logout",
+
+      // Index / login
+      pin_title: "Enter your PIN",
+      pin_help: "pin_help",
+      members_count: "Members",
+      committee_count: "Committee",
+      admin_count: "Admin",
+      continue: "Continue",
+
+      // Member tiles
+      directory_title: "Directory", directory_sub: "Search members & contacts",
+      events_title: "Events", events_sub: "View & RSVP",
+      halls_title: "Book Halls", halls_sub: "Request slots",
+      fees_title: "Fees", fees_sub: "Pay & history",
+      loans_title: "Loan Request", loans_sub: "Apply & status",
+
+      // Committee tiles
+      approvals_title: "Approvals", approvals_sub: "Hall / Loan approvals",
+      loan_desk_title: "Loan Desk", loan_desk_sub: "Review & decisions",
+      finance_title: "Finance", finance_sub: "Fees & ledger",
+
+      // Generic
+      reset_sessions: "Reset Sessions"
+    },
+    te: {
+      app_title: "పద్మశాలి కమ్యూనిటీ",
+      tagline: "ఐక్యత • సేవ • అభివృద్ధి",
+      english: "English",
+      telugu: "తెలుగు",
+      logout: "లాగ్ అవుట్",
+
+      pin_title: "మీ పిన్ నమోదు చేయండి",
+      pin_help: "pin_help",
+      members_count: "సభ్యులు",
+      committee_count: "కమిటీ",
+      admin_count: "అడ్మిన్",
+      continue: "కొనసాగించండి",
+
+      directory_title: "డైరెక్టరీ", directory_sub: "సభ్యులు & కాంటాక్ట్స్ శోధన",
+      events_title: "ఈవెంట్స్", events_sub: "చూడండి & RSVP",
+      halls_title: "హాల్ బుకింగ్", halls_sub: "స్లాట్‌లు అభ్యర్థించండి",
+      fees_title: "ఫీజులు", fees_sub: "చెల్లింపులు & హిస్టరీ",
+      loans_title: "లోన్ రిక్వెస్ట్", loans_sub: "అప్లై & స్టేటస్",
+
+      approvals_title: "అప్రూవల్స్", approvals_sub: "హాల్ / లోన్ అప్రూవల్స్",
+      loan_desk_title: "లోన్ డెస్క్", loan_desk_sub: "రివ్యూ & డెసిషన్స్",
+      finance_title: "ఫైనాన్స్", finance_sub: "ఫీజులు & లెజర్",
+
+      reset_sessions: "సెషన్‌లను రీసెట్ చేయండి"
+    }
+  };
+
+  function get(){ return localStorage.getItem(KEY) || 'en'; }
+  function set(v){ localStorage.setItem(KEY, v); apply(); }
+  function t(key){ const L=get(); return (dict[L] && dict[L][key]) || key; }
+
+  function apply(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const k = el.getAttribute('data-i18n');
+      el.textContent = t(k);
+    });
+    const btn = document.getElementById('lang-pill');
+    if(btn) btn.textContent = (get()==='te') ? dict.te.telugu : dict.en.english;
+  }
+
+  window.getLang = get;
+  window.setLang = set;
+  window.applyI18n = apply;
+  window.i18n = { t };
+})();
