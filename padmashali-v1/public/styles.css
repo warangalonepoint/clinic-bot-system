@@ -1,110 +1,122 @@
-/* v16.2 styles.css – Layout Fixes */
+/* ===========================
+   styles.css — v16.3 (rework)
+   - Logo oversize guard
+   - Balanced banner height
+   - Stable header/pills flow
+   =========================== */
 
-body {
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--fg);
+/* -------- Theme tokens -------- */
+:root{
+  --bg:#f5f6fa;
+  --fg:#1f2430;
+  --muted:#6b7280;
+  --card:#ffffff;
+  --ring:rgba(0,0,0,.08);
 }
-
-:root {
-  --bg: #f5f5f7;
-  --fg: #222;
-  --card-bg: #fff;
-  --muted: #666;
-}
-
-body.dark {
-  --bg: #121212;
-  --fg: #e0e0e0;
-  --card-bg: #1e1e1e;
-  --muted: #aaa;
-}
-
-.pc-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--card-bg);
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+body.dark{
+  --bg:#0f1115;
+  --fg:#e6e7ea;
+  --muted:#a7adbb;
+  --card:#181b21;
+  --ring:rgba(255,255,255,.08);
 }
 
-.pc-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font:14px/1.4 "Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 
-.pc-logo {
-  width: 42px;       /* reduced logo size */
-  height: 42px;
-  border-radius: 8px;
-  object-fit: contain;
+/* -------- Generic cards -------- */
+.card,.glass{
+  background:var(--card);
+  border-radius:16px;
+  box-shadow:0 6px 24px var(--ring);
+}
+.card{padding:14px 16px;margin:12px}
+
+/* -------- App Header (pc-banner) -------- */
+.pc-banner{
+  display:flex;flex-direction:column;gap:8px;
+  padding:12px 14px;margin:12px;border-radius:16px;
+  background:var(--card);box-shadow:0 6px 24px var(--ring);
 }
 
-.pc-title {
-  font-weight: bold;
-  font-size: 16px;   /* slightly smaller to keep 1 line */
-  white-space: nowrap;
+/* first row: logo + title block */
+.pc-row{display:flex;align-items:center;gap:10px;min-width:0}
+.pc-left{display:flex;align-items:center;gap:10px;min-width:0}
+.pc-logo{
+  width:40px;height:40px;border-radius:10px;
+  object-fit:contain;flex:0 0 40px;
+}
+.pc-tt{min-width:0}
+.pc-title{
+  font-weight:800;letter-spacing:.2px;
+  font-size:18px;               /* one-line on phones */
+  line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.pc-subtitle{
+  margin-top:2px;font-size:12px;color:var(--muted)
 }
 
-.pc-subtitle {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 2px;
+/* third row: pills */
+.pc-actions{display:flex;gap:8px;flex-wrap:nowrap}
+.pc-pill{
+  border:0;border-radius:999px;padding:7px 12px;
+  background:var(--bg);color:var(--fg);
+  font-size:13px;box-shadow:0 1px 4px var(--ring);
+}
+.pc-pill:active{transform:translateY(1px)}
+
+/* -------- Banner image block -------- */
+.hero-wrap{width:100%;display:flex;justify-content:center}
+.hero-img{
+  width:94%;
+  height:clamp(160px, 28vh, 260px);   /* stable, balanced height */
+  border-radius:18px;object-fit:cover;
+  box-shadow:0 8px 32px var(--ring);
 }
 
-.pc-right {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
+/* -------- Page content cards -------- */
+.section{padding:12px}
+
+/* -------- PIN card alignment (index) -------- */
+.pin-card .label{font-size:18px;font-weight:800;margin-bottom:10px}
+.pin-card input[type="password"], .pin-card input[type="text"]{
+  width:100%;height:48px;border-radius:12px;border:0;
+  background:var(--bg);color:var(--fg);padding:0 14px;
+  box-shadow:inset 0 0 0 1px var(--ring);
 }
 
-.pc-pill {
-  border: none;
-  padding: 6px 12px;
-  border-radius: 20px;
-  background: var(--bg);
-  color: var(--fg);
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.2s;
+/* -------- Layout safety nets -------- */
+/* If someone drops the raw logo image in the page, prevent it from becoming huge */
+img.brand-logo,
+img[src$="assets/logo.png"],
+img[src$="/assets/logo.png"],
+img[src*="/assets/logo.png"]{
+  display:block;margin:12px auto;
+  max-width:180px;height:auto;        /* <= key fix */
+  border-radius:12px;box-shadow:0 6px 24px var(--ring);
 }
 
-.pc-pill:hover {
-  background: #ddd;
-}
-body.dark .pc-pill:hover {
-  background: #333;
-}
+/* Make sure normal content images (like the Devi/Shiva banner) don't overflow */
+img,svg,video{max-width:100%;height:auto}
 
-/* Banner image wrapper */
-.banner-img {
-  display: block;
-  margin: 10px auto;
-  border-radius: 14px;
-  width: 92%;
-  max-height: 180px;   /* balanced banner height */
-  object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+/* Buttons/links reset for consistency in cards lists */
+a.btn,button.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  border:0;border-radius:12px;padding:10px 14px;
+  background:#2f6df6;color:#fff;font-weight:600
 }
+a.btn:active,button.btn:active{transform:translateY(1px)}
 
-/* Cards */
-.card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  font-size: 14px;
-}
+/* Directory / tiles look consistent */
+.tile{background:var(--card);border-radius:16px;padding:14px 16px;margin:12px;box-shadow:0 6px 24px var(--ring)}
+.tile h3{margin:0 0 6px;font-size:16px}
+.tile .sub{color:var(--muted);font-size:13px}
 
-.card h3 {
-  margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 600;
-}
+/* Footer */
+.footer{padding:14px;text-align:center;color:var(--muted)}
