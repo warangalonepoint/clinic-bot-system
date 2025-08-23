@@ -1,44 +1,43 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Hall Booking</title>
-<link rel="stylesheet" href="styles.css?v=18">
-<script src="i18n.js?v=18"></script>
-<script src="theme.js?v=18" defer></script>
-<script src="banner.js?v=18" defer></script>
-<script src="app.js?v=18" defer></script>
-</head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Book Halls</title>
+  <link rel="stylesheet" href="styles.css?v=16">
+  <script src="i18n.js?v=16"></script>
+  <script src="theme.js?v=16" defer></script>
+  <script src="banner.js?v=16" defer></script>
+</head>
+<body>
 <div class="wrap">
   <div id="app-banner"></div>
 
   <div class="card">
-    <h2>🏛️ <span data-i18n="book_halls">Book Halls</span></h2>
-    <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:10px">
-      <select id="hall" class="input">
-        <option>Kalyana Mandapam</option><option>Function Hall</option><option>Meeting Room</option>
-      </select>
-      <input id="date" class="input" type="date">
-      <select id="slot" class="input"><option>Morning</option><option>Afternoon</option><option>Evening</option><option>Full Day</option></select>
-      <input id="purpose" class="input" placeholder="Purpose">
-      <input id="attendees" class="input" type="number" placeholder="Expected attendees">
+    <div class="pc-title" data-i18n="halls_title">Book Halls</div>
+    <div class="pc-tagline" data-i18n="halls_sub">Request slots</div>
+
+    <div style="display:grid;gap:10px;margin-top:12px">
+      <select class="input" id="hall"><option>Hall A</option><option>Hall B</option><option>Hall C</option></select>
+      <input class="input" id="date" type="date">
+      <select class="input" id="slot"><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
+      <input class="input" id="purpose" placeholder="Purpose">
+      <button class="btn" onclick="req()">Request</button>
     </div>
-    <div style="margin-top:10px"><button class="btn" id="submit">Request Booking</button></div>
+
+    <div id="out" style="margin-top:14px"></div>
   </div>
 
-  <div class="card">
-    <b>My Requests</b>
-    <table class="table"><thead><tr><th>Date</th><th>Hall</th><th>Slot</th><th>Purpose</th><th>Status</th></tr></thead><tbody id="mine"></tbody></table>
-    <p id="mineEmpty" class="muted" style="display:none">No requests yet.</p>
-  </div>
-
-  <footer>© Padmashali Community — V1</footer>
+  <div class="footer">© Padmashali Community — V1</div>
 </div>
 <script>
-const s=JSON.parse(localStorage.getItem("pc_session")||"null"); if(!s){location.href='index.html';} const UID=localStorage.getItem('pc_uid');
-const K='pc_hall_requests';
-function getAll(){return JSON.parse(localStorage.getItem(K)||'[]');} function setAll(v){localStorage.setItem(K,JSON.stringify(v));}
-submit.onclick=()=>{const rec={id:'H'+Date.now().toString(36),uid:UID,hall:hall.value, date:date.value, slot:slot.value, purpose:purpose.value, attendees:+attendees.value||0, status:'Pending', ts:Date.now()}; if(!rec.date||!rec.purpose){alert('Date & Purpose required');return;} const L=getAll(); L.push(rec); setAll(L); render();};
-function render(){const mine=getAll().filter(x=>x.uid===UID).sort((a,b)=>b.ts-a.ts); const T=document.getElementById('mine'); T.innerHTML=''; document.getElementById('mineEmpty').style.display=mine.length?'none':'block';
-  mine.forEach(x=>{const tr=document.createElement('tr'); tr.innerHTML=`<td>${x.date}</td><td>${x.hall}</td><td>${x.slot}</td><td>${x.purpose}</td><td><span class="badge">${x.status}</span></td>`; T.appendChild(tr);});}
-render();
+function req(){
+  if(!date.value) return alert('Pick a date');
+  const rec={hall:hall.value,date:date.value,slot:slot.value,purpose:purpose.value, status:'Pending'};
+  const list=JSON.parse(localStorage.getItem('pc_halls')||'[]'); list.push(rec);
+  localStorage.setItem('pc_halls',JSON.stringify(list));
+  out.innerHTML = `<div class="link-card"><div class="link-title">Request submitted</div>
+    <div class="link-sub">${rec.hall} • ${rec.date} • ${rec.slot}</div><div>${rec.purpose}</div></div>`;
+}
 </script>
-</body></html>
+</body>
+</html>
