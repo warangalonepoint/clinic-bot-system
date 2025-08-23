@@ -1,21 +1,19 @@
-// theme.js v16  (old model: toggles body.dark)
-(function () {
-  const KEY = 'pc_theme'; // 'light' | 'dark'
-
-  function getTheme(){ try { return localStorage.getItem(KEY) || 'light'; } catch { return 'light'; } }
-  function setTheme(v){ try { localStorage.setItem(KEY, v); } catch {} }
-
-  window.applyTheme = function(){
-    const t = getTheme();
-    document.body.classList.toggle('dark', t === 'dark');
-    const pill = document.getElementById('theme-pill');
-    if (pill) pill.textContent = (t === 'dark') ? '🌙' : '☀️';
-  };
-
-  window.cycleTheme = function(){
-    setTheme(getTheme()==='dark' ? 'light' : 'dark');
-    applyTheme();
-  };
-
-  document.addEventListener('DOMContentLoaded', applyTheme);
+// Simple theme manager (light/dark) for v16
+(function(){
+  const KEY = 'pc-theme';
+  function get(){ return localStorage.getItem(KEY) || 'light'; }
+  function set(t){ localStorage.setItem(KEY, t); document.documentElement.setAttribute('data-theme', t); }
+  function apply(){ set(get()); updatePill(); }
+  function cycle(){
+    set(get()==='dark' ? 'light' : 'dark');
+    updatePill();
+  }
+  function updatePill(){
+    const btn = document.getElementById('theme-pill');
+    if(!btn) return;
+    btn.textContent = (get()==='dark') ? '🌙' : '☀️';
+  }
+  window.applyTheme = apply;
+  window.cycleTheme = cycle;
+  window.getTheme = get;
 })();
