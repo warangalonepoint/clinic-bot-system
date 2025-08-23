@@ -1,42 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Padmashali Community — Login</title>
-
-  <link rel="stylesheet" href="styles.css?v=16">
-  <script src="i18n.js?v=16"></script>
-  <script src="theme.js?v=16" defer></script>
-  <script src="banner.js?v=16" defer></script>
-  <script src="app.js?v=16" defer></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Padmashali Community — Sign In</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body>
-<div class="wrap">
-  <div id="app-banner"></div>
+<body class="theme-auto">
+  <div class="wrap">
 
-  <div class="card">
-    <div class="pc-title" data-i18n="enter_pin">Enter your PIN</div>
-    <div style="display:flex; gap:12px; margin-top:12px;">
-      <input id="pin" class="input" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
-      <button class="btn" onclick="handleLogin()" data-i18n="continue">Continue</button>
-    </div>
-    <div class="muted" style="margin-top:10px" data-i18n="pin_help">
-      Members: 1111 · Committee: 5555 · Admin: 9999
-    </div>
+    <!-- Banner mount -->
+    <div id="app-banner" class="mb-16"></div>
+
+    <!-- PIN card -->
+    <section class="card glass">
+      <h2 class="h2">Enter your PIN</h2>
+      <div class="row" style="gap:12px; align-items:center;">
+        <input id="pin" inputmode="numeric" maxlength="4" class="input"
+               placeholder="••••" aria-label="PIN"/>
+        <button class="btn" id="go">Continue</button>
+      </div>
+      <p class="muted mt-8" data-i18n="pin_help">
+        Members: 1111 · Committee: 5555 · Admin: 9999
+      </p>
+    </section>
+
+    <footer class="muted center py-24">© Padmashali Community — V1</footer>
   </div>
 
-  <div class="footer">© Padmashali Community — V1</div>
-</div>
-
-<script>
-function handleLogin(){
-  const p = (document.getElementById('pin').value||'').trim();
-  const role = (p==='1111')?'members':(p==='5555')?'committee':(p==='9999')?'admin':'';
-  if(!role){ alert('Invalid PIN'); return; }
-  localStorage.setItem('pc_session', JSON.stringify({role, ts: Date.now()}));
-  location.href = role + '.html';
-}
-</script>
+  <!-- Scripts (order matters) -->
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+  <script src="banner.js"></script>
+  <script>
+    // simple role routing
+    document.getElementById('go').onclick = function () {
+      const v = (document.getElementById('pin').value || '').trim();
+      if (v === '1111') location.href = 'members.html';
+      else if (v === '5555') location.href = 'committee.html';
+      else if (v === '9999') location.href = 'admin.html';
+      else alert('Invalid PIN');
+    };
+  </script>
 </body>
 </html>
