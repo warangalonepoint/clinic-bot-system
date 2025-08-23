@@ -1,29 +1,34 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Manage Directory</title>
-<link rel="stylesheet" href="styles.css?v=4">
-<script src="i18n.js?v=4"></script>
-<script src="theme.js?v=4" defer></script>
-<script src="banner.js?v=4" defer></script>
-<script src="app.js?v=4" defer></script>
-  <link rel="stylesheet" href="styles.css?v=3">
-<script src="i18n.js?v=3"></script>
-<script src="theme.js?v=3" defer></script>
-<script src="banner.js?v=3" defer></script>
-<script src="app.js?v=3" defer></script>
-</head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Manage Directory</title>
+
+  <link rel="stylesheet" href="styles.css?v=9">
+  <script src="i18n.js?v=9"></script>
+  <script src="theme.js?v=9" defer></script>
+  <script src="banner.js?v=9" defer></script>
+  <script src="app.js?v=9" defer></script>
+</head>
+<body>
 <div class="wrap">
+  <!-- Banner host -->
   <div id="app-banner"></div>
+
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <h2>🗂️ Manage Directory</h2>
+      <h2 style="margin:0">🗂️ Manage Directory</h2>
       <div>
         <button class="ghost btn" id="exportBtn">Export CSV</button>
-        <label class="btn" style="cursor:pointer">Import CSV<input id="csvFile" type="file" accept=".csv" style="display:none"></label>
+        <label class="btn" style="cursor:pointer">Import CSV
+          <input id="csvFile" type="file" accept=".csv" style="display:none">
+        </label>
       </div>
     </div>
   </div>
 
+  <!-- Form -->
   <div class="card">
     <b>Add / Edit Member</b>
     <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:10px">
@@ -42,6 +47,7 @@
     </div>
   </div>
 
+  <!-- Records -->
   <div class="card">
     <b>All Records</b>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
@@ -49,40 +55,128 @@
       <select id="filterArea" class="input"><option value="">Any Area</option></select>
       <select id="filterSeva" class="input"><option value="">Any Seva</option></select>
     </div>
-    <table class="table">
-      <thead><tr><th>Name</th><th>Area</th><th>Seva</th><th>Email</th><th>Phone</th><th>ID</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
+
+    <div class="table-container">
+      <table class="table">
+        <thead><tr><th>Name</th><th>Area</th><th>Seva</th><th>Email</th><th>Phone</th><th>ID</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
     <p id="empty" class="muted" style="display:none">No records.</p>
   </div>
+
   <footer>© Padmashali Community — V1</footer>
 </div>
+
 <script>
-const s=JSON.parse(localStorage.getItem("pc_session")||"null"); if(!s||(s.role!=='committee'&&s.role!=='admin')) location.href='index.html';
-const K='pc_directory';
-const $=(sel)=>document.querySelector(sel); const f={name:$('#name'),phone:$('#phone'),email:$('#email'),area:$('#area'),seva:$('#seva'),family:$('#family'),notes:$('#notes')};
-const rows=$('#rows'), q=$('#q'), fArea=$('#filterArea'), fSeva=$('#filterSeva'), delBtn=$('#deleteBtn'); let editId=null;
-function getAll(){return JSON.parse(localStorage.getItem(K)||'[]');} function setAll(v){localStorage.setItem(K,JSON.stringify(v));} function uid(){return 'D'+Math.random().toString(36).slice(2,10);}
-function unique(v){return Array.from(new Set(v.filter(Boolean))).sort();}
-function buildFilters(){ const L=getAll(); fArea.innerHTML='<option value="">Any Area</option>'+unique(L.map(x=>x.area)).map(a=>`<option>${a}</option>`).join(''); fSeva.innerHTML='<option value="">Any Seva</option>'+unique(L.map(x=>x.seva)).map(a=>`<option>${a}</option>`).join('');}
-function render(){
-  const text=(q.value||'').toLowerCase(), a=fArea.value, s=fSeva.value;
-  const list=getAll().filter(x=>{const okT=!text||`${x.name} ${x.area} ${x.seva} ${x.phone} ${x.email||''}`.toLowerCase().includes(text); const okA=!a||x.area===a; const okS=!s||x.seva===s; return okT&&okA&&okS;}).sort((m,n)=>m.name.localeCompare(n.name));
-  rows.innerHTML=''; $('#empty').style.display=list.length?'none':'block';
-  list.forEach(x=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td><a href="#" onclick="edit('${x.id}');return false;">${x.name}</a></td><td>${x.area||''}</td><td>${x.seva||''}</td><td>${x.email||'—'}</td><td>${x.phone||''}</td><td>${x.id}</td>`; rows.appendChild(tr); });
-}
-window.edit=(id)=>{const it=getAll().find(x=>x.id===id); if(!it) return; editId=id; Object.entries(f).forEach(([k,el])=>el.value=it[k]||''); delBtn.style.display='inline-block'; window.scrollTo({top:0,behavior:'smooth'});}
-$('#saveBtn').onclick=()=>{const name=(f.name.value||'').trim(), phone=(f.phone.value||'').trim(); if(!name||!phone){alert('Name & Phone required');return;}
-  const rec={id:editId||uid(),name,phone,email:f.email.value||'',area:f.area.value||'',seva:f.seva.value||'',family:f.family.value||'',notes:f.notes.value||'',ts:Date.now()};
-  const L=getAll(); const i=L.findIndex(x=>x.id===rec.id); if(i>=0) L[i]=rec; else L.push(rec); setAll(L); $('#clearBtn').click(); buildFilters(); render();};
-$('#clearBtn').onclick=()=>{editId=null; Object.values(f).forEach(x=>x.value=''); delBtn.style.display='none';};
-$('#deleteBtn').onclick=()=>{if(!editId) return; if(!confirm('Delete this member?')) return; setAll(getAll().filter(x=>x.id!==editId)); $('#clearBtn').click(); buildFilters(); render();};
-$('#exportBtn').onclick=()=>{const L=getAll(); const rows=[['ID','Name','Phone','Email','Area','Seva','FamilyID','Notes'],...L.map(x=>[x.id,x.name||'',x.phone||'',x.email||'',x.area||'',x.seva||'',x.family||'',x.notes||''])]; const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='directory.csv'; a.click(); URL.revokeObjectURL(url);};
-$('#csvFile').onchange=(e)=>{const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=()=>{const text=reader.result||''; const lines=text.split(/\r?\n/).filter(Boolean); if(lines.length<2){alert('Empty CSV');return;} const hdr=lines[0].split(',').map(s=>s.replace(/^"|"$/g,'').trim().toLowerCase()); const idx=k=>hdr.indexOf(k); const L=getAll();
-  for(let i=1;i<lines.length;i++){const cells=lines[i].match(/("([^"]|"")*"|[^,]+)/g)||[]; const val=j=>(cells[j]||'').replace(/^"|"$/g,'').replace(/""/g,'"').trim();
-    const rec={id:val(idx('id'))||uid(),name:val(idx('name')),phone:val(idx('phone')),email:val(idx('email')),area:val(idx('area')),seva:val(idx('seva')),family:val(idx('familyid')),notes:val(idx('notes'))};
-    if(!rec.name && !rec.phone) continue; const j=L.findIndex(x=>x.id===rec.id || (rec.phone && x.phone===rec.phone)); if(j>=0) L[j]={...L[j],...rec,id:L[j].id}; else L.push(rec);}
-  setAll(L); buildFilters(); render(); alert('Import complete.'); e.target.value='';}; reader.readAsText(file);};
-buildFilters(); [q,fArea,fSeva].forEach(el=>el.addEventListener('input',render)); render();
+  // role guard: committee or admin
+  const s=JSON.parse(localStorage.getItem("pc_session")||"null");
+  if(!s || (s.role!=='committee' && s.role!=='admin')) location.href='index.html';
+
+  const K='pc_directory';
+  const $=(sel)=>document.querySelector(sel);
+  const f={name:$('#name'),phone:$('#phone'),email:$('#email'),area:$('#area'),seva:$('#seva'),family:$('#family'),notes:$('#notes')};
+  const rows=$('#rows'), q=$('#q'), fArea=$('#filterArea'), fSeva=$('#filterSeva'), delBtn=$('#deleteBtn');
+  let editId=null;
+
+  function getAll(){ try{return JSON.parse(localStorage.getItem(K)||'[]');}catch(_){return [];} }
+  function setAll(v){ localStorage.setItem(K,JSON.stringify(v)); }
+  function uid(){ return 'D'+Math.random().toString(36).slice(2,10); }
+  function unique(v){ return Array.from(new Set(v.filter(Boolean))).sort(); }
+
+  function buildFilters(){
+    const L=getAll();
+    fArea.innerHTML='<option value="">Any Area</option>'+unique(L.map(x=>x.area)).map(a=>`<option>${a}</option>`).join('');
+    fSeva.innerHTML='<option value="">Any Seva</option>'+unique(L.map(x=>x.seva)).map(a=>`<option>${a}</option>`).join('');
+  }
+
+  function render(){
+    const text=(q.value||'').toLowerCase(), a=fArea.value, s=fSeva.value;
+    const list=getAll()
+      .filter(x=>{
+        const okT=!text || `${x.name} ${x.area} ${x.seva} ${x.phone} ${x.email||''}`.toLowerCase().includes(text);
+        const okA=!a||x.area===a, okS=!s||x.seva===s;
+        return okT&&okA&&okS;
+      })
+      .sort((m,n)=>m.name.localeCompare(n.name));
+
+    rows.innerHTML=''; $('#empty').style.display=list.length?'none':'block';
+    list.forEach(x=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><a href="#" onclick="edit('${x.id}');return false;">${x.name}</a></td>
+                    <td>${x.area||''}</td><td>${x.seva||''}</td><td>${x.email||'—'}</td>
+                    <td>${x.phone||''}</td><td>${x.id}</td>`;
+      rows.appendChild(tr);
+    });
+  }
+
+  window.edit=(id)=>{
+    const it=getAll().find(x=>x.id===id); if(!it) return;
+    editId=id; Object.entries(f).forEach(([k,el])=>el.value=it[k]||'');
+    delBtn.style.display='inline-block'; window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  $('#saveBtn').onclick=()=>{
+    const name=(f.name.value||'').trim(), phone=(f.phone.value||'').trim();
+    if(!name||!phone){ alert('Name & Phone required'); return; }
+    const rec={id:editId||uid(),name,phone,email:f.email.value||'',area:f.area.value||'',
+               seva:f.seva.value||'',family:f.family.value||'',notes:f.notes.value||'',ts:Date.now()};
+    const L=getAll(); const i=L.findIndex(x=>x.id===rec.id);
+    if(i>=0) L[i]=rec; else L.push(rec);
+    setAll(L); $('#clearBtn').click(); buildFilters(); render();
+  };
+
+  $('#clearBtn').onclick=()=>{ editId=null; Object.values(f).forEach(x=>x.value=''); delBtn.style.display='none'; };
+
+  $('#deleteBtn').onclick=()=>{ if(!editId) return; if(!confirm('Delete this member?')) return;
+    setAll(getAll().filter(x=>x.id!==editId)); $('#clearBtn').click(); buildFilters(); render(); };
+
+  // Export all to CSV
+  $('#exportBtn').onclick=()=>{
+    const L=getAll();
+    const rows=[['ID','Name','Phone','Email','Area','Seva','FamilyID','Notes'],
+      ...L.map(x=>[x.id,x.name||'',x.phone||'',x.email||'',x.area||'',x.seva||'',x.family||'',x.notes||''])];
+    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='directory.csv'; a.click(); URL.revokeObjectURL(url);
+  };
+
+  // Import CSV (ID optional; phone used as dedupe key if ID missing)
+  $('#csvFile').onchange=(e)=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const text=reader.result||'';
+      const lines=text.split(/\r?\n/).filter(Boolean);
+      if(lines.length<2){ alert('Empty CSV'); return; }
+      const hdr=lines[0].split(',').map(s=>s.replace(/^"|"$/g,'').trim().toLowerCase());
+      const idx=k=>hdr.indexOf(k);
+      const L=getAll();
+      for(let i=1;i<lines.length;i++){
+        const cells=lines[i].match(/("([^"]|"")*"|[^,]+)/g)||[];
+        const val=j=>(cells[j]||'').replace(/^"|"$/g,'').replace(/""/g,'"').trim();
+        const rec={
+          id: val(idx('id')) || '',
+          name: val(idx('name')),
+          phone: val(idx('phone')),
+          email: val(idx('email')),
+          area: val(idx('area')),
+          seva: val(idx('seva')),
+          family: val(idx('familyid')),
+          notes: val(idx('notes'))
+        };
+        if(!rec.name && !rec.phone) continue;
+        if(!rec.id) rec.id = 'D'+Math.random().toString(36).slice(2,10);
+        const j=L.findIndex(x=>x.id===rec.id || (rec.phone && x.phone===rec.phone));
+        if(j>=0) L[j]={...L[j],...rec,id:L[j].id}; else L.push(rec);
+      }
+      setAll(L); buildFilters(); render(); alert('Import complete.');
+      e.target.value='';
+    };
+    reader.readAsText(file);
+  };
+
+  buildFilters(); [q,fArea,fSeva].forEach(el=>el.addEventListener('input',render)); render();
 </script>
-</body></html>
+</body>
+</html>
