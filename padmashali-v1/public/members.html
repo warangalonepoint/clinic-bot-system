@@ -1,52 +1,44 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Padmashali Community — Members</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Padmashali — Members</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-theme')||'light');</script>
 </head>
 <body>
+  <div class="wrap"></div>
+
   <div class="wrap">
-    <div id="app-banner"></div>
-
-    <div class="hero card">
-      <img class="hero-img" src="assets/hero.png" alt="Hero"/>
-    </div>
-
-    <div class="section">
+    <div class="section tiles">
       <a class="tile" href="directory.html">
-        <h3 data-i18n="directory">Directory</h3>
-        <div class="sub" data-i18n="directory_sub">Search members & contacts</div>
+        <h3 data-i18n="directory_title">Directory</h3>
+        <p data-i18n="directory_sub">Search members & contacts</p>
       </a>
-
       <a class="tile" href="events.html">
-        <h3 data-i18n="events">Events</h3>
-        <div class="sub" data-i18n="events_sub">View & RSVP</div>
+        <h3 data-i18n="events_title">Events</h3>
+        <p data-i18n="events_sub">View & RSVP</p>
       </a>
-
       <a class="tile" href="hall-booking.html">
-        <h3 data-i18n="halls">Book Halls</h3>
-        <div class="sub" data-i18n="halls_sub">Request slots</div>
+        <h3 data-i18n="halls_title">Book Halls</h3>
+        <p data-i18n="halls_sub">Request slots</p>
       </a>
-
       <a class="tile" href="fees.html">
-        <h3 data-i18n="fees">Fees</h3>
-        <div class="sub" data-i18n="fees_sub">Pay & history</div>
+        <h3 data-i18n="fees_title">Fees</h3>
+        <p data-i18n="fees_sub">Pay & history</p>
       </a>
-
       <a class="tile" href="loan-requests.html">
-        <h3 data-i18n="loans">Loan Request</h3>
-        <div class="sub" data-i18n="loans_sub">Apply & status</div>
+        <h3 data-i18n="loans_title">Loan Request</h3>
+        <p data-i18n="loans_sub">Apply & status</p>
       </a>
     </div>
-
-    <footer class="muted center">© Padmashali Community — V1</footer>
+    <div class="footer">© Padmashali Community — V1</div>
   </div>
 
   <script src="theme.js"></script>
   <script src="i18n.js"></script>
-  <script src="banner.js"></script>
   <script src="app.js"></script>
+  <script src="banner.js"></script>
 </body>
 </html>
