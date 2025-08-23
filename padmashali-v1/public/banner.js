@@ -1,54 +1,45 @@
-<!-- banner.js -->
-<script>
-(function () {
-  // prevent double mount
-  if (window.__PC_BANNER_MOUNTED__) return;
-  window.__PC_BANNER_MOUNTED__ = true;
+// Reusable banner + hero (uses assets/logo.png & assets/banner.png)
+(function(){
+  const LOGO = window.APP_LOGO_PATH || 'assets/logo.png';
+  const BANNER = window.APP_BANNER_PATH || 'assets/banner.png';
 
-  function getHost() {
-    // prefer explicit placeholder if present
-    let host = document.getElementById('app-banner');
-    if (!host) {
-      // create one at the top of .wrap (or body) if missing
-      const wrap = document.querySelector('.wrap') || document.body;
-      host = document.createElement('div');
-      host.id = 'app-banner';
-      wrap.prepend(host);
+  function ensureContainer(){
+    let wrap = document.querySelector('.wrap');
+    if(!wrap){
+      wrap = document.createElement('div');
+      wrap.className = 'wrap';
+      document.body.prepend(wrap);
     }
-    // clean any older static banners inside the host
-    host.querySelectorAll('.pc-banner').forEach(n => n.remove());
-    return host;
+    return wrap;
   }
 
-  function render() {
-    const host = getHost();
-    const logo = (window.APP_LOGO_PATH || 'assets/logo.png');
-    const bannerImg = (window.APP_BANNER_PATH || 'assets/banner.png');
+  function inject(){
+    const wrap = ensureContainer();
 
-    host.innerHTML = `
-      <style>
-        .pc-banner{width:100%; box-sizing:border-box;}
-      </style>
-      <div class="pc-banner glass card">
-        <div class="pc-brand">
-          <img src="${logo}" class="pc-logo" alt="logo" onerror="this.style.display='none'"/>
-          <div class="pc-brand-text">
-            <div class="pc-title" data-i18n="app_title">Padmashali Community</div>
-            <div class="pc-sub" data-i18n="tagline">unity • seva • growth</div>
-            <div class="pc-pills">
-              <button id="lang-pill" class="pc-pill pill" onclick="setLang(getLang()==='te'?'en':'te')">English</button>
-              <button id="theme-pill" class="pc-pill pill" onclick="cycleTheme()" title="Theme">🌙</button>
-              <button id="logout-pill" class="pc-pill pill" onclick="logout()" data-i18n="logout">Logout</button>
-            </div>
-          </div>
+    // Banner (header)
+    const top = document.createElement('div');
+    top.className = 'section card glass pc-banner';
+    top.innerHTML = `
+      <div class="pc-header">
+        <img src="${LOGO}" alt="Logo" class="pc-logo" onerror="this.style.display='none'">
+        <div>
+          <div class="pc-title" data-i18n="app_title">Padmashali Community</div>
+          <div class="pc-tagline" data-i18n="tagline">unity • seva • growth</div>
         </div>
       </div>
-      <img class="hero-img card" src="${bannerImg}" alt="" loading="lazy"
-           onerror="this.style.display='none'"/>
-    `;
-    applyI18n?.(); applyTheme?.();
+      <div class="pc-pills">
+        <button id="lang-pill" class="pill" onclick="setLang(getLang()==='te'?'en':'te')">English</button>
+        <button id="theme-pill" class="pill" onclick="cycleTheme()" title="Theme">☀️</button>
+        <button id="logout-pill" class="pill pill-danger" onclick="logout()" data-i18n="logout">Logout</button>
+      </div>`;
+    wrap.prepend(top);
+
+    // Hero image (separate, below the header)
+    const hero = document.createElement('div');
+    hero.className = 'section card glass hero';
+    hero.innerHTML = `<img class="hero-img" src="${BANNER}" alt="Community Banner">`;
+    top.after(hero);
   }
 
-  document.addEventListener('DOMContentLoaded', render);
+  document.addEventListener('DOMContentLoaded', inject);
 })();
-</script>
