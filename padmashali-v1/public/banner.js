@@ -1,68 +1,54 @@
-// banner.js v16
+<!-- banner.js -->
+<script>
 (function () {
-  window.pcLogout = function(){
-    try{ localStorage.removeItem('pc_session'); }catch{}
-    location.href = 'index.html';
-  };
+  // prevent double mount
+  if (window.__PC_BANNER_MOUNTED__) return;
+  window.__PC_BANNER_MOUNTED__ = true;
 
-  function ensureHost(){
-    let el = document.getElementById('app-banner');
-    if (!el){
-      el = document.createElement('div'); el.id='app-banner';
-      const wrap = document.querySelector('.wrap,.container') || document.body;
-      wrap.prepend(el);
+  function getHost() {
+    // prefer explicit placeholder if present
+    let host = document.getElementById('app-banner');
+    if (!host) {
+      // create one at the top of .wrap (or body) if missing
+      const wrap = document.querySelector('.wrap') || document.body;
+      host = document.createElement('div');
+      host.id = 'app-banner';
+      wrap.prepend(host);
     }
-    return el;
+    // clean any older static banners inside the host
+    host.querySelectorAll('.pc-banner').forEach(n => n.remove());
+    return host;
   }
 
-  function hasSession(){
-    try { return !!JSON.parse(localStorage.getItem('pc_session')||'null'); }
-    catch { return false; }
-  }
-
-  function render(){
-    const host   = ensureHost();
-    const logo   = window.APP_LOGO_PATH   || 'assets/logo.png';
-    const banner = window.APP_BANNER_PATH || 'assets/banner.png';
+  function render() {
+    const host = getHost();
+    const logo = (window.APP_LOGO_PATH || 'assets/logo.png');
+    const bannerImg = (window.APP_BANNER_PATH || 'assets/banner.png');
 
     host.innerHTML = `
-      <div class="pc-header card">
-        <div class="pc-header-left">
-          <img class="pc-logo" src="${logo}" alt="logo" onerror="this.style.display='none'"/>
-          <div style="min-width:0">
+      <style>
+        .pc-banner{width:100%; box-sizing:border-box;}
+      </style>
+      <div class="pc-banner glass card">
+        <div class="pc-brand">
+          <img src="${logo}" class="pc-logo" alt="logo" onerror="this.style.display='none'"/>
+          <div class="pc-brand-text">
             <div class="pc-title" data-i18n="app_title">Padmashali Community</div>
-            <div class="pc-tagline" data-i18n="tagline">unity • seva • growth</div>
+            <div class="pc-sub" data-i18n="tagline">unity • seva • growth</div>
+            <div class="pc-pills">
+              <button id="lang-pill" class="pc-pill pill" onclick="setLang(getLang()==='te'?'en':'te')">English</button>
+              <button id="theme-pill" class="pc-pill pill" onclick="cycleTheme()" title="Theme">🌙</button>
+              <button id="logout-pill" class="pc-pill pill" onclick="logout()" data-i18n="logout">Logout</button>
+            </div>
           </div>
         </div>
-        <div class="pc-actions">
-          <button id="lang-pill"  class="pc-pill" onclick="setLang(getLang()==='te'?'en':'te')">English</button>
-          <button id="theme-pill" class="pc-pill" onclick="cycleTheme()" title="Theme">☀️</button>
-          ${hasSession()?`<button id="logout-pill" class="pc-pill" onclick="pcLogout()" data-i18n="logout">Logout</button>`:''}
-        </div>
       </div>
-
-      <div class="pc-hero card">
-        <img src="${banner}" alt="banner">
-      </div>
+      <img class="hero-img card" src="${bannerImg}" alt="" loading="lazy"
+           onerror="this.style.display='none'"/>
     `;
-
-    // Hide any legacy logout buttons in page markup
-    document.querySelectorAll('button').forEach(b=>{
-      const t=(b.textContent||'').trim();
-      if(b.id!=='logout-pill' && (t==='Logout'||t==='లాగ్ అవుట్')) b.style.display='none';
-    });
-
-    if (typeof applyI18n === 'function') applyI18n();
-    if (typeof applyTheme === 'function') applyTheme();
-
-    // Fallback if banner is missing
-    const img = host.querySelector('.pc-hero img');
-    img.onerror = () => {
-      const hero = host.querySelector('.pc-hero');
-      hero.innerHTML = `<div style="height:220px;border-radius:16px;background:linear-gradient(135deg,#dbeafe,#ede9fe)"></div>`;
-    };
+    applyI18n?.(); applyTheme?.();
   }
 
-  window.addEventListener('resize', ()=>{ clearTimeout(window.__bnr_r); window.__bnr_r=setTimeout(render,120); });
   document.addEventListener('DOMContentLoaded', render);
 })();
+</script>
