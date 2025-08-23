@@ -1,5 +1,5 @@
 (function () {
-  // expose a single logout for all pages
+  // single logout used everywhere
   window.pcLogout = function () {
     try { localStorage.removeItem("pc_session"); } catch {}
     location.href = "index.html";
@@ -17,13 +17,27 @@
   }
 
   function heroHeight() {
-    const h = Math.round(window.innerHeight * (window.APP_HERO_VH || 0.30));
+    const h = Math.round(window.innerHeight * (window.APP_HERO_VH || 0.30)); // 30vh default
     return Math.max(160, Math.min(300, h));
   }
 
   function hasSession() {
     try { return !!JSON.parse(localStorage.getItem("pc_session") || "null"); }
     catch { return false; }
+  }
+
+  // auto-fit title on one line (reduce font size a bit if needed)
+  function fitTitle(el) {
+    if (!el) return;
+    const cs = getComputedStyle(el);
+    let size = parseFloat(cs.fontSize);           // px
+    const min = 16;                                // don't go smaller than 16px
+    let guard = 0;
+    while (el.scrollWidth > el.clientWidth && size > min && guard < 20) {
+      size -= 1;
+      el.style.fontSize = size + "px";
+      guard++;
+    }
   }
 
   function render() {
@@ -35,17 +49,17 @@
       <!-- HEADER -->
       <div class="pc-header card glass"
            style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;">
-        <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <div class="pc-header-left" style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;">
           <img src="${logo}" alt="logo"
                onerror="this.style.display='none'"
                style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:1px solid var(--muted-border,#d0d7de)"/>
-          <div style="min-width:0">
-            <div class="pc-title one-line" data-i18n="app_title">Padmashali Community</div>
+          <div style="min-width:0;flex:1;">
+            <div class="pc-title" data-i18n="app_title">Padmashali Community</div>
             <div class="muted" data-i18n="tagline">unity • seva • growth</div>
           </div>
         </div>
-        <div class="pc-actions" style="display:flex;gap:8px;flex:0 0 auto">
-          <button id="lang-pill"  class="pc-pill pill" style="white-space:nowrap"
+        <div class="pc-actions" style="display:flex;gap:8px;flex:0 0 auto;white-space:nowrap;">
+          <button id="lang-pill"  class="pc-pill pill"
                   onclick="setLang(getLang()==='te'?'en':'te')">English</button>
           <button id="theme-pill" class="pc-pill pill" onclick="cycleTheme()" title="Theme">🌙</button>
           ${hasSession() ? `<button id="logout-pill" class="pc-pill pill" onclick="pcLogout()">Logout</button>` : ``}
@@ -59,15 +73,14 @@
       </div>
     `;
 
-    // graceful fallback if banner missing
+    // fallback if banner missing
     const img = el.querySelector(".pc-hero img");
     img.onerror = () => {
       const hero = el.querySelector(".pc-hero");
       hero.innerHTML = `<div style="height:${heroHeight()}px;border-radius:16px;background:linear-gradient(135deg,#dbeafe,#ede9fe)"></div>`;
     };
 
-    // hide legacy/bottom logout buttons if any remain in page markup
-    // (English and Telugu text)
+    // hide any legacy/logout buttons left in page markup
     document.querySelectorAll("button").forEach(b => {
       const txt = (b.textContent || "").trim();
       if (b.id !== "logout-pill" && (txt === "Logout" || txt === "లాగ్ అవుట్")) {
@@ -77,6 +90,9 @@
 
     if (typeof applyI18n === "function") applyI18n();
     if (typeof applyTheme === "function") applyTheme();
+
+    // ensure heading stays on one line (EN/TE)
+    fitTitle(el.querySelector(".pc-title"));
   }
 
   window.addEventListener("resize", () => {
