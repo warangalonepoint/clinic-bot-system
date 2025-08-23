@@ -1,36 +1,49 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Hall Approvals</title>
-<link rel="stylesheet" href="styles.css?v=18">
-<script src="i18n.js?v=18"></script>
-<script src="theme.js?v=18" defer></script>
-<script src="banner.js?v=18" defer></script>
-<script src="app.js?v=18" defer></script>
-</head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Approvals</title>
+  <link rel="stylesheet" href="styles.css?v=16">
+  <script src="i18n.js?v=16"></script>
+  <script src="theme.js?v=16" defer></script>
+  <script src="banner.js?v=16" defer></script>
+</head>
+<body>
 <div class="wrap">
   <div id="app-banner"></div>
-  <div class="card"><h2>✅ Hall Approvals</h2></div>
+
   <div class="card">
-    <b>Pending</b>
-    <table class="table"><thead><tr><th>Date</th><th>Hall</th><th>Slot</th><th>Purpose</th><th>Attendees</th><th>Decision</th></tr></thead><tbody id="pending"></tbody></table>
+    <div class="pc-title">Hall / Loan approvals</div>
+    <div class="pc-tagline">Review new requests (offline demo)</div>
+
+    <div id="list" style="margin-top:12px"></div>
   </div>
-  <div class="card">
-    <b>Decided</b>
-    <table class="table"><thead><tr><th>Date</th><th>Hall</th><th>Slot</th><th>Purpose</th><th>Status</th></tr></thead><tbody id="done"></tbody></table>
-  </div>
-  <footer>© Padmashali Community — V1</footer>
+
+  <div class="footer">© Padmashali Community — V1</div>
 </div>
 <script>
-const s=JSON.parse(localStorage.getItem("pc_session")||"null"); if(!s||(s.role!=='committee'&&s.role!=='admin')) location.href='index.html';
-const K='pc_hall_requests'; function getAll(){return JSON.parse(localStorage.getItem(K)||'[]');} function setAll(v){localStorage.setItem(K,JSON.stringify(v));}
-function render(){const L=getAll().sort((a,b)=>b.ts-a.ts); const P=document.getElementById('pending'); const D=document.getElementById('done'); P.innerHTML=''; D.innerHTML='';
-  L.forEach(x=>{ if(x.status==='Pending'){ const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${x.date}</td><td>${x.hall}</td><td>${x.slot}</td><td>${x.purpose}</td><td>${x.attendees||0}</td>
-      <td><button class="btn" onclick="decide('${x.id}','Approved')">Approve</button> <button class="ghost btn" onclick="decide('${x.id}','Rejected')">Reject</button></td>`; P.appendChild(tr);
-    } else { const tr=document.createElement('tr'); tr.innerHTML=`<td>${x.date}</td><td>${x.hall}</td><td>${x.slot}</td><td>${x.purpose}</td><td><span class="badge">${x.status}</span></td>`; D.appendChild(tr); }
-  });
+function render(){
+  const halls=JSON.parse(localStorage.getItem('pc_halls')||'[]');
+  const loans=JSON.parse(localStorage.getItem('pc_loans')||'[]');
+  list.innerHTML = halls.map((r,i)=>card('Hall', r, ()=>set('pc_halls',i,'Approved'), ()=>set('pc_halls',i,'Rejected'))).join('') +
+                   loans.map((r,i)=>card('Loan', r, ()=>set('pc_loans',i,'Approved'), ()=>set('pc_loans',i,'Rejected'))).join('') ||
+                   '<div class="pc-tagline">No pending items.</div>';
 }
-window.decide=(id,st)=>{const L=getAll(); const i=L.findIndex(z=>z.id===id); if(i<0) return; L[i].status=st; setAll(L); render();};
+function card(kind,r,ok,no){
+  const sub = kind==='Hall' ? `${r.hall} • ${r.date} • ${r.slot}` : `${r.amount} • ${r.reason}`;
+  return `<div class="link-card">
+    <div class="link-title">${kind} request — ${r.status||'Pending'}</div>
+    <div class="link-sub">${sub}</div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <button class="pill" onclick="(${ok})(event)">Approve</button>
+      <button class="pill" onclick="(${no})(event)">Reject</button>
+    </div>
+  </div>`;
+}
+function set(key,i,status){
+  const arr=JSON.parse(localStorage.getItem(key)||'[]'); arr[i].status=status; localStorage.setItem(key,JSON.stringify(arr)); render();
+}
 render();
 </script>
-</body></html>
+</body>
+</html>
