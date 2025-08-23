@@ -1,55 +1,60 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin Hub</title>
-  <link rel="stylesheet" href="styles.css?v=17">
-  <script src="i18n.js?v=17"></script>
-  <script src="theme.js?v=17" defer></script>
-  <script src="banner.js?v=17" defer></script>
-  <script src="app.js?v=17" defer></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Padmashali Community — Admin</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body>
-<div class="wrap">
-  <div id="app-banner"></div>
+<body class="theme-auto">
+  <div class="wrap">
 
-  <img src="assets/banner.png" alt="Banner" class="hero">
+    <!-- Banner mount -->
+    <div id="app-banner" class="mb-16"></div>
 
-  <div class="card">
-    <a class="link-card" href="directory.html">
-      <div class="link-title" data-i18n="directory_title">Directory</div>
-      <div class="link-sub"   data-i18n="directory_sub">Search members & contacts</div>
-    </a>
+    <!-- Hero -->
+    <img class="hero-img card" src="assets/banner.png" alt="" loading="lazy"/>
 
-    <a class="link-card" href="events-manage.html">
-      <div class="link-title" data-i18n="events_manage_title">Events</div>
-      <div class="link-sub"   data-i18n="events_manage_sub">Create & manage • Open | View</div>
-    </a>
+    <!-- Admin console -->
+    <section class="card glass">
+      <a class="tile" href="directory-manage.html">
+        <div class="tile-title">Directory</div>
+        <div class="tile-sub">Manage members & contacts</div>
+      </a>
 
-    <a class="link-card" href="hall-approvals.html">
-      <div class="link-title" data-i18n="approvals_title">Approvals</div>
-      <div class="link-sub"   data-i18n="approvals_sub">Hall / Loan approvals • Open</div>
-    </a>
+      <a class="tile" href="events-manage.html">
+        <div class="tile-title">Events</div>
+        <div class="tile-sub">Create & manage — Open | View</div>
+      </a>
 
-    <a class="link-card" href="fees-manage.html">
-      <div class="link-title" data-i18n="finance_title">Finance</div>
-      <div class="link-sub"   data-i18n="finance_sub">Fees & ledger • Open</div>
-    </a>
+      <a class="tile" href="hall-approvals.html">
+        <div class="tile-title">Approvals</div>
+        <div class="tile-sub">Hall / Loan approvals — Open</div>
+      </a>
 
-    <a class="link-card" href="loan-review.html">
-      <div class="link-title" data-i18n="loan_desk_title">Loan Desk</div>
-      <div class="link-sub"   data-i18n="loan_desk_sub">Review & decisions • Open</div>
-    </a>
+      <a class="tile" href="loan-review.html">
+        <div class="tile-title">Loan Desk</div>
+        <div class="tile-sub">Review & decisions — Open</div>
+      </a>
 
-    <div class="link-card">
-      <div class="link-title" data-i18n="reset_sessions">Reset Sessions</div>
-      <div class="link-sub"   data-i18n="reset_hint">Clears localStorage & sessions for safety.</div>
-      <button class="btn" style="margin-top:10px;background:#e25c5c" onclick="localStorage.clear();alert('Cleared!')"
-        data-i18n="reset_btn">Reset</button>
-    </div>
+      <a class="tile" href="fees-manage.html">
+        <div class="tile-title">Finance</div>
+        <div class="tile-sub">Fees & ledger — Open</div>
+      </a>
+
+      <div class="divider"></div>
+
+      <button class="btn danger" onclick="localStorage.clear(); sessionStorage.clear(); alert('Sessions cleared');">
+        Reset Sessions
+      </button>
+    </section>
+
+    <footer class="muted center py-24">© Padmashali Community — V1</footer>
   </div>
 
-  <div class="footer">© Padmashali Community — V1</div>
-</div>
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+  <script src="banner.js"></script>
 </body>
 </html>
