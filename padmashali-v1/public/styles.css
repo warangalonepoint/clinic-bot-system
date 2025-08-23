@@ -1,124 +1,84 @@
-/* Global Reset */
-body {
+/* === Base Reset === */
+* {
   margin: 0;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
   background: var(--bg);
   color: var(--fg);
   transition: background 0.3s, color 0.3s;
+  padding: 10px;
 }
 
-/* Light / Dark mode */
 :root {
-  --bg: #f9f9fb;
-  --fg: #111;
-  --card-bg: #fff;
-  --muted: #666;
+  --bg: #f9f9f9;
+  --fg: #222;
+  --card: #fff;
   --pill-bg: #eee;
-  --pill-fg: #111;
 }
-[data-theme="dark"] {
-  --bg: #111;
-  --fg: #f9f9fb;
-  --card-bg: #1c1c1c;
-  --muted: #aaa;
+
+body.dark {
+  --bg: #121212;
+  --fg: #f0f0f0;
+  --card: #1e1e1e;
   --pill-bg: #333;
-  --pill-fg: #f9f9fb;
 }
 
-/* Glass card style */
-.card, .pc-banner {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  margin: 12px;
-}
-
-/* Banner */
+/* === Header / Banner === */
 .pc-banner {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: center;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--card);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Logo + Title */
 .pc-left {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 4px;
+  gap: 10px;
 }
 
 .pc-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  margin-bottom: 6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
 }
 
 .pc-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--fg);
+  font-weight: 600;
+  font-size: 1.2rem;
 }
 
-.pc-tagline {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-/* Pills Row */
 .pc-right {
   display: flex;
-  justify-content: center;
   gap: 8px;
-  margin-top: 6px;
 }
 
 .pc-pill {
+  background: var(--pill-bg);
   border: none;
   border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  padding: 5px 12px;
   cursor: pointer;
-  background: var(--pill-bg);
-  color: var(--pill-fg);
-  transition: background 0.2s;
 }
 
-.pc-pill:hover {
-  opacity: 0.8;
+/* === Card Styles === */
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Directory Table */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
-}
-table th, table td {
-  padding: 10px;
-  text-align: left;
-}
-table th {
-  background: var(--pill-bg);
-  font-weight: 600;
-}
-table tr:nth-child(even) {
-  background: rgba(0,0,0,0.03);
-}
-
-/* Responsive Fix */
-@media (max-width: 420px) {
-  .pc-title { font-size: 1.4rem; }
-  .pc-tagline { font-size: 0.75rem; }
-  .pc-pill { font-size: 0.75rem; padding: 5px 12px; }
+a {
+  text-decoration: none;
+  color: inherit;
 }
