@@ -1,7 +1,30 @@
-function getTheme(){return localStorage.getItem('pc_theme')||'auto';}
-function systemDark(){return matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;}
-function activeTheme(){return getTheme()==='auto'?(systemDark()?'dark':'light'):getTheme();}
-function applyTheme(){const v=activeTheme();document.documentElement.setAttribute('data-theme',v);const p=document.getElementById('theme-pill');if(p)p.textContent=v==='dark'?'🌙':'☀️';}
-function cycleTheme(){const a=['auto','dark','light'];const n=a[(a.indexOf(getTheme())+1)%a.length];localStorage.setItem('pc_theme',n);applyTheme();}
-matchMedia && matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
-document.addEventListener('DOMContentLoaded',applyTheme);
+// theme.js (old model - body.dark)
+(function () {
+  const KEY = 'pc_theme'; // 'light' | 'dark'
+
+  function getTheme() {
+    try { return localStorage.getItem(KEY) || 'light'; } catch { return 'light'; }
+  }
+  function setTheme(v) {
+    try { localStorage.setItem(KEY, v); } catch {}
+  }
+
+  // Apply by toggling body.dark (old model)
+  window.applyTheme = function applyTheme() {
+    const t = getTheme();
+    document.body.classList.toggle('dark', t === 'dark');
+    // update pill (if present)
+    const pill = document.getElementById('theme-pill');
+    if (pill) pill.textContent = (t === 'dark') ? '🌙' : '☀️';
+  };
+
+  // Toggle + persist
+  window.cycleTheme = function cycleTheme() {
+    const next = getTheme() === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    applyTheme();
+  };
+
+  // Init
+  document.addEventListener('DOMContentLoaded', applyTheme);
+})();
