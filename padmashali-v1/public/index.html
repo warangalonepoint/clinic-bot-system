@@ -3,66 +3,36 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
-  <title>Padmashali Community — Sign In</title>
-  <link rel="stylesheet" href="styles.css?v=16"/>
+  <title>Padmashali Community — Sign in</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="theme-auto">
+<body>
   <div class="wrap">
-
-    <!-- Banner mount -->
-    <div id="app-banner" class="mb-16">
-      <!-- Fallback (appears only if banner.js fails) -->
-      <div class="card glass row gap-12 items-center">
-        <img src="assets/logo.png" alt="" class="logo-40" onerror="this.style.display='none'"/>
-        <div class="grow">
-          <div class="h1 tight">Padmashali Community</div>
-          <div class="muted">unity • seva • growth</div>
-        </div>
-      </div>
-    </div>
+    <!-- Banner (injected by banner.js) -->
+    <div id="app-banner"></div>
 
     <!-- Hero -->
-    <img class="hero-img card" src="assets/banner.png" alt="" loading="lazy"/>
+    <div class="hero card">
+      <img class="hero-img" src="assets/hero.png" alt="Hero"/>
+    </div>
 
-    <!-- PIN card -->
-    <section class="card glass">
-      <h2 class="h2" data-i18n="enter_pin">Enter your PIN</h2>
-      <div class="row" style="gap:12px; align-items:center;">
-        <input id="pin" inputmode="numeric" maxlength="4" class="input"
+    <!-- Login card -->
+    <div class="card">
+      <h2 data-i18n="pin_title">Enter your PIN</h2>
+      <form id="pin-form" class="row" onsubmit="return handlePinSubmit(event)">
+        <input id="pin" class="input" type="password" inputmode="numeric" autocomplete="one-time-code"
                placeholder="••••" aria-label="PIN"/>
-        <button class="btn" id="go" data-i18n="continue">Continue</button>
-      </div>
-      <p class="muted mt-8" id="pin_help">
-        Members: 1111 · Committee: 5555 · Admin: 9999
-      </p>
-    </section>
+        <button class="btn primary" type="submit" data-i18n="continue">Continue</button>
+      </form>
+      <div class="muted" id="pin_help" data-i18n="pin_help">Members: 1111 · Committee: 5555 · Admin: 9999</div>
+    </div>
 
-    <footer class="muted center py-24">© Padmashali Community — V1</footer>
+    <footer class="muted center">© Padmashali Community — V1</footer>
   </div>
 
-  <!-- Global banner config (optional) -->
-  <script>
-    window.APP_LOGO_PATH = "assets/logo.png";
-    window.APP_TITLE = "Padmashali Community";
-    window.APP_TAGLINE = "unity • seva • growth";
-  </script>
-
-  <!-- Scripts (order matters) with cache-busting -->
-  <script src="theme.js?v=16"></script>
-  <script src="i18n.js?v=16"></script>
-  <script src="app.js?v=16"></script>
-  <script src="banner.js?v=16"></script>
-  <script>
-    document.getElementById('go').onclick = function () {
-      const v = (document.getElementById('pin').value || '').trim();
-      if (v === '1111') location.href = 'members.html';
-      else if (v === '5555') location.href = 'committee.html';
-      else if (v === '9999') location.href = 'admin.html';
-      else alert('Invalid PIN');
-    };
-  </script>
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="banner.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
