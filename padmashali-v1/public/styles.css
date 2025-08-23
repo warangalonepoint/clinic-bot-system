@@ -60,3 +60,7 @@ html[data-theme="light"] .pc-pill{ color:#0b1220; }
   .table{ table-layout: fixed; width: 700px; }   /* force horizontal scroll inside container */
   .card{ overflow: hidden; }                      /* keep soft corners while table scrolls */
 }
+.pc-pill { color: inherit; font-weight: 600; min-width: 88px; justify-content: center; }
+html[data-theme="light"] .pc-pill { color: #0b1220; }
+.pc-header .pc-title { font-size: 1.25rem; }
+@media (min-width: 480px) { .pc-header .pc-title { font-size: 1.45rem; } }
