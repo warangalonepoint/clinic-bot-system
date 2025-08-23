@@ -3,45 +3,50 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin Hub</title>
-
-  <link rel="stylesheet" href="styles.css?v=16">
-  <script src="i18n.js?v=16"></script>
-  <script src="theme.js?v=16" defer></script>
-  <script src="banner.js?v=16" defer></script>
-  <script src="app.js?v=16" defer></script>
+  <link rel="stylesheet" href="styles.css?v=17">
+  <script src="i18n.js?v=17"></script>
+  <script src="theme.js?v=17" defer></script>
+  <script src="banner.js?v=17" defer></script>
+  <script src="app.js?v=17" defer></script>
 </head>
 <body>
 <div class="wrap">
   <div id="app-banner"></div>
 
-  <div class="card glass">
-    <a class="link-card" href="directory-manage.html">
-      <div class="link-title" data-i18n="directory_manage_title">Directory</div>
-      <div class="link-sub" data-i18n="directory_manage_sub">Search members & contacts</div>
+  <img src="assets/banner.png" alt="Banner" class="hero">
+
+  <div class="card">
+    <a class="link-card" href="directory.html">
+      <div class="link-title" data-i18n="directory_title">Directory</div>
+      <div class="link-sub"   data-i18n="directory_sub">Search members & contacts</div>
     </a>
+
     <a class="link-card" href="events-manage.html">
       <div class="link-title" data-i18n="events_manage_title">Events</div>
-      <div class="link-sub" data-i18n="events_manage_sub">Create & manage</div>
+      <div class="link-sub"   data-i18n="events_manage_sub">Create & manage • Open | View</div>
     </a>
+
     <a class="link-card" href="hall-approvals.html">
       <div class="link-title" data-i18n="approvals_title">Approvals</div>
-      <div class="link-sub" data-i18n="approvals_sub">Hall / Loan approvals</div>
+      <div class="link-sub"   data-i18n="approvals_sub">Hall / Loan approvals • Open</div>
     </a>
+
     <a class="link-card" href="fees-manage.html">
       <div class="link-title" data-i18n="finance_title">Finance</div>
-      <div class="link-sub" data-i18n="finance_sub">Fees & ledger</div>
+      <div class="link-sub"   data-i18n="finance_sub">Fees & ledger • Open</div>
     </a>
+
     <a class="link-card" href="loan-review.html">
       <div class="link-title" data-i18n="loan_desk_title">Loan Desk</div>
-      <div class="link-sub" data-i18n="loan_desk_sub">Review & decisions</div>
+      <div class="link-sub"   data-i18n="loan_desk_sub">Review & decisions • Open</div>
     </a>
-  </div>
 
-  <div class="card" style="border-color:#ef4444">
-    <div class="link-title" style="color:#ef4444" data-i18n="reset_sessions">Reset Sessions</div>
-    <div class="link-sub" data-i18n="reset_sessions_sub">Clears localStorage & sessions for safety.</div>
-    <button class="pill" style="margin-top:10px;background:#ef4444;color:#fff"
-            onclick="localStorage.clear(); alert('Sessions cleared');">Reset</button>
+    <div class="link-card">
+      <div class="link-title" data-i18n="reset_sessions">Reset Sessions</div>
+      <div class="link-sub"   data-i18n="reset_hint">Clears localStorage & sessions for safety.</div>
+      <button class="btn" style="margin-top:10px;background:#e25c5c" onclick="localStorage.clear();alert('Cleared!')"
+        data-i18n="reset_btn">Reset</button>
+    </div>
   </div>
 
   <div class="footer">© Padmashali Community — V1</div>
