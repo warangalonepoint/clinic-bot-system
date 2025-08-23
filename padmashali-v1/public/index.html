@@ -14,9 +14,14 @@
 <script src="i18n.js"></script>
 <script src="theme.js"></script>
 <script src="banner.js"></script>
+<!-- Light theme overrides -->
+<style>
+  html[data-theme="light"] body{ background:#f7f8fb; color:#0b1220; }
+  html[data-theme="light"] .card{ background:#ffffff; border-color:#e5e7eb; }
+  html[data-theme="light"] .pill{ background:#ffffff; border-color:#e5e7eb; color:#0b1220; }
+</style>
 </head><body>
 <div class="wrap">
-  <!-- Reusable banner -->
   <div id="app-banner"></div>
 
   <div class="card">
@@ -33,21 +38,20 @@
 </div>
 
 <script>
-  // Keep PIN routing same as before
-  const PINS = {"1111":{role:"member",target:"members.html"},
-                "5555":{role:"committee",target:"committee.html"},
-                "9999":{role:"admin",target:"admin.html"}};
-  const session = JSON.parse(localStorage.getItem("pc_session")||"null");
-  if (session && session.role && session.target) location.href = session.target;
+  const PINS={"1111":{role:"member",target:"members.html"},
+              "5555":{role:"committee",target:"committee.html"},
+              "9999":{role:"admin",target:"admin.html"}};
+  const session=JSON.parse(localStorage.getItem("pc_session")||"null");
+  if(session && session.target) location.href=session.target;
 
   function route(){
     const v=(document.getElementById('pin').value||'').trim();
     const hit=PINS[v]; const msg=document.getElementById('msg');
     if(!hit){ msg.style.display='block'; return; }
     localStorage.setItem('pc_session', JSON.stringify({role:hit.role,target:hit.target,ts:Date.now()}));
-    location.href = hit.target;
+    location.href=hit.target;
   }
-  document.getElementById('go').onclick = route;
-  document.getElementById('pin').addEventListener('keydown', e=>{ if(e.key==='Enter') route(); });
+  document.getElementById('go').onclick=route;
+  document.getElementById('pin').addEventListener('keydown',e=>{ if(e.key==='Enter') route(); });
 </script>
 </body></html>
