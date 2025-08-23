@@ -1,122 +1,175 @@
-/* ===========================
-   styles.css — v16.3 (rework)
-   - Logo oversize guard
-   - Balanced banner height
-   - Stable header/pills flow
-   =========================== */
-
-/* -------- Theme tokens -------- */
+/* ==== Padmashali v16 – clean, glassy, mobile-first ==== */
 :root{
-  --bg:#f5f6fa;
-  --fg:#1f2430;
-  --muted:#6b7280;
-  --card:#ffffff;
-  --ring:rgba(0,0,0,.08);
+  --bg:#f5f7fb;
+  --card: #ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --brand:#2251d1;
+  --pill-bg:#eef2f7;
+  --pill-text:#0f172a;
+  --border: rgba(15,23,42,.08);
+  --shadow: 0 10px 30px rgba(2,6,23,.08);
+  --radius: 18px;
 }
-body.dark{
-  --bg:#0f1115;
-  --fg:#e6e7ea;
-  --muted:#a7adbb;
-  --card:#181b21;
-  --ring:rgba(255,255,255,.08);
+[data-theme="dark"]{
+  --bg:#0f141a;
+  --card:#131a22;
+  --text:#e6edf6;
+  --muted:#9fb0c2;
+  --pill-bg:#1b2430;
+  --pill-text:#e6edf6;
+  --border: rgba(255,255,255,.06);
+  --shadow: 0 12px 28px rgba(0,0,0,.35);
 }
-
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
   margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
   background:var(--bg);
-  color:var(--fg);
-  font:14px/1.4 "Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text);
+  line-height:1.45;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+.wrap{
+  max-width:960px;
+  margin:0 auto;
+  padding:16px;
 }
 
-/* -------- Generic cards -------- */
-.card,.glass{
+.card{
   background:var(--card);
-  border-radius:16px;
-  box-shadow:0 6px 24px var(--ring);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
 }
-.card{padding:14px 16px;margin:12px}
+.glass{
+  backdrop-filter: blur(10px);
+}
+.section{margin:16px 0}
 
-/* -------- App Header (pc-banner) -------- */
+/* ===== Banner (Header: logo + title + tagline + pills) ===== */
 .pc-banner{
-  display:flex;flex-direction:column;gap:8px;
-  padding:12px 14px;margin:12px;border-radius:16px;
-  background:var(--card);box-shadow:0 6px 24px var(--ring);
+  padding:14px 16px;
 }
-
-/* first row: logo + title block */
-.pc-row{display:flex;align-items:center;gap:10px;min-width:0}
-.pc-left{display:flex;align-items:center;gap:10px;min-width:0}
+.pc-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
 .pc-logo{
-  width:40px;height:40px;border-radius:10px;
-  object-fit:contain;flex:0 0 40px;
+  width:52px;height:52px;border-radius:14px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  background:#fff;
+  object-fit:contain;
+  padding:6px;
 }
-.pc-tt{min-width:0}
 .pc-title{
-  font-weight:800;letter-spacing:.2px;
-  font-size:18px;               /* one-line on phones */
-  line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-weight:800;
+  font-size:22px;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
-.pc-subtitle{
-  margin-top:2px;font-size:12px;color:var(--muted)
+.pc-tagline{
+  margin-top:2px;
+  color:var(--muted);
+  font-size:14px;
+}
+.pc-pills{
+  margin-top:12px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.pill{
+  appearance:none;
+  border:1px solid var(--border);
+  background:var(--pill-bg);
+  color:var(--pill-text);
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:600;
+  font-size:14px;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+.pill:active{transform:translateY(1px) scale(.99)}
+.pill-danger{
+  background: linear-gradient(180deg, #ffe7e7, #ffdcdc);
+  border-color: rgba(255,0,0,.15);
+  color:#8b1d1d;
+}
+[data-theme="dark"] .pill-danger{
+  background: linear-gradient(180deg, #2a1717, #221111);
+  border-color: rgba(255,0,0,.25);
+  color:#ffb3b3;
 }
 
-/* third row: pills */
-.pc-actions{display:flex;gap:8px;flex-wrap:nowrap}
-.pc-pill{
-  border:0;border-radius:999px;padding:7px 12px;
-  background:var(--bg);color:var(--fg);
-  font-size:13px;box-shadow:0 1px 4px var(--ring);
+/* ===== Hero banner image (separate – not overlaid) ===== */
+.hero{
+  padding:10px;
 }
-.pc-pill:active{transform:translateY(1px)}
-
-/* -------- Banner image block -------- */
-.hero-wrap{width:100%;display:flex;justify-content:center}
 .hero-img{
-  width:94%;
-  height:clamp(160px, 28vh, 260px);   /* stable, balanced height */
-  border-radius:18px;object-fit:cover;
-  box-shadow:0 8px 32px var(--ring);
+  width:100%;
+  height: clamp(180px, 42vw, 300px);
+  border-radius: calc(var(--radius) + 6px);
+  object-fit: cover;
+  box-shadow:var(--shadow);
 }
 
-/* -------- Page content cards -------- */
-.section{padding:12px}
+/* ===== Tiles (menu items) ===== */
+.tiles{display:flex;flex-direction:column;gap:14px}
+.tile{
+  display:block;
+  padding:18px 16px;
+  border-radius: calc(var(--radius) + 6px);
+  background:var(--card);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+.tile h3{margin:0 0 4px;font-size:18px}
+.tile p{margin:0;color:var(--muted);font-size:14px}
 
-/* -------- PIN card alignment (index) -------- */
-.pin-card .label{font-size:18px;font-weight:800;margin-bottom:10px}
-.pin-card input[type="password"], .pin-card input[type="text"]{
-  width:100%;height:48px;border-radius:12px;border:0;
-  background:var(--bg);color:var(--fg);padding:0 14px;
-  box-shadow:inset 0 0 0 1px var(--ring);
+/* ===== Forms ===== */
+.input{
+  width:100%;
+  padding:14px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  font-size:16px;
+}
+.btn{
+  appearance:none;
+  border:none;
+  background:var(--brand);
+  color:#fff;
+  padding:14px 18px;
+  border-radius:12px;
+  font-weight:700;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+.btn:active{transform:translateY(1px)}
+.row{
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+}
+.row > *{flex:1}
+.center{display:flex;justify-content:center}
+
+/* ===== Footer ===== */
+.footer{
+  margin:24px 0;
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
 }
 
-/* -------- Layout safety nets -------- */
-/* If someone drops the raw logo image in the page, prevent it from becoming huge */
-img.brand-logo,
-img[src$="assets/logo.png"],
-img[src$="/assets/logo.png"],
-img[src*="/assets/logo.png"]{
-  display:block;margin:12px auto;
-  max-width:180px;height:auto;        /* <= key fix */
-  border-radius:12px;box-shadow:0 6px 24px var(--ring);
-}
-
-/* Make sure normal content images (like the Devi/Shiva banner) don't overflow */
-img,svg,video{max-width:100%;height:auto}
-
-/* Buttons/links reset for consistency in cards lists */
-a.btn,button.btn{
-  display:inline-flex;align-items:center;gap:8px;
-  border:0;border-radius:12px;padding:10px 14px;
-  background:#2f6df6;color:#fff;font-weight:600
-}
-a.btn:active,button.btn:active{transform:translateY(1px)}
-
-/* Directory / tiles look consistent */
-.tile{background:var(--card);border-radius:16px;padding:14px 16px;margin:12px;box-shadow:0 6px 24px var(--ring)}
-.tile h3{margin:0 0 6px;font-size:16px}
-.tile .sub{color:var(--muted);font-size:13px}
-
-/* Footer */
-.footer{padding:14px;text-align:center;color:var(--muted)}
+/* Utility */
+.hide{display:none!important}
