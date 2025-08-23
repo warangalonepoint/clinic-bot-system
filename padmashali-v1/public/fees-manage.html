@@ -1,33 +1,35 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Manage Fees</title>
-<link rel="stylesheet" href="styles.css?v=18">
-<script src="i18n.js?v=18"></script>
-<script src="theme.js?v=18" defer></script>
-<script src="banner.js?v=18" defer></script>
-<script src="app.js?v=18" defer></script>
-</head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finance — Fees & Ledger</title>
+  <link rel="stylesheet" href="styles.css?v=16">
+  <script src="i18n.js?v=16"></script>
+  <script src="theme.js?v=16" defer></script>
+  <script src="banner.js?v=16" defer></script>
+</head>
+<body>
 <div class="wrap">
   <div id="app-banner"></div>
+
   <div class="card">
-    <h2>📒 Fees Manager</h2>
-    <div><button class="ghost btn" id="exportBtn">Export CSV</button></div>
+    <div class="pc-title">Fees & ledger</div>
+    <div class="pc-tagline">View aggregate totals (offline)</div>
+
+    <div id="sum" class="link-card"></div>
+    <div id="list"></div>
   </div>
-  <div class="card">
-    <b>All Payments</b>
-    <table class="table"><thead><tr><th>Date</th><th>UID</th><th>Amount</th><th>Mode</th></tr></thead><tbody id="all"></tbody></table>
-    <p><b>Total Collected:</b> <span id="total">₹0</span></p>
-  </div>
-  <footer>© Padmashali Community — V1</footer>
+
+  <div class="footer">© Padmashali Community — V1</div>
 </div>
 <script>
-const s=JSON.parse(localStorage.getItem("pc_session")||"null"); if(!s||(s.role!=='committee'&&s.role!=='admin')) location.href='index.html';
-const K='pc_fees'; function getAll(){return JSON.parse(localStorage.getItem(K)||'[]');} function fmt(x){return '₹'+Number(x).toLocaleString('en-IN');}
-function render(){const L=getAll().sort((a,b)=>b.ts-a.ts); const T=document.getElementById('all'); T.innerHTML=''; let sum=0;
-  L.forEach(x=>{const tr=document.createElement('tr'); tr.innerHTML=`<td>${new Date(x.ts).toLocaleDateString('en-IN')}</td><td>${x.uid}</td><td>${fmt(x.amount)}</td><td>${x.mode}</td>`; T.appendChild(tr); sum+=x.amount;});
-  document.getElementById('total').textContent=fmt(sum);
+function render(){
+  const all=JSON.parse(localStorage.getItem('pc_fees')||'[]');
+  const total=all.reduce((a,b)=>a+Number(b.amt||0),0);
+  sum.innerHTML = `<div class="link-title">Total ₹${total}</div><div class="link-sub">${all.length} payments</div>`;
+  list.innerHTML = all.slice().reverse().map(r=>`<div class="link-card"><div class="link-title">₹${r.amt}</div><div class="link-sub">${new Date(r.ts).toLocaleString()}</div></div>`).join('') || '<div class="pc-tagline">No records.</div>';
 }
-exportBtn.onclick=()=>{const L=getAll(); const rows=[['ID','UID','Amount','Mode','Date'],...L.map(x=>[x.id,x.uid,x.amount,x.mode,new Date(x.ts).toLocaleDateString('en-IN')])]; const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='fees.csv'; a.click(); URL.revokeObjectURL(url);};
 render();
 </script>
-</body></html>
+</body>
+</html>
