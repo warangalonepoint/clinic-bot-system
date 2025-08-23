@@ -85,7 +85,7 @@ footer{opacity:.7;font-size:13px;margin:18px 0;text-align:center}
 
 <script src="i18n.js"></script>
 <script>
-  // guard: must be member OR committee/admin (any logged-in user can view)
+  // guard: any logged-in role can use this page
   const s = JSON.parse(localStorage.getItem("pc_session")||"null");
   if(!s){ location.href='index.html'; }
 
@@ -108,9 +108,7 @@ footer{opacity:.7;font-size:13px;margin:18px 0;text-align:center}
 
   function getAll(){ return JSON.parse(localStorage.getItem(LSKEY)||'[]'); }
   function setAll(arr){ localStorage.setItem(LSKEY, JSON.stringify(arr)); }
-
   function fmtTime(a,b){ return `${a}–${b}`; }
-
   function overlap(a1,b1,a2,b2){ return a1<b2 && a2<b1; } // half-open
   function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
 
