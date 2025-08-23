@@ -32,15 +32,59 @@ footer{opacity:.7;font-size:13px;margin:18px;text-align:center}
 
   <div class="card">
     <div class="grid">
-      <div class="tile"><a href="directory.html"><b data-i18n="directory">Directory</b><div class="muted" data-i18n="dir_sub">Search members & contacts</div></a></div>
-      <div class="tile"><b data-i18n="manage_content">Manage Content</b><div class="muted">Banners, pages, links</div></div>
-      <div class="tile"><b data-i18n="user_roles">User Roles</b><div class="muted">Add / disable members</div></div>
-      <div class="tile"><b data-i18n="hall_inventory">Hall Inventory</b><div class="muted">Pricing & slots</div></div>
-      <div class="tile"><b data-i18n="finance">Finance</b><div class="muted">Fees & ledger</div></div>
-      <div class="tile"><b data-i18n="loan_desk">Loan Desk</b><div class="muted">Rules & limits</div></div>
-      <div class="tile"><b data-i18n="backups">Backups</b><div class="muted">Export CSV / JSON</div></div>
-      <div class="tile"><b data-i18n="settings">Settings</b><div class="muted">Branding & SEO</div></div>
-      <div class="tile"><b data-i18n="audit_logs">Audit Logs</b><div class="muted">Security & trails</div></div>
+      <div class="tile">
+        <a href="directory.html">
+          <b data-i18n="directory">Directory</b>
+          <div class="muted" data-i18n="dir_sub">Search members & contacts</div>
+        </a>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="manage_content">Manage Content</b>
+        <div class="muted">Banners, pages, links</div>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="user_roles">User Roles</b>
+        <div class="muted">Add / disable members</div>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="hall_inventory">Hall Inventory</b>
+        <div class="muted">Pricing & slots</div>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="finance">Finance</b>
+        <div class="muted">Fees & ledger</div>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="loan_desk">Loan Desk</b>
+        <div class="muted">Rules & limits</div>
+      </div>
+
+      <div class="tile">
+        <b>Approvals</b><div class="muted">Hall / Loan approvals</div>
+        <div style="margin-top:8px">
+          <a href="hall-approvals.html" style="text-decoration:none;color:#a7f3d0">Open Hall Approvals</a>
+        </div>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="backups">Backups</b>
+        <div class="muted">Export CSV / JSON</div>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="settings">Settings</b>
+        <div class="muted">Branding & SEO</div>
+      </div>
+
+      <div class="tile">
+        <b data-i18n="audit_logs">Audit Logs</b>
+        <div class="muted">Security & trails</div>
+      </div>
     </div>
   </div>
 
@@ -55,7 +99,7 @@ footer{opacity:.7;font-size:13px;margin:18px;text-align:center}
 
 <script src="i18n.js"></script>
 <script>
-  // role guard
+  // Role guard: admin only
   const s = JSON.parse(localStorage.getItem("pc_session")||"null");
   if (!s || s.role!=='admin') location.href='index.html';
 
