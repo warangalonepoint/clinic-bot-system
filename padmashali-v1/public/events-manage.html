@@ -1,80 +1,56 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Manage Events</title>
-<link rel="stylesheet" href="styles.css?v=18">
-<script src="i18n.js?v=18"></script>
-<script src="theme.js?v=18" defer></script>
-<script src="banner.js?v=18" defer></script>
-<script src="app.js?v=18" defer></script>
-</head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Events — Manage</title>
+  <link rel="stylesheet" href="styles.css?v=16">
+  <script src="i18n.js?v=16"></script>
+  <script src="theme.js?v=16" defer></script>
+  <script src="banner.js?v=16" defer></script>
+</head>
+<body>
 <div class="wrap">
   <div id="app-banner"></div>
 
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <h2>🎛️ <span data-i18n="events">Events</span> — Manage</h2>
-      <div><button class="ghost btn" onclick="history.back()" data-i18n="home">Home</button></div>
+    <div class="pc-title">Create & manage events</div>
+    <div class="pc-tagline">Offline demo — stored locally</div>
+
+    <div style="display:grid;gap:10px;margin-top:12px">
+      <input class="input" id="t" placeholder="Title">
+      <input class="input" id="d" type="date">
+      <input class="input" id="p" placeholder="Place">
+      <input class="input" id="desc" placeholder="Short description">
+      <button class="btn" onclick="add()">Add Event</button>
     </div>
+
+    <div id="list" style="margin-top:14px"></div>
   </div>
 
-  <div class="card">
-    <b>Create / Edit</b>
-    <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:10px">
-      <input id="title" class="input" placeholder="Title *">
-      <input id="date" class="input" type="date">
-      <input id="time" class="input" type="time">
-      <input id="location" class="input" placeholder="Location">
-      <input id="desc" class="input" placeholder="Description">
-    </div>
-    <div style="margin-top:10px;display:flex;gap:8px">
-      <button class="btn" id="save">Save</button>
-      <button class="ghost btn" id="clear">Clear</button>
-      <button class="btn" style="background:#ef4444;display:none" id="del">Delete</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <b>All Events</b>
-    <div id="rows" style="display:grid;gap:10px;margin-top:10px"></div>
-  </div>
-
-  <footer>© Padmashali Community — V1</footer>
+  <div class="footer">© Padmashali Community — V1</div>
 </div>
 <script>
-const s=JSON.parse(localStorage.getItem('pc_session')||'null'); if(!s || (s.role!=='committee' && s.role!=='admin')) location.href='index.html';
-const K='pc_events'; let editId=null;
-function getAll(){return JSON.parse(localStorage.getItem(K)||'[]');}
-function setAll(v){localStorage.setItem(K,JSON.stringify(v));}
-function uid(){return 'E'+Math.random().toString(36).slice(2,10);}
-function fmt(dt){return new Date(dt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});}
+let items=JSON.parse(localStorage.getItem('pc_events')||'[]');
+function save(){ localStorage.setItem('pc_events',JSON.stringify(items)); }
 function render(){
-  const L=getAll().sort((a,b)=>a.when-b.when);
-  const R=document.getElementById('rows'); R.innerHTML='';
-  L.forEach(e=>{
-    const d=document.createElement('div'); d.className='glass tile';
-    d.innerHTML=`<b>${e.title}</b><div class="muted">${fmt(e.when)} • ${e.location||''}</div><div>${e.desc||''}</div>
-    <div style="margin-top:8px"><button class="ghost btn" onclick="edit('${e.id}')">Edit</button></div>`;
-    R.appendChild(d);
-  });
+  list.innerHTML=items.map((e,i)=>`
+    <div class="link-card" style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="link-title">${e.t}</div>
+        <div class="link-sub">${e.d} • ${e.p}</div>
+        <div>${e.desc||''}</div>
+      </div>
+      <button class="pill" onclick="del(${i})">Delete</button>
+    </div>`).join('') || '<div class="pc-tagline">No events yet.</div>';
 }
-function edit(id){
-  const e=getAll().find(x=>x.id===id); if(!e) return;
-  editId=id; title.value=e.title; desc.value=e.desc||''; location.value=e.location||'';
-  const dt=new Date(e.when); date.value=dt.toISOString().slice(0,10); time.value=dt.toTimeString().slice(0,5);
-  del.style.display='inline-block'; window.scrollTo({top:0,behavior:'smooth'});
+function add(){
+  if(!t.value.trim()) return alert('Title required');
+  items.push({t:t.value,d:d.value,p:p.value,desc:desc.value});
+  t.value=d.value=p.value=desc.value='';
+  save(); render();
 }
-save.onclick=()=>{
-  const t=(title.value||'').trim(); if(!t){alert('Title required');return;}
-  const d=date.value||new Date().toISOString().slice(0,10); const tm=time.value||'10:00';
-  const when=new Date(`${d}T${tm}:00`).getTime();
-  const rec={id:editId||uid(),title:t,desc:desc.value||'',location:location.value||'',when};
-  const L=getAll(); const i=L.findIndex(x=>x.id===rec.id); if(i>=0) L[i]=rec; else L.push(rec); setAll(L);
-  clear.click(); render();
-};
-clear.onclick=()=>{editId=null; [title,desc,location,date,time].forEach(x=>x.value=''); del.style.display='none';};
-del.onclick=()=>{ if(!editId) return; if(!confirm('Delete this event?')) return;
-  setAll(getAll().filter(x=>x.id!==editId)); clear.click(); render();
-};
+function del(i){ items.splice(i,1); save(); render(); }
 render();
 </script>
-</body></html>
+</body>
+</html>
