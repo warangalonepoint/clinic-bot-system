@@ -1,45 +1,38 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Events</title>
-  <link rel="stylesheet" href="styles.css?v=16">
-  <script src="i18n.js?v=16"></script>
-  <script src="theme.js?v=16" defer></script>
-  <script src="banner.js?v=16" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Padmashali — Events</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-theme')||'light');</script>
 </head>
 <body>
-<div class="wrap">
-  <div id="app-banner"></div>
-
-  <div class="card">
-    <div class="pc-title" data-i18n="events_title">Events</div>
-    <div class="pc-tagline" data-i18n="events_sub">View & RSVP</div>
-
-    <div id="list" style="margin-top:12px"></div>
-  </div>
-
-  <div class="footer">© Padmashali Community — V1</div>
-</div>
-<script>
-const events=[
- {title:"Monthly Seva Meet",date:"2025-09-05",place:"Warangal Hall A",desc:"Planning & volunteering."},
- {title:"Health Camp",date:"2025-09-15",place:"Kazipet Clinic",desc:"Free checkups."}
-];
-function render(){
-  list.innerHTML=events.map((e,i)=>`
-    <div class="link-card">
-      <div class="link-title">${e.title}</div>
-      <div class="link-sub">${e.date} • ${e.place}</div>
-      <div style="margin-top:8px">${e.desc}</div>
-      <div style="margin-top:10px;display:flex;gap:8px">
-        <button class="pill" onclick="rsvp(${i},'yes')">RSVP Yes</button>
-        <button class="pill" onclick="rsvp(${i},'no')">RSVP No</button>
+  <div class="wrap"></div>
+  <div class="wrap">
+    <div class="section tiles">
+      <div class="tile">
+        <h3>Community Annadanam</h3>
+        <p class="muted">Sep 29 • 10:00 AM • Warangal Hall</p>
+        <div class="row" style="margin-top:8px">
+          <button class="pill">RSVP</button>
+          <button class="pill">Add to Calendar</button>
+        </div>
       </div>
-    </div>`).join('');
-}
-function rsvp(i,v){ alert(`Saved: ${events[i].title} — ${v.toUpperCase()}`); }
-render();
-</script>
+      <div class="tile">
+        <h3>Education Support Drive</h3>
+        <p class="muted">Oct 06 • 9:30 AM • Hanamkonda</p>
+        <div class="row" style="margin-top:8px">
+          <button class="pill">RSVP</button>
+          <button class="pill">Add to Calendar</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer">© Padmashali Community — V1</div>
+  </div>
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+  <script src="banner.js"></script>
 </body>
 </html>
