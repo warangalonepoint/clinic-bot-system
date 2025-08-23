@@ -1,22 +1,15 @@
 <script>
-  // Theme: 'dark' | 'light' | 'auto'
+  // Theme: 'auto' (default), 'dark', 'light'
   function getTheme(){ return localStorage.getItem('pc_theme') || 'auto'; }
-  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
-  function currentThemeValue(){
-    const pref=getTheme();
-    return pref==='auto' ? (systemPrefersDark() ? 'dark' : 'light') : pref;
-  }
+  function systemDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function activeTheme(){ return getTheme()==='auto' ? (systemDark()?'dark':'light') : getTheme(); }
   function applyTheme(){
-    const v=currentThemeValue();
-    document.documentElement.setAttribute('data-theme', v);
-    const btn=document.getElementById('theme-pill');
-    if(btn) btn.textContent = v==='dark' ? '🌙' : '☀️';
+    const v=activeTheme(); document.documentElement.setAttribute('data-theme', v);
+    const pill=document.getElementById('theme-pill'); if(pill) pill.textContent = v==='dark'?'🌙':'☀️';
   }
   function cycleTheme(){
-    const order=['auto','dark','light'];
-    const next=order[(order.indexOf(getTheme())+1)%order.length];
-    localStorage.setItem('pc_theme', next);
-    applyTheme();
+    const options=['auto','dark','light']; const next=options[(options.indexOf(getTheme())+1)%options.length];
+    localStorage.setItem('pc_theme', next); applyTheme();
   }
   window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
   document.addEventListener('DOMContentLoaded', applyTheme);
