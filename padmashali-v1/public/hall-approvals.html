@@ -1,49 +1,31 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Approvals</title>
-  <link rel="stylesheet" href="styles.css?v=16">
-  <script src="i18n.js?v=16"></script>
-  <script src="theme.js?v=16" defer></script>
-  <script src="banner.js?v=16" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Padmashali — Hall Approvals</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-theme')||'light');</script>
 </head>
 <body>
-<div class="wrap">
-  <div id="app-banner"></div>
-
-  <div class="card">
-    <div class="pc-title">Hall / Loan approvals</div>
-    <div class="pc-tagline">Review new requests (offline demo)</div>
-
-    <div id="list" style="margin-top:12px"></div>
-  </div>
-
-  <div class="footer">© Padmashali Community — V1</div>
-</div>
-<script>
-function render(){
-  const halls=JSON.parse(localStorage.getItem('pc_halls')||'[]');
-  const loans=JSON.parse(localStorage.getItem('pc_loans')||'[]');
-  list.innerHTML = halls.map((r,i)=>card('Hall', r, ()=>set('pc_halls',i,'Approved'), ()=>set('pc_halls',i,'Rejected'))).join('') +
-                   loans.map((r,i)=>card('Loan', r, ()=>set('pc_loans',i,'Approved'), ()=>set('pc_loans',i,'Rejected'))).join('') ||
-                   '<div class="pc-tagline">No pending items.</div>';
-}
-function card(kind,r,ok,no){
-  const sub = kind==='Hall' ? `${r.hall} • ${r.date} • ${r.slot}` : `${r.amount} • ${r.reason}`;
-  return `<div class="link-card">
-    <div class="link-title">${kind} request — ${r.status||'Pending'}</div>
-    <div class="link-sub">${sub}</div>
-    <div style="margin-top:10px;display:flex;gap:8px">
-      <button class="pill" onclick="(${ok})(event)">Approve</button>
-      <button class="pill" onclick="(${no})(event)">Reject</button>
+  <div class="wrap"></div>
+  <div class="wrap">
+    <div class="section tiles">
+      <div class="tile">
+        <h3>Oct 12 • 10:00–14:00 • Main Hall</h3>
+        <p class="muted">Requested by: S. Laxmi • Purpose: Annaprasana</p>
+        <div class="row" style="margin-top:8px">
+          <button class="pill">View</button>
+          <button class="pill">Approve</button>
+          <button class="pill pill-danger">Decline</button>
+        </div>
+      </div>
     </div>
-  </div>`;
-}
-function set(key,i,status){
-  const arr=JSON.parse(localStorage.getItem(key)||'[]'); arr[i].status=status; localStorage.setItem(key,JSON.stringify(arr)); render();
-}
-render();
-</script>
+    <div class="footer">© Padmashali Community — V1</div>
+  </div>
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+  <script src="banner.js"></script>
 </body>
 </html>
