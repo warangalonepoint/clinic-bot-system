@@ -1,62 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Padmashali Community</title>
-<style>
-:root{color-scheme:dark}
-body{margin:0;font-family:system-ui,Inter,Arial;background:#0f1115;color:#e8eaed}
-.wrap{max-width:980px;margin:24px auto;padding:16px}
-.card{background:#171a21;border:1px solid #222736;border-radius:18px;padding:18px}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.tile{background:#11141a;border:1px solid #1f2432;border-radius:16px;padding:14px}
-.tile a{color:inherit;text-decoration:none}
-.muted{opacity:.75}
-.btn{background:#11141a;border:1px solid #1f2432;color:inherit;padding:8px 12px;border-radius:10px;cursor:pointer}
-</style>
-<script src="i18n.js"></script>
-<script src="theme.js"></script>
-<script src="banner.js"></script>
-<style>
-  html[data-theme="light"] body{ background:#f7f8fb; color:#0b1220; }
-  html[data-theme="light"] .card,.tile,.btn{ background:#ffffff; border-color:#e5e7eb; }
-</style>
-</head>
-<body>
+<link rel="stylesheet" href="styles.css?v=3">
+<script src="i18n.js?v=3"></script>
+<script src="theme.js?v=3" defer></script>
+<script src="banner.js?v=3" defer></script>
+<script src="app.js?v=3" defer></script>
+</head><body>
 <div class="wrap">
   <div id="app-banner"></div>
-
-  <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-    <button class="btn" onclick="logout()" data-i18n="logout">Logout</button>
+  <div class="card" style="display:flex;justify-content:flex-end;margin-bottom:12px">
+    <button class="ghost btn" onclick="logout()" data-i18n="logout">Logout</button>
   </div>
-
   <div class="card">
     <div class="grid">
-      <div class="tile"><a href="directory.html">
-        <b data-i18n="directory">Directory</b><div class="muted" data-i18n="dir_sub">Search members & contacts</div>
-      </a></div>
-      <div class="tile"><a href="events.html">
-        <b data-i18n="events">Events</b><div class="muted" data-i18n="events_sub_view">View & RSVP</div>
-      </a></div>
-      <div class="tile"><a href="hall-booking.html">
-        <b data-i18n="book_halls">Book Halls</b><div class="muted" data-i18n="book_halls_sub">Request slots</div>
-      </a></div>
-      <div class="tile"><a href="fees.html">
-        <b data-i18n="fees">Fees</b><div class="muted" data-i18n="fees_sub_member">Pay & history</div>
-      </a></div>
-      <div class="tile"><a href="loan-requests.html">
-        <b data-i18n="loan_request">Loan Request</b><div class="muted" data-i18n="loan_request_sub">Apply & status</div>
-      </a></div>
+      <div class="tile"><a href="directory.html"><b data-i18n="directory">Directory</b><div class="muted" data-i18n="dir_sub">Search members & contacts</div></a></div>
+      <div class="tile"><a href="events.html"><b data-i18n="events">Events</b><div class="muted" data-i18n="events_sub_view">View & RSVP</div></a></div>
+      <div class="tile"><a href="hall-booking.html"><b data-i18n="book_halls">Book Halls</b><div class="muted" data-i18n="book_halls_sub">Request slots</div></a></div>
+      <div class="tile"><a href="fees.html"><b data-i18n="fees">Fees</b><div class="muted" data-i18n="fees_sub_member">Pay & history</div></a></div>
+      <div class="tile"><a href="loan-requests.html"><b data-i18n="loan_request">Loan Request</b><div class="muted" data-i18n="loan_request_sub">Apply & status</div></a></div>
     </div>
   </div>
-
-  <p class="muted" style="text-align:center;margin-top:18px">© Padmashali Community — V1</p>
+  <footer>© Padmashali Community — V1</footer>
 </div>
-
 <script>
-  const s=JSON.parse(localStorage.getItem("pc_session")||"null");
-  if(!s || s.role!=='member') location.href='index.html';
-  function logout(){ localStorage.removeItem('pc_session'); location.href='index.html'; }
-  applyI18n(); applyTheme();
+const s=JSON.parse(localStorage.getItem("pc_session")||"null");
+if(!s || s.role!=='member') location.href='index.html';
+function logout(){ localStorage.removeItem('pc_session'); location.href='index.html'; }
 </script>
 </body></html>
