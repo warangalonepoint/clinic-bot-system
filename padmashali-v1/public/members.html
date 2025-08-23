@@ -3,61 +3,50 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
   <title>Padmashali Community — Members</title>
-  <link rel="stylesheet" href="styles.css?v=16"/>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="theme-auto">
+<body>
   <div class="wrap">
+    <div id="app-banner"></div>
 
-    <div id="app-banner" class="mb-16">
-      <div class="card glass row gap-12 items-center">
-        <img src="assets/logo.png" alt="" class="logo-40" onerror="this.style.display='none'"/>
-        <div class="grow">
-          <div class="h1 tight">Padmashali Community</div>
-          <div class="muted">unity • seva • growth</div>
-        </div>
-      </div>
+    <div class="hero card">
+      <img class="hero-img" src="assets/hero.png" alt="Hero"/>
     </div>
 
-    <img class="hero-img card" src="assets/banner.png" alt="" loading="lazy"/>
-
-    <section class="card glass">
+    <div class="section">
       <a class="tile" href="directory.html">
-        <div class="tile-title">Directory</div>
-        <div class="tile-sub">Search members & contacts</div>
+        <h3 data-i18n="directory">Directory</h3>
+        <div class="sub" data-i18n="directory_sub">Search members & contacts</div>
       </a>
 
       <a class="tile" href="events.html">
-        <div class="tile-title">Events</div>
-        <div class="tile-sub">View & RSVP</div>
+        <h3 data-i18n="events">Events</h3>
+        <div class="sub" data-i18n="events_sub">View & RSVP</div>
       </a>
 
       <a class="tile" href="hall-booking.html">
-        <div class="tile-title">Book Halls</div>
-        <div class="tile-sub">Request slots</div>
+        <h3 data-i18n="halls">Book Halls</h3>
+        <div class="sub" data-i18n="halls_sub">Request slots</div>
       </a>
 
       <a class="tile" href="fees.html">
-        <div class="tile-title">Fees</div>
-        <div class="tile-sub">Pay & history</div>
+        <h3 data-i18n="fees">Fees</h3>
+        <div class="sub" data-i18n="fees_sub">Pay & history</div>
       </a>
 
       <a class="tile" href="loan-requests.html">
-        <div class="tile-title">Loan Request</div>
-        <div class="tile-sub">Apply & status</div>
+        <h3 data-i18n="loans">Loan Request</h3>
+        <div class="sub" data-i18n="loans_sub">Apply & status</div>
       </a>
-    </section>
+    </div>
 
-    <footer class="muted center py-24">© Padmashali Community — V1</footer>
+    <footer class="muted center">© Padmashali Community — V1</footer>
   </div>
 
-  <script>window.APP_LOGO_PATH="assets/logo.png";window.APP_TITLE="Padmashali Community";window.APP_TAGLINE="unity • seva • growth";</script>
-  <script src="theme.js?v=16"></script>
-  <script src="i18n.js?v=16"></script>
-  <script src="app.js?v=16"></script>
-  <script src="banner.js?v=16"></script>
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="banner.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
