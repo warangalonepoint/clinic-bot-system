@@ -1,4 +1,3 @@
-<script>
 (function(){
   function ensureHost(){
     let host=document.getElementById('app-banner');
@@ -29,4 +28,3 @@
   }
   document.addEventListener('DOMContentLoaded',render);
 })();
-</script>
