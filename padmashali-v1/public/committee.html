@@ -31,12 +31,35 @@ footer{opacity:.7;font-size:13px;margin:18px;text-align:center}
 
   <div class="card">
     <div class="grid">
-      <div class="tile"><b data-i18n="directory">Directory</b><div class="muted" data-i18n="dir_sub">Search members & contacts</div><div style="margin-top:8px"><a href="directory.html" style="text-decoration:none;color:#a7f3d0">Open</a></div></div>
-      <div class="tile"><b>Announcements</b><div class="muted">Post & schedule</div></div>
-      <div class="tile"><b>Polls</b><div class="muted">Create & view results</div></div>
-      <div class="tile"><b>Approvals</b><div class="muted">Hall / Loan approvals</div></div>
-      <div class="tile"><b>Event Manager</b><div class="muted">Plan programs</div></div>
-      <div class="tile"><b>Reports</b><div class="muted">Monthly summary</div></div>
+      <div class="tile">
+        <a href="directory.html">
+          <b data-i18n="directory">Directory</b>
+          <div class="muted" data-i18n="dir_sub">Search members & contacts</div>
+        </a>
+      </div>
+
+      <div class="tile">
+        <b>Announcements</b><div class="muted">Post & schedule</div>
+      </div>
+
+      <div class="tile">
+        <b>Polls</b><div class="muted">Create & view results</div>
+      </div>
+
+      <div class="tile">
+        <b>Approvals</b><div class="muted">Hall / Loan approvals</div>
+        <div style="margin-top:8px">
+          <a href="hall-approvals.html" style="text-decoration:none;color:#a7f3d0">Open Hall Approvals</a>
+        </div>
+      </div>
+
+      <div class="tile">
+        <b>Event Manager</b><div class="muted">Plan programs</div>
+      </div>
+
+      <div class="tile">
+        <b>Reports</b><div class="muted">Monthly summary</div>
+      </div>
     </div>
   </div>
 
@@ -45,7 +68,7 @@ footer{opacity:.7;font-size:13px;margin:18px;text-align:center}
 
 <script src="i18n.js"></script>
 <script>
-  // role guard
+  // Role guard: committee only
   const s = JSON.parse(localStorage.getItem("pc_session")||"null");
   if (!s || s.role!=='committee') location.href='index.html';
 
