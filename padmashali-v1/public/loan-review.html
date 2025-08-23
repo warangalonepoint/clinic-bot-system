@@ -1,49 +1,45 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Loan Review</title>
-<link rel="stylesheet" href="styles.css?v=18">
-<script src="i18n.js?v=18"></script>
-<script src="theme.js?v=18" defer></script>
-<script src="banner.js?v=18" defer></script>
-<script src="app.js?v=18" defer></script>
-</head><body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loan Desk</title>
+  <link rel="stylesheet" href="styles.css?v=16">
+  <script src="i18n.js?v=16"></script>
+  <script src="theme.js?v=16" defer></script>
+  <script src="banner.js?v=16" defer></script>
+</head>
+<body>
 <div class="wrap">
   <div id="app-banner"></div>
+
   <div class="card">
-    <h2>🧾 Loan Review</h2>
+    <div class="pc-title">Loan Desk</div>
+    <div class="pc-tagline">Review & decisions</div>
+
+    <div id="list" style="margin-top:12px"></div>
   </div>
-  <div class="card">
-    <b>Pending</b>
-    <table class="table"><thead><tr><th>Date</th><th>Name</th><th>Phone</th><th>Amount</th><th>Months</th><th>Purpose</th><th>Collateral</th><th>Decision</th></tr></thead><tbody id="pending"></tbody></table>
-  </div>
-  <div class="card">
-    <b>Decided</b>
-    <table class="table"><thead><tr><th>Date</th><th>Name</th><th>Amount</th><th>Status</th><th>Decision</th></tr></thead><tbody id="done"></tbody></table>
-  </div>
-  <footer>© Padmashali Community — V1</footer>
+
+  <div class="footer">© Padmashali Community — V1</div>
 </div>
 <script>
-const s=JSON.parse(localStorage.getItem("pc_session")||"null"); if(!s||(s.role!=='committee'&&s.role!=='admin')) location.href='index.html';
-const K='pc_loans';
-function getAll(){return JSON.parse(localStorage.getItem(K)||'[]');} function setAll(v){localStorage.setItem(K,JSON.stringify(v));}
-function fmtMoney(x){return '₹'+Number(x).toLocaleString('en-IN');}
-function emi(p, annualRate, m){const r=annualRate/12/100; if(!r) return p/m; return p*r*Math.pow(1+r,m)/(Math.pow(1+r,m)-1);}
-function render(){const L=getAll().sort((a,b)=>b.ts-a.ts); const P=document.getElementById('pending'); const D=document.getElementById('done'); P.innerHTML=''; D.innerHTML='';
-  L.forEach(x=>{ if(x.status==='Pending'){ const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${new Date(x.ts).toLocaleDateString('en-IN')}</td><td>${x.name}</td><td>${x.phone}</td><td>${fmtMoney(x.amount)}</td><td>${x.months}</td><td>${x.purpose}</td><td>${x.collateral||'—'}</td>
-      <td><div style="display:flex;gap:6px;flex-wrap:wrap">
-        <input id="amt_${x.id}" class="input" type="number" value="${x.amount}" style="width:120px">
-        <input id="mon_${x.id}" class="input" type="number" value="${x.months}" style="width:120px">
-        <input id="rate_${x.id}" class="input" type="number" step="0.1" value="${x.rate||12}" style="width:120px">
-        <button class="btn" onclick="approve('${x.id}')">Approve</button>
-        <button class="ghost btn" onclick="reject('${x.id}')">Reject</button></div></td>`; P.appendChild(tr);
-    } else { const dec=x.decision?`₹${x.decision.approvedAmount} / ${x.decision.months}m @ ${x.decision.rate}% (EMI ₹${x.decision.emi})`:'—';
-      const tr=document.createElement('tr'); tr.innerHTML=`<td>${new Date(x.ts).toLocaleDateString('en-IN')}</td><td>${x.name}</td><td>${fmtMoney(x.amount)}</td><td><span class="badge">${x.status}</span></td><td>${dec}</td>`; D.appendChild(tr);}
-  });
+function render(){
+  const arr=JSON.parse(localStorage.getItem('pc_loans')||'[]');
+  list.innerHTML=arr.map((r,i)=>`
+    <div class="link-card">
+      <div class="link-title">${r.amount} — ${r.status||'Pending'}</div>
+      <div class="link-sub">${new Date(r.ts).toLocaleString()}</div>
+      <div>${r.reason}</div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="pill" onclick="set(${i},'Approved')">Approve</button>
+        <button class="pill" onclick="set(${i},'Rejected')">Reject</button>
+      </div>
+    </div>`).join('') || '<div class="pc-tagline">No requests.</div>';
 }
-window.approve=id=>{const L=getAll(); const i=L.findIndex(z=>z.id===id); if(i<0) return; const amt=+document.getElementById('amt_'+id).value||0, mon=+document.getElementById('mon_'+id).value||0, rate=+document.getElementById('rate_'+id).value||12; if(!amt||!mon){alert('Enter amount & months');return;}
-  const e=Math.round(emi(amt,rate,mon)); L[i].status='Approved'; L[i].decision={approvedAmount:amt,months:mon,rate,emi:e}; setAll(L); render();};
-window.reject=id=>{const L=getAll(); const i=L.findIndex(z=>z.id===id); if(i<0) return; L[i].status='Rejected'; L[i].decision=null; setAll(L); render();};
+function set(i,status){
+  const arr=JSON.parse(localStorage.getItem('pc_loans')||'[]'); arr[i].status=status;
+  localStorage.setItem('pc_loans',JSON.stringify(arr)); render();
+}
 render();
 </script>
-</body></html>
+</body>
+</html>
