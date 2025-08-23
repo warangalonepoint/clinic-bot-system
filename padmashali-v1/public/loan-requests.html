@@ -1,47 +1,39 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Loan Request</title>
-  <link rel="stylesheet" href="styles.css?v=16">
-  <script src="i18n.js?v=16"></script>
-  <script src="theme.js?v=16" defer></script>
-  <script src="banner.js?v=16" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Padmashali — Loan Request</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-theme')||'light');</script>
 </head>
 <body>
-<div class="wrap">
-  <div id="app-banner"></div>
-
-  <div class="card">
-    <div class="pc-title" data-i18n="loans_title">Loan Request</div>
-    <div class="pc-tagline" data-i18n="loans_sub">Apply & status</div>
-
-    <div style="display:grid;gap:10px;margin-top:12px">
-      <input class="input" id="amount" type="number" placeholder="Amount (₹)">
-      <input class="input" id="reason" placeholder="Reason">
-      <button class="btn" onclick="applyLoan()">Apply</button>
+  <div class="wrap"></div>
+  <div class="wrap">
+    <div class="section card glass" style="padding:16px">
+      <h3 style="margin:0 0 10px">Apply for Loan</h3>
+      <div class="row">
+        <input class="input" placeholder="Amount (₹)">
+        <select class="input"><option>Purpose</option><option>Education</option><option>Medical</option><option>Business</option></select>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <input class="input" placeholder="Notes (optional)">
+        <button class="btn">Submit</button>
+      </div>
     </div>
 
-    <div id="list" style="margin-top:14px"></div>
-  </div>
+    <div class="section card glass" style="padding:16px">
+      <h3 style="margin:0 0 10px">Your Requests</h3>
+      <div class="tiles">
+        <div class="tile"><strong>₹20,000</strong> <span class="muted"> • Education • Status: Pending</span></div>
+      </div>
+    </div>
 
-  <div class="footer">© Padmashali Community — V1</div>
-</div>
-<script>
-function applyLoan(){
-  const amt=Number(amount.value||0); if(!amt) return alert('Enter amount');
-  const rec={amount:'₹'+amt,reason:reason.value,status:'Pending',ts:Date.now()};
-  const arr=JSON.parse(localStorage.getItem('pc_loans')||'[]'); arr.push(rec);
-  localStorage.setItem('pc_loans',JSON.stringify(arr));
-  amount.value=reason.value='';
-  render();
-}
-function render(){
-  const arr=JSON.parse(localStorage.getItem('pc_loans')||'[]').reverse();
-  list.innerHTML=arr.map(r=>`<div class="link-card"><div class="link-title">${r.amount} — ${r.status}</div>
-  <div class="link-sub">${new Date(r.ts).toLocaleString()}</div><div>${r.reason}</div></div>`).join('') || '<div class="pc-tagline">No requests yet.</div>';
-}
-render();
-</script>
+    <div class="footer">© Padmashali Community — V1</div>
+  </div>
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+  <script src="banner.js"></script>
 </body>
 </html>
