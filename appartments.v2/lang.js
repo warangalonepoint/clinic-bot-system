@@ -1,8 +1,5 @@
-<!-- Save as: lang.js  (place next to your HTML files) -->
+<!-- Save as: lang.js -->
 <script>
-// Lightweight i18n for Apartments App (EN ↔ TE)
-// Rules: no UI changes, instant swap, persists via localStorage.
-
 (function () {
   const I18N = {
     en: {
@@ -48,7 +45,12 @@
       "Deny":"Deny",
       "OTP":"OTP",
       "Verify":"Verify",
-      "Welcome":"Welcome"
+      "Welcome":"Welcome",
+
+      /* Runtime messages */
+      "Checking…":"Checking…",
+      "Invalid PIN.":"Invalid PIN.",
+      "Error loading PINs.":"Error loading PINs."
     },
     te: {
       "Dashboard":"డ్యాష్‌బోర్డ్",
@@ -93,11 +95,15 @@
       "Deny":"నిరాకరించు",
       "OTP":"ఓటీపీ",
       "Verify":"ధృవీకరించు",
-      "Welcome":"స్వాగతం"
+      "Welcome":"స్వాగతం",
+
+      /* Runtime messages */
+      "Checking…":"తనిఖీ జరుగుతోంది…",
+      "Invalid PIN.":"చెల్లని పిన్.",
+      "Error loading PINs.":"పిన్‌లను లోడ్ చేయడంలో లోపం."
     }
   };
 
-  // Inject Telugu font only when needed
   function ensureTeluguFont(active) {
     let link = document.getElementById('te-font');
     if (active && !link) {
@@ -128,11 +134,9 @@
     document.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-aria], [data-i18n-title]')
       .forEach(el => translateElement(el, dict));
 
-    // Toggle HTML class for font
     document.documentElement.classList.toggle('lang-te', lang === 'te');
     ensureTeluguFont(lang === 'te');
 
-    // Update toggle label if present
     const btn = document.getElementById('langToggle');
     if (btn) {
       btn.textContent = (lang === 'te') ? 'EN' : 'TE';
@@ -145,7 +149,13 @@
     applyTranslations(localStorage.getItem('lang'));
   }
 
-  // Observe future nodes (dynamic content)
+  // simple translator for runtime strings
+  function t(key){
+    const lang = localStorage.getItem('lang') || 'en';
+    const d = I18N[lang] || I18N.en;
+    return d[key] !== undefined ? d[key] : key;
+  }
+
   const obs = new MutationObserver(() => {
     const lang = localStorage.getItem('lang') || 'en';
     applyTranslations(lang);
@@ -160,7 +170,6 @@
     if (btn) btn.addEventListener('click', () => setLang((localStorage.getItem('lang') === 'te') ? 'en' : 'te'));
   });
 
-  // Expose small API if needed
-  window.AppI18N = { setLang, dict: I18N };
+  window.AppI18N = { setLang, dict: I18N, t };
 })();
 </script>
