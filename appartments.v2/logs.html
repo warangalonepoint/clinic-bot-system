@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Logs - Onestop C-Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <style>
+    /* minimal helpers in case styles.css is basic */
+    .app-header{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:12px}
+    .logo{width:40px;height:40px;border-radius:8px}
+    .clinic-name{margin:0;font-weight:800}
+    .banner{height:40px;object-fit:contain}
+    .theme-toggle{padding:8px 10px;border:0;border-radius:10px}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;padding:12px}
+    .filters input,.filters button{padding:10px 12px;border-radius:10px}
+    .logs-table{padding:0 12px 16px}
+    .logs-table table{width:100%;border-collapse:collapse}
+    .logs-table th,.logs-table td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+    .app-footer{padding:12px;text-align:center;color:#666}
+    .nav-btn{background:#111;color:#fff;border:0}
+    .lang-toggle{position:fixed;right:14px;bottom:14px;z-index:20;padding:10px 12px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:800}
+    html.lang-te body{font-family:"Noto Sans Telugu",system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+  </style>
+</head>
+<body>
+  <!-- Language Toggle -->
+  <button id="langToggle" class="lang-toggle" aria-label="Toggle language" title="తెలుగుకు మారండి">TE</button>
+
+  <!-- Header -->
+  <header class="app-header">
+    <img src="assets/logo.png" alt="Clinic Logo" class="logo" />
+    <h1 class="clinic-name">Onestop C-Demo</h1>
+    <img src="assets/banner.png" alt="Clinic Banner" class="banner" />
+    <button id="themeToggle" class="theme-toggle" title="Theme">🌙</button>
+  </header>
+
+  <!-- Filters -->
+  <section class="filters">
+    <input type="date" id="dateFilter" aria-label="Filter by date" />
+    <input type="text" id="searchName" placeholder="Search by Name" data-i18n-placeholder="Search by Name" />
+    <input type="text" id="searchReason" placeholder="Search by Reason" data-i18n-placeholder="Search by Reason" />
+    <button id="exportBtn" class="nav-btn" data-i18n="Export CSV">Export CSV</button>
+  </section>
+
+  <!-- Table -->
+  <section class="logs-table">
+    <table>
+      <thead>
+        <tr>
+          <th data-i18n="Date">Date</th>
+          <th data-i18n="Patient Name">Patient Name</th>
+          <th data-i18n="Slot Time">Slot Time</th>
+          <th data-i18n="Reason">Reason</th>
+          <th data-i18n="Contact">Contact</th>
+          <th data-i18n="Token">Token</th>
+          <th data-i18n="Reminder Sent">Reminder Sent</th>
+          <th data-i18n="Action">Action</th>
+        </tr>
+      </thead>
+      <tbody id="logsBody">
+        <tr><td colspan="8" id="loadingCell" data-i18n="Loading...">Loading...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Powered by Onestop AI</p>
+  </footer>
+
+  <!-- i18n -->
+  <script src="./lang.js" defer></script>
+
+  <script>
+    // tiny translator helper
+    function tr(key){ return (window.AppI18N && AppI18N.t) ? AppI18N.t(key) : key; }
+
+    // ====== Config (KEEP YOUR KEYS SAFE) ======
+    const API_KEY = "YOUR_API_KEY";      // <-- do not commit a real key
+    const BASE_ID = "app1T8WiRqZIR4xY";
+    const TABLE_NAME = "BookingsLogs";
+
+    // ====== Theme toggle ======
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
+
+    // ====== Data fetch & render ======
+    async function fetchLogs() {
+      try{
+        const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}?maxRecords=200&view=Grid%20view`, {
+          headers: { Authorization: `Bearer ${API_KEY}` }
+        });
+        const data = await res.json();
+        displayLogs(data.records || []);
+      }catch(err){
+        console.error(err);
+        document.getElementById('logsBody').innerHTML = `<tr><td colspan="8">${tr('Failed to load')}</td></tr>`;
+      }
+    }
+
+    function displayLogs(records) {
+      const tbody = document.getElementById('logsBody');
+      const dateFilter = document.getElementById('dateFilter').value;
+      const nameQ = (document.getElementById('searchName').value || '').toLowerCase();
+      const reasonQ = (document.getElementById('searchReason').value || '').toLowerCase();
+
+      const filtered = (records || []).filter(rec => {
+        const f = rec.fields || {};
+        const dateOk = !dateFilter || (f.Timestamp || '').startsWith(dateFilter);
+        const nameOk = !nameQ || (String(f['Patient Name']||'').toLowerCase().includes(nameQ));
+        const reasonOk = !reasonQ || (String(f['Reason']||'').toLowerCase().includes(reasonQ));
+        return dateOk && nameOk && reasonOk;
+      });
+
+      tbody.innerHTML = '';
+      if(!filtered.length){
+        tbody.innerHTML = `<tr><td colspan="8">${tr('No records')}</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(rec => {
+        const f = rec.fields || {};
+        const trEl = document.createElement('tr');
+        trEl.innerHTML = `
+          <td>${f.Timestamp || ''}</td>
+          <td>${f['Patient Name'] || ''}</td>
+          <td>${f['Slot Time'] || ''}</td>
+          <td>${f.Reason || ''}</td>
+          <td><a href="tel:${f.Contact || ''}">${f.Contact || ''}</a></td>
+          <td>${f.Token || ''}</td>
+          <td>${f['Reminder Sent'] || ''}</td>
+          <td>
+            <button title="${tr('Send WhatsApp Reminder')}" onclick="sendReminder('${(f.Contact||'').replace(/'/g,'&#39;')}', '${(f['Patient Name']||'').replace(/'/g,'&#39;')}', '${(f['Slot Time']||'').replace(/'/g,'&#39;')}', '${rec.id}')">📩</button>
+          </td>
+        `;
+        tbody.appendChild(trEl);
+      });
+    }
+
+    async function sendReminder(phone, name, slot, recordId) {
+      const msg = `Hello ${name}, ${tr('this is a reminder for your appointment at')} ${slot} ${tr('today')}. - Onestop C-Demo`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+      try{
+        await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}/${recordId}`, {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ fields: { "Reminder Sent": "✔️" } })
+        });
+        fetchLogs();
+      }catch(e){
+        console.error(e);
+        alert(tr('Failed to update reminder status'));
+      }
+    }
+
+    // ====== Filters & Export ======
+    ['dateFilter','searchName','searchReason'].forEach(id=>{
+      document.getElementById(id).addEventListener('input', fetchLogs);
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const rows = document.querySelectorAll("table tr");
+      let csv = [];
+      rows.forEach(row => {
+        let cols = row.querySelectorAll("td, th");
+        let rowData = [];
+        cols.forEach(col => rowData.push(col.innerText.replace(/\n/g,' ').trim()));
+        csv.push(rowData.join(","));
+      });
+      const blob = new Blob([csv.join("\n")], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "booking_logs.csv";
+      a.click();
+    });
+
+    fetchLogs();
+  </script>
+</body>
+</html>
