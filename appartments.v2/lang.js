@@ -1,6 +1,3 @@
-// Lightweight i18n for Apartments App (EN ↔ TE)
-// Rules: no UI changes, instant swap, persists via localStorage.
-
 (function () {
   const I18N = {
     en: {
@@ -51,35 +48,64 @@
       "Action":"Action",
       "Block":"Block",
 
-      // New sections/labels
+      // Residents
       "Bookings":"Bookings",
       "No bookings yet.":"No bookings yet.",
       "Clear My Bookings":"Clear My Bookings",
       "Add":"Add",
       "Amenity":"Amenity",
-
       "Category":"Category",
       "Priority":"Priority",
       "Description":"Description",
       "Assigned To":"Assigned To",
       "No complaints yet.":"No complaints yet.",
-
       "Notice":"Notice",
       "Audience":"Audience",
       "Mark Read":"Mark Read",
       "No notices yet.":"No notices yet.",
-
       "Visitor Log":"Visitor Log",
       "Search name/purpose":"Search name/purpose",
       "Export CSV":"Export CSV",
       "Photo":"Photo",
       "No visitors yet.":"No visitors yet.",
-
       "Pre-Approve a Visitor":"Pre-Approve a Visitor",
       "Visitor Name":"Visitor Name",
       "Clear My Pre-Approvals":"Clear My Pre-Approvals",
       "No pre-approvals yet.":"No pre-approvals yet.",
       "Delete":"Delete",
+
+      // Committee
+      "Committee Console":"Committee Console",
+      "Post a Notice":"Post a Notice",
+      "Title":"Title",
+      "Message":"Message",
+      "e.g., Water supply shutdown":"e.g., Water supply shutdown",
+      "All Residents":"All Residents",
+      "Block A":"Block A",
+      "Block B":"Block B",
+      "Block C":"Block C",
+      "Publish":"Publish",
+      "Export Notices CSV":"Export Notices CSV",
+      "Complaints Board":"Complaints Board",
+      "All":"All",
+      "Open":"Open",
+      "In Progress":"In Progress",
+      "Closed":"Closed",
+      "Search flat/category/text":"Search flat/category/text",
+      "Flat":"Flat",
+      "When":"When",
+      "Assignee":"Assignee",
+      "Details":"Details",
+      "Actions":"Actions",
+      "Vendor/Staff":"Vendor/Staff",
+      "Close":"Close",
+      "Today at a Glance":"Today at a Glance",
+      "Visitors:":"Visitors:",
+      "Deliveries:":"Deliveries:",
+      "Open Complaints:":"Open Complaints:",
+      "Notices Posted:":"Notices Posted:",
+      "Back to PIN":"Back to PIN",
+      "Reset / Cache Tools":"Reset / Cache Tools",
 
       // Runtime
       "Checking…":"Checking…",
@@ -88,7 +114,8 @@
       "Submitted":"Submitted",
       "Saved locally.":"Saved locally.",
       "Save your flat first.":"Save your flat first.",
-      "Name required":"Name required"
+      "Name required":"Name required",
+      "Title and Message required.":"Title and Message required."
     },
     te: {
       // Core
@@ -138,35 +165,64 @@
       "Action":"చర్య",
       "Block":"బ్లాక్",
 
-      // New sections/labels
+      // Residents
       "Bookings":"బుకింగ్స్",
       "No bookings yet.":"ఇంకా బుకింగ్స్ లేవు.",
       "Clear My Bookings":"నా బుకింగ్స్ క్లియర్ చేయి",
       "Add":"జోడించు",
       "Amenity":"సౌకర్యం",
-
       "Category":"వర్గం",
       "Priority":"ప్రాధాన్యత",
       "Description":"వివరణ",
       "Assigned To":"కేటాయించిన వ్యక్తి",
       "No complaints yet.":"ఇంకా ఫిర్యాదులు లేవు.",
-
       "Notice":"నోటీసు",
       "Audience":"ప్రేక్షకులు",
       "Mark Read":"చదివినట్లుగా గుర్తించు",
       "No notices yet.":"ఇంకా నోటీసులు లేవు.",
-
       "Visitor Log":"సందర్శకుల నమోదు",
       "Search name/purpose":"పేరు/ఉద్దేశ్యం శోధించండి",
       "Export CSV":"CSV ఎగుమతి",
       "Photo":"ఫోటో",
       "No visitors yet.":"ఇంకా సందర్శకులు లేరు.",
-
       "Pre-Approve a Visitor":"సందర్శకుడిని ముందస్తుగా అనుమతించు",
       "Visitor Name":"సందర్శకుడి పేరు",
       "Clear My Pre-Approvals":"నా ముందస్తు అనుమతులు క్లియర్ చేయి",
       "No pre-approvals yet.":"ఇంకా ముందస్తు అనుమతులు లేవు.",
       "Delete":"తొలగించు",
+
+      // Committee
+      "Committee Console":"కమిటీ కన్సోల్",
+      "Post a Notice":"నోటీసు పోస్ట్ చేయి",
+      "Title":"శీర్షిక",
+      "Message":"సందేశం",
+      "e.g., Water supply shutdown":"ఉదా., నీటి సరఫరా నిలిపివేత",
+      "All Residents":"అన్ని నివాసులు",
+      "Block A":"బ్లాక్ A",
+      "Block B":"బ్లాక్ B",
+      "Block C":"బ్లాక్ C",
+      "Publish":"ప్రచురించు",
+      "Export Notices CSV":"నోటీసులు CSV ఎగుమతి",
+      "Complaints Board":"ఫిర్యాదుల బోర్డు",
+      "All":"అన్ని",
+      "Open":"ఓపెన్",
+      "In Progress":"ప్రగతిలో ఉంది",
+      "Closed":"మూసివేయబడింది",
+      "Search flat/category/text":"ఫ్లాట్/వర్గం/పాఠ్యం శోధించండి",
+      "Flat":"ఫ్లాట్",
+      "When":"ఎప్పుడు",
+      "Assignee":"కేటాయించిన వ్యక్తి",
+      "Details":"వివరాలు",
+      "Actions":"చర్యలు",
+      "Vendor/Staff":"విక్రేత/సిబ్బంది",
+      "Close":"మూసివేయి",
+      "Today at a Glance":"ఈ రోజు ఒక చూపులో",
+      "Visitors:":"సందర్శకులు:",
+      "Deliveries:":"డెలివరీలు:",
+      "Open Complaints:":"తెరిచి ఉన్న ఫిర్యాదులు:",
+      "Notices Posted:":"పోస్ట్ చేసిన నోటీసులు:",
+      "Back to PIN":"పిన్‌కి తిరిగి వెళ్ళు",
+      "Reset / Cache Tools":"రీసెట్ / క్యాష్ టూల్స్",
 
       // Runtime
       "Checking…":"తనిఖీ జరుగుతోంది…",
@@ -175,11 +231,11 @@
       "Submitted":"సమర్పించబడింది",
       "Saved locally.":"లోకల్‌గా సేవ్ అయ్యింది.",
       "Save your flat first.":"ముందు మీ ఫ్లాట్ సేవ్ చేయండి.",
-      "Name required":"పేరు అవసరం"
+      "Name required":"పేరు అవసరం",
+      "Title and Message required.":"శీర్షిక మరియు సందేశం అవసరం."
     }
   };
 
-  // Load Telugu font only when needed
   function ensureTeluguFont(active) {
     let link = document.getElementById('te-font');
     if (active && !link) {
@@ -194,26 +250,20 @@
   function translateElement(el, dict) {
     const key = el.getAttribute('data-i18n');
     if (key && dict[key] !== undefined) el.textContent = dict[key];
-
     const phKey = el.getAttribute('data-i18n-placeholder');
     if (phKey && dict[phKey] !== undefined) el.setAttribute('placeholder', dict[phKey]);
-
     const ariaKey = el.getAttribute('data-i18n-aria');
     if (ariaKey && dict[ariaKey] !== undefined) el.setAttribute('aria-label', dict[ariaKey]);
-
     const titleKey = el.getAttribute('data-i18n-title');
     if (titleKey && dict[titleKey] !== undefined) el.setAttribute('title', dict[titleKey]);
   }
 
   function applyTranslations(lang) {
     const dict = I18N[lang] || I18N.en;
-    document
-      .querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-aria], [data-i18n-title]')
+    document.querySelectorAll('[data-i18n],[data-i18n-placeholder],[data-i18n-aria],[data-i18n-title]')
       .forEach(el => translateElement(el, dict));
-
     document.documentElement.classList.toggle('lang-te', lang === 'te');
     ensureTeluguFont(lang === 'te');
-
     const btn = document.getElementById('langToggle');
     if (btn) {
       btn.textContent = (lang === 'te') ? 'EN' : 'TE';
@@ -226,14 +276,12 @@
     applyTranslations(localStorage.getItem('lang'));
   }
 
-  // Simple translator for runtime strings
   function t(key){
     const lang = localStorage.getItem('lang') || 'en';
     const d = I18N[lang] || I18N.en;
     return d[key] !== undefined ? d[key] : key;
   }
 
-  // Re-translate dynamically added nodes
   const obs = new MutationObserver(() => {
     const lang = localStorage.getItem('lang') || 'en';
     applyTranslations(lang);
@@ -243,11 +291,9 @@
     const lang = localStorage.getItem('lang') || 'en';
     applyTranslations(lang);
     obs.observe(document.body, { childList: true, subtree: true });
-
     const btn = document.getElementById('langToggle');
     if (btn) btn.addEventListener('click', () => setLang((localStorage.getItem('lang') === 'te') ? 'en' : 'te'));
   });
 
-  // Expose tiny API if needed
   window.AppI18N = { setLang, dict: I18N, t };
 })();
