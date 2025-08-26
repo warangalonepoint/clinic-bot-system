@@ -1,4 +1,4 @@
-// Apartments App i18n (EN ↔ TE)
+// Apartments App i18n (EN ↔ TE) — unified for Index, Residents, Committee, Guards, Admin, Reset, Visitors, Logs
 (function () {
   const I18N = {
     en: {
@@ -62,18 +62,36 @@
       "Maintenance Tools":"Maintenance Tools",
       "These actions affect only this browser/device. Export before wiping if needed.":"These actions affect only this browser/device. Export before wiping if needed.",
       "Quick Exports":"Quick Exports","Local Data":"Local Data","Cache & Updates":"Cache & Updates",
-      "Visitors (All)":"Visitors (All)","Wipe All App Data":"Wipe All App Data","Clear Profile Only":"Clear Profile Only",
+      "Wipe All App Data":"Wipe All App Data","Clear Profile Only":"Clear Profile Only",
       "Clear Visitors":"Clear Visitors","Clear Deliveries":"Clear Deliveries","Clear Complaints":"Clear Complaints",
       "Clear Notices":"Clear Notices","Clear Browser Cache Storage":"Clear Browser Cache Storage",
       "Unregister Service Worker":"Unregister Service Worker","Reload App":"Reload App",
-      // reset runtime (confirmations / statuses)
+      // reset runtime
       "This will remove all app data on this device. Continue?":"This will remove all app data on this device. Continue?",
       "All app data cleared.":"All app data cleared.","Profile cleared.":"Profile cleared.",
       "Visitors cleared.":"Visitors cleared.","Deliveries cleared.":"Deliveries cleared.",
       "Complaints cleared.":"Complaints cleared.","Notices cleared.":"Notices cleared.",
       "Cache storage cleared.":"Cache storage cleared.","Cache API not supported.":"Cache API not supported.",
       "Failed to clear cache.":"Failed to clear cache.","Service worker unregistered. Reload to take effect.":"Service worker unregistered. Reload to take effect.",
-      "Service Worker not supported.":"Service Worker not supported.","Failed to unregister service worker.":"Failed to unregister service worker."
+      "Service Worker not supported.":"Service Worker not supported.","Failed to unregister service worker.":"Failed to unregister service worker.",
+
+      // ===== Visitors (pass generator page) =====
+      "Visitor Pass — offline demo":"Visitor Pass — offline demo",
+      "Create Visitor":"Create Visitor",
+      "Resident":"Resident",
+      "Upcoming Visitors":"Upcoming Visitors",
+      "Copy Pass":"Copy Pass","Pass copied":"Pass copied","Copy this pass:":"Copy this pass:",
+      "Please fill Resident, Visitor, Phone, Date and Time.":"Please fill Resident, Visitor, Phone, Date and Time.",
+      "Clear ALL visitors on this device?":"Clear ALL visitors on this device?",
+      "Show this token at the gate.":"Show this token at the gate.",
+
+      // ===== Logs (Airtable) =====
+      "Search by Name":"Search by Name","Search by Reason":"Search by Reason",
+      "Patient Name":"Patient Name","Slot Time":"Slot Time","Reason":"Reason","Contact":"Contact","Token":"Token",
+      "Reminder Sent":"Reminder Sent","Loading...":"Loading...","No records":"No records","Failed to load":"Failed to load",
+      "Send WhatsApp Reminder":"Send WhatsApp Reminder",
+      "this is a reminder for your appointment at":"this is a reminder for your appointment at",
+      "today":"today","Failed to update reminder status":"Failed to update reminder status"
     },
 
     te: {
@@ -99,7 +117,7 @@
       "Notice":"నోటీసు","Audience":"ప్రేక్షకులు","Mark Read":"చదివినట్లుగా గుర్తించు","No notices yet.":"ఇంకా నోటీసులు లేవు.",
       "Visitor Log":"సందర్శకుల నమోదు","Search name/purpose":"పేరు/ఉద్దేశ్యం శోధించండి","Export CSV":"CSV ఎగుమతి","Photo":"ఫోటో",
       "No visitors yet.":"ఇంకా సందర్శకులు లేరు.",
-      "Pre-Approve a Visitor":"సందర్శకుడిని ముందస్తుగా అనుమతించు","Visitor Name":"సందర్శకుడి పేరు",
+      "Pre-Approve a Visitor":"సందర్శకుడిని ముందస్తుగా అనుమతించు","Visitor Name":"విజిటర్ పేరు",
       "Clear My Pre-Approvals":"నా ముందస్తు అనుమతులు క్లియర్ చేయి","No pre-approvals yet.":"ఇంకా ముందస్తు అనుమతులు లేవు.","Delete":"తొలగించు",
       // residents runtime
       "Submitted":"సమర్పించబడింది","Saved locally.":"లోకల్‌గా సేవ్ అయ్యింది.","Save your flat first.":"ముందు మీ ఫ్లాట్ సేవ్ చేయండి.","Name required":"పేరు అవసరం",
@@ -138,7 +156,7 @@
       "Maintenance Tools":"నిర్వహణ సాధనాలు",
       "These actions affect only this browser/device. Export before wiping if needed.":"ఈ చర్యలు ఈ బ్రౌజర్/పరికరానికే వర్తిస్తాయి. డేటా తొలగించే ముందు అవసరమైతే ఎగుమతి చేయండి.",
       "Quick Exports":"త్వరిత ఎగుమతులు","Local Data":"లోకల్ డేటా","Cache & Updates":"క్యాష్ & అప్‌డేట్స్",
-      "Visitors (All)":"సందర్శకులు (అన్ని)","Wipe All App Data":"అన్ని యాప్ డేటాను తొలగించు","Clear Profile Only":"ప్రొఫైల్ మాత్రమే క్లియర్ చేయి",
+      "Wipe All App Data":"అన్ని యాప్ డేటాను తొలగించు","Clear Profile Only":"ప్రొఫైల్ మాత్రమే క్లియర్ చేయి",
       "Clear Visitors":"సందర్శకులను క్లియర్ చేయి","Clear Deliveries":"డెలివరీలను క్లియర్ చేయి","Clear Complaints":"ఫిర్యాదులను క్లియర్ చేయి",
       "Clear Notices":"నోటీసులను క్లియర్ చేయి","Clear Browser Cache Storage":"బ్రౌజర్ క్యాష్ స్టోరేజ్ క్లియర్ చేయి",
       "Unregister Service Worker":"సర్వీస్ వర్కర్ ను అన్‌రిజిస్టర్ చేయి","Reload App":"యాప్ రీలోడ్ చేయి",
@@ -151,7 +169,25 @@
       "Failed to clear cache.":"క్యాష్ క్లియర్ చేయడం విఫలమైంది.",
       "Service worker unregistered. Reload to take effect.":"సర్వీస్ వర్కర్ అన్‌రిజిస్టర్ అయింది. ప్రభావం చూపడానికి రీలోడ్ చేయండి.",
       "Service Worker not supported.":"సర్వీస్ వర్కర్ సపోర్ట్ కాదు.",
-      "Failed to unregister service worker.":"సర్వీస్ వర్కర్ అన్‌రిజిస్టర్ చేయడం విఫలమైంది."
+      "Failed to unregister service worker.":"సర్వీస్ వర్కర్ అన్‌రిజిస్టర్ చేయడం విఫలమైంది.",
+
+      // ===== Visitors (pass generator page) =====
+      "Visitor Pass — offline demo":"విజిటర్ పాస్ — ఆఫ్లైన్ డెమో",
+      "Create Visitor":"విజిటర్ సృష్టించండి",
+      "Resident":"వాసి",
+      "Upcoming Visitors":"రాబోయే సందర్శకులు",
+      "Copy Pass":"పాస్ కాపీ చేయండి","Pass copied":"పాస్ కాపీ అయింది","Copy this pass:":"ఈ పాస్‌ను కాపీ చేయండి:",
+      "Please fill Resident, Visitor, Phone, Date and Time.":"దయచేసి వాసి, సందర్శకుడు, ఫోన్, తేదీ మరియు సమయాన్ని నమోదు చేయండి.",
+      "Clear ALL visitors on this device?":"ఈ పరికరంలో ఉన్న అన్ని సందర్శకులను క్లియర్ చేయాలా?",
+      "Show this token at the gate.":"ఈ టోకెన్‌ను గేటు వద్ద చూపించండి.",
+
+      // ===== Logs (Airtable) =====
+      "Search by Name":"పేరుతో శోధించండి","Search by Reason":"కారణంతో శోధించండి",
+      "Patient Name":"రోగి పేరు","Slot Time":"స్లాట్ సమయం","Reason":"కారణం","Contact":"సంప్రదింపు","Token":"టోకెన్",
+      "Reminder Sent":"రిమైండర్ పంపబడింది","Loading...":"లోడ్ అవుతోంది...","No records":"రికార్డులు లేవు","Failed to load":"లోడ్ కాలేదు",
+      "Send WhatsApp Reminder":"వాట్సాప్ రిమైండర్ పంపండి",
+      "this is a reminder for your appointment at":"మీ అపాయింట్మెంట్ కు ఇది రిమైండర్ — సమయం",
+      "today":"ఈ రోజు","Failed to update reminder status":"రిమైండర్ స్థితి అప్‌డేట్ కాలేదు"
     }
   };
 
