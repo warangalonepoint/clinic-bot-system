@@ -1,0 +1,184 @@
+/* Base */
+*{box-sizing:border-box}
+body.bg{background:#f5f7fa;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif}
+.wrap{max-width:1100px;margin:16px auto;padding:16px}
+.mt{margin-top:12px}
+.mt8{margin-top:8px}
+.h2{margin:0 0 8px}
+.muted{color:#666}
+.w100{width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.space{align-items:center;justify-content:space-between}
+.span2{grid-column:1/-1}
+
+/* Cards & header */
+.card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.hero{position:relative;padding:0;overflow:hidden;border-radius:18px}
+.banner{width:100%;height:180px;object-fit:cover;display:block}
+@media(max-width:560px){.banner{height:140px}}
+.hero-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))}
+.logo{position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:999px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.hero-title{margin-left:80px;margin-bottom:6px;font-weight:800;font-size:20px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+/* Inputs & buttons */
+.in{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px;background:#fff}
+.btn{padding:12px 16px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff;cursor:pointer;text-align:center}
+
+/* Layout grids */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.gridWide{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+@media(max-width:1000px){.gridWide{grid-template-columns:1fr}}
+
+/* Tables */
+.tablewrap{margin-top:10px;overflow:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
+
+/* Tabs */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.tab{padding:10px 14px;border-radius:999px;background:#eee;cursor:pointer;font-weight:700;border:0}
+.tab.active{background:#111;color:#fff}
+.hidden{display:none}
+
+/* Pills */
+.pill{background:#eee;border-radius:999px;padding:6px 12px;display:inline-block}
+
+/* Camera */
+.cam{display:grid;grid-template-columns:1fr 160px;gap:10px}
+@media(max-width:520px){.cam{grid-template-columns:1fr}}
+video,canvas,img.snap{width:100%;border-radius:12px;background:#000;max-height:240px;object-fit:cover}
+
+/* Logout */
+.logout{position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;font-weight:700;background:#111;color:#fff}
+.divider{border:none;border-top:1px solid #eee;margin:14px 0}
+.wraptags{flex-wrap:wrap;gap:8px}
+
+/* ========================================================= */
+/* === i18n toggle + glassmorphism utilities (safe add-on) === */
+/* ========================================================= */
+
+/* Design tokens */
+:root{
+  --g-bg-dark:#0b1020;
+  --g-text:#f3f5ff;
+  --g-muted: rgba(255,255,255,.65);
+
+  --g-glass-bg: rgba(255,255,255,.08);      /* dark-mode glass */
+  --g-glass-bdr: rgba(255,255,255,.22);
+  --g-glass-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.25);
+
+  --g-neon-a:#8A5CF6;
+  --g-neon-b:#FF6A9A;
+
+  --g-radius-xl:24px;
+  --g-radius-md:14px;
+  --g-fast:200ms cubic-bezier(.22,.61,.36,1);
+}
+
+/* Telugu font activation (font injected by lang.js) */
+html.lang-te, html.lang-te *{
+  font-family:"Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+}
+
+/* Tiny floating language toggle (top-right) */
+.lang-toggle{
+  position: fixed; top: 10px; right: 10px; z-index: 9999;
+  padding: 8px 12px; height: 36px; min-width: 44px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius: 999px;
+  background: rgba(17,17,17,.85);
+  color:#fff; font-size: 12px; letter-spacing:.4px; font-weight:600;
+  border: 1px solid rgba(255,255,255,.18);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  cursor: pointer; user-select: none;
+  transition: transform var(--g-fast), box-shadow var(--g-fast), opacity var(--g-fast);
+}
+.lang-toggle:hover{ transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0,0,0,.4); }
+.lang-toggle:active{ transform: translateY(0); }
+.lang-toggle.light{ background: rgba(255,255,255,.85); color:#111; border-color: rgba(0,0,0,.2); }
+
+/* Generic glass surfaces (opt-in utilities) */
+.g-glass{
+  background: var(--g-glass-bg);
+  border: 1px solid var(--g-glass-bdr);
+  border-radius: var(--g-radius-xl);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--g-glass-shadow);
+}
+.g-card{ padding: 16px; }
+.g-panel{ padding: 20px; }
+.g-chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 12px; border-radius:999px;
+}
+
+/* Buttons (optional glass variants) */
+.g-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px; border-radius: var(--g-radius-md);
+  border:1px solid rgba(255,255,255,.18);
+  color: var(--g-text); text-decoration:none; font-weight:600;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(10px);
+  transition: transform var(--g-fast), box-shadow var(--g-fast), opacity var(--g-fast);
+}
+.g-btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.35); }
+.g-btn:active{ transform: translateY(0); }
+
+.g-btn-primary{
+  background: linear-gradient(135deg, var(--g-neon-a), var(--g-neon-b));
+  border: none; color:#fff;
+  box-shadow: 0 8px 20px rgba(138,92,246,.35), 0 4px 12px rgba(255,106,154,.25);
+}
+.g-btn-outline{ background: transparent; border:1px solid var(--g-glass-bdr); }
+
+/* Inputs (optional glass style) */
+.g-input{
+  width:100%; padding:12px 14px; border-radius:12px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.06); color: var(--g-text);
+  outline:none; backdrop-filter: blur(8px);
+  transition: border-color var(--g-fast), box-shadow var(--g-fast);
+}
+.g-input::placeholder{ color: var(--g-muted); }
+.g-input:focus{
+  border-color: rgba(255,255,255,.35);
+  box-shadow: 0 0 0 2px rgba(138,92,246,.35);
+}
+
+/* Progress (for dashboards) */
+.g-progress{ height:10px; border-radius:999px; overflow:hidden; background: rgba(255,255,255,.1); }
+.g-progress > span{
+  display:block; height:100%;
+  background: linear-gradient(90deg, var(--g-neon-a), var(--g-neon-b));
+  width:0%; transition: width var(--g-fast);
+}
+
+/* Optional page background helpers */
+.g-page-dark{
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #1b2342 0%, transparent 60%),
+    radial-gradient(1000px 520px at 120% 20%, #2a1852 0%, transparent 55%),
+    var(--g-bg-dark);
+}
+.g-blob{ position:absolute; filter: blur(40px); opacity:.45; pointer-events:none; }
+.g-blob.a{ width:220px; height:220px; background:#9b6bff; top:-40px; left:-40px; border-radius:50%; }
+.g-blob.b{ width:260px; height:260px; background:#ff6aa2; bottom:-60px; right:-40px; border-radius:50%; }
+
+/* Accessibility: focus ring */
+:where(.lang-toggle, .g-btn, .g-input):focus-visible{
+  outline: 2px solid var(--g-neon-b);
+  outline-offset: 2px;
+}
+
+/* Optional: make any existing .card glass by adding .glass class */
+.card.glass{
+  background: var(--g-glass-bg);
+  border: 1px solid var(--g-glass-bdr);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--g-glass-shadow);
+}
