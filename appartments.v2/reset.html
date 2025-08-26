@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Apartments • Reset</title>
+<link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+</head>
+<body class="bg">
+  <!-- Language Toggle -->
+  <button id="langToggle" class="lang-toggle" aria-label="Toggle language" title="తెలుగుకు మారండి">TE</button>
+
+  <!-- Back -->
+  <button class="logout" onclick="location.href='./index.html'" data-i18n="Back to PIN">Back to PIN</button>
+
+  <main class="wrap">
+    <!-- Header -->
+    <div class="card hero">
+      <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+      <div class="hero-overlay">
+        <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+        <div class="hero-title" data-i18n="Reset / Cache Tools">Reset / Cache Tools</div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="card mt">
+      <h2 class="h2" data-i18n="Maintenance Tools">Maintenance Tools</h2>
+      <p class="muted" data-i18n="These actions affect only this browser/device. Export before wiping if needed.">
+        These actions affect only this browser/device. Export before wiping if needed.
+      </p>
+    </div>
+
+    <!-- Quick Exports -->
+    <div class="card mt">
+      <h2 class="h2" data-i18n="Quick Exports">Quick Exports</h2>
+      <div class="grid2">
+        <button class="btn" id="x_vis" data-i18n="Visitors (All)">Visitors (All)</button>
+        <button class="btn" id="x_del" data-i18n="Deliveries (All)">Deliveries (All)</button>
+        <button class="btn" id="x_compl" data-i18n="Complaints (All)">Complaints (All)</button>
+        <button class="btn" id="x_not" data-i18n="Notices (All)">Notices (All)</button>
+      </div>
+    </div>
+
+    <!-- Local Data -->
+    <div class="card mt">
+      <h2 class="h2" data-i18n="Local Data">Local Data</h2>
+      <div class="grid2">
+        <button class="btn" id="wipe_all" data-i18n="Wipe All App Data">Wipe All App Data</button>
+        <button class="btn" id="wipe_profile" data-i18n="Clear Profile Only">Clear Profile Only</button>
+        <button class="btn" id="wipe_vis" data-i18n="Clear Visitors">Clear Visitors</button>
+        <button class="btn" id="wipe_del" data-i18n="Clear Deliveries">Clear Deliveries</button>
+        <button class="btn" id="wipe_compl" data-i18n="Clear Complaints">Clear Complaints</button>
+        <button class="btn" id="wipe_not" data-i18n="Clear Notices">Clear Notices</button>
+      </div>
+      <p class="muted mt8" id="status"></p>
+    </div>
+
+    <!-- Cache / SW -->
+    <div class="card mt">
+      <h2 class="h2" data-i18n="Cache & Updates">Cache & Updates</h2>
+      <div class="grid2">
+        <button class="btn" id="clear_cache" data-i18n="Clear Browser Cache Storage">Clear Browser Cache Storage</button>
+        <button class="btn" id="unreg_sw" data-i18n="Unregister Service Worker">Unregister Service Worker</button>
+        <button class="btn" id="reload_now" data-i18n="Reload App">Reload App</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- i18n -->
+  <script src="./lang.js" defer></script>
+
+  <script>
+  // i18n helper
+  function tr(key){ return (window.AppI18N && AppI18N.t) ? AppI18N.t(key) : key; }
+
+  // keys/util
+  const K={ profile:"apt_profile", preapprove:"apt_preapprove", visits:"apt_visits", deliveries:"apt_deliveries", complaints:"apt_complaints", notices:"apt_notices", bookings:"apt_bookings" };
+  const $=id=>document.getElementById(id);
+  const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+  const csv=(rows,heads,name)=>{
+    const out=[heads.join(",")];
+    rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));
+    a.download=name; a.click();
+  };
+
+  // Exports
+  x_vis.onclick = ()=>{ const rows=jget(K.visits).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_All.csv"); };
+  x_del.onclick = ()=>{ const rows=jget(K.deliveries).map(({photo,...x})=>x); csv(rows,["id","flat","from","ts","status"],"Deliveries_All.csv"); };
+  x_compl.onclick= ()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints_All.csv"); };
+  x_not.onclick  = ()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices_All.csv"); };
+
+  // Status helper
+  function setStatus(msg){ $("status").textContent = msg; setTimeout(()=>{ $("status").textContent=""; }, 2200); }
+  function confirmWipe(msg){ return window.confirm(msg); }
+
+  // Wipes
+  wipe_all.onclick=()=>{
+    if(!confirmWipe(tr("This will remove all app data on this device. Continue?"))) return;
+    Object.values(K).forEach(k=>localStorage.removeItem(k));
+    localStorage.removeItem("apt_notices_read");
+    localStorage.removeItem("lang");
+    sessionStorage.clear();
+    setStatus(tr("All app data cleared."));
+  };
+  wipe_profile.onclick=()=>{ localStorage.removeItem(K.profile); setStatus(tr("Profile cleared.")); };
+  wipe_vis.onclick    =()=>{ localStorage.removeItem(K.visits); setStatus(tr("Visitors cleared.")); };
+  wipe_del.onclick    =()=>{ localStorage.removeItem(K.deliveries); setStatus(tr("Deliveries cleared.")); };
+  wipe_compl.onclick  =()=>{ localStorage.removeItem(K.complaints); setStatus(tr("Complaints cleared.")); };
+  wipe_not.onclick    =()=>{ localStorage.removeItem(K.notices); localStorage.removeItem("apt_notices_read"); setStatus(tr("Notices cleared.")); };
+
+  // Cache / SW
+  clear_cache.onclick=async()=>{
+    try{
+      if('caches' in window){
+        const names=await caches.keys();
+        await Promise.all(names.map(n=>caches.delete(n)));
+        setStatus(tr("Cache storage cleared."));
+      }else setStatus(tr("Cache API not supported."));
+    }catch(e){ console.error(e); setStatus(tr("Failed to clear cache.")); }
+  };
+  unreg_sw.onclick=async()=>{
+    try{
+      if('serviceWorker' in navigator){
+        const regs=await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r=>r.unregister()));
+        setStatus(tr("Service worker unregistered. Reload to take effect."));
+      }else setStatus(tr("Service Worker not supported."));
+    }catch(e){ console.error(e); setStatus(tr("Failed to unregister service worker.")); }
+  };
+  reload_now.onclick=()=>{ location.reload(true); };
+
+  // Keep parity with other pages
+  if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
+  </script>
+</body>
+</html>
