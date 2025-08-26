@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Apartments • Committee</title>
+<link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+</head>
+<body class="bg">
+  <!-- Language Toggle -->
+  <button id="langToggle" class="lang-toggle" aria-label="Toggle language" title="తెలుగుకు మారండి">TE</button>
+
+  <!-- Logout -->
+  <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'" data-i18n="Logout">Logout</button>
+
+  <main class="wrap">
+    <div class="card hero">
+      <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+      <div class="hero-overlay">
+        <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+        <div class="hero-title" data-i18n="Committee Console">Committee Console</div>
+      </div>
+    </div>
+
+    <!-- Post a Notice -->
+    <div class="card mt">
+      <h2 class="h2" data-i18n="Post a Notice">Post a Notice</h2>
+      <div class="grid2">
+        <label data-i18n="Title">Title
+          <input id="n_title" class="in"
+                 placeholder="e.g., Water supply shutdown"
+                 data-i18n-placeholder="e.g., Water supply shutdown">
+        </label>
+        <label data-i18n="Audience">Audience
+          <select id="n_aud" class="in">
+            <option value="All" data-i18n="All Residents">All Residents</option>
+            <option data-i18n="Block A">Block A</option>
+            <option data-i18n="Block B">Block B</option>
+            <option data-i18n="Block C">Block C</option>
+          </select>
+        </label>
+        <label class="span2" data-i18n="Message">Message
+          <textarea id="n_msg" class="in" rows="4"
+                    placeholder="Short, clear message..."
+                    data-i18n-placeholder="Short, clear message..."></textarea>
+        </label>
+      </div>
+      <div class="row mt8">
+        <button class="btn" id="n_add" data-i18n="Publish">Publish</button>
+        <button class="btn" id="n_export" data-i18n="Export Notices CSV">Export Notices CSV</button>
+      </div>
+      <div class="tablewrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-i18n="Notice">Notice</th>
+              <th data-i18n="Audience">Audience</th>
+              <th data-i18n="Time">Time</th>
+              <th data-i18n="Action">Action</th>
+            </tr>
+          </thead>
+          <tbody id="n_tbody"></tbody>
+        </table>
+        <div id="n_empty" class="muted" data-i18n="No notices yet.">No notices yet.</div>
+      </div>
+    </div>
+
+    <!-- Complaints Board -->
+    <div class="card mt">
+      <div class="row space">
+        <h2 class="h2" data-i18n="Complaints Board">Complaints Board</h2>
+        <div class="row">
+          <select id="c_filter" class="in">
+            <option value="" data-i18n="All">All</option>
+            <option data-i18n="Open">Open</option>
+            <option data-i18n="In Progress">In Progress</option>
+            <option data-i18n="Closed">Closed</option>
+          </select>
+          <input id="c_search" class="in" style="max-width:260px"
+                 placeholder="Search flat/category/text"
+                 data-i18n-placeholder="Search flat/category/text">
+          <button class="btn" id="c_export" data-i18n="Export CSV">Export CSV</button>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-i18n="Flat">Flat</th>
+              <th data-i18n="When">When</th>
+              <th data-i18n="Category">Category</th>
+              <th data-i18n="Priority">Priority</th>
+              <th data-i18n="Status">Status</th>
+              <th data-i18n="Assignee">Assignee</th>
+              <th data-i18n="Details">Details</th>
+              <th data-i18n="Actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="c_tbody"></tbody>
+        </table>
+        <div id="c_empty" class="muted" data-i18n="No complaints yet.">No complaints yet.</div>
+      </div>
+    </div>
+
+    <!-- Today at a Glance -->
+    <div class="card mt">
+      <h2 class="h2" data-i18n="Today at a Glance">Today at a Glance</h2>
+      <div class="row wraptags">
+        <span class="pill"><span data-i18n="Visitors:">Visitors:</span> <b id="s_vis">0</b></span>
+        <span class="pill"><span data-i18n="Deliveries:">Deliveries:</span> <b id="s_del">0</b></span>
+        <span class="pill"><span data-i18n="Open Complaints:">Open Complaints:</span> <b id="s_open">0</b></span>
+        <span class="pill"><span data-i18n="Notices Posted:">Notices Posted:</span> <b id="s_not">0</b></span>
+      </div>
+    </div>
+
+    <div class="card mt">
+      <div class="grid2">
+        <a class="btn" href="./index.html" data-i18n="Back to PIN">Back to PIN</a>
+        <a class="btn" href="./reset.html" data-i18n="Reset / Cache Tools">Reset / Cache Tools</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- i18n -->
+  <script src="./lang.js" defer></script>
+
+  <script>
+  // i18n runtime helper
+  function tr(key){ return (window.AppI18N && AppI18N.t) ? AppI18N.t(key) : key; }
+
+  const K={notices:"apt_notices", complaints:"apt_complaints", visits:"apt_visits", deliveries:"apt_deliveries"};
+  const $=id=>document.getElementById(id);
+  const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+  const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+  const ymd=()=>new Date().toISOString().slice(0,10);
+  const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
+  const uid=()=>Math.random().toString(36).slice(2,9);
+
+  // notices
+  function renderNotices(){
+    const rows=jget(K.notices).sort((a,b)=>b.ts-a.ts);
+    n_tbody.innerHTML=""; n_empty.style.display=rows.length?"none":"block";
+    rows.forEach((r,i)=>{
+      const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+      const trEl=document.createElement("tr");
+      trEl.innerHTML=`<td>${i+1}</td>
+        <td><b>${r.title || tr("Notice")}</b><br>${r.msg || ""}</td>
+        <td>${r.aud || "All"}</td>
+        <td>${t}</td>
+        <td><button class="btn" onclick="delNotice('${r.id}')" data-i18n="Delete">${tr("Delete")}</button></td>`;
+      n_tbody.appendChild(trEl);
+    });
+  }
+  n_add.onclick=()=>{
+    const title=n_title.value.trim(), msg=n_msg.value.trim(), aud=n_aud.value;
+    if(!title||!msg){ alert(tr("Title and Message required.")); return; }
+    const arr=jget(K.notices);
+    arr.unshift({id:uid(),title,msg,aud,ts:Date.now()});
+    jset(K.notices,arr);
+    n_title.value=n_msg.value="";
+    renderNotices(); renderStats();
+  };
+  n_export.onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices.csv"); };
+  window.delNotice=(id)=>{ let arr=jget(K.notices); arr=arr.filter(x=>x.id!==id); jset(K.notices,arr); renderNotices(); renderStats(); };
+
+  // complaints
+  function renderComplaints(){
+    const q=(c_search.value||"").toLowerCase(), f=c_filter.value||"";
+    let rows=jget(K.complaints).slice().sort((a,b)=>b.ts-a.ts);
+    if(f) rows=rows.filter(r=>r.status===f);
+    rows=rows.filter(r=>
+      (r.flat||"").toLowerCase().includes(q) ||
+      (r.cat||"").toLowerCase().includes(q) ||
+      (r.desc||"").toLowerCase().includes(q)
+    );
+    c_tbody.innerHTML=""; c_empty.style.display=rows.length?"none":"block";
+    rows.forEach((r,i)=>{
+      const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+      const trEl=document.createElement("tr");
+      trEl.innerHTML=`
+        <td>${i+1}</td><td>${r.flat||"—"}</td><td>${t}</td><td>${r.cat}</td><td>${r.priority}</td>
+        <td>
+          <select onchange="setStatus('${r.id}',this.value)">
+            <option${r.status==="Open"?" selected":""}>Open</option>
+            <option${r.status==="In Progress"?" selected":""}>In Progress</option>
+            <option${r.status==="Closed"?" selected":""}>Closed</option>
+          </select>
+        </td>
+        <td><input value="${r.assign||""}" onchange="setAssign('${r.id}',this.value)" placeholder="${tr("Vendor/Staff")}"/></td>
+        <td>${r.desc||""}</td>
+        <td class="row">
+          <button class="btn" onclick="closeC('${r.id}')" data-i18n="Close">${tr("Close")}</button>
+          <button class="btn" onclick="delC('${r.id}')" data-i18n="Delete">${tr("Delete")}</button>
+        </td>`;
+      c_tbody.appendChild(trEl);
+    });
+  }
+  window.setStatus=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status=val; jset(K.complaints,arr); renderStats(); } };
+  window.setAssign=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].assign=val; jset(K.complaints,arr); } };
+  window.closeC=(id)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status="Closed"; jset(K.complaints,arr); renderComplaints(); renderStats(); } };
+  window.delC=(id)=>{ let arr=jget(K.complaints); arr=arr.filter(x=>x.id!==id); jset(K.complaints,arr); renderComplaints(); renderStats(); };
+  c_export.onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints.csv"); };
+  c_filter.addEventListener("change",renderComplaints);
+  c_search.addEventListener("input",renderComplaints);
+
+  // stats
+  function renderStats(){
+    const today=ymd();
+    const vis=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
+    const del=jget(K.deliveries).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
+    const open=jget(K.complaints).filter(c=>c.status!=="Closed").length;
+    s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; s_not.textContent=jget(K.notices).length;
+  }
+
+  if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+  renderNotices(); renderComplaints(); renderStats();
+  </script>
+</body>
+</html>
