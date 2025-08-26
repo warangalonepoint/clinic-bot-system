@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#111"/>
 </head>
 <body class="bg">
-  <!-- Language Toggle (fixed, top-right) -->
+  <!-- Language Toggle -->
   <button id="langToggle" class="lang-toggle" aria-label="Toggle language" title="తెలుగుకు మారండి">TE</button>
 
   <main class="wrap">
@@ -37,7 +37,10 @@
     </div>
   </main>
 
-  <script>
+  <!-- i18n first (defer preserves order before inline script below) -->
+  <script src="./lang.js" defer></script>
+
+  <script defer>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").catch(()=>{});
     }
@@ -52,32 +55,44 @@
     async function loadPins(){
       const r = await fetch("./pins.json",{cache:"no-store"});
       if(!r.ok) throw new Error("pins.json missing");
-      return r.json(); // { residents:"1111", guards:"2222", committee:"3333", admin:"4444" }
+      return r.json();
     }
 
-    document.getElementById("pinForm").addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      const pin = document.getElementById("pin").value.trim();
-      const msg = document.getElementById("msg");
-      msg.textContent = "Checking…";
-      try{
-        const pins = await loadPins();
-        let matched = null;
-        for(const [role,val] of Object.entries(pins)){
-          if(String(val)===pin){ matched = role; break; }
-        }
-        if(!matched){ msg.textContent = "Invalid PIN."; return; }
-        sessionStorage.setItem("apt_role", matched);
-        sessionStorage.setItem("apt_login_at", String(Date.now()));
-        location.replace(rolePage[matched] || "./index.html");
-      }catch(err){
-        msg.textContent = "Error loading PINs.";
-        console.error(err);
+    // translator helper (works even if AppI18N not ready yet)
+    function tr(key){
+      if (window.AppI18N && typeof window.AppI18N.t === 'function') {
+        return window.AppI18N.t(key);
       }
+      return key; // fallback
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const form = document.getElementById("pinForm");
+      const msg  = document.getElementById("msg");
+
+      form.addEventListener("submit", async (e)=>{
+        e.preventDefault();
+        msg.textContent = tr("Checking…");
+        try{
+          const pin = document.getElementById("pin").value.trim();
+          const pins = await loadPins();
+          let matched = null;
+          for(const [role,val] of Object.entries(pins)){
+            if(String(val)===pin){ matched = role; break; }
+          }
+          if(!matched){
+            msg.textContent = tr("Invalid PIN.");
+            return;
+          }
+          sessionStorage.setItem("apt_role", matched);
+          sessionStorage.setItem("apt_login_at", String(Date.now()));
+          location.replace(rolePage[matched] || "./index.html");
+        }catch(err){
+          msg.textContent = tr("Error loading PINs.");
+          console.error(err);
+        }
+      });
     });
   </script>
-
-  <!-- i18n script (loads Telugu font on demand, handles toggle & persistence) -->
-  <script src="./lang.js" defer></script>
 </body>
 </html>
