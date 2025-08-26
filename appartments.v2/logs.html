@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <style>
-    /* minimal helpers in case styles.css is basic */
     .app-header{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:12px}
     .logo{width:40px;height:40px;border-radius:8px}
     .clinic-name{margin:0;font-weight:800}
@@ -94,13 +93,14 @@
     async function fetchLogs() {
       try{
         const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}?maxRecords=200&view=Grid%20view`, {
-          headers: { Authorization: `Bearer ${API_KEY}` }
+          headers: { Authorization: \`Bearer \${API_KEY}\` }
         });
+        if(!res.ok){ throw new Error('HTTP '+res.status); }
         const data = await res.json();
         displayLogs(data.records || []);
       }catch(err){
         console.error(err);
-        document.getElementById('logsBody').innerHTML = `<tr><td colspan="8">${tr('Failed to load')}</td></tr>`;
+        document.getElementById('logsBody').innerHTML = \`<tr><td colspan="8">\${tr('Failed to load')}</td></tr>\`;
       }
     }
 
@@ -112,7 +112,7 @@
 
       const filtered = (records || []).filter(rec => {
         const f = rec.fields || {};
-        const dateOk = !dateFilter || (f.Timestamp || '').startsWith(dateFilter);
+        const dateOk = !dateFilter || (String(f.Timestamp || '').startsWith(dateFilter));
         const nameOk = !nameQ || (String(f['Patient Name']||'').toLowerCase().includes(nameQ));
         const reasonOk = !reasonQ || (String(f['Reason']||'').toLowerCase().includes(reasonQ));
         return dateOk && nameOk && reasonOk;
@@ -120,7 +120,7 @@
 
       tbody.innerHTML = '';
       if(!filtered.length){
-        tbody.innerHTML = `<tr><td colspan="8">${tr('No records')}</td></tr>`;
+        tbody.innerHTML = \`<tr><td colspan="8">\${tr('No records')}</td></tr>\`;
         return;
       }
 
@@ -128,15 +128,16 @@
         const f = rec.fields || {};
         const trEl = document.createElement('tr');
         trEl.innerHTML = `
-          <td>${f.Timestamp || ''}</td>
-          <td>${f['Patient Name'] || ''}</td>
-          <td>${f['Slot Time'] || ''}</td>
-          <td>${f.Reason || ''}</td>
-          <td><a href="tel:${f.Contact || ''}">${f.Contact || ''}</a></td>
-          <td>${f.Token || ''}</td>
-          <td>${f['Reminder Sent'] || ''}</td>
+          <td>\${f.Timestamp || ''}</td>
+          <td>\${f['Patient Name'] || ''}</td>
+          <td>\${f['Slot Time'] || ''}</td>
+          <td>\${f.Reason || ''}</td>
+          <td><a href="tel:\${f.Contact || ''}">\${f.Contact || ''}</a></td>
+          <td>\${f.Token || ''}</td>
+          <td>\${f['Reminder Sent'] || ''}</td>
           <td>
-            <button title="${tr('Send WhatsApp Reminder')}" onclick="sendReminder('${(f.Contact||'').replace(/'/g,'&#39;')}', '${(f['Patient Name']||'').replace(/'/g,'&#39;')}', '${(f['Slot Time']||'').replace(/'/g,'&#39;')}', '${rec.id}')">📩</button>
+            <button title="\${tr('Send WhatsApp Reminder')}"
+              onclick="sendReminder('\${(f.Contact||'').replace(/'/g,'&#39;')}','\${(f['Patient Name']||'').replace(/'/g,'&#39;')}','\${(f['Slot Time']||'').replace(/'/g,'&#39;')}','\${rec.id}')">📩</button>
           </td>
         `;
         tbody.appendChild(trEl);
@@ -144,14 +145,14 @@
     }
 
     async function sendReminder(phone, name, slot, recordId) {
-      const msg = `Hello ${name}, ${tr('this is a reminder for your appointment at')} ${slot} ${tr('today')}. - Onestop C-Demo`;
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+      const msg = \`Hello \${name}, \${tr('this is a reminder for your appointment at')} \${slot} \${tr('today')}. - Onestop C-Demo\`;
+      window.open(\`https://wa.me/\${phone}?text=\${encodeURIComponent(msg)}\`, '_blank');
 
       try{
-        await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}/${recordId}`, {
+        await fetch(\`https://api.airtable.com/v0/\${BASE_ID}/\${encodeURIComponent(TABLE_NAME)}/\${recordId}\`, {
           method: "PATCH",
           headers: {
-            Authorization: `Bearer ${API_KEY}`,
+            Authorization: \`Bearer \${API_KEY}\`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({ fields: { "Reminder Sent": "✔️" } })
