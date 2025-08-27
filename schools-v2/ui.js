@@ -1,207 +1,78 @@
-/* Ping Schools PWA – UI logic (theme + language + demo data) */
+/* Ping Schools – shared UI */
+const $ = (q,r=document)=>r.querySelector(q);
+const $$ = (q,r=document)=>Array.from(r.querySelectorAll(q));
 
-const $ = (q, root = document) => root.querySelector(q);
-const $$ = (q, root = document) => Array.from(root.querySelectorAll(q));
+/* THEME */
+const THEME='ping_school_theme';
+function setTheme(t){ document.documentElement.classList.toggle('dark', t==='dark'); localStorage.setItem(THEME,t);
+  const tgl=$('#themeToggle'); if(tgl) tgl.textContent=t==='dark'?'☀️':'🌙'; }
+setTheme(localStorage.getItem(THEME)||'light');
+$('#themeToggle')?.addEventListener('click',()=>setTheme(document.documentElement.classList.contains('dark')?'light':'dark'));
 
-/* -------- THEME -------- */
-const THEME_KEY = 'ping_school_theme';
-const root = document.documentElement;
-const themeToggle = $('#themeToggle');
-
-function applyTheme(t) {
-  if (t === 'dark') root.classList.add('dark');
-  else root.classList.remove('dark');
-  localStorage.setItem(THEME_KEY, t);
-  themeToggle.textContent = t === 'dark' ? '☀️' : '🌙';
-}
-applyTheme(localStorage.getItem(THEME_KEY) || 'light');
-
-themeToggle.addEventListener('click', () => {
-  const next = root.classList.contains('dark') ? 'light' : 'dark';
-  applyTheme(next);
-});
-
-/* -------- LANGUAGE -------- */
-const LANG_KEY = 'ping_school_lang';
-const i18n = {
-  en: {
-    app_title: 'Ping Schools',
-    dash_title: 'Dashboard',
-    kpi_students: 'Students', kpi_teachers: 'Teachers', kpi_present: 'Present Today', kpi_dues: 'Fee Dues',
-    today_classes: 'Today’s Classes', quick_actions: 'Quick Actions',
-    mark_att: 'Mark Attendance', new_notice: 'New Notice',
-    classes_title: 'Classes', add_class:'Add Class',
-    th_class:'Class', th_teacher:'Teacher', th_room:'Room', th_time:'Time',
-    att_title:'Attendance', load_list:'Load List', export_csv:'Export CSV', th_name:'Name', th_status:'Status',
-    exams_title:'Exams', schedule_exam:'Schedule',
-    fees_title:'Fees', collect_fee:'Collect Fee', th_student:'Student', th_due:'Due', th_action:'Action',
-    notices_title:'Notices', publish:'Publish'
+/* LANGUAGE */
+const LANG='ping_school_lang';
+const i18n={
+  en:{ app:'Ping Schools', login_title:'Login PIN', welcome:'Welcome', pin_ph:'4–8 digit PIN', submit:'Submit',
+      dash:'Dashboard', classes:'Classes', attendance:'Attendance', exams:'Exams', fees:'Fees', notices:'Notices',
+      k_students:'Students',k_teachers:'Teachers',k_present:'Present Today',k_dues:'Fee Dues',
+      quick:'Quick Actions', mark:'Mark Attendance', notice:'New Notice',
+      my_classes:'My Classes', homework:'Homework', leaves:'Leaves', parents:'Parents', coordinator:'Coordinator', admin:'Admin'
   },
-  te: {
-    app_title: 'పింగ్ స్కూల్స్',
-    dash_title: 'డాష్‌బోర్డ్',
-    kpi_students: 'విద్యార్థులు', kpi_teachers: 'గురువులు', kpi_present: 'ఈరోజు హాజరు', kpi_dues: 'ఫీజు బకాయిలు',
-    today_classes: 'ఈరోజు తరగతులు', quick_actions: 'త్వరిత చర్యలు',
-    mark_att: 'హాజరు నమోదు', new_notice: 'క్రొత్త నోటీస్',
-    classes_title: 'తరగతులు', add_class:'తరగతి జోడించు',
-    th_class:'తరగతి', th_teacher:'గురువు', th_room:'గది', th_time:'సమయం',
-    att_title:'హాజరు', load_list:'జాబితా లోడు', export_csv:'CSV ఎగుమతి', th_name:'పేరు', th_status:'స్థితి',
-    exams_title:'పరీక్షలు', schedule_exam:'షెడ్యూల్',
-    fees_title:'ఫీజులు', collect_fee:'ఫీజు వసూలు', th_student:'విద్యార్థి', th_due:'బకాయి', th_action:'చర్య',
-    notices_title:'నోటీసులు', publish:'ప్రచురించు'
+  te:{ app:'పింగ్ స్కూల్స్', login_title:'పిన్ నమోదు', welcome:'స్వాగతం', pin_ph:'4–8 అంకెల పిన్', submit:'సబ్మిట్',
+      dash:'డాష్‌బోర్డ్', classes:'తరగతులు', attendance:'హాజరు', exams:'పరీక్షలు', fees:'ఫీజులు', notices:'నోటీసులు',
+      k_students:'విద్యార్థులు',k_teachers:'గురువులు',k_present:'ఈరోజు హాజరు',k_dues:'బకాయిలు',
+      quick:'త్వరిత చర్యలు', mark:'హాజరు నమోదు', notice:'క్రొత్త నోటీస్',
+      my_classes:'నా తరగతులు', homework:'హోంవర్క్', leaves:'అనుమతులు', parents:'తల్లిదండ్రులు', coordinator:'కోఆర్డినేటర్', admin:'అడ్మిన్'
   }
 };
-function applyLang(code){
-  const dict = i18n[code] || i18n.en;
-  $$('[data-i]').forEach(el => {
-    const k = el.getAttribute('data-i');
-    if (dict[k]) el.textContent = dict[k];
-  });
-  $('#app_title').textContent = dict.app_title || 'Ping Schools';
-  localStorage.setItem(LANG_KEY, code);
-  // chip highlight
-  $$('.langChip').forEach(c => {
-    c.style.opacity = c.dataset.lang === code ? '1' : '.65';
-  });
+function setLang(code){
+  const dict=i18n[code]||i18n.en;
+  $$('[data-i]').forEach(el=>{ const k=el.getAttribute('data-i'); if(dict[k]) el.textContent=dict[k];});
+  $('#app_title')?.textContent=dict.app;
+  localStorage.setItem(LANG,code);
+  $$('.langChip').forEach(b=>b.classList.toggle('active', b.dataset.lang===code));
 }
-applyLang(localStorage.getItem(LANG_KEY) || 'en');
+setLang(localStorage.getItem(LANG)||'en');
+$$('.langChip').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
 
-$$('.langChip').forEach(b=>{
-  b.addEventListener('click', ()=>applyLang(b.dataset.lang));
-});
-
-/* -------- TABS -------- */
-$('#tabs').addEventListener('click', (e)=>{
-  const btn = e.target.closest('.nav-pill');
-  if(!btn) return;
-  $$('.nav-pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const tab = btn.dataset.tab;
-  $$('section[data-screen]').forEach(s=>{
-    s.classList.toggle('hidden', s.getAttribute('data-screen') !== tab);
-  });
-});
-
-/* -------- DEMO DATA / RENDER -------- */
-const demo = {
-  kpis: {students: 842, teachers: 58, present: 791, dues: 76},
-  classes: [
-    {cls:'Grade 8 • Math', teacher:'Anita Rao', room:'B-203', time:'10:00–10:45'},
-    {cls:'Grade 10 • Physics', teacher:'K. Varun', room:'Lab-2', time:'11:00–11:45'},
-    {cls:'Grade 6 • English', teacher:'R. Lakshmi', room:'A-105', time:'12:00–12:45'},
-  ],
-  roster: ['Aarav','Nikhil','Ishita','Sanjana','Prashanth','Meera','Dev','Harshita','Kiran','Ananya'],
-  fees: [
-    {name:'Aman Gupta', due: '₹2,000'},
-    {name:'Niharika R', due: '₹1,500'},
-    {name:'Rahul S', due: '₹3,200'},
-  ],
-  exams: []
-};
-
-function renderKPIs(){
-  $('#k_students').textContent = demo.kpis.students;
-  $('#k_teachers').textContent = demo.kpis.teachers;
-  $('#k_present').textContent  = demo.kpis.present;
-  $('#k_dues').textContent     = demo.kpis.dues;
-}
-function renderToday(){
-  const wrap = $('#list_classes'); wrap.innerHTML = '';
-  demo.classes.forEach(c=>{
-    const div = document.createElement('div');
-    div.className = 'item';
-    div.innerHTML = `<div>
-      <div style="font-weight:800">${c.cls}</div>
-      <div class="muted" style="font-size:13px">${c.teacher} • ${c.room}</div>
-    </div>
-    <span class="badge">${c.time}</span>`;
-    wrap.appendChild(div);
-  });
-}
-function renderClasses(){
-  const tb = $('#class_tbody'); tb.innerHTML = '';
-  demo.classes.forEach(c=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${c.cls}</td><td>${c.teacher}</td><td>${c.room}</td><td>${c.time}</td>
-                    <td><button class="btn secondary" style="padding:8px 12px">Edit</button></td>`;
-    tb.appendChild(tr);
-  });
-  // class dropdown for attendance
-  const sel = $('#att_class'); sel.innerHTML = '';
-  demo.classes.forEach((c,i)=>{
-    const o = document.createElement('option'); o.value=i; o.textContent=c.cls; sel.appendChild(o);
-  });
-}
-function renderFees(){
-  const tb = $('#fee_tbody'); tb.innerHTML='';
-  demo.fees.forEach(s=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${s.name}</td><td>${s.due}</td>
-      <td><button class="btn" style="padding:8px 12px">Pay</button></td>`;
-    tb.appendChild(tr);
-  });
-}
-function renderNotices(){
-  const box = $('#notice_list'); box.innerHTML = '';
-  const arr = JSON.parse(localStorage.getItem('school_notices')||'[]');
-  arr.forEach(n=>{
-    const d = document.createElement('div');
-    d.className = 'item';
-    d.innerHTML = `<div>
-      <div style="font-weight:800">${n.title} • <span class="muted" style="font-weight:600">${n.aud}</span></div>
-      <div class="muted" style="font-size:13px">${n.msg}</div>
-    </div>
-    <span class="badge">${new Date(n.ts).toLocaleDateString()}</span>`;
-    box.appendChild(d);
+/* INDEX: PIN router (optional pins.json; falls back to default map) */
+async function initLogin(){
+  const pinInp=$('#pin');
+  if(!pinInp) return;
+  const mapDefault={ '1111':'teacher.html', '2222':'coordinator.html', '3333':'parents.html', '9999':'admin.html' };
+  let map=mapDefault;
+  try{
+    const res=await fetch('pins.json'); if(res.ok){ map=await res.json(); }
+  }catch{}
+  $('#loginForm').addEventListener('submit',(e)=>{
+    e.preventDefault();
+    const pin=(pinInp.value||'').trim();
+    const goto=map[pin];
+    if(!goto){ alert('Invalid PIN'); return; }
+    location.href=goto;
   });
 }
 
-/* Attendance actions */
-$('#att_load').addEventListener('click', ()=>{
-  const tb = $('#att_tbody'); tb.innerHTML='';
-  demo.roster.forEach((name,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${name}</td>
-      <td><select class="in"><option>Present</option><option>Absent</option><option>Late</option></select></td>`;
-    tb.appendChild(tr);
+/* SIMPLE TABS (role pages) */
+function initTabs(){
+  const tabs=$('#tabs'); if(!tabs) return;
+  tabs.addEventListener('click',e=>{
+    const b=e.target.closest('.nav-pill'); if(!b) return;
+    $$('#tabs .nav-pill').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+    const id=b.dataset.tab; $$('section[data-screen]').forEach(s=>s.classList.toggle('hidden', s.dataset.screen!==id));
   });
-});
-$('#att_export').addEventListener('click', ()=>{
-  const rows = [['#','Name','Status']];
-  $$('#att_tbody tr').forEach(tr=>{
-    const tds = tr.querySelectorAll('td');
-    rows.push([tds[0].innerText, tds[1].innerText, tr.querySelector('select').value]);
-  });
-  const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = 'attendance.csv'; a.click();
-});
+}
 
-/* Notices actions */
-$('#n_publish').addEventListener('click', ()=>{
-  const title = $('#n_title').value.trim(),
-        msg   = $('#n_msg').value.trim(),
-        aud   = $('#n_aud').value;
-  if(!title||!msg) return alert('Title & message required');
-  const arr = JSON.parse(localStorage.getItem('school_notices')||'[]');
-  arr.unshift({id:crypto.randomUUID(), title, msg, aud, ts:Date.now()});
-  localStorage.setItem('school_notices', JSON.stringify(arr));
-  $('#n_title').value=''; $('#n_msg').value='';
-  renderNotices();
-});
-$('#n_export').addEventListener('click', ()=>{
-  const rows = JSON.parse(localStorage.getItem('school_notices')||'[]');
-  const heads = ['id','title','msg','aud','ts'];
-  const out = [heads.join(',')].concat(rows.map(r=>heads.map(h=>`"${String(r[h]??'').replace(/"/g,'""')}"`).join(',')));
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([out.join('\n')],{type:'text/csv'}));
-  a.download = 'notices.csv'; a.click();
-});
+/* Demo data fillers (dashboard) */
+function fillKPIs(){
+  $('#k_students')?.(function(){}) // noop if not present
+  if(!$('#k_students')) return;
+  $('#k_students').textContent='842';
+  $('#k_teachers').textContent='58';
+  $('#k_present').textContent='791';
+  $('#k_dues').textContent='76';
+}
 
-/* Init */
-renderKPIs();
-renderToday();
-renderClasses();
-renderFees();
-renderNotices();
+initLogin();
+initTabs();
+fillKPIs();
