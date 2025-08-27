@@ -1,188 +1,146 @@
-/* =========================
-   Peach–Mint Mobile UI Theme
-   (drop-in replacement for styles.css)
-   ========================= */
-
-/* Tokens */
+/* ---------- Design Tokens ---------- */
 :root{
-  --bg1:#fff4ec;         /* peach */
-  --bg2:#f0fbf5;         /* mint wash */
-  --ink:#17223b;         /* deep navy text */
-  --muted:#6b7280;       /* muted text */
-  --brand:#ff7b5c;       /* coral CTA */
-  --brand-2:#54d1a9;     /* mint accent */
-  --chip:#f7f9fc;
+  --bg: #f5f7fa;
+  --bg-grad-1:#ffedd5;  /* warm peach */
+  --bg-grad-2:#e0f2fe;  /* soft blue  */
   --card:#ffffff;
-  --shadow: 0 8px 24px rgba(20,28,45,.12);
-  --glass: rgba(255,255,255,.65);
-  --radius-xl:24px;
-  --radius-lg:18px;
-  --radius-md:14px;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --brand:#111827;  /* buttons */
+  --accent:#ff7d5c; /* primary accent (index submit) */
+  --line:#e5e7eb;
+
+  --glass-bg: rgba(255,255,255,.75);
+  --glass-stroke: rgba(255,255,255,.6);
+  --glass-shadow: 0 18px 40px rgba(2,8,23,.16);
 }
 
-/* Base */
-*{box-sizing:border-box;-webkit-tap-highlight-color: transparent}
+body.dark{
+  --bg:#0b1220;
+  --bg-grad-1:#0b1220;
+  --bg-grad-2:#0b1220;
+  --card:#0f172a;
+  --ink:#e5e7eb;
+  --muted:#9aa4b2;
+  --brand:#0ea5e9;
+  --accent:#0ea5e9;
+  --line:#1f2737;
+
+  --glass-bg: rgba(16,22,38,.7);
+  --glass-stroke: rgba(255,255,255,.08);
+  --glass-shadow: 0 18px 40px rgba(0,0,0,.45);
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
 html,body{height:100%}
 body.bg{
   margin:0;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
   color:var(--ink);
-  background:
-    radial-gradient(1200px 800px at 90% -10%, #ffe0d4 0%, transparent 60%),
-    radial-gradient(1000px 700px at -10% 20%, #e9fff3 0%, transparent 55%),
-    linear-gradient(180deg, var(--bg1), var(--bg2));
+  background: radial-gradient(1200px 800px at 15% 8%, var(--bg-grad-1), transparent 62%),
+              radial-gradient(1200px 800px at 85% 12%, var(--bg-grad-2), transparent 62%),
+              var(--bg);
 }
-.wrap{max-width:1100px;margin:16px auto;padding:16px}
 
-/* Utils */
+/* layout */
+.wrap{max-width:1100px;margin:16px auto;padding:16px}
 .mt{margin-top:12px}
 .mt8{margin-top:8px}
-.h2{margin:0 0 8px;font-size:22px;font-weight:800}
+.h2{margin:0 0 8px}
 .muted{color:var(--muted)}
 .w100{width:100%}
-.row{display:flex;gap:12px;flex-wrap:wrap}
+.row{display:flex;gap:10px;flex-wrap:wrap}
 .space{align-items:center;justify-content:space-between}
 .span2{grid-column:1/-1}
-
-/* Cards + Hero */
-.card{
-  background:var(--card);
-  border-radius:var(--radius-xl);
-  padding:16px;
-  box-shadow:var(--shadow);
-  border:1px solid rgba(17,24,39,.04);
-}
-.hero{
-  position:relative;
-  padding:0;
-  overflow:hidden;
-  border-radius:var(--radius-xl);
-  box-shadow: var(--shadow);
-}
-.banner{
-  width:100%;height:220px;object-fit:cover;display:block;
-  filter:saturate(1.05) contrast(1.02);
-}
-@media(max-width:560px){.banner{height:180px}}
-.hero-overlay{
-  position:absolute; inset:0;
-  display:flex; align-items:flex-end;
-  padding:14px;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.35));
-}
-.logo{
-  position:absolute; top:14px; left:14px;
-  width:64px;height:64px;border-radius:18px;background:#fff;padding:10px;
-  box-shadow: 0 10px 28px rgba(0,0,0,.18);
-}
-.hero-title{
-  margin-left:86px;margin-bottom:10px;
-  font-weight:900;font-size:28px;letter-spacing:.3px;color:#fff;
-  text-shadow: 0 2px 8px rgba(0,0,0,.35);
-}
-
-/* Inputs */
-.in{
-  width:100%;padding:14px 14px;
-  border:1px solid rgba(17,24,39,.08);
-  border-radius:16px;font-size:16px;background:#fff;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
-  outline:none; transition: box-shadow .2s, border-color .2s;
-}
-.in:focus{
-  border-color: rgba(84,209,169,.5);
-  box-shadow: 0 0 0 4px rgba(84,209,169,.15);
-}
-
-/* Buttons */
-.btn{
-  padding:14px 18px;border:0;border-radius:16px;font-weight:800;
-  background:var(--brand); color:#fff; cursor:pointer; text-align:center;
-  letter-spacing:.2px; box-shadow:0 10px 20px rgba(255,123,92,.28);
-  transition: transform .06s ease, filter .2s;
-}
-.btn:active{ transform: translateY(1px) }
-.btn.secondary{
-  background:#fff; color:var(--ink);
-  border:1px solid rgba(17,24,39,.08);
-  box-shadow: var(--shadow);
-}
-.btn.ghost{
-  background:transparent; color:var(--brand);
-  border:1.5px solid var(--brand);
-}
-
-/* Chips / Tabs */
-.tabs{
-  display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 2px;
-}
-.tab{
-  padding:10px 14px;border-radius:20px;
-  background:var(--chip); cursor:pointer;font-weight:800;border:1px solid rgba(17,24,39,.06);
-  color:#111;
-}
-.tab.active{
-  background:linear-gradient(135deg,#ffffff, #ffe9e1);
-  border-color: rgba(255,123,92,.35);
-  box-shadow: 0 6px 14px rgba(255,123,92,.20);
-}
 .hidden{display:none}
 
-/* Pills & small chips */
-.pill{
-  display:inline-flex; align-items:center; gap:8px;
-  background:#fff; border:1px solid rgba(17,24,39,.08);
-  border-radius:999px; padding:8px 12px; font-weight:700;
-  box-shadow: var(--shadow);
+/* ---------- Cards & Header ---------- */
+.card{
+  background:var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:var(--glass-shadow);
+  border:1px solid var(--glass-stroke);
+}
+.hero{position:relative;padding:0;overflow:hidden;border-radius:22px}
+.banner{width:100%;height:180px;object-fit:cover;display:block;filter:saturate(1.1)}
+@media(max-width:560px){.banner{height:140px}}
+.hero-overlay{
+  position:absolute;inset:0;display:flex;align-items:flex-end;
+  padding:14px;background:linear-gradient(to bottom,rgba(0,0,0,0) 55%,rgba(0,0,0,.38))
+}
+.logo{
+  position:absolute;top:12px;left:12px;width:56px;height:56px;border-radius:14px;
+  background:#fff;padding:8px;box-shadow:0 10px 26px rgba(0,0,0,.25)
+}
+.hero-title{
+  margin-left:80px;margin-bottom:6px;font-weight:800;font-size:28px;color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.35)
 }
 
-/* Table look → soft cards */
-.tablewrap{margin-top:10px;overflow:auto}
-.tbl{width:100%;border-collapse:separate;border-spacing:0 12px}
-.tbl th{font-size:13px;color:var(--muted);text-align:left;padding:0 10px}
-.tbl td{
-  background:#fff; padding:14px 12px; font-size:15px; vertical-align:top;
-  border-top:1px solid rgba(17,24,39,.06);
-  border-bottom:1px solid rgba(17,24,39,.06);
+/* ---------- Toolbar Chips (theme / language) ---------- */
+.toolbar{position:absolute;right:16px;top:12px;display:flex;gap:10px;z-index:2}
+.toolbar.left-bottom{left:16px;right:auto;top:auto;bottom:12px}
+.chip{
+  border:0;border-radius:999px;padding:10px 14px;
+  background:#ffffffea;color:#0f172a;font-weight:700;
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+  cursor:pointer;user-select:none
 }
-.tbl tr td:first-child{border-left:1px solid rgba(17,24,39,.06);border-top-left-radius:14px;border-bottom-left-radius:14px}
-.tbl tr td:last-child{border-right:1px solid rgba(17,24,39,.06);border-top-right-radius:14px;border-bottom-right-radius:14px}
+.chip.active{outline:2px solid #111}
+body.dark .chip{background:#101626;color:#fff;box-shadow:0 12px 26px rgba(0,0,0,.5)}
 
-/* Grids */
+/* ---------- Inputs & Buttons ---------- */
+.in{
+  width:100%;padding:12px 14px;border:1px solid var(--line);
+  border-radius:12px;font-size:15px;background:#fff;color:#0f172a
+}
+body.dark .in{background:#0b1220;color:var(--ink);border-color:#1f2737}
+.btn{
+  padding:12px 16px;border:0;border-radius:12px;font-weight:700;
+  background:var(--brand);color:#fff;cursor:pointer;text-align:center
+}
+.btn.accent{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+
+/* ---------- Layout grids ---------- */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .gridWide{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
 @media(max-width:1000px){.gridWide{grid-template-columns:1fr}}
 
-/* Camera blocks */
-.cam{display:grid;grid-template-columns:1fr 180px;gap:12px}
+/* ---------- Tables ---------- */
+.tablewrap{margin-top:10px;overflow:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{padding:10px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+.tbl thead th{font-weight:800;color:var(--ink)}
+
+/* ---------- Tabs ---------- */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.tab{
+  padding:10px 14px;border-radius:999px;background:#eef2ff;border:1px solid var(--line);
+  cursor:pointer;font-weight:700;color:#111827
+}
+.tab.active{background:#111827;color:#fff;border-color:#111827}
+body.dark .tab{background:#0f172a;border-color:#1f2737;color:#e5e7eb}
+body.dark .tab.active{background:#0ea5e9;border-color:#0ea5e9;color:#00111d}
+
+/* ---------- Pills ---------- */
+.pill{background:#eef2ff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;display:inline-block}
+body.dark .pill{background:#0f172a;border-color:#1f2737;color:#cbd5e1}
+
+/* ---------- Camera ---------- */
+.cam{display:grid;grid-template-columns:1fr 160px;gap:10px}
 @media(max-width:520px){.cam{grid-template-columns:1fr}}
-video,canvas,img.snap{
-  width:100%;border-radius:16px;background:#000;max-height:240px;object-fit:cover;
-  box-shadow: var(--shadow);
-}
+video,canvas,img.snap{width:100%;border-radius:12px;background:#000;max-height:240px;object-fit:cover}
 
-/* Floating logout button */
+/* ---------- Misc ---------- */
 .logout{
-  position:fixed; right:16px; top:16px; z-index:9;
-  padding:10px 14px; border:0; border-radius:999px; font-weight:800;
-  background:rgba(23,34,59,.85); color:#fff; backdrop-filter: blur(8px);
-  box-shadow: var(--shadow);
+  position:fixed;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;border-radius:12px;
+  font-weight:700;background:#111;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.25);cursor:pointer
 }
-
-/* Divider + tag wrap */
-.divider{border:none;border-top:1px dashed rgba(17,24,39,.12);margin:14px 0}
+.divider{border:none;border-top:1px solid var(--line);margin:14px 0}
 .wraptags{flex-wrap:wrap;gap:8px}
-
-/* Glass utility (for small overlay toolbars) */
-.glass{
-  background:var(--glass); backdrop-filter: blur(10px);
-  border:1px solid rgba(255,255,255,.4); box-shadow: var(--shadow);
-  border-radius: 18px;
-  color:var(--ink);
-}
-
-/* Optional: big section headers like the reference */
-.section-title{
-  font-size:28px; font-weight:900; margin:4px 0 12px;
-}
