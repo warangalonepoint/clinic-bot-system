@@ -1,202 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Apartments • Admin</title>
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
-</head>
-<body class="bg">
-  <!-- Language Toggle -->
-  <button id="langToggle" class="lang-toggle" aria-label="Toggle language" title="తెలుగుకు మారండి">TE</button>
+<script src="./lang.js" defer></script>
+</head><body class="bg">
+<button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
-  <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'" data-i18n="Logout">Logout</button>
-
-  <main class="wrap">
-    <div class="card hero">
-      <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
-      <div class="hero-overlay">
-        <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
-        <div class="hero-title" data-i18n="Admin Console">Admin Console</div>
-      </div>
+<main class="wrap">
+  <div class="card hero">
+    <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+      <div class="hero-title">Admin Console</div>
     </div>
+    <div class="hero-tools">
+      <button id="themeToggle" class="chip">🌙</button>
+      <button class="chip" onclick="AppI18N.setLang('en')">EN</button>
+      <button class="chip" onclick="AppI18N.setLang('te')">TE</button>
+    </div>
+  </div>
 
-    <div class="card mt">
+  <div class="card mt">
+    <div class="grid2">
+      <a class="btn" href="./residents.html">Residents</a>
+      <a class="btn" href="./guards.html">Guards</a>
+      <a class="btn" href="./committee.html">Committee</a>
+      <a class="btn" href="./reset.html">Reset / Cache Tools</a>
+    </div>
+  </div>
+
+  <div class="gridWide mt">
+    <section class="card">
+      <div class="row space">
+        <h2 class="h2">Complaints Operations</h2>
+        <div class="row">
+          <select id="c_filter" class="in"><option value="">All</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
+          <input id="c_search" class="in" placeholder="Search flat/category/text" style="max-width:240px">
+          <button class="btn" id="c_export">Export CSV</button>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th><th>Actions</th></tr></thead><tbody id="c_tbody"></tbody></table>
+        <div id="c_empty" class="muted">No complaints yet.</div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2 class="h2">Quick Notice</h2>
       <div class="grid2">
-        <a class="btn" href="./residents.html" data-i18n="Residents">Residents</a>
-        <a class="btn" href="./guards.html" data-i18n="Guards">Guards</a>
-        <a class="btn" href="./committee.html" data-i18n="Committee">Committee</a>
-        <a class="btn" href="./reset.html" data-i18n="Reset / Cache Tools">Reset / Cache Tools</a>
+        <label>Title <input id="n_title" class="in" placeholder="e.g., Lift maintenance"></label>
+        <label>Audience
+          <select id="n_aud" class="in"><option value="All">All Residents</option><option>Block A</option><option>Block B</option><option>Block C</option></select>
+        </label>
+        <label class="span2">Message
+          <textarea id="n_msg" class="in" rows="4" placeholder="Short message..."></textarea>
+        </label>
       </div>
-    </div>
-
-    <div class="gridWide mt">
-      <!-- Complaints Ops -->
-      <section class="card">
-        <div class="row space">
-          <h2 class="h2" data-i18n="Complaints Operations">Complaints Operations</h2>
-          <div class="row">
-            <select id="c_filter" class="in">
-              <option value="" data-i18n="All">All</option>
-              <option data-i18n="Open">Open</option>
-              <option data-i18n="In Progress">In Progress</option>
-              <option data-i18n="Closed">Closed</option>
-            </select>
-            <input id="c_search" class="in" style="max-width:240px"
-                   placeholder="Search flat/category/text"
-                   data-i18n-placeholder="Search flat/category/text">
-            <button class="btn" id="c_export" data-i18n="Export CSV">Export CSV</button>
-          </div>
-        </div>
-        <div class="tablewrap">
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th data-i18n="Flat">Flat</th>
-                <th data-i18n="When">When</th>
-                <th data-i18n="Category">Category</th>
-                <th data-i18n="Priority">Priority</th>
-                <th data-i18n="Status">Status</th>
-                <th data-i18n="Assignee">Assignee</th>
-                <th data-i18n="Details">Details</th>
-                <th data-i18n="Actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="c_tbody"></tbody>
-          </table>
-          <div id="c_empty" class="muted" data-i18n="No complaints yet.">No complaints yet.</div>
-        </div>
-      </section>
-
-      <!-- Quick Notice + Today Overview -->
-      <aside class="card">
-        <h2 class="h2" data-i18n="Quick Notice">Quick Notice</h2>
-        <div class="grid2">
-          <label data-i18n="Title">Title
-            <input id="n_title" class="in"
-                   placeholder="e.g., Lift maintenance"
-                   data-i18n-placeholder="e.g., Lift maintenance">
-          </label>
-          <label data-i18n="Audience">Audience
-            <select id="n_aud" class="in">
-              <option value="All" data-i18n="All Residents">All Residents</option>
-              <option data-i18n="Block A">Block A</option>
-              <option data-i18n="Block B">Block B</option>
-              <option data-i18n="Block C">Block C</option>
-            </select>
-          </label>
-          <label class="span2" data-i18n="Message">Message
-            <textarea id="n_msg" class="in" rows="4"
-                      placeholder="Short message..."
-                      data-i18n-placeholder="Short message..."></textarea>
-          </label>
-        </div>
-        <div class="row mt8">
-          <button class="btn" id="n_add" data-i18n="Publish">Publish</button>
-          <button class="btn" id="n_export" data-i18n="Export Notices CSV">Export Notices CSV</button>
-        </div>
-
-        <hr class="divider">
-
-        <h2 class="h2" data-i18n="Today Overview">Today Overview</h2>
-        <div class="row wraptags">
-          <span class="pill"><span data-i18n="Visitors:">Visitors:</span> <b id="s_vis">0</b></span>
-          <span class="pill"><span data-i18n="Deliveries:">Deliveries:</span> <b id="s_del">0</b></span>
-          <span class="pill"><span data-i18n="Open Complaints:">Open Complaints:</span> <b id="s_open">0</b></span>
-          <span class="pill"><span data-i18n="Notices Posted:">Notices Posted:</span> <b id="s_not">0</b></span>
-        </div>
-      </aside>
-    </div>
-
-    <div class="card mt">
-      <h2 class="h2" data-i18n="Export / Backup">Export / Backup</h2>
-      <div class="grid2">
-        <button class="btn" id="x_vis" data-i18n="Visitors (Today)">Visitors (Today)</button>
-        <button class="btn" id="x_del" data-i18n="Deliveries (All)">Deliveries (All)</button>
-        <button class="btn" id="x_compl" data-i18n="Complaints (All)">Complaints (All)</button>
-        <button class="btn" id="x_not" data-i18n="Notices (All)">Notices (All)</button>
+      <div class="row mt8">
+        <button class="btn" id="n_add">Publish</button>
+        <button class="btn" id="n_export">Export Notices CSV</button>
       </div>
+
+      <hr class="divider">
+
+      <h2 class="h2">Today Overview</h2>
+      <div class="row wraptags">
+        <span class="pill">Visitors: <b id="s_vis">0</b></span>
+        <span class="pill">Deliveries: <b id="s_del">0</b></span>
+        <span class="pill">Open Complaints: <b id="s_open">0</b></span>
+        <span class="pill">Notices Posted: <b id="s_not">0</b></span>
+      </div>
+    </aside>
+  </div>
+
+  <div class="card mt">
+    <h2 class="h2">Export / Backup</h2>
+    <div class="grid2">
+      <button class="btn" id="x_vis">Visitors (Today)</button>
+      <button class="btn" id="x_del">Deliveries (All)</button>
+      <button class="btn" id="x_compl">Complaints (All)</button>
+      <button class="btn" id="x_not">Notices (All)</button>
     </div>
-  </main>
+  </div>
+</main>
 
-  <!-- i18n -->
-  <script src="./lang.js" defer></script>
+<script>
+/* theme + SW */
+(function(){
+  const btn=document.getElementById('themeToggle'); if(!btn) return;
+  const apply=(m)=>{ document.body.classList.toggle('dark', m==='dark'); btn.textContent=m==='dark'?'☀️':'🌙'; localStorage.setItem('theme',m); };
+  apply(localStorage.getItem('theme')||'light');
+  btn.addEventListener('click',()=>apply(document.body.classList.contains('dark')?'light':'dark'));
+})();
+if ("serviceWorker" in navigator && localStorage.getItem("apt_sw") !== "off") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
 
-  <script>
-  // translator helper
-  function tr(key){ return (window.AppI18N && AppI18N.t) ? AppI18N.t(key) : key; }
+const K={notices:"apt_notices", complaints:"apt_complaints", visits:"apt_visits", deliveries:"apt_deliveries"};
+const $=id=>document.getElementById(id);
+const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const ymd=()=>new Date().toISOString().slice(0,10);
+const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
+const uid=()=>Math.random().toString(36).slice(2,9);
 
-  const K={notices:"apt_notices", complaints:"apt_complaints", visits:"apt_visits", deliveries:"apt_deliveries"};
-  const $=id=>document.getElementById(id);
-  const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
-  const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-  const ymd=()=>new Date().toISOString().slice(0,10);
-  const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
-  const uid=()=>Math.random().toString(36).slice(2,9);
-
-  // Complaints
-  function renderComplaints(){
-    const q=(c_search.value||"").toLowerCase(), f=c_filter.value||"";
-    let rows=jget(K.complaints).slice().sort((a,b)=>b.ts-a.ts);
-    if(f) rows=rows.filter(r=>r.status===f);
-    rows=rows.filter(r=> (r.flat||"").toLowerCase().includes(q) || (r.cat||"").toLowerCase().includes(q) || (r.desc||"").toLowerCase().includes(q) );
-    c_tbody.innerHTML=""; c_empty.style.display=rows.length?"none":"block";
-    rows.forEach((r,i)=>{
-      const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td>${i+1}</td><td>${r.flat||"—"}</td><td>${t}</td><td>${r.cat}</td><td>${r.priority}</td>
-        <td>
-          <select onchange="setStatus('${r.id}',this.value)">
+/* Complaints */
+function renderComplaints(){
+  const q=(c_search.value||"").toLowerCase(), f=c_filter.value||"";
+  let rows=jget(K.complaints).slice().sort((a,b)=>b.ts-a.ts);
+  if(f) rows=rows.filter(r=>r.status===f);
+  rows=rows.filter(r=> (r.flat||"").toLowerCase().includes(q) || (r.cat||"").toLowerCase().includes(q) || (r.desc||"").toLowerCase().includes(q) );
+  c_tbody.innerHTML=""; c_empty.style.display=rows.length?"none":"block";
+  rows.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${i+1}</td><td>${r.flat||"—"}</td><td>${t}</td><td>${r.cat}</td><td>${r.priority}</td>
+      <td><select onchange="setStatus('${r.id}',this.value)">
             <option${r.status==="Open"?" selected":""}>Open</option>
             <option${r.status==="In Progress"?" selected":""}>In Progress</option>
             <option${r.status==="Closed"?" selected":""}>Closed</option>
-          </select>
-        </td>
-        <td><input value="${r.assign||""}" onchange="setAssign('${r.id}',this.value)" placeholder="${tr("Vendor/Staff")}"/></td>
-        <td>${r.desc||""}</td>
-        <td class="row"><button class="btn" onclick="closeC('${r.id}')" data-i18n="Close">${tr("Close")}</button><button class="btn" onclick="delC('${r.id}')" data-i18n="Delete">${tr("Delete")}</button></td>`;
-      c_tbody.appendChild(tr);
-    });
-  }
-  window.setStatus=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status=val; jset(K.complaints,arr); renderStats(); } };
-  window.setAssign=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].assign=val; jset(K.complaints,arr); } };
-  window.closeC=(id)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status="Closed"; jset(K.complaints,arr); renderComplaints(); renderStats(); } };
-  window.delC=(id)=>{ let arr=jget(K.complaints); arr=arr.filter(x=>x.id!==id); jset(K.complaints,arr); renderComplaints(); renderStats(); };
-  c_export.onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints.csv"); };
-  c_filter.addEventListener("change",renderComplaints);
-  c_search.addEventListener("input",renderComplaints);
+          </select></td>
+      <td><input value="${r.assign||""}" onchange="setAssign('${r.id}',this.value)" placeholder="Vendor/Staff"/></td>
+      <td>${r.desc||""}</td>
+      <td class="row"><button class="btn" onclick="closeC('${r.id}')">Close</button><button class="btn" onclick="delC('${r.id}')">Delete</button></td>`;
+    c_tbody.appendChild(tr);
+  });
+}
+window.setStatus=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status=val; jset(K.complaints,arr); renderStats(); } };
+window.setAssign=(id,val)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].assign=val; jset(K.complaints,arr); } };
+window.closeC=(id)=>{ const arr=jget(K.complaints); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status="Closed"; jset(K.complaints,arr); renderComplaints(); renderStats(); } };
+window.delC=(id)=>{ let arr=jget(K.complaints); arr=arr.filter(x=>x.id!==id); jset(K.complaints,arr); renderComplaints(); renderStats(); };
+c_export.onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints.csv"); };
+c_filter.addEventListener("change",renderComplaints);
+c_search.addEventListener("input",renderComplaints);
 
-  // Notices
-  function renderNoticesCount(){ s_not.textContent=jget(K.notices).length; }
-  n_add.onclick=()=>{
-    const title=n_title.value.trim(), msg=n_msg.value.trim(), aud=n_aud.value;
-    if(!title||!msg){ alert(tr("Title and Message required.")); return; }
-    const arr=jget(K.notices);
-    arr.unshift({id:uid(),title,msg,aud,ts:Date.now()});
-    jset(K.notices,arr);
-    n_title.value=n_msg.value="";
-    renderNoticesCount();
-  };
-  n_export.onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices.csv"); };
+/* Notices quick */
+function renderNoticesCount(){ s_not.textContent=jget(K.notices).length; }
+n_add.onclick=()=>{ const title=n_title.value.trim(), msg=n_msg.value.trim(), aud=n_aud.value; if(!title||!msg){alert("Title and Message required.");return;} const arr=jget(K.notices); arr.unshift({id:uid(),title,msg,aud,ts:Date.now()}); jset(K.notices,arr); n_title.value=n_msg.value=""; renderNoticesCount(); };
+n_export.onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices.csv"); };
 
-  // Stats + Exports
-  function renderStats(){
-    const today=ymd();
-    const vis=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
-    const del=jget(K.deliveries).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length;
-    const open=jget(K.complaints).filter(c=>c.status!=="Closed").length;
-    s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; renderNoticesCount();
-  }
-  x_vis.onclick=()=>{ const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===ymd()).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_Today.csv"); };
-  x_del.onclick=()=>{ const rows=jget(K.deliveries).map(({photo,...x})=>x); csv(rows,["id","flat","from","ts","status"],"Deliveries_All.csv"); };
-  x_compl.onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints_All.csv"); };
-  x_not.onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices_All.csv"); };
+/* Stats + Exports */
+function renderStats(){ const today=ymd(); const vis=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length; const del=jget(K.deliveries).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length; const open=jget(K.complaints).filter(c=>c.status!=="Closed").length; s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; renderNoticesCount(); }
+x_vis.onclick=()=>{ const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===ymd()).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_Today.csv"); };
+x_del.onclick=()=>{ const rows=jget(K.deliveries).map(({photo,...x})=>x); csv(rows,["id","flat","from","ts","status"],"Deliveries_All.csv"); };
+x_compl.onclick=()=>{ const rows=jget(K.complaints); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"Complaints_All.csv"); };
+x_not.onclick=()=>{ const rows=jget(K.notices); csv(rows,["id","title","msg","aud","ts"],"Notices_All.csv"); };
 
-  if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-  renderComplaints(); renderStats();
-  </script>
-</body>
-</html>
+renderComplaints(); renderStats();
+</script>
+</body></html>
