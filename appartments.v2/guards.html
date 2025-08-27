@@ -205,5 +205,5 @@ vh_export.onclick=()=>{ const rows=jget(K.visits).filter(v=>new Date(v.ts).toISO
 
 renderPreApprovals(); renderDeliveries(); renderVisitorsHistory();
 window.addEventListener("beforeunload",()=>{ if(cam1) stopStream(cam1); if(cam2) stopStream(cam2); });
-</script>
+<script src="./lang.js" defer></script>
 </body></html>
