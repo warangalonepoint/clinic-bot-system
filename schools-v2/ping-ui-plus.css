@@ -1,0 +1,143 @@
+/* PING / Modychat Look – High-fidelity skin
+   Load AFTER your existing CSS (or after ping-ui.css) */
+
+:root{
+  --ping-bg1:#ffccdf;      /* warm pink */
+  --ping-bg2:#f1e7ff;      /* soft violet */
+  --ping-bg3:#fdf8ff;      /* near white */
+  --ping-navy:#0a1130;     /* deep header */
+  --ping-navy-2:#0f1a44;
+  --ping-pill:#ffffff;
+  --ping-pill-ring:#ffffff3a;
+  --ping-ink:#0e1328;
+  --ping-muted:#7a86a5;
+  --ping-glow: 0 18px 40px rgba(0,0,0,.18);
+  --ping-soft: 0 12px 26px rgba(13,19,54,.18);
+}
+:root.dark{
+  --ping-bg1:#221f3a;
+  --ping-bg2:#12192f;
+  --ping-bg3:#0b1024;
+  --ping-navy:#060d24;
+  --ping-navy-2:#0a1433;
+  --ping-pill:#0e142b;
+  --ping-pill-ring:#ffffff25;
+  --ping-ink:#e9eef9;
+  --ping-muted:#a1abc7;
+  --ping-glow: 0 20px 50px rgba(0,0,0,.55);
+  --ping-soft: 0 14px 30px rgba(0,0,0,.45);
+}
+
+/* Background: brighter gradient */
+body{
+  color:var(--ping-ink);
+  background:
+    radial-gradient(1200px 900px at 10% -10%, var(--ping-bg1) 0%, var(--ping-bg2) 55%, var(--ping-bg3) 100%);
+}
+
+/* HERO: navy slab with rounded corners */
+.hero{
+  background: linear-gradient(180deg, var(--ping-navy), var(--ping-navy-2));
+  border-radius:32px;
+  box-shadow: var(--ping-glow);
+}
+.hero .banner{
+  height:220px; opacity:.22; filter:saturate(1.2) contrast(1.05);
+}
+.hero::after{
+  background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.45) 100%);
+}
+.brand-badge{
+  width:72px;height:72px;border-radius:26px;
+}
+.hero-title{ font-size:32px; letter-spacing:.3px }
+
+/* Header controls = chunky pills */
+.hero-controls .pill{
+  height:46px; min-width:60px; padding:10px 16px;
+  background:var(--ping-pill);
+  border:1px solid var(--ping-pill-ring);
+  color:#0e1328;
+}
+
+/* Cards: more round & glassy */
+.card{
+  border-radius:30px;
+  background: rgba(255,255,255,.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--ping-soft);
+  border:1px solid rgba(255,255,255,.55);
+}
+:root.dark .card{
+  background: rgba(15,19,46,.72);
+  border-color: rgba(255,255,255,.06);
+}
+
+/* Tabs → Ping chips */
+.tabs{ gap:14px }
+.tab{
+  padding:14px 20px; border-radius:999px;
+  background:#eaf0ff; border:1px solid #d9e2ff;
+  color:#0e1328; font-weight:800; letter-spacing:.2px;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.tab:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(13,19,54,.12) }
+.tab.active{
+  background:#fff; color:#0e1328; border-color:#fff;
+  box-shadow:0 10px 26px rgba(13,19,54,.18);
+}
+
+/* Inputs */
+.in, select, textarea{
+  border-radius:18px; border:1px solid #e6e9f4; background:#fff;
+}
+:root.dark .in, :root.dark select, :root.dark textarea{
+  background:#0f1733; border-color:#1b2548;
+}
+
+/* Buttons */
+.btn{
+  border-radius:18px;
+  box-shadow: 0 12px 30px rgba(255,106,69,.28);
+  background: linear-gradient(180deg,#ff9a7c,#ff6a45 78%);
+}
+.btn.dark{ background: linear-gradient(180deg,#4657ff,#2d3bff) }
+
+/* “Chat list” look for any .list of .cell */
+.list{ display:flex; flex-direction:column; gap:14px }
+.cell{
+  background:#fff; border-radius:22px; padding:16px 18px;
+  display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center;
+  box-shadow: 0 10px 24px rgba(13,19,54,.12);
+  border:1px solid #f2f4fb;
+}
+:root.dark .cell{ background:#0f1733; border-color:#16204b }
+.cell .av{
+  width:50px;height:50px;border-radius:16px; display:grid; place-items:center;
+  background: radial-gradient(100px 100px at 30% 20%, #ffe9e1 0%, #efe9ff 65%, #ffffff 100%);
+  font-weight:900; color:#1a2140;
+}
+.cell .meta{ color:#7a86a5; font-size:13px }
+
+/* Table: neumorphic rows */
+.tbl{ border-collapse:separate; border-spacing:0 12px }
+.tbl tbody tr{
+  background:#fff; box-shadow: 0 10px 24px rgba(13,19,54,.10);
+}
+.tbl tbody td{ border-top:1px solid #f1f4fb; border-bottom:1px solid #f1f4fb }
+:root.dark .tbl tbody tr{ background:#0f1733; box-shadow: 0 10px 24px rgba(0,0,0,.35) }
+:root.dark .tbl tbody td{ border-color:#18224d }
+
+/* Floating bottom dock (optional) */
+.dock{
+  position:sticky; bottom:12px; display:flex; gap:18px; justify-content:space-around;
+  background: linear-gradient(180deg, var(--ping-navy), var(--ping-navy-2));
+  padding:14px 18px; border-radius:26px; margin:10px auto 0; max-width:640px;
+  box-shadow: var(--ping-glow); border:1px solid rgba(255,255,255,.06);
+}
+.dock .ic{
+  width:58px;height:58px;border-radius:18px;
+  display:grid; place-items:center; background:rgba(255,255,255,.08);
+  color:#fff; font-size:22px; border:1px solid rgba(255,255,255,.12);
+}
