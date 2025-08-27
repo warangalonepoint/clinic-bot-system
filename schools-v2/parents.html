@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ping Schools • Parents</title>
+  <link rel="stylesheet" href="ping-ui-plus.css">
+  <style>.nav-pills{display:flex;gap:12px;flex-wrap:wrap}.nav-pill{padding:12px 16px;border-radius:999px;border:1px solid #e3e7ff;background:#fff;font-weight:800;cursor:pointer}.nav-pill.active{background:#0b153f;color:#fff;border-color:transparent;box-shadow:0 12px 22px rgba(4,10,36,.35)}</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card hero">
+      <img class="banner" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1600&auto=format&fit=crop" alt="">
+      <div class="hero-overlay">
+        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/OOjs_UI_icon_book-ltr.svg" alt="">
+        <div class="hero-title" id="app_title">Ping Schools</div>
+      </div>
+      <button class="logout" onclick="location.href='index.html'">Logout</button>
+      <div class="chips">
+        <button id="themeToggle" class="chip">🌙</button>
+        <button class="chip langChip active" data-lang="en">EN</button>
+        <button class="chip langChip" data-lang="te">TE</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div id="tabs" class="nav-pills">
+        <button class="nav-pill active" data-tab="dashboard" data-i="dash">Dashboard</button>
+        <button class="nav-pill" data-tab="homework" data-i="homework">Homework</button>
+        <button class="nav-pill" data-tab="notices" data-i="notices">Notices</button>
+        <button class="nav-pill" data-tab="fees" data-i="fees">Fees</button>
+      </div>
+    </section>
+
+    <section class="card" data-screen="dashboard">
+      <h2 class="h2" data-i="dash">Dashboard</h2>
+      <div class="grid2">
+        <div class="card"><div class="muted">Child</div><h2>Arjun • Grade 6</h2></div>
+        <div class="card"><div class="muted" data-i="fees">Fees</div><h2>Due ₹1,500</h2></div>
+      </div>
+    </section>
+
+    <section class="card hidden" data-screen="homework">
+      <h2 class="h2" data-i="homework">Homework</h2>
+      <div class="tablewrap"><table class="tbl"><thead><tr><th>Subject</th><th>Due</th><th>Note</th></tr></thead>
+        <tbody><tr><td>Math</td><td>Fri</td><td>Worksheet #5</td></tr></tbody></table></div>
+    </section>
+
+    <section class="card hidden" data-screen="notices">
+      <h2 class="h2" data-i="notices">Notices</h2>
+      <div class="tablewrap"><table class="tbl"><thead><tr><th>Title</th><th>When</th></tr></thead>
+        <tbody><tr><td>Parent–Teacher Meeting</td><td>Sep 5</td></tr></tbody></table></div>
+    </section>
+
+    <section class="card hidden" data-screen="fees">
+      <h2 class="h2" data-i="fees">Fees</h2>
+      <div class="row"><input class="in" placeholder="UPI / Ref ID"><button class="btn">Pay Now</button></div>
+    </section>
+  </main>
+  <script src="ui.js"></script>
+</body>
+</html>
