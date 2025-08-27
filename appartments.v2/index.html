@@ -1,51 +1,100 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Apartments • PIN (Safe Mode)</title>
-<link rel="stylesheet" href="./styles.css">
-<meta name="theme-color" content="#111"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Apartments • PIN</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <meta name="theme-color" content="#111"/>
+  <script src="./lang.js" defer></script>
 </head>
 <body class="bg">
-<main class="wrap">
-  <div class="card hero">
-    <img class="banner" src="./assets/apartments_banner.png" alt>
-    <div class="hero-overlay">
-      <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
-      <div class="hero-title">Onestop Apartments</div>
-    </div>
-  </div>
+  <main class="wrap">
+    <!-- Header -->
+    <div class="card hero">
+      <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+      <div class="hero-overlay">
+        <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+        <div class="hero-title" data-i18n="app_title">Onestop Apartments</div>
+      </div>
 
-  <div class="card mt">
-    <h2 class="h2">Login PIN</h2>
-    <p class="muted">Welcome</p>
-    <form id="pinForm">
-      <input id="pin" type="password" inputmode="numeric" placeholder="4–8 digit PIN" class="in">
-      <button class="btn w100 mt8">Submit</button>
-    </form>
-    <div id="msg" class="muted mt8"></div>
-  </div>
-</main>
+      <!-- Header tools: theme + language -->
+      <div class="hero-tools">
+        <button id="themeToggle" class="chip">🌙</button>
+        <button class="chip" onclick="AppI18N.setLang('en')">EN</button>
+        <button class="chip" onclick="AppI18N.setLang('te')">TE</button>
+      </div>
+    </div>
+
+    <!-- PIN -->
+    <div class="card mt glass">
+      <h2 class="h2" data-i18n="Login PIN">Login PIN</h2>
+      <p class="muted" data-i18n="Welcome">Welcome</p>
+      <form id="pinForm">
+        <input id="pin" type="password" inputmode="numeric" autocomplete="one-time-code"
+               placeholder="4–8 digit PIN" class="in" data-i18n="4–8 digit PIN">
+        <button class="btn w100 mt8" data-i18n="Submit">Submit</button>
+      </form>
+      <div id="msg" class="muted mt8"></div>
+    </div>
+  </main>
 
 <script>
-const rolePage={residents:"./residents.html",guards:"./guards.html",committee:"./committee.html",admin:"./admin.html"};
-const FALLBACK_PINS={residents:"1111",guards:"2222",committee:"3333",admin:"4444"};
+/* ---------- theme toggle ---------- */
+(function(){
+  const btn = document.getElementById('themeToggle');
+  const apply = (m)=>{ document.body.classList.toggle('dark', m==='dark'); btn.textContent = m==='dark' ? '☀️' : '🌙'; localStorage.setItem('theme', m); };
+  apply(localStorage.getItem('theme') || 'light');
+  btn.addEventListener('click', ()=> apply(document.body.classList.contains('dark') ? 'light' : 'dark'));
+})();
+
+/* ---------- service worker (safe) ---------- */
+if ("serviceWorker" in navigator && localStorage.getItem("apt_sw") !== "off") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+
+/* ---------- routing ---------- */
+const rolePage = {
+  residents : "./residents.html",
+  guards    : "./guards.html",
+  committee : "./committee.html",
+  admin     : "./admin.html"
+};
+
+/* ---------- robust PIN loading (cache-busting + fallback) ---------- */
+const FALLBACK_PINS = { residents:"1111", guards:"2222", committee:"3333", admin:"4444" };
 
 async function loadPins(){
-  try{
-    const r=await fetch("./pins.json?v="+Date.now(),{cache:"no-store"});
-    if(!r.ok) throw 0;
+  try {
+    const r = await fetch("./pins.json?v="+Date.now(), { cache:"no-store", headers:{ "pragma":"no-cache","cache-control":"no-cache" }});
+    if (!r.ok) throw new Error("pins.json HTTP " + r.status);
     return JSON.parse(await r.text());
-  }catch{return FALLBACK_PINS}
+  } catch (e) {
+    console.warn("PIN load failed, using fallback:", e);
+    return FALLBACK_PINS;
+  }
 }
-document.getElementById("pinForm").addEventListener("submit",async e=>{
+
+/* ---------- form handler ---------- */
+document.getElementById("pinForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const pin=document.getElementById("pin").value.trim();
-  const msg=document.getElementById("msg");
-  msg.textContent="Checking…";
-  const pins=await loadPins();
-  let role=null; for(const [k,v] of Object.entries(pins)){ if(String(v)===pin){ role=k; break; } }
-  if(!role){ msg.textContent="Invalid PIN."; return; }
-  sessionStorage.setItem("apt_role",role);
-  location.replace(rolePage[role]);
+  const pin = document.getElementById("pin").value.trim();
+  const msg = document.getElementById("msg");
+  msg.textContent = (window.AppI18N?.t("Checking…")) || "Checking…";
+  try{
+    const pins = await loadPins();
+    let matched = null;
+    for (const [role,val] of Object.entries(pins)) if(String(val)===pin){ matched=role; break; }
+    if (!matched) { msg.textContent = (window.AppI18N?.t("Invalid PIN.")) || "Invalid PIN."; return; }
+    sessionStorage.setItem("apt_role", matched);
+    sessionStorage.setItem("apt_login_at", String(Date.now()));
+    location.replace(rolePage[matched] || "./index.html");
+  }catch(err){
+    msg.textContent = (window.AppI18N?.t("Error loading PINs.")) || "Error loading PINs.";
+    console.error(err);
+  }
 });
 </script>
-</body></html>
+</body>
+</html>
