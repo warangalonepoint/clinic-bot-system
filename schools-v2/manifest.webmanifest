@@ -1,0 +1,9 @@
+{
+  "name": "Ping Schools",
+  "short_name": "Schools",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0a123a",
+  "theme_color": "#0a123a",
+  "icons": []
+}
