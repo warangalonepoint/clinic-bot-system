@@ -1,100 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Apartments • PIN</title>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Onestop Apartments</title>
   <link rel="stylesheet" href="./styles.css">
-  <meta name="theme-color" content="#111"/>
   <script src="./lang.js" defer></script>
+  <style>
+    body {
+      margin:0; font-family:system-ui; 
+      background: linear-gradient(135deg,#e0e9f7,#f9f9f9);
+    }
+    .card {
+      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.25);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      padding: 16px;
+      margin: 20px;
+    }
+    .hero {
+      position: relative; overflow:hidden;
+    }
+    .banner {
+      width:100%; height:160px; object-fit:cover;
+      border-radius: 18px;
+    }
+    .logo {
+      position:absolute; top:12px; left:12px;
+      width:56px; height:56px; border-radius:50%;
+      background:#fff; padding:6px;
+    }
+    .hero-title {
+      position:absolute; bottom:14px; left:80px;
+      color:#fff; font-weight:800; font-size:22px;
+      text-shadow:0 2px 6px rgba(0,0,0,.6);
+    }
+    .toggles {position:absolute;top:12px;right:12px;display:flex;gap:8px}
+    .toggles button {padding:6px 10px;border-radius:12px;border:0;font-weight:600;cursor:pointer}
+  </style>
 </head>
-<body class="bg">
-  <main class="wrap">
-    <!-- Header -->
-    <div class="card hero">
-      <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
-      <div class="hero-overlay">
-        <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
-        <div class="hero-title" data-i18n="app_title">Onestop Apartments</div>
-      </div>
-
-      <!-- Header tools: theme + language -->
-      <div class="hero-tools">
-        <button id="themeToggle" class="chip">🌙</button>
-        <button class="chip" onclick="AppI18N.setLang('en')">EN</button>
-        <button class="chip" onclick="AppI18N.setLang('te')">TE</button>
-      </div>
-    </div>
-
-    <!-- PIN -->
-    <div class="card mt glass">
-      <h2 class="h2" data-i18n="Login PIN">Login PIN</h2>
-      <p class="muted" data-i18n="Welcome">Welcome</p>
-      <form id="pinForm">
-        <input id="pin" type="password" inputmode="numeric" autocomplete="one-time-code"
-               placeholder="4–8 digit PIN" class="in" data-i18n="4–8 digit PIN">
-        <button class="btn w100 mt8" data-i18n="Submit">Submit</button>
-      </form>
-      <div id="msg" class="muted mt8"></div>
+<body>
+  <main class="card hero">
+    <img class="banner" src="./assets/apartments_banner.png" alt="banner">
+    <img class="logo" src="./assets/logo.png" alt="logo">
+    <div class="hero-title" data-i18n="Onestop Apartments">Onestop Apartments</div>
+    <div class="toggles">
+      <button onclick="document.body.classList.toggle('dark')">🌙</button>
+      <button onclick="AppI18N.setLang('en')">EN</button>
+      <button onclick="AppI18N.setLang('te')">TE</button>
     </div>
   </main>
 
-<script>
-/* ---------- theme toggle ---------- */
-(function(){
-  const btn = document.getElementById('themeToggle');
-  const apply = (m)=>{ document.body.classList.toggle('dark', m==='dark'); btn.textContent = m==='dark' ? '☀️' : '🌙'; localStorage.setItem('theme', m); };
-  apply(localStorage.getItem('theme') || 'light');
-  btn.addEventListener('click', ()=> apply(document.body.classList.contains('dark') ? 'light' : 'dark'));
-})();
+  <section class="card">
+    <h2 data-i18n="Login PIN">Login PIN</h2>
+    <p data-i18n="Welcome">Welcome</p>
+    <input id="pin" placeholder="4–8 digit PIN" data-i18n="4–8 digit PIN">
+    <button onclick="checkPIN()" data-i18n="Submit">Submit</button>
+  </section>
 
-/* ---------- service worker (safe) ---------- */
-if ("serviceWorker" in navigator && localStorage.getItem("apt_sw") !== "off") {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-}
-
-/* ---------- routing ---------- */
-const rolePage = {
-  residents : "./residents.html",
-  guards    : "./guards.html",
-  committee : "./committee.html",
-  admin     : "./admin.html"
-};
-
-/* ---------- robust PIN loading (cache-busting + fallback) ---------- */
-const FALLBACK_PINS = { residents:"1111", guards:"2222", committee:"3333", admin:"4444" };
-
-async function loadPins(){
-  try {
-    const r = await fetch("./pins.json?v="+Date.now(), { cache:"no-store", headers:{ "pragma":"no-cache","cache-control":"no-cache" }});
-    if (!r.ok) throw new Error("pins.json HTTP " + r.status);
-    return JSON.parse(await r.text());
-  } catch (e) {
-    console.warn("PIN load failed, using fallback:", e);
-    return FALLBACK_PINS;
-  }
-}
-
-/* ---------- form handler ---------- */
-document.getElementById("pinForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const pin = document.getElementById("pin").value.trim();
-  const msg = document.getElementById("msg");
-  msg.textContent = (window.AppI18N?.t("Checking…")) || "Checking…";
-  try{
-    const pins = await loadPins();
-    let matched = null;
-    for (const [role,val] of Object.entries(pins)) if(String(val)===pin){ matched=role; break; }
-    if (!matched) { msg.textContent = (window.AppI18N?.t("Invalid PIN.")) || "Invalid PIN."; return; }
-    sessionStorage.setItem("apt_role", matched);
-    sessionStorage.setItem("apt_login_at", String(Date.now()));
-    location.replace(rolePage[matched] || "./index.html");
-  }catch(err){
-    msg.textContent = (window.AppI18N?.t("Error loading PINs.")) || "Error loading PINs.";
-    console.error(err);
-  }
-});
-<script src="./lang.js" defer></script>
+  <script>
+    function checkPIN(){
+      const p=document.getElementById("pin").value;
+      if(p==="1111") location.href="residents.html";
+      else alert(AppI18N.getLang()==="te"?"చెల్లని పిన్.":"Invalid PIN.");
+    }
+  </script>
 </body>
 </html>
