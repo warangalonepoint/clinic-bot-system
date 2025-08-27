@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ping Schools • Coordinator</title>
+  <link rel="stylesheet" href="ping-ui-plus.css">
+  <style>.nav-pills{display:flex;gap:12px;flex-wrap:wrap}.nav-pill{padding:12px 16px;border-radius:999px;border:1px solid #e3e7ff;background:#fff;font-weight:800;cursor:pointer}.nav-pill.active{background:#0b153f;color:#fff;border-color:transparent;box-shadow:0 12px 22px rgba(4,10,36,.35)}</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card hero">
+      <img class="banner" src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?q=80&w=1600&auto=format&fit=crop" alt="">
+      <div class="hero-overlay">
+        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/OOjs_UI_icon_book-ltr.svg" alt="">
+        <div class="hero-title" id="app_title">Ping Schools</div>
+      </div>
+      <button class="logout" onclick="location.href='index.html'">Logout</button>
+      <div class="chips">
+        <button id="themeToggle" class="chip">🌙</button>
+        <button class="chip langChip active" data-lang="en">EN</button>
+        <button class="chip langChip" data-lang="te">TE</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div id="tabs" class="nav-pills">
+        <button class="nav-pill active" data-tab="dashboard" data-i="dash">Dashboard</button>
+        <button class="nav-pill" data-tab="classes"  data-i="classes">Classes</button>
+        <button class="nav-pill" data-tab="attendance" data-i="attendance">Attendance</button>
+        <button class="nav-pill" data-tab="notices" data-i="notices">Notices</button>
+      </div>
+    </section>
+
+    <section class="card" data-screen="dashboard">
+      <h2 class="h2" data-i="dash">Dashboard</h2>
+      <div class="grid2">
+        <div class="card"><div class="muted" data-i="k_students">Students</div><h2 id="k_students">—</h2></div>
+        <div class="card"><div class="muted" data-i="k_teachers">Teachers</div><h2 id="k_teachers">—</h2></div>
+      </div>
+    </section>
+
+    <section class="card hidden" data-screen="classes">
+      <h2 class="h2" data-i="classes">Classes</h2>
+      <div class="row"><input class="in" placeholder="Search"/><button class="btn">Add</button></div>
+      <div class="tablewrap mt8"><table class="tbl"><thead><tr><th>Class</th><th>Teacher</th><th>Room</th><th>Time</th></tr></thead>
+        <tbody id="class_tbody"></tbody></table></div>
+    </section>
+
+    <section class="card hidden" data-screen="attendance">
+      <h2 class="h2" data-i="attendance">Attendance</h2>
+      <div class="row"><input class="in" type="date"/><select class="in"><option>All Classes</option></select><button class="btn" data-i="mark">Generate</button></div>
+    </section>
+
+    <section class="card hidden" data-screen="notices">
+      <h2 class="h2" data-i="notices">Notices</h2>
+      <div class="grid2">
+        <input class="in" placeholder="Title">
+        <select class="in"><option>All</option><option>Teachers</option><option>Parents</option></select>
+        <textarea class="in span2" rows="3" placeholder="Message"></textarea>
+      </div>
+      <div class="mt8"><button class="btn" data-i="notice">Publish</button></div>
+    </section>
+  </main>
+  <script src="ui.js"></script>
+</body>
+</html>
