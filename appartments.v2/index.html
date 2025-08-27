@@ -1,155 +1,236 @@
-:root{
-  /* Deeper gradient + high-contrast palette */
-  --bg-1:#dfe6ff;
-  --bg-2:#ffe2f1;
-  --ink:#0b1026;
-  --muted:#5b6b8a;
-  --brand:#0a123a;        /* header */
-  --brand-2:#00071f;
-  --accent:#ff3d6e;
-  --card:#ffffffb8;       /* more opaque glass */
-  --stroke:#ffffffee;     /* brighter edge */
-  --radius:26px;
-  --shadow:0 18px 50px rgba(11,16,38,.25);
-  --glass-blur:18px;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modychat UI</title>
+  <style>
+    :root{
+      --bg-1:#dfe6ff;
+      --bg-2:#ffe2f1;
+      --ink:#0b1026;
+      --muted:#5b6b8a;
+      --brand:#0a123a;       
+      --brand-2:#00071f;
+      --accent:#ff3d6e;
+      --card:#ffffffb8;      
+      --stroke:#ffffffee;    
+      --radius:26px;
+      --shadow:0 18px 50px rgba(11,16,38,.25);
+      --glass-blur:18px;
+    }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  color:var(--ink);
-  /* vivid layered backdrop */
-  background:
-    radial-gradient(1200px 700px at 85% -10%, #ffc1da 0%, #ffd1e6 25%, transparent 55%),
-    radial-gradient(1100px 700px at -10% 10%, #bcd9ff 0%, #cfe3ff 25%, transparent 55%),
-    linear-gradient(180deg, var(--bg-1), var(--bg-2));
-  display:flex; align-items:center; justify-content:center; padding:18px;
-}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 85% -10%, #ffc1da 0%, #ffd1e6 25%, transparent 55%),
+        radial-gradient(1100px 700px at -10% 10%, #bcd9ff 0%, #cfe3ff 25%, transparent 55%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      display:flex; align-items:center; justify-content:center; padding:18px;
+    }
 
-.phone{
-  width:410px; max-width:100%;
-  border-radius:34px;
-  background:#ffffff1a;
-  backdrop-filter: blur(26px) saturate(140%);
-  border:1px solid #ffffff90;
-  box-shadow:0 25px 70px rgba(10,18,58,.28), inset 0 1px 0 #ffffffaa;
-  overflow:hidden;
-}
+    .phone{
+      width:410px; max-width:100%;
+      border-radius:34px;
+      background:#ffffff1a;
+      backdrop-filter: blur(26px) saturate(140%);
+      border:1px solid #ffffff90;
+      box-shadow:0 25px 70px rgba(10,18,58,.28), inset 0 1px 0 #ffffffaa;
+      overflow:hidden;
+    }
 
-/* HEADER */
-.header{
-  background:linear-gradient(180deg,var(--brand),var(--brand-2));
-  color:#fff; padding:20px 18px 12px; position:relative;
-  box-shadow:0 14px 40px rgba(0,7,31,.45);
-}
-.header .top{display:flex;align-items:center;gap:10px;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:12px}
-.app-icon{
-  width:38px;height:38px;border-radius:14px;background:#fff;
-  display:grid;place-items:center;color:var(--brand);font-weight:800;
-  box-shadow:0 10px 24px rgba(255,255,255,.25), inset 0 -2px 6px #00000010;
-}
-.search{
-  margin-top:12px;background:#ffffff26;border:1px solid #ffffff50;color:#fff;
-  padding:12px 14px;border-radius:16px;width:100%;outline:none;
-  box-shadow: inset 0 1px 0 #ffffff70;
-}
-.tabs{
-  margin-top:12px;display:flex;gap:10px;background:#00000035;
-  padding:7px;border-radius:999px;width:max-content;border:1px solid #ffffff25;
-}
-.tab{
-  border:0;padding:9px 16px;border-radius:999px;font-weight:800;
-  color:#e8ecff;background:transparent;cursor:pointer;letter-spacing:.2px
-}
-.tab.active{
-  background:#ffffff; color:var(--brand);
-  box-shadow:0 10px 18px rgba(255,255,255,.25);
-}
+    /* HEADER */
+    .header{
+      background:linear-gradient(180deg,var(--brand),var(--brand-2));
+      color:#fff; padding:20px 18px 12px; position:relative;
+      box-shadow:0 14px 40px rgba(0,7,31,.45);
+    }
+    .header .top{display:flex;align-items:center;gap:10px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .app-icon{
+      width:38px;height:38px;border-radius:14px;background:#fff;
+      display:grid;place-items:center;color:var(--brand);font-weight:800;
+      box-shadow:0 10px 24px rgba(255,255,255,.25), inset 0 -2px 6px #00000010;
+    }
+    .search{
+      margin-top:12px;background:#ffffff26;border:1px solid #ffffff50;color:#fff;
+      padding:12px 14px;border-radius:16px;width:100%;outline:none;
+      box-shadow: inset 0 1px 0 #ffffff70;
+    }
+    .tabs{
+      margin-top:12px;display:flex;gap:10px;background:#00000035;
+      padding:7px;border-radius:999px;width:max-content;border:1px solid #ffffff25;
+    }
+    .tab{
+      border:0;padding:9px 16px;border-radius:999px;font-weight:800;
+      color:#e8ecff;background:transparent;cursor:pointer;letter-spacing:.2px
+    }
+    .tab.active{
+      background:#ffffff; color:var(--brand);
+      box-shadow:0 10px 18px rgba(255,255,255,.25);
+    }
 
-/* SCREENS */
-.screen{display:none;padding:16px}
-.screen.active{display:block}
+    /* SCREENS */
+    .screen{display:none;padding:16px}
+    .screen.active{display:block}
 
-/* GLASS CARD */
-.card{
-  background:var(--card);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border:1px solid var(--stroke);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:16px;
-}
+    /* GLASS CARD */
+    .card{
+      background:var(--card);
+      backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
 
-.title{font-weight:900;font-size:26px;margin:8px 0 12px; letter-spacing:.2px}
-.sub{font-size:13px;color:var(--muted)}
-.row-sb{display:flex;justify-content:space-between;align-items:center}
-.gap12{gap:12px}
+    .title{font-weight:900;font-size:26px;margin:8px 0 12px; letter-spacing:.2px}
+    .sub{font-size:13px;color:var(--muted)}
+    .row-sb{display:flex;justify-content:space-between;align-items:center}
+    .gap12{gap:12px}
 
-/* LIST */
-.list{display:flex;flex-direction:column;gap:14px}
-.item{
-  display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
-  padding:14px 16px;border-radius:20px;background:#fdfdff;
-  border:1px solid #e9edff; box-shadow:0 12px 24px rgba(11,16,38,.08);
-}
-.ava{
-  width:48px;height:48px;border-radius:16px;display:grid;place-items:center;
-  background:conic-gradient(from 140deg at 50% 50%, #ffd4e2, #ffe9b8, #e2f0ff, #e3d6ff, #ffd4e2);
-  color:#111;font-weight:900;font-size:14px;border:1px solid #fff;
-  box-shadow:0 6px 14px rgba(0,0,0,.06);
-}
-.meta{font-size:13px;color:var(--muted)}
-.time{font-size:13px;color:#7181a8;text-align:right}
-.badge{
-  background:#0b1026;color:#fff;font-size:12px;padding:4px 9px;border-radius:999px;
-  box-shadow:0 8px 16px rgba(11,16,38,.25)
-}
+    /* LIST */
+    .list{display:flex;flex-direction:column;gap:14px}
+    .item{
+      display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+      padding:14px 16px;border-radius:20px;background:#fdfdff;
+      border:1px solid #e9edff; box-shadow:0 12px 24px rgba(11,16,38,.08);
+    }
+    .ava{
+      width:48px;height:48px;border-radius:16px;display:grid;place-items:center;
+      background:conic-gradient(from 140deg at 50% 50%, #ffd4e2, #ffe9b8, #e2f0ff, #e3d6ff, #ffd4e2);
+      color:#111;font-weight:900;font-size:14px;border:1px solid #fff;
+      box-shadow:0 6px 14px rgba(0,0,0,.06);
+    }
+    .meta{font-size:13px;color:var(--muted)}
+    .time{font-size:13px;color:#7181a8;text-align:right}
+    .badge{
+      background:#0b1026;color:#fff;font-size:12px;padding:4px 9px;border-radius:999px;
+      box-shadow:0 8px 16px rgba(11,16,38,.25)
+    }
 
-/* CHAT */
-.chat{display:flex;flex-direction:column;gap:12px}
-.bubble{
-  max-width:78%;padding:13px 15px;border-radius:20px;background:#ffffff;
-  border:1px solid #eaefff;box-shadow:0 10px 20px rgba(11,16,38,.08)
-}
-.bubble.me{
-  margin-left:auto;background:#ffe8f0;border-color:#ffd6e5;
-  box-shadow:0 10px 24px rgba(255,61,110,.2)
-}
-.composer{display:grid;grid-template-columns:1fr auto;gap:12px;margin-top:8px}
-.input{
-  padding:12px 14px;border-radius:14px;border:1px solid #e3e7ff;outline:none;background:#fff
-}
-.send{
-  background:linear-gradient(180deg,#0b153f,#040a24); color:#fff;border:0;
-  padding:12px 18px;border-radius:14px;font-weight:800;cursor:pointer;
-  box-shadow:0 12px 26px rgba(4,10,36,.4)
-}
+    /* CHAT */
+    .chat{display:flex;flex-direction:column;gap:12px}
+    .bubble{
+      max-width:78%;padding:13px 15px;border-radius:20px;background:#ffffff;
+      border:1px solid #eaefff;box-shadow:0 10px 20px rgba(11,16,38,.08)
+    }
+    .bubble.me{
+      margin-left:auto;background:#ffe8f0;border-color:#ffd6e5;
+      box-shadow:0 10px 24px rgba(255,61,110,.2)
+    }
+    .composer{display:grid;grid-template-columns:1fr auto;gap:12px;margin-top:8px}
+    .input{
+      padding:12px 14px;border-radius:14px;border:1px solid #e3e7ff;outline:none;background:#fff
+    }
+    .send{
+      background:linear-gradient(180deg,#0b153f,#040a24); color:#fff;border:0;
+      padding:12px 18px;border-radius:14px;font-weight:800;cursor:pointer;
+      box-shadow:0 12px 26px rgba(4,10,36,.4)
+    }
 
-/* DOCK */
-.dock{position:sticky;bottom:12px;display:flex;gap:12px;justify-content:center}
-.dock .pill{
-  background:#0b153f; color:#fff;border-radius:20px;padding:12px 14px;display:flex;gap:14px;
-  box-shadow:0 20px 40px rgba(4,10,36,.45), inset 0 1px 0 #ffffff30
-}
-.dock button{
-  width:48px;height:48px;border-radius:16px;border:1px solid #ffffff25;
-  background:#ffffff12;color:#fff;font-size:18px;cursor:pointer;
-  box-shadow:inset 0 1px 0 #ffffff25, 0 10px 22px rgba(0,0,0,.25)
-}
+    /* DOCK */
+    .dock{position:sticky;bottom:12px;display:flex;gap:12px;justify-content:center}
+    .dock .pill{
+      background:#0b153f; color:#fff;border-radius:20px;padding:12px 14px;display:flex;gap:14px;
+      box-shadow:0 20px 40px rgba(4,10,36,.45), inset 0 1px 0 #ffffff30
+    }
+    .dock button{
+      width:48px;height:48px;border-radius:16px;border:1px solid #ffffff25;
+      background:#ffffff12;color:#fff;font-size:18px;cursor:pointer;
+      box-shadow:inset 0 1px 0 #ffffff25, 0 10px 22px rgba(0,0,0,.25)
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="header">
+      <div class="top">
+        <div class="brand">
+          <div class="app-icon">💬</div>
+          <div><b>Modychat</b></div>
+        </div>
+      </div>
+      <input type="text" placeholder="Search" class="search">
+      <div class="tabs">
+        <button class="tab active" onclick="switchScreen('chats')">Chats</button>
+        <button class="tab" onclick="switchScreen('status')">Status</button>
+        <button class="tab" onclick="switchScreen('calls')">Calls</button>
+      </div>
+    </div>
 
-/* SETTINGS */
-.settings .row{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-.tile{
-  background:#fff;border:1px solid #e9edff;border-radius:18px;padding:14px 16px;
-  display:flex;justify-content:space-between;align-items:center;box-shadow:0 10px 20px rgba(11,16,38,.08)
-}
-.profile-card{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
-.avatar-big{
-  width:72px;height:72px;border-radius:22px;
-  background:linear-gradient(145deg,#d1f7ff,#eafaff);
-  display:grid;place-items:center;font-weight:900;color:#0b3752;border:1px solid #fff;
-  box-shadow:0 12px 28px rgba(11,55,82,.18)
-}
+    <div class="screen active" id="chats">
+      <div class="title">All Chats</div>
+      <div class="list">
+        <div class="item">
+          <div class="ava">JR</div>
+          <div>
+            <div><b>Joe Root</b></div>
+            <div class="meta">Hey, lunch? 😊</div>
+          </div>
+          <div class="time">
+            2:45
+            <div class="badge">3</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="ava">NJ</div>
+          <div>
+            <div><b>Navel Joard</b></div>
+            <div class="meta">Sent a photo</div>
+          </div>
+          <div class="time">4:16</div>
+        </div>
+        <div class="item">
+          <div class="ava">JA</div>
+          <div>
+            <div><b>James Anderson</b></div>
+            <div class="meta">Awesome! see you</div>
+          </div>
+          <div class="time">6:30</div>
+        </div>
+        <div class="item">
+          <div class="ava">M</div>
+          <div>
+            <div><b>Meetup 2020</b></div>
+            <div class="meta">Agenda updated</div>
+          </div>
+          <div class="time">9:05</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen" id="status">
+      <div class="title">My Status</div>
+      <div class="card">Status updates coming soon...</div>
+    </div>
+
+    <div class="screen" id="calls">
+      <div class="title">All Calls</div>
+      <div class="card">Recent calls will appear here.</div>
+    </div>
+
+    <div class="dock">
+      <div class="pill">
+        <button>💬</button>
+        <button>📷</button>
+        <button>📁</button>
+        <button>👤</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchScreen(id){
+      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+</body>
+</html>
