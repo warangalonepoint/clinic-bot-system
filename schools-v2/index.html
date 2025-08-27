@@ -1,0 +1,55 @@
+<!doctype html><html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Onestop School • Login</title>
+<link rel="stylesheet" href="ping-ui.css">
+<meta name="theme-color" content="#ff7a59">
+</head>
+<body>
+<main class="wrap">
+  <!-- HERO -->
+  <header class="hero">
+    <img class="banner" src="assets/apartments_banner.png" alt="">
+    <div class="brand-badge"><img src="assets/logo.png" alt="" style="width:40px;height:40px"></div>
+    <button class="logout" onclick="location.href='https://onestop.example'">Logout</button>
+    <div class="hero-controls">
+      <button class="pill" title="Theme" data-theme-toggle>🌞</button>
+      <button class="pill" data-lang="en">EN</button>
+      <button class="pill" data-lang="te">TE</button>
+    </div>
+    <div class="hero-row">
+      <h1 class="hero-title" data-i18n="app">Onestop School</h1>
+    </div>
+  </header>
+
+  <!-- LOGIN CARD -->
+  <section class="card">
+    <h2 data-i18n="pin_title">Login PIN</h2>
+    <p class="muted" data-i18n="welcome">Welcome</p>
+    <input id="pin" class="in" placeholder="4–8 digit PIN" inputmode="numeric" maxlength="8">
+    <div class="row mt8">
+      <button id="go" class="btn" data-i18n="submit">Submit</button>
+      <button class="btn ghost" onclick="localStorage.clear()">Clear Cache</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>How it works</h2>
+    <p class="muted">Enter the PIN for your role (Teachers / Students / Admin). You’ll be routed automatically.</p>
+  </section>
+</main>
+
+<script src="ui.js"></script>
+<script>
+/* Keep your existing PIN routing.
+   Example: { teachers: "2222", students:"3333", admin:"1111" } */
+const PINS={teachers:"2222", students:"3333", admin:"1111"};
+document.getElementById('go').onclick=()=>{
+  const p=(pin.value||"").trim();
+  if(p===PINS.admin) location.href="admin.html";
+  else if(p===PINS.teachers) location.href="teachers.html";
+  else if(p===PINS.students) location.href="students.html";
+  else alert("Wrong PIN");
+};
+</script>
+</body></html>
