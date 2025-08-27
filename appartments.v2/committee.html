@@ -135,5 +135,5 @@ c_search.addEventListener("input",renderComplaints);
 function renderStats(){ const today=ymd(); const vis=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length; const del=jget(K.deliveries).filter(v=>new Date(v.ts).toISOString().slice(0,10)===today).length; const open=jget(K.complaints).filter(c=>c.status!=="Closed").length; s_vis.textContent=vis; s_del.textContent=del; s_open.textContent=open; s_not.textContent=jget(K.notices).length; }
 
 renderNotices(); renderComplaints(); renderStats();
-</script>
+<script src="./lang.js" defer></script>
 </body></html>
