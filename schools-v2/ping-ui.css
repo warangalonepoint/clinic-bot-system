@@ -1,0 +1,143 @@
+/* PING UI — Bright Glassmorphism for Schools PWA
+   Drop-in theme: replace your current styles.css OR import after it.
+   Uses CSS vars so your old class names keep working.
+*/
+
+/* ---------- THEME TOKENS ---------- */
+:root{
+  --bg: #fff7f2;
+  --bg-grad: radial-gradient(1200px 800px at 0% 0%, #ffe1d0 0%, #fff7f2 40%, #ecfff5 100%);
+  --ink: #0f172a;
+  --muted:#5b6575;
+  --brand:#ff7a59;          /* coral */
+  --brand-2:#2e5bff;        /* azure accent */
+  --good:#16a34a;
+  --bad:#ef4444;
+  --glass:#ffffffcc;        /* white with alpha */
+  --glass-deep:#0b1020cc;   /* navy glass */
+  --ring:#00000014;
+  --shadow: 0 10px 40px rgba(0,0,0,.12), inset 0 1px rgba(255,255,255,.5);
+}
+:root.dark{
+  --bg:#0b1020;
+  --bg-grad: radial-gradient(1100px 760px at 10% 10%, #121936 0%, #0b1020 55%, #0a1715 100%);
+  --ink:#f1f5f9;
+  --muted:#a6b0c0;
+  --glass:#0e1428cc;
+  --glass-deep:#060a16cc;
+  --ring:#ffffff1a;
+  --shadow: 0 10px 40px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.04);
+}
+
+/* ---------- BASE ---------- */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  color:var(--ink);
+  background:var(--bg-grad), var(--bg);
+  font-family: system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial, sans-serif;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ---------- WRAPPER ---------- */
+.wrap{max-width:1100px;margin:20px auto;padding:12px}
+
+/* ---------- HERO / APP BAR ---------- */
+.hero{
+  position:relative; overflow:hidden; border-radius:26px;
+  background:var(--glass-deep); color:#fff;
+  box-shadow:var(--shadow);
+}
+.hero .banner{width:100%;height:210px;object-fit:cover;opacity:.85;filter:saturate(1.05)}
+.hero::after{ /* glass fade overlay */
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(to bottom,transparent 40%, rgba(0,0,0,.35) 95%);
+  pointer-events:none;
+}
+.hero-row{
+  position:absolute; inset:0; display:flex; align-items:flex-end; padding:16px;
+}
+.brand-badge{
+  position:absolute; top:14px; left:14px;
+  width:68px; height:68px; border-radius:22px; background:#fff;
+  display:grid; place-items:center;
+  box-shadow:var(--shadow);
+}
+.hero-title{
+  font-weight:900; font-size:34px; line-height:1.05; letter-spacing:.2px; text-shadow:0 2px 10px rgba(0,0,0,.35);
+  margin:0 0 8px 84px;
+}
+.hero-controls{
+  position:absolute; top:14px; right:14px; display:flex; gap:10px;
+}
+.pill{
+  display:inline-grid; place-items:center; padding:10px 14px; min-width:56px; height:42px;
+  border-radius:999px; font-weight:800; letter-spacing:.3px;
+  color:#0b1020; background:#fff; border:1px solid #fff; box-shadow:var(--shadow);
+}
+.pill.ghost{ background:transparent; color:#fff; border-color:#ffffff66 }
+
+/* ---------- CARDS ---------- */
+.card{
+  margin:16px 0; padding:16px; border-radius:26px; background:var(--glass);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow:var(--shadow); border:1px solid var(--ring);
+}
+.card.dark{ background:var(--glass-deep) }
+.card h2{ margin:4px 2px 12px; font-size:28px; letter-spacing:.2px }
+
+/* ---------- GRID & ROWS ---------- */
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+@media (max-width:900px){ .grid2{grid-template-columns:1fr} }
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+/* ---------- INPUTS / BUTTONS ---------- */
+.in, select, textarea{
+  width:100%; padding:14px 14px; font-size:16px;
+  border-radius:16px; border:1px solid var(--ring); outline:none;
+  background:#fff; color:var(--ink); box-shadow: inset 0 2px 6px rgba(0,0,0,.04);
+}
+:root.dark .in, :root.dark select, :root.dark textarea{
+  background:#0f172a; color:#e2e8f0; border-color:#1f2937;
+}
+textarea{min-height:90px; resize:vertical}
+
+.btn{
+  padding:12px 18px; border-radius:16px; border:0; font-weight:800; letter-spacing:.3px;
+  background:linear-gradient(180deg, var(--brand), #ff6a45);
+  color:#fff; cursor:pointer; box-shadow:var(--shadow);
+}
+.btn.ghost{ background:#11182710; color:var(--ink) }
+.btn.dark{ background:linear-gradient(180deg, #263bff, #1c2fdc) }
+.btn.bad{ background:#ef4444 }
+
+/* ---------- TABS (Ping style) ---------- */
+.tabs{ display:flex; flex-wrap:wrap; gap:12px }
+.tab{
+  padding:14px 18px; border-radius:22px; font-weight:800; letter-spacing:.2px;
+  background:#f1f5ff; color:#0b1020; border:1px solid #dfe6ff; cursor:pointer;
+}
+.tab.active{ background:#1f2b57; color:#fff; border-color:#1f2b57; box-shadow:var(--shadow) }
+
+/* ---------- TABLES ---------- */
+.tablewrap{ margin-top:10px; overflow:auto }
+.tbl{ width:100%; border-collapse:separate; border-spacing:0 10px }
+.tbl thead th{ text-align:left; padding:4px 10px; color:var(--muted); font-size:13px }
+.tbl tbody tr{ background:#fff; box-shadow:var(--shadow) }
+.tbl tbody td{ padding:12px 10px; border-top:1px solid var(--ring); border-bottom:1px solid var(--ring) }
+.tbl tbody tr td:first-child{ border-radius:14px 0 0 14px }
+.tbl tbody tr td:last-child{ border-radius:0 14px 14px 0 }
+:root.dark .tbl tbody tr{ background:#0f172a }
+
+/* ---------- UTIL ---------- */
+.muted{ color:var(--muted) }
+.hidden{ display:none !important }
+.mt8{ margin-top:8px }
+.center{ display:grid; place-items:center }
+.logout{
+  position: absolute; top:14px; right:14px; z-index:3;
+  padding:10px 14px; border-radius:16px; background:#111827; color:#fff; border:0; font-weight:800;
+  box-shadow:var(--shadow)
+}
