@@ -1,287 +1,260 @@
-/* lang.js — v3.0 (EN/TE) — global mini i18n for Apartments suite
-   - Auto-translates innerText, placeholders, and <option> labels.
-   - Prefers explicit [data-i18n] keys; otherwise matches visible English text.
-   - API: AppI18N.setLang('en'|'te'), AppI18N.getLang(), AppI18N.apply()
-*/
+/* lang.js — final */
 
-(function (w, d) {
+(function(){
   const STORAGE_KEY = "apt_lang";
-  const LANGS = ["en", "te"];
+  const FALLBACK = "en";
 
-  // ------------ DICTIONARY ------------
+  // Dictionary
   const dict = {
-    en: {},
+    en: {
+      app_title: "Onestop Apartments",
+      submit: "Submit",
+      welcome: "Welcome",
+      login_pin: "Login PIN",
+      pin_placeholder: "4–8 digit PIN",
 
-    te: {
-      // Common UI
-      "Onestop Apartments": "ఒనెస్టాప్ అపార్ట్‌మెంట్స్",
-      "Residents": "నివాసులు",
-      "Guards": "గార్డులు",
-      "Committee": "కమిటీ",
-      "Admin": "అడ్మిన్",
-      "Dashboard": "డ్యాష్‌బోర్డ్",
-      "Bookings": "బుకింగ్స్",
-      "Complaints": "ఫిర్యాదులు",
-      "Notices": "ప్రకటనలు",
-      "Visitor Log": "సందర్శకుల నమోదు",
-      "Pre-Approve a Visitor": "సందర్శకుడిని ముందస్తు ఆమోదం",
-      "Back to PIN": "పిన్ పేజీకి వెనక్కు",
-      "Reset / Cache Tools": "రిసెట్ / క్యాష్ టూల్స్",
-      "Logout": "లాగ్ అవుట్",
+      // Tabs / titles
+      dashboard: "Dashboard",
+      residents_title: "Residents",
+      guards_title: "Guards",
+      committee_title: "Committee",
+      log_title: "Visitor Log",
+      visitors_title: "Pre-Approve a Visitor",
+      bookings_title: "Bookings",
+      complaints_title: "Complaints",
+      notices_title: "Notices",
 
-      // Index / PIN
-      "Login PIN": "లాగిన్ పిన్",
-      "Welcome": "స్వాగతం",
-      "4–8 digit PIN": "4–8 అంకెల పిన్",
-      "Submit": "సబ్మిట్",
-      "Checking…": "తనిఖీ జరుగుతోంది…",
-      "Invalid PIN.": "చెల్లని పిన్.",
-      "Error loading PINs.": "పిన్లు లోడ్ కాలేదు.",
-
-      // Hero chips
-      "EN": "EN",
-      "TE": "TE",
-
-      // Profile (Residents)
-      "Flat Number": "ఫ్లాట్ నంబర్",
-      "Name": "పేరు",
-      "Phone": "ఫోన్",
-      "Block": "బ్లాక్",
-      "Save": "సేవ్",
-      "Saved locally.": "లోకల్‌గా సేవ్ అయ్యింది.",
-
-      // Bookings (Residents)
-      "Amenity": "వసతి",
-      "Date": "తేదీ",
-      "Time": "సమయం",
-      "Add Booking": "బుకింగ్ జోడించండి",
-      "Export CSV": "CSV ఎగుమతి",
-      "Clear My Bookings": "నా బుకింగ్స్ క్లియర్",
-      "Cancel": "రద్దు",
-      "My Bookings": "నా బుకింగ్స్",
-
-      // Complaints (Residents)
-      "Category": "వర్గం",
-      "Priority": "ప్రాధాన్యత",
-      "Low": "తక్కువ",
-      "Medium": "మధ్యస్థ",
-      "High": "అత్యధికం",
-      "Description": "వివరణ",
-      "Status": "స్థితి",
-      "Assignee": "నిర్వహించే వ్యక్తి",
-      "Add Complaint": "ఫిర్యాదు జోడించండి",
-      "Clear": "క్లియర్",
-      "Export Complaints CSV": "ఫిర్యాదుల CSV ఎగుమతి",
-      "Open": "ఓపెన్",
-      "In Progress": "జరుగుతోంది",
-      "Closed": "మూసివేయబడింది",
-
-      // Notices (Residents + Committee/Admin list)
-      "#": "#",
-      "Notice": "ప్రకటన",
-      "Audience": "ప్రేక్షకులు",
-      "When": "ఎప్పుడు",
-      "Time": "సమయం",
-      "Action": "చర్య",
-      "Mark Read": "చదివినట్లు గుర్తించు",
-      "No notices yet.": "ఇప్పటివరకు ప్రకటనలు లేవు.",
-
-      // Visitor Log (Residents)
-      "Search name/purpose": "పేరు/ఉద్దేశ్యం శోధించండి",
-      "Name": "పేరు",
-      "Purpose": "ఉద్దేశ్యం",
-      "Photo": "ఫోటో",
-      "No visitors yet.": "ఇప్పటి వరకు సందర్శకులు లేరు.",
-      "Export Visitors CSV": "సందర్శకుల CSV ఎగుమతి",
-
-      // Pre-Approval (Residents)
-      "Visitor Name": "సందర్శకుడి పేరు",
-      "10-digit (optional)": "10 అంకెలు (ఐచ్ఛికం)",
-      "e.g., Courier / Friend": "ఉదా., కొరియర్ / స్నేహితుడు",
-      "e.g., Delivery, Guest": "ఉదా., డెలివరీ, అతిథి",
-      "Add": "జోడించండి",
-      "Export CSV": "CSV ఎగుమతి",
-      "Clear My Pre-Approvals": "నా ముందస్తు ఆమోదాలు క్లియర్",
-      "Status": "స్థితి",
-      "Delete": "తొలగించు",
-      "Queued": "క్యూ చేయబడింది",
-      "Checked-In": "చెక్-ఇన్ అయింది",
-      "No pre-approvals yet.": "ముందస్తు ఆమోదాలు లేవు.",
+      // Common fields / actions
+      save: "Save",
+      flat_number: "Flat Number",
+      name: "Name",
+      phone: "Phone",
+      block: "Block",
+      date: "Date",
+      time: "Time",
+      purpose: "Purpose",
+      status: "Status",
+      action: "Action",
+      export_csv: "Export CSV",
+      delete: "Delete",
+      close: "Close",
+      cancel: "Cancel",
+      add: "Add",
+      checkin: "Check-In",
+      open_camera: "Open Camera",
+      capture_photo: "Capture Photo",
+      at_gate: "At Gate",
+      dispatched: "Dispatched",
 
       // Guards
-      "Guard Console": "గార్డ్ కన్సోల్",
-      "Pre-Approved Visitors": "ముందస్తు ఆమోదించిన సందర్శకులు",
-      "Search name/flat/purpose": "పేరు/ఫ్లాట్/ఉద్దేశ్యం శోధించండి",
-      "From residents’ pre-approvals. Verify ID → tap Check-In.": "నివాసుల ముందస్తు ఆమోదాల నుండి. ఐడి తనిఖీ చేసి → చెక్-ఇన్ ట్యాప్ చేయండి.",
-      "Flat": "ఫ్లాట్",
-      "Date": "తేదీ",
-      "Purpose": "ఉద్దేశ్యం",
-      "Check-In": "చెక్-ఇన్",
-      "Walk-in Visitor": "వాక్-ఇన్ సందర్శకుడు",
-      "Flat / Unit": "ఫ్లాట్ / యూనిట్",
-      "Visitor name": "సందర్శకుడి పేరు",
-      "optional": "ఐచ్ఛికం",
-      "guest/maintenance": "అతిథి/మెయింటెనెన్స్",
-      "Open Camera": "కెమెరాను ఓపెన్ చేయండి",
-      "Capture Photo": "ఫోటో తీసుకోండి",
-      "Couriers / Deliveries": "కొరియర్లు / డెలివరీలు",
-      "From / Courier": "ఎవరి నుండి / కొరియర్",
-      "Capture Parcel": "పార్సెల్ ఫోటో తీయండి",
-      "Add Delivery": "డెలివరీ జోడించండి",
-      "Export Deliveries CSV": "డెలివరీలు CSV ఎగుమతి",
-      "Dispatch": "డిస్‌పాచ్",
-      "At Gate": "గేటు వద్ద",
-      "Dispatched": "పంపబడింది",
-      "Visitor History (Today)": "ఈరోజు సందర్శకులు",
-      "No visitors checked in today.": "ఈరోజు చెక్-ఇన్ అయిన సందర్శకులు లేరు.",
+      preapproved_visitors: "Pre-Approved Visitors",
+      search_hint_pa: "Search name/flat/purpose",
+      walkin_visitor: "Walk-in Visitor",
+      flat_unit: "Flat / Unit",
+      visitor_name: "Visitor Name",
+      phone_opt: "Phone (optional)",
+      purpose_hint: "guest / maintenance",
+      deliveries: "Couriers / Deliveries",
+      from_courier: "From / Courier",
+      capture_parcel: "Capture Parcel",
+      add_delivery: "Add Delivery",
+      visitors_today: "Visitor History (Today)",
+      search_hint_vh: "Search name/flat/purpose",
 
       // Committee
-      "Committee Console": "కమిటీ కన్సోల్",
-      "Post a Notice": "ప్రకటన పోస్ట్ చేయండి",
-      "Title": "శీర్షిక",
-      "All Residents": "అన్ని నివాసితులు",
-      "Block A": "బ్లాక్ A",
-      "Block B": "బ్లాక్ B",
-      "Block C": "బ్లాక్ C",
-      "Message": "సందేశం",
-      "Publish": "ప్రచురించు",
-      "Export Notices CSV": "ప్రకటనలు CSV ఎగుమతి",
-      "Complaints Board": "ఫిర్యాదుల బోర్డు",
-      "All": "అన్ని",
-      "Search flat/category/text": "ఫ్లాట్/వర్గం/పాఠ్యం శోధించండి",
-      "Details": "వివరాలు",
-      "Close": "మూసివేయి",
-      "Today at a Glance": "ఈరోజు సమీక్ష",
-      "Visitors:": "సందర్శకులు:",
-      "Deliveries:": "డెలివరీలు:",
-      "Open Complaints:": "తెరిచిన ఫిర్యాదులు:",
-      "Notices Posted:": "ప్రచురించిన ప్రకటనలు:",
+      post_notice: "Post a Notice",
+      title: "Title",
+      audience: "Audience",
+      message: "Message",
+      publish: "Publish",
+      all_residents: "All Residents",
+      block_a: "Block A",
+      block_b: "Block B",
+      block_c: "Block C",
+      complaints_board: "Complaints Board",
+      filter_all: "All",
+      filter_open: "Open",
+      filter_inprogress: "In Progress",
+      filter_closed: "Closed",
+      when: "When",
+      category: "Category",
+      priority: "Priority",
+      assignee: "Assignee",
+      details: "Details",
+      today_glance: "Today at a Glance",
+      visitors_count: "Visitors",
+      deliveries_count: "Deliveries",
+      open_complaints_count: "Open Complaints",
+      notices_posted_count: "Notices Posted",
 
       // Admin
-      "Admin Console": "అడ్మిన్ కన్సోల్",
-      "Complaints Operations": "ఫిర్యాదుల నిర్వహణ",
-      "Quick Notice": "త్వరిత ప్రకటన",
-      "Today Overview": "ఈరోజు అవలోకనం",
-      "Export / Backup": "ఎగుమతి / బ్యాకప్",
-      "Visitors (Today)": "సందర్శకులు (ఈరోజు)",
-      "Deliveries (All)": "డెలివరీలు (అన్ని)",
-      "Complaints (All)": "ఫిర్యాదులు (అన్ని)",
-      "Notices (All)": "ప్రకటనలు (అన్ని)",
+      admin_console: "Admin Console",
+      quick_notice: "Quick Notice",
+      today_overview: "Today Overview",
+      export_backup: "Export / Backup",
+      visitors_today_btn: "Visitors (Today)",
+      deliveries_all_btn: "Deliveries (All)",
+      complaints_all_btn: "Complaints (All)",
+      notices_all_btn: "Notices (All)",
 
-      // Visitors (standalone page)
-      "Visitor Pass — offline demo": "విజిటర్ పాస్ — ఆఫ్‌లైన్ డెమో",
-      "Visitors": "సందర్శకులు",
-      "Create a visitor pass. A short token is generated; you can copy/share the pass text to security.":
-        "సందర్శకుడి పాస్ సృష్టించండి. చిన్న టోకెన్ తయారవుతుంది; సెక్యూరిటీతో పాస్ టెక్స్ట్‌ను కాపీ/షేర్ చేయవచ్చు.",
-      "Create Visitor": "సందర్శకుడిని సృష్టించండి",
-      "Resident / Flat": "నివాసి / ఫ్లాట్",
-      "Visitor Name": "సందర్శకుడి పేరు",
-      "Phone": "ఫోన్",
-      "10-digit number": "10 అంకెల నంబర్",
-      "Vehicle (optional)": "వాహనం (ఐచ్ఛికం)",
-      "Purpose / Notes (optional)": "ఉద్దేశ్యం / గమనికలు (ఐచ్ఛికం)",
-      "Create Pass": "పాస్ సృష్టించండి",
-      "Clear All": "అన్నీ క్లియర్ చేయండి",
-      "Upcoming Visitors": "రాబోయే సందర్శకులు",
-      "No visitors yet.": "ఇప్పటికీ సందర్శకులు లేరు.",
-      "Copy Pass": "పాస్ కాపీ చేయండి",
+      // Residents sections
+      visitor_log: "Visitor Log",
+      preapprove_title: "Pre-Approve a Visitor",
+      no_visitors: "No visitors yet.",
+      no_notices: "No notices yet.",
+      no_preapprovals: "No pre-approvals yet.",
+      invalid_pin: "Invalid PIN.",
+      checking: "Checking…",
+      error_loading_pins: "Error loading PINs."
+    },
 
-      // Reset
-      "SW Reset": "సర్వీస్ వర్కర్ రీసెట్",
-      "Unregister SW + Clear Caches": "సర్వీస్ వర్కర్ రద్దు + క్యాష్ క్లియర్",
-      "Cleared. Reloading…": "క్లియర్ అయింది. రీలోడ్ అవుతోంది…",
-      "Reset failed": "రిసెట్ విఫలమైంది",
+    te: {
+      app_title: "ఒనెస్టాప్ అపార్ట్‌మెంట్స్",
+      submit: "సబ్మిట్",
+      welcome: "స్వాగతం",
+      login_pin: "లాగిన్ పిన్",
+      pin_placeholder: "4–8 అంకెల పిన్",
 
-      // Misc alerts (app logic)
-      "Save your flat first.": "ముందుగా మీ ఫ్లాట్ సేవ్ చేయండి.",
-      "Name required": "పేరు అవసరం",
-      "Flat and Name required": "ఫ్లాట్ మరియు పేరు అవసరం",
-      "Flat and From required": "ఫ్లాట్ మరియు From అవసరం",
-      "Title and Message required.": "శీర్షిక మరియు సందేశం అవసరం."
+      // Tabs / titles
+      dashboard: "డ్యాష్‌బోర్డ్",
+      residents_title: "నివాసితులు",
+      guards_title: "గార్డ్స్",
+      committee_title: "కమిటీ",
+      log_title: "విజిటర్ లాగ్",
+      visitors_title: "ప్రీ-అప్రూవ్ విజిటర్",
+      bookings_title: "బుకింగ్స్",
+      complaints_title: "ఫిర్యాదులు",
+      notices_title: "ప్రకటనలు",
+
+      // Common fields / actions
+      save: "సేవ్",
+      flat_number: "ఫ్లాట్ నంబర్",
+      name: "పేరు",
+      phone: "ఫోన్",
+      block: "బ్లాక్",
+      date: "తేదీ",
+      time: "సమయం",
+      purpose: "ఉద్దేశ్యం",
+      status: "స్థితి",
+      action: "చర్య",
+      export_csv: "CSV ఎగుమతి",
+      delete: "డిలీట్",
+      close: "క్లోజ్",
+      cancel: "రద్దు",
+      add: "జోడించు",
+      checkin: "చెక్-ఇన్",
+      open_camera: "కెమేరా ఓపెన్",
+      capture_photo: "ఫోటో తీసుకోండి",
+      at_gate: "గేటు వద్ద",
+      dispatched: "డిస్పాచ్ చేశారు",
+
+      // Guards
+      preapproved_visitors: "ప్రీ-అప్రూవ్ చేసిన విజిటర్లు",
+      search_hint_pa: "పేరు/ఫ్లాట్/ఉద్దేశ్యం శోధన",
+      walkin_visitor: "వాక్-ఇన్ విజిటర్",
+      flat_unit: "ఫ్లాట్ / యూనిట్",
+      visitor_name: "విజిటర్ పేరు",
+      phone_opt: "ఫోన్ (ఐచ్ఛికం)",
+      purpose_hint: "గెస్ట్ / మెయింటెనెన్స్",
+      deliveries: "కూరియర్ / డెలివరీలు",
+      from_courier: "ఎక్కడి నుండి / కూరియర్",
+      capture_parcel: "పార్సెల్ ఫోటో",
+      add_delivery: "డెలివరీ జోడించు",
+      visitors_today: "ఈ రోజు విజిటర్ హిస్టరీ",
+      search_hint_vh: "పేరు/ఫ్లాట్/ఉద్దేశ్యం శోధన",
+
+      // Committee
+      post_notice: "ప్రకటన పోస్ట్ చేయండి",
+      title: "శీర్షిక",
+      audience: "ఎవరికి",
+      message: "సందేశం",
+      publish: "పబ్లిష్",
+      all_residents: "అన్ని నివాసితులు",
+      block_a: "బ్లాక్ A",
+      block_b: "బ్లాక్ B",
+      block_c: "బ్లాక్ C",
+      complaints_board: "ఫిర్యాదుల బోర్డు",
+      filter_all: "అన్నీ",
+      filter_open: "ఓపెన్",
+      filter_inprogress: "ప్రోగ్రెస్‌లో",
+      filter_closed: "క్లోజ్డ్",
+      when: "ఎప్పుడు",
+      category: "కేటగిరీ",
+      priority: "ప్రాధాన్యం",
+      assignee: "బాధ్యతవహించినవారు",
+      details: "వివరాలు",
+      today_glance: "ఈ రోజు ఒక చూపు",
+      visitors_count: "విజిటర్లు",
+      deliveries_count: "డెలివరీలు",
+      open_complaints_count: "ఓపెన్ ఫిర్యాదులు",
+      notices_posted_count: "పోస్ట్ చేసిన ప్రకటనలు",
+
+      // Admin
+      admin_console: "అడ్మిన్ కన్సోల్",
+      quick_notice: "త్వరిత ప్రకటన",
+      today_overview: "ఈ రోజు అవలోకనం",
+      export_backup: "ఎగుమతి / బ్యాకప్",
+      visitors_today_btn: "విజిటర్లు (ఈ రోజు)",
+      deliveries_all_btn: "డెలివరీలు (అన్ని)",
+      complaints_all_btn: "ఫిర్యాదులు (అన్ని)",
+      notices_all_btn: "ప్రకటనలు (అన్ని)",
+
+      // Residents sections
+      visitor_log: "విజిటర్ లాగ్",
+      preapprove_title: "విజిటర్ ప్రీ-అప్రూవ్",
+      no_visitors: "ఇంకా విజిటర్లు లేరు.",
+      no_notices: "ఇంకా ప్రకటనలు లేవు.",
+      no_preapprovals: "ఇంకా ప్రీ-అప్రూవల్స్ లేవు.",
+      invalid_pin: "తప్పుడు పిన్.",
+      checking: "పరిశీలిస్తున్నాం…",
+      error_loading_pins: "పిన్‌లను లోడ్ చేయడంలో పొరపాటు."
     }
   };
 
-  // ------------ CORE ------------
-  const getLang = () => (localStorage.getItem(STORAGE_KEY) || "en");
-  const setLang = (code) => {
-    const lang = LANGS.includes(code) ? code : "en";
+  function t(key){
+    const lang = (localStorage.getItem(STORAGE_KEY) || FALLBACK);
+    const table = dict[lang] || dict[FALLBACK];
+    return table[key] || key; // fallback: show key if missing
+  }
+
+  function applyI18n(){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{
+      const k = el.getAttribute("data-i18n");
+      const val = t(k);
+      // If input/placeholder
+      if(el.tagName === "INPUT" || el.tagName === "TEXTAREA"){
+        if(el.hasAttribute("placeholder")) el.placeholder = val;
+        else el.value = val;
+      }else{
+        el.textContent = val;
+      }
+    });
+    // title update if present
+    const titleEl = document.querySelector("title");
+    if(titleEl){
+      const base = titleEl.getAttribute("data-i18n-base");
+      if(base){ titleEl.textContent = t(base); }
+    }
+  }
+
+  // public API
+  window.setLang = function(lang){
+    if(!dict[lang]) lang = FALLBACK;
     localStorage.setItem(STORAGE_KEY, lang);
-    applyI18N();
+    applyI18n();
   };
 
-  // Translate a single string if present
-  function tr(s, lang) {
-    if (!s) return s;
-    const key = s.trim();
-    const hit = dict[lang][key];
-    return hit || key;
+  // init on ready + load (extra safe)
+  function init(){
+    const saved = localStorage.getItem(STORAGE_KEY) || FALLBACK;
+    if(!dict[saved]) localStorage.setItem(STORAGE_KEY, FALLBACK);
+    applyI18n();
   }
 
-  // Translate element text/placeholder/option text
-  function translateElement(el, lang) {
-    // explicit key
-    const keyAttr = el.getAttribute && el.getAttribute("data-i18n");
-    if (keyAttr) {
-      el.textContent = tr(keyAttr, lang);
-      return;
-    }
-
-    // inputs & textareas placeholders
-    if (el.placeholder) el.placeholder = tr(el.placeholder, lang);
-
-    // buttons & tabs & labels & headers & table headers
-    const tag = el.tagName;
-    if (/(BUTTON|LABEL|H1|H2|H3|H4|TH|TD|SPAN|DIV|A)$/i.test(tag)) {
-      const txt = (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3)
-        ? el.textContent.trim()
-        : el.textContent.trim();
-      if (txt) el.textContent = tr(txt, lang);
-    }
-
-    // select options
-    if (tag === "SELECT") {
-      [...el.options].forEach(op => { op.textContent = tr(op.textContent, lang); });
-    }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init, {once:true});
+  }else{
+    init();
   }
-
-  // Walk the DOM and translate
-  function applyI18N(root) {
-    const lang = getLang();
-    const scope = root || d.body;
-    if (!scope) return;
-
-    // Everything with data-i18n first
-    scope.querySelectorAll("[data-i18n]").forEach(el => translateElement(el, lang));
-
-    // Then common elements (fallback when data-i18n missing)
-    const sel = [
-      "input[placeholder]",
-      "textarea[placeholder]",
-      "button",
-      "label",
-      "select",
-      "th","td",
-      "h1","h2","h3","h4",
-      ".tab",".btn",".pill","a","span","div"
-    ].join(",");
-    scope.querySelectorAll(sel).forEach(el => translateElement(el, lang));
-
-    // Page title
-    if (d.title) d.title = tr(d.title, lang);
-  }
-
-  // Observe dynamic changes (tables, renders)
-  const obs = new MutationObserver(muts => {
-    if (!muts.length) return;
-    // Throttle: translate once per microtask
-    applyI18N();
-  });
-
-  d.addEventListener("DOMContentLoaded", () => {
-    applyI18N();
-    try { obs.observe(d.body, { childList: true, subtree: true }); } catch {}
-  });
-
-  // Expose API
-  w.AppI18N = { setLang, getLang, apply: applyI18N };
-})(window, document);
+  window.addEventListener("load", applyI18n);
+})();
