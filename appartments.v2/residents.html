@@ -233,5 +233,5 @@ window.delPA=(id)=>{ let arr=jget(K.preapprove); arr=arr.filter(x=>x.id!==id); j
 function renderAll(){ renderBookings(); renderMyComplaints(); renderNotices(); renderVisitorLog(); renderPre(); }
 if("serviceWorker" in navigator){/* already registered conditionally above */ }
 loadProfile(); renderAll();
-</script>
+<script src="./lang.js" defer></script>
 </body></html>
