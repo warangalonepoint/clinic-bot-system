@@ -1,55 +1,171 @@
-<!doctype html><html lang="en">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Onestop School • Login</title>
-<link rel="stylesheet" href="ping-ui.css">
-<meta name="theme-color" content="#ff7a59">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Ping Schools • PWA</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="ping-ui-plus.css">
+  <meta name="theme-color" content="#0a123a"/>
+  <style>
+    /* page-only tweaks */
+    .hero-actions{position:absolute;right:16px;top:16px;display:flex;gap:10px;z-index:3}
+    .chip.small{padding:8px 12px}
+    .nav-pills{display:flex;gap:12px;flex-wrap:wrap}
+    .nav-pill{padding:12px 16px;border-radius:999px;border:1px solid #e3e7ff;background:#fff;font-weight:800;cursor:pointer}
+    .nav-pill.active{background:#0b153f;color:#fff;border-color:transparent;box-shadow:0 12px 22px rgba(4,10,36,.35)}
+    html.dark .nav-pill{background:#0f1733;color:#e8eefc;border-color:#1b2548}
+    html.dark .nav-pill.active{background:#2b37ff}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media(max-width:900px){.kpi{grid-template-columns:repeat(2,1fr)}}
+    .kpi .card{padding:14px 16px}
+    .kpi h3{margin:2px 0 4px;font-size:14px;color:var(--muted)}
+    .kpi b{font-size:24px}
+    .two{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+    @media(max-width:1000px){.two{grid-template-columns:1fr}}
+    .listy{display:flex;flex-direction:column;gap:10px}
+    .item{background:#fff;border:1px solid #e9edff;border-radius:18px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow-2)}
+    html.dark .item{background:#0f1733;border-color:#1b2548}
+    .badge{background:#0b1026;color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:800}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+  </style>
 </head>
 <body>
-<main class="wrap">
-  <!-- HERO -->
-  <header class="hero">
-    <img class="banner" src="assets/apartments_banner.png" alt="">
-    <div class="brand-badge"><img src="assets/logo.png" alt="" style="width:40px;height:40px"></div>
-    <button class="logout" onclick="location.href='https://onestop.example'">Logout</button>
-    <div class="hero-controls">
-      <button class="pill" title="Theme" data-theme-toggle>🌞</button>
-      <button class="pill" data-lang="en">EN</button>
-      <button class="pill" data-lang="te">TE</button>
-    </div>
-    <div class="hero-row">
-      <h1 class="hero-title" data-i18n="app">Onestop School</h1>
-    </div>
-  </header>
+  <main class="wrap">
+    <!-- HERO -->
+    <section class="card hero">
+      <img class="banner" src="https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=1600&auto=format&fit=crop" alt="Campus">
+      <div class="hero-overlay">
+        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/OOjs_UI_icon_book-ltr.svg" alt="logo">
+        <div class="hero-title" id="app_title">Ping Schools</div>
+      </div>
+      <div class="hero-actions">
+        <button id="themeToggle" class="chip small" title="Theme">🌙</button>
+        <button data-lang="en" class="chip small langChip">EN</button>
+        <button data-lang="te" class="chip small langChip">TE</button>
+      </div>
+    </section>
 
-  <!-- LOGIN CARD -->
-  <section class="card">
-    <h2 data-i18n="pin_title">Login PIN</h2>
-    <p class="muted" data-i18n="welcome">Welcome</p>
-    <input id="pin" class="in" placeholder="4–8 digit PIN" inputmode="numeric" maxlength="8">
-    <div class="row mt8">
-      <button id="go" class="btn" data-i18n="submit">Submit</button>
-      <button class="btn ghost" onclick="localStorage.clear()">Clear Cache</button>
-    </div>
-  </section>
+    <!-- NAV / TABS -->
+    <section class="card">
+      <div class="nav-pills" id="tabs">
+        <button class="nav-pill active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-pill" data-tab="classes">Classes</button>
+        <button class="nav-pill" data-tab="attendance">Attendance</button>
+        <button class="nav-pill" data-tab="exams">Exams</button>
+        <button class="nav-pill" data-tab="fees">Fees</button>
+        <button class="nav-pill" data-tab="notices">Notices</button>
+      </div>
+    </section>
 
-  <section class="card">
-    <h2>How it works</h2>
-    <p class="muted">Enter the PIN for your role (Teachers / Students / Admin). You’ll be routed automatically.</p>
-  </section>
-</main>
+    <!-- DASHBOARD -->
+    <section class="card" data-screen="dashboard">
+      <h2 class="h2" data-i="dash_title">Dashboard</h2>
+      <div class="kpi">
+        <div class="card"><h3 data-i="kpi_students">Students</h3><b id="k_students">—</b></div>
+        <div class="card"><h3 data-i="kpi_teachers">Teachers</h3><b id="k_teachers">—</b></div>
+        <div class="card"><h3 data-i="kpi_present">Present Today</h3><b id="k_present">—</b></div>
+        <div class="card"><h3 data-i="kpi_dues">Fee Dues</h3><b id="k_dues">—</b></div>
+      </div>
+      <div class="two mt">
+        <div class="card">
+          <h3 class="h2" style="font-size:20px" data-i="today_classes">Today’s Classes</h3>
+          <div class="listy" id="list_classes"></div>
+        </div>
+        <div class="card">
+          <h3 class="h2" style="font-size:20px" data-i="quick_actions">Quick Actions</h3>
+          <div class="toolbar">
+            <button class="btn" id="btn_mark_att" data-i="mark_att">Mark Attendance</button>
+            <button class="btn secondary" id="btn_new_notice" data-i="new_notice">New Notice</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<script src="ui.js"></script>
-<script>
-/* Keep your existing PIN routing.
-   Example: { teachers: "2222", students:"3333", admin:"1111" } */
-const PINS={teachers:"2222", students:"3333", admin:"1111"};
-document.getElementById('go').onclick=()=>{
-  const p=(pin.value||"").trim();
-  if(p===PINS.admin) location.href="admin.html";
-  else if(p===PINS.teachers) location.href="teachers.html";
-  else if(p===PINS.students) location.href="students.html";
-  else alert("Wrong PIN");
-};
-</script>
-</body></html>
+    <!-- CLASSES -->
+    <section class="card hidden" data-screen="classes">
+      <h2 class="h2" data-i="classes_title">Classes</h2>
+      <div class="row">
+        <input class="in" id="class_search" placeholder="Search class/teacher" />
+        <button class="btn" id="class_add" data-i="add_class">Add Class</button>
+      </div>
+      <div class="tablewrap mt8">
+        <table class="tbl">
+          <thead><tr>
+            <th data-i="th_class">Class</th>
+            <th data-i="th_teacher">Teacher</th>
+            <th data-i="th_room">Room</th>
+            <th data-i="th_time">Time</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="class_tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ATTENDANCE -->
+    <section class="card hidden" data-screen="attendance">
+      <h2 class="h2" data-i="att_title">Attendance</h2>
+      <div class="row">
+        <input class="in" id="att_date" type="date">
+        <select class="in" id="att_class"></select>
+        <button class="btn" id="att_load" data-i="load_list">Load List</button>
+        <button class="btn secondary" id="att_export" data-i="export_csv">Export CSV</button>
+      </div>
+      <div class="tablewrap mt8">
+        <table class="tbl">
+          <thead><tr><th>#</th><th data-i="th_name">Name</th><th data-i="th_status">Status</th></tr></thead>
+          <tbody id="att_tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EXAMS -->
+    <section class="card hidden" data-screen="exams">
+      <h2 class="h2" data-i="exams_title">Exams</h2>
+      <div class="row">
+        <input class="in" id="exam_name" placeholder="Exam Name">
+        <input class="in" id="exam_date" type="date">
+        <button class="btn" id="exam_add" data-i="schedule_exam">Schedule</button>
+      </div>
+      <div class="listy mt8" id="exam_list"></div>
+    </section>
+
+    <!-- FEES -->
+    <section class="card hidden" data-screen="fees">
+      <h2 class="h2" data-i="fees_title">Fees</h2>
+      <div class="row">
+        <input class="in" id="fee_search" placeholder="Search student">
+        <button class="btn" id="fee_collect" data-i="collect_fee">Collect Fee</button>
+      </div>
+      <div class="tablewrap mt8">
+        <table class="tbl">
+          <thead><tr><th data-i="th_student">Student</th><th data-i="th_due">Due</th><th data-i="th_action">Action</th></tr></thead>
+          <tbody id="fee_tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- NOTICES -->
+    <section class="card hidden" data-screen="notices">
+      <h2 class="h2" data-i="notices_title">Notices</h2>
+      <div class="grid2">
+        <input class="in" id="n_title" placeholder="Title">
+        <select class="in" id="n_aud">
+          <option>All</option><option>Teachers</option><option>Students</option><option>Parents</option>
+        </select>
+        <textarea class="in span2" id="n_msg" rows="3" placeholder="Message"></textarea>
+      </div>
+      <div class="row mt8">
+        <button class="btn" id="n_publish" data-i="publish">Publish</button>
+        <button class="btn secondary" id="n_export" data-i="export_csv">Export CSV</button>
+      </div>
+      <div class="listy mt" id="notice_list"></div>
+    </section>
+
+    <footer class="muted mt8" style="text-align:center">© Ping Schools PWA</footer>
+  </main>
+
+  <script src="ui.js"></script>
+</body>
+</html>
