@@ -3,7 +3,6 @@
 <title>Apartments • Guards</title>
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
-<script src="./lang.js" defer></script>
 </head><body class="bg">
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
@@ -12,110 +11,98 @@
     <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
     <div class="hero-overlay">
       <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
-      <div class="hero-title">Guard Console</div>
-    </div>
-    <div class="hero-tools">
-      <button id="themeToggle" class="chip">🌙</button>
-      <button class="chip" onclick="AppI18N.setLang('en')">EN</button>
-      <button class="chip" onclick="AppI18N.setLang('te')">TE</button>
+      <div class="hero-title" data-i18n="guards_title">Guard Console</div>
+      <div class="toolbar" style="position:absolute;right:14px;top:14px;display:flex;gap:8px">
+        <button id="themeBtn" class="chip">🌙</button>
+        <button id="langEN" class="chip small">EN</button>
+        <button id="langTE" class="chip small">TE</button>
+      </div>
     </div>
   </div>
 
   <div class="grid2 mt">
     <section class="card">
       <div class="row space">
-        <h2 class="h2">Pre-Approved Visitors</h2>
+        <h2 class="h2" data-i18n="preapproved_title">Pre-Approved Visitors</h2>
         <input id="pa_search" class="in" placeholder="Search name/flat/purpose" style="max-width:260px">
       </div>
-      <p class="muted">From residents’ pre-approvals. Verify ID → tap <b>Check-In</b>.</p>
+      <p class="muted" data-i18n="preapproved_hint">From residents’ pre-approvals. Verify ID → tap <b>Check-In</b>.</p>
       <div class="tablewrap">
         <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Date</th><th>Purpose</th><th>Action</th></tr></thead><tbody id="pa_tbody"></tbody></table>
-        <div id="pa_empty" class="muted">No pre-approvals found.</div>
+        <div id="pa_empty" class="muted" data-i18n="none_found">No pre-approvals found.</div>
       </div>
     </section>
 
     <section class="card">
-      <h2 class="h2">Walk-in Visitor</h2>
+      <h2 class="h2" data-i18n="walkin_title">Walk-in Visitor</h2>
       <div class="grid2">
-        <label>Flat / Unit <input id="w_flat" class="in" placeholder="e.g., A-302"></label>
-        <label>Name <input id="w_name" class="in" placeholder="Visitor name"></label>
-        <label>Phone <input id="w_phone" class="in" inputmode="numeric" maxlength="10" placeholder="optional"></label>
-        <label>Purpose <input id="w_purpose" class="in" placeholder="guest/maintenance"></label>
+        <label><span data-i18n="flat_unit">Flat / Unit</span> <input id="w_flat" class="in" placeholder="e.g., A-302"></label>
+        <label><span data-i18n="name">Name</span> <input id="w_name" class="in" placeholder="Visitor name"></label>
+        <label><span data-i18n="phone">Phone</span> <input id="w_phone" class="in" inputmode="numeric" maxlength="10" placeholder="optional"></label>
+        <label><span data-i18n="purpose">Purpose</span> <input id="w_purpose" class="in" placeholder="guest/maintenance"></label>
       </div>
       <div class="cam mt8">
         <div><video id="cam" playsinline autoplay muted></video><canvas id="snap" style="display:none"></canvas></div>
         <div>
-          <button class="btn" id="cam_start">Open Camera</button>
-          <button class="btn mt8" id="cam_capture">Capture Photo</button>
+          <button class="btn" id="cam_start" data-i18n="open_camera">Open Camera</button>
+          <button class="btn mt8" id="cam_capture" data-i18n="capture_photo">Capture Photo</button>
           <img id="preview" class="snap" alt="Snapshot" style="display:none"/>
         </div>
       </div>
       <div class="row mt8">
-        <button class="btn" id="w_checkin">Check-In</button>
-        <button class="btn" id="w_clear">Clear</button>
+        <button class="btn" id="w_checkin" data-i18n="checkin">Check-In</button>
+        <button class="btn" id="w_clear" data-i18n="clear">Clear</button>
       </div>
     </section>
   </div>
 
   <div class="card mt">
-    <h2 class="h2">Couriers / Deliveries</h2>
+    <h2 class="h2" data-i18n="deliveries_title">Couriers / Deliveries</h2>
     <div class="grid2">
-      <label>Flat / Unit <input id="d_flat" class="in" placeholder="A-302"></label>
-      <label>From / Courier <input id="d_from" class="in" placeholder="Amazon / Swiggy"></label>
+      <label><span data-i18n="flat_unit">Flat / Unit</span> <input id="d_flat" class="in" placeholder="A-302"></label>
+      <label><span data-i18n="from_courier">From / Courier</span> <input id="d_from" class="in" placeholder="Amazon / Swiggy"></label>
     </div>
     <div class="cam mt8">
       <div><video id="cam2" playsinline autoplay muted></video><canvas id="snap2" style="display:none"></canvas></div>
       <div>
-        <button class="btn" id="cam2_start">Open Camera</button>
-        <button class="btn mt8" id="cam2_capture">Capture Parcel</button>
+        <button class="btn" id="cam2_start" data-i18n="open_camera">Open Camera</button>
+        <button class="btn mt8" id="cam2_capture" data-i18n="capture_parcel">Capture Parcel</button>
         <img id="preview2" class="snap" alt="Parcel" style="display:none"/>
       </div>
     </div>
     <div class="row mt8">
-      <button class="btn" id="d_add">Add Delivery</button>
-      <button class="btn" id="d_export">Export Deliveries CSV</button>
+      <button class="btn" id="d_add" data-i18n="add_delivery">Add Delivery</button>
+      <button class="btn" id="d_export" data-i18n="export_csv">Export Deliveries CSV</button>
     </div>
     <div class="tablewrap">
       <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>From</th><th>Time</th><th>Photo</th><th>Status</th><th>Action</th></tr></thead><tbody id="d_tbody"></tbody></table>
-      <div id="d_empty" class="muted">No deliveries yet.</div>
+      <div id="d_empty" class="muted" data-i18n="none_yet">No deliveries yet.</div>
     </div>
   </div>
 
   <div class="card mt">
     <div class="row space">
-      <h2 class="h2">Visitor History (Today)</h2>
+      <h2 class="h2" data-i18n="history_today">Visitor History (Today)</h2>
       <div class="row">
         <input id="vh_search" class="in" placeholder="Search name/flat/purpose" style="max-width:260px">
-        <button class="btn" id="vh_export">Export Visitors CSV</button>
+        <button class="btn" id="vh_export" data-i18n="export_csv">Export Visitors CSV</button>
       </div>
     </div>
     <div class="tablewrap">
       <table class="tbl"><thead><tr><th>#</th><th>Flat</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead><tbody id="vh_tbody"></tbody></table>
-      <div id="vh_empty" class="muted">No visitors checked in today.</div>
+      <div id="vh_empty" class="muted" data-i18n="none_today">No visitors checked in today.</div>
     </div>
   </div>
 
   <div class="card mt">
     <div class="grid2">
-      <a class="btn" href="./index.html">Back to PIN</a>
-      <a class="btn" href="./reset.html">Reset / Cache Tools</a>
+      <a class="btn" href="./index.html" data-i18n="back_to_pin">Back to PIN</a>
+      <a class="btn" href="./reset.html" data-i18n="reset_tools">Reset / Cache Tools</a>
     </div>
   </div>
 </main>
 
 <script>
-/* theme */
-(function(){
-  const btn=document.getElementById('themeToggle'); if(!btn) return;
-  const apply=(m)=>{ document.body.classList.toggle('dark', m==='dark'); btn.textContent=m==='dark'?'☀️':'🌙'; localStorage.setItem('theme',m); };
-  apply(localStorage.getItem('theme')||'light');
-  btn.addEventListener('click',()=>apply(document.body.classList.contains('dark')?'light':'dark'));
-})();
-if ("serviceWorker" in navigator && localStorage.getItem("apt_sw") !== "off") {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-}
-
-/* storage + helpers */
 const K={preapprove:"apt_preapprove", visits:"apt_visits", deliveries:"apt_deliveries"};
 const $=id=>document.getElementById(id);
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
@@ -124,12 +111,12 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const todayYMD=()=>new Date().toISOString().slice(0,10);
 const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 
-/* camera */
+// camera
 async function openCam(videoEl){ if(!navigator.mediaDevices?.getUserMedia){ alert("Camera not supported"); return null; } const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}); videoEl.srcObject=s; return s; }
 function capture(videoEl,canvasEl){ const vw=videoEl.videoWidth||640,vh=videoEl.videoHeight||480; canvasEl.width=vw; canvasEl.height=vh; const ctx=canvasEl.getContext("2d"); ctx.drawImage(videoEl,0,0,vw,vh); return canvasEl.toDataURL("image/jpeg",0.7); }
 function stopStream(s){ try{s.getTracks().forEach(t=>t.stop());}catch{} }
 
-/* pre-approvals */
+// pre-approvals
 function renderPreApprovals(){
   const q=(pa_search.value||"").toLowerCase();
   const rows=jget(K.preapprove).filter(x=>String(x.date||"").slice(0,10)>=todayYMD()).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
@@ -139,11 +126,12 @@ function renderPreApprovals(){
 }
 pa_search.addEventListener("input",renderPreApprovals);
 
-/* walk-in */
+// walk-in
 let cam1=null,cam2=null;
 cam_start.onclick=async()=>{ cam1=await openCam(cam); };
 cam_capture.onclick=()=>{ if(!cam1){alert("Open camera first");return} const d=capture(cam,snap); preview.src=d; preview.style.display="block"; };
 w_clear.onclick=()=>{ w_flat.value=w_name.value=w_phone.value=w_purpose.value=""; preview.src=""; preview.style.display="none"; if(cam1) stopStream(cam1); cam1=null; };
+
 window.checkIn=(flat,name,phone,purpose)=>{ w_flat.value=flat; w_name.value=name; w_phone.value=phone||""; w_purpose.value=purpose||"guest"; window.scrollTo({top:0,behavior:"smooth"}); };
 
 w_checkin.onclick=()=>{
@@ -152,6 +140,7 @@ w_checkin.onclick=()=>{
   const photo = preview.src && preview.style.display!=="none" ? preview.src : "";
   const arr=jget(K.visits); arr.unshift({id:uid(),flat,name,phone,purpose,ts:Date.now(),photo});
   jset(K.visits,arr);
+  // mark PA used if matches (today)
   let pre=jget(K.preapprove);
   pre = pre.map(p=> (p.flat===flat && p.name===name && p.date===todayYMD()) ? {...p, status:"Checked-In"} : p);
   jset(K.preapprove,pre);
@@ -159,9 +148,10 @@ w_checkin.onclick=()=>{
   renderPreApprovals(); renderVisitorsHistory();
 };
 
-/* deliveries */
+// deliveries
 cam2_start.onclick=async()=>{ cam2=await openCam(cam2); };
 cam2_capture.onclick=()=>{ if(!cam2){alert("Open camera first");return} const d=capture(cam2,snap2); preview2.src=d; preview2.style.display="block"; };
+
 d_add.onclick=()=>{
   const flat=d_flat.value.trim(), from=d_from.value.trim();
   if(!flat||!from){ alert("Flat and From required"); return; }
@@ -171,6 +161,7 @@ d_add.onclick=()=>{
   d_from.value=""; preview2.src=""; preview2.style.display="none";
   renderDeliveries();
 };
+
 function renderDeliveries(){
   const rows=jget(K.deliveries).sort((a,b)=>b.ts-a.ts);
   d_tbody.innerHTML=""; d_empty.style.display=rows.length?"none":"block";
@@ -186,7 +177,7 @@ function renderDeliveries(){
 window.dispatchDel=(id)=>{ const arr=jget(K.deliveries); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status="Dispatched"; jset(K.deliveries,arr); renderDeliveries(); } };
 d_export.onclick=()=>{ const rows=jget(K.deliveries).map(({photo,...x})=>x); csv(rows,["id","flat","from","ts","status"],"Deliveries.csv"); };
 
-/* visitors today */
+// visitors history
 function renderVisitorsHistory(){
   const q=(vh_search.value||"").toLowerCase();
   const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD())
@@ -203,7 +194,17 @@ function renderVisitorsHistory(){
 vh_search.addEventListener("input",renderVisitorsHistory);
 vh_export.onclick=()=>{ const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD()).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_Today.csv"); };
 
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 renderPreApprovals(); renderDeliveries(); renderVisitorsHistory();
 window.addEventListener("beforeunload",()=>{ if(cam1) stopStream(cam1); if(cam2) stopStream(cam2); });
-<script src="./lang.js" defer></script>
+</script>
+
+<script>
+// theme/lang same as index
+(function initTheme(){const s=localStorage.getItem("apt_theme")||"light"; if(s==="dark")document.documentElement.setAttribute("data-theme","dark"); themeBtn.textContent=s==="dark"?"☀️":"🌙";})();
+themeBtn.onclick=()=>{const d=document.documentElement.getAttribute("data-theme")==="dark"; if(d){document.documentElement.removeAttribute("data-theme");localStorage.setItem("apt_theme","light");themeBtn.textContent="🌙";}else{document.documentElement.setAttribute("data-theme","dark");localStorage.setItem("apt_theme","dark");themeBtn.textContent="☀️";}};
+function getLang(){return localStorage.getItem("apt_lang")||"en"}; function setLang(l){localStorage.setItem("apt_lang",l);applyI18N&&applyI18N();}
+langEN.onclick=()=>setLang("en"); langTE.onclick=()=>setLang("te");
+if(typeof applyI18N!=="function"){const I={en:{guards_title:"Guard Console",preapproved_title:"Pre-Approved Visitors",preapproved_hint:"From residents’ pre-approvals. Verify ID → tap Check-In.",walkin_title:"Walk-in Visitor",flat_unit:"Flat / Unit",name:"Name",phone:"Phone",purpose:"Purpose",open_camera:"Open Camera",capture_photo:"Capture Photo",capture_parcel:"Capture Parcel",checkin:"Check-In",clear:"Clear",deliveries_title:"Couriers / Deliveries",from_courier:"From / Courier",add_delivery:"Add Delivery",export_csv:"Export CSV",none_found:"No pre-approvals found.",none_yet:"No deliveries yet.",history_today:"Visitor History (Today)",none_today:"No visitors checked in today.",back_to_pin:"Back to PIN",reset_tools:"Reset / Cache Tools"},te:{guards_title:"గార్డ్ కన్సోల్",preapproved_title:"ప్రీ-అప్రూవ్ అయిన సందర్శకులు",preapproved_hint:"రెసిడెంట్స్ ప్రీ-అప్రూవల్స్ నుండి. ఐడీ వెరిఫై చేయండి → Check-In.",walkin_title:"వాకిన్ సందర్శకుడు",flat_unit:"ఫ్లాట్ / యూనిట్",name:"పేరు",phone:"ఫోన్",purpose:"ఉద్దేశ్యం",open_camera:"కెమెరా ఓపెన్",capture_photo:"ఫోటో క్యాప్చర్",capture_parcel:"పార్సెల్ క్యాప్చర్",checkin:"చెక్-ఇన్",clear:"క్లియర్",deliveries_title:"డెలివరీలు",from_courier:"ఫ్రమ్ / కొరియర్",add_delivery:"డెలివరీ జోడించు",export_csv:"CSV ఎక్స్‌పోర్ట్",none_found:"ప్రీ-అప్రూవల్ దొరకలేదు.",none_yet:"డెలివరీలు లేవు.",history_today:"ఈరోజు సందర్శకుల చరిత్ర",none_today:"ఈరోజు సందర్శకులు లేరు.",back_to_pin:"పిన్‌కు వెనుకకు",reset_tools:"రీసెట్ / క్యాషే టూల్స్"}};window.applyI18N=function(){const L=I[getLang()]||I.en;document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(L[k]) el.textContent=L[k];});};}applyI18N();
+</script>
 </body></html>
