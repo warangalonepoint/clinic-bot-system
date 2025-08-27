@@ -3,62 +3,63 @@
 <title>Apartments • Residents</title>
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
+<style>
+.toolbar{position:absolute;left:16px;bottom:12px;display:flex;gap:8px;z-index:2}
+.chip{border:0;border-radius:999px;padding:8px 12px;background:#ffffffea;color:#0f172a;font-weight:700;box-shadow:0 6px 22px rgba(0,0,0,.18);cursor:pointer}
+.chip.active{outline:2px solid #111}
+body.dark .chip{background:#101626;color:#fff}
+.tabs .tab{border-radius:999px}
+</style>
 </head>
 <body class="bg">
-
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main class="wrap">
-  <!-- HERO -->
   <div class="card hero">
     <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+    <div class="toolbar">
+      <button id="themeToggle" class="chip">🌙</button>
+      <button id="langEN" class="chip">EN</button>
+      <button id="langTE" class="chip">TE</button>
+    </div>
     <div class="hero-overlay">
       <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
       <div class="hero-title" data-i18n="residents_title">Residents</div>
-      <div class="toolbar" style="position:absolute;right:14px;top:14px;display:flex;gap:8px">
-        <button id="themeBtn" class="chip" title="Toggle theme">🌙</button>
-        <button id="langEN" class="chip small">EN</button>
-        <button id="langTE" class="chip small">TE</button>
-      </div>
     </div>
   </div>
 
-  <!-- Tabs header -->
+  <!-- tabs -->
   <div class="card mt">
     <div class="tabs">
-      <button class="tab active" data-t="#t_dash" data-i18n="tab_dashboard">Dashboard</button>
-      <button class="tab" data-t="#t_book" data-i18n="tab_bookings">Bookings</button>
-      <button class="tab" data-t="#t_comp" data-i18n="tab_complaints">Complaints</button>
-      <button class="tab" data-t="#t_not"  data-i18n="tab_notices">Notices</button>
-      <button class="tab" data-t="#t_log"  data-i18n="tab_log">Visitor Log</button>
-      <button class="tab" data-t="#t_pre"  data-i18n="tab_pre">Pre-Approve a Visitor</button>
+      <button class="tab active" data-t="#t_dash" data-i18n="dashboard">Dashboard</button>
+      <button class="tab" data-t="#t_book" data-i18n="bookings">Bookings</button>
+      <button class="tab" data-t="#t_comp" data-i18n="complaints">Complaints</button>
+      <button class="tab" data-t="#t_notice" data-i18n="notices">Notices</button>
+      <button class="tab" data-t="#t_log" data-i18n="log_title">Visitor Log</button>
+      <button class="tab" data-t="#t_pre" data-i18n="preapprove">Pre-Approve a Visitor</button>
     </div>
   </div>
 
-  <!-- DASHBOARD / PROFILE -->
+  <!-- Dashboard / Profile -->
   <section class="card" id="t_dash">
     <h2 class="h2" data-i18n="residents_title">Residents</h2>
     <div class="grid2">
-      <label><span data-i18n="flat_number">Flat Number</span>
-        <input id="p_flat" class="in" placeholder="A-302"></label>
-      <label><span data-i18n="name">Name</span>
-        <input id="p_name" class="in" placeholder="Your name"></label>
-      <label><span data-i18n="phone">Phone</span>
-        <input id="p_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
-      <label><span data-i18n="block">Block</span>
-        <input id="p_block" class="in" placeholder="A / B / C"></label>
+      <label data-i18n="flat_number">Flat Number <input id="p_flat" class="in"></label>
+      <label data-i18n="name">Name <input id="p_name" class="in"></label>
+      <label data-i18n="phone">Phone <input id="p_phone" class="in" inputmode="numeric" maxlength="10"></label>
+      <label data-i18n="block">Block <input id="p_block" class="in"></label>
     </div>
     <button class="btn mt8" id="p_save" data-i18n="save">Save</button>
     <div id="p_msg" class="muted mt8" data-i18n="welcome">Welcome</div>
   </section>
 
-  <!-- BOOKINGS -->
+  <!-- Bookings -->
   <section class="card hidden" id="t_book">
-    <h2 class="h2" data-i18n="bookings_title">Bookings</h2>
+    <h2 class="h2" data-i18n="bookings">Bookings</h2>
     <div class="grid2">
-      <label>Amenity <input id="b_amen" class="in" placeholder="Clubhouse / Hall"></label>
+      <label>Amenity <input id="b_amen" class="in" placeholder="Hall / Court"></label>
       <label>Date <input id="b_date" class="in" type="date"></label>
-      <label>Time <input id="b_time" class="in" placeholder="5–6 PM"></label>
+      <label>Time <input id="b_time" class="in" placeholder="6–8 PM"></label>
     </div>
     <div class="row mt8">
       <button class="btn" id="b_add">Add</button>
@@ -66,74 +67,58 @@
       <button class="btn" id="b_clear">Clear My Bookings</button>
     </div>
     <div class="tablewrap">
-      <table class="tbl">
-        <thead><tr><th>#</th><th>Amenity</th><th>Date</th><th>Time</th><th>Flat</th><th>Action</th></tr></thead>
-        <tbody id="b_tbody"></tbody>
-      </table>
+      <table class="tbl"><thead><tr><th>#</th><th>Amenity</th><th>Date</th><th>Time</th><th>Flat</th><th>Action</th></tr></thead><tbody id="b_tbody"></tbody></table>
       <div id="b_empty" class="muted">No bookings yet.</div>
     </div>
   </section>
 
-  <!-- COMPLAINTS -->
+  <!-- Complaints -->
   <section class="card hidden" id="t_comp">
-    <h2 class="h2" data-i18n="complaints_title">Complaints</h2>
+    <h2 class="h2" data-i18n="complaints">Complaints</h2>
     <div class="grid2">
       <label>Category
-        <select id="c_cat" class="in">
-          <option>Plumbing</option><option>Electrical</option><option>Housekeeping</option><option>Security</option>
-        </select>
+        <select id="c_cat" class="in"><option>Plumbing</option><option>Electrical</option><option>Cleaning</option><option>Security</option></select>
       </label>
       <label>Priority
         <select id="c_pri" class="in"><option>Low</option><option>Medium</option><option>High</option></select>
       </label>
-      <label class="span2">Description
-        <input id="c_desc" class="in" placeholder="Short description">
-      </label>
+      <label class="span2">Description <input id="c_desc" class="in" placeholder="Describe the issue"></label>
     </div>
     <div class="row mt8">
-      <button class="btn" id="c_add">Raise</button>
-      <button class="btn" id="c_export">Export My Complaints</button>
+      <button class="btn" id="c_add">Submit</button>
+      <button class="btn" id="c_export">Export CSV</button>
     </div>
     <div class="tablewrap">
-      <table class="tbl">
-        <thead><tr><th>#</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th></tr></thead>
-        <tbody id="c_tbody"></tbody>
-      </table>
+      <table class="tbl"><thead><tr><th>#</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th></tr></thead><tbody id="c_tbody"></tbody></table>
       <div id="c_empty" class="muted">No complaints yet.</div>
     </div>
   </section>
 
-  <!-- NOTICES -->
-  <section class="card hidden" id="t_not">
-    <h2 class="h2" data-i18n="notices_title">Notices</h2>
+  <!-- Notices -->
+  <section class="card hidden" id="t_notice">
+    <h2 class="h2" data-i18n="notices">Notices</h2>
     <div class="tablewrap">
-      <table class="tbl">
-        <thead><tr><th>#</th><th>Notice</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead>
-        <tbody id="n_tbody"></tbody>
-      </table>
+      <table class="tbl"><thead><tr><th>#</th><th>Notice</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead><tbody id="n_tbody"></tbody></table>
       <div id="n_empty" class="muted">No notices yet.</div>
     </div>
   </section>
 
-  <!-- VISITOR LOG -->
+  <!-- Visitor Log -->
   <section class="card hidden" id="t_log">
-    <h2 class="h2">Visitor Log</h2>
+    <h2 class="h2" data-i18n="log_title">Visitor Log</h2>
     <div class="row space">
       <input id="v_search" class="in" placeholder="Search name/purpose" style="max-width:260px">
       <button class="btn" id="v_export">Export CSV</button>
     </div>
     <div class="tablewrap">
-      <table class="tbl">
-        <thead><tr><th>#</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead>
-        <tbody id="v_tbody"></tbody>
-      </table>
+      <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead><tbody id="v_tbody"></tbody></table>
       <div id="v_empty" class="muted">No visitors yet.</div>
     </div>
   </section>
 
-  <!-- PRE-APPROVALS -->
+  <!-- Pre-Approval -->
   <section class="card hidden" id="t_pre">
-    <h2 class="h2">Pre-Approve a Visitor</h2>
+    <h2 class="h2" data-i18n="preapprove">Pre-Approve a Visitor</h2>
     <div class="grid2">
       <label>Visitor Name <input id="pa_name" class="in" placeholder="e.g., Courier / Friend"></label>
       <label>Phone <input id="pa_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit (optional)"></label>
@@ -152,8 +137,20 @@
   </section>
 </main>
 
-<!-- ===== PAGE LOGIC (unchanged from your app) ===== -->
+<script src="./lang.js"></script>
 <script>
+/* ---------- theme + language (same as index) ---------- */
+(function(){
+  const applyTheme=(t)=>document.body.classList.toggle('dark',t==='dark');
+  const t=localStorage.getItem('theme')||'light'; applyTheme(t);
+  themeToggle.textContent=t==='dark'?'☀️':'🌙';
+  themeToggle.onclick=()=>{const next=document.body.classList.contains('dark')?'light':'dark';localStorage.setItem('theme',next);applyTheme(next);themeToggle.textContent=next==='dark'?'☀️':'🌙';};
+  const setLang=(lng)=>{localStorage.setItem('lang',lng); if(window.i18n?.apply) window.i18n.apply(lng);};
+  langEN.onclick=()=>setLang('en'); langTE.onclick=()=>setLang('te');
+  const l=localStorage.getItem('lang')||'en'; if(window.i18n?.apply) window.i18n.apply(l);
+})();
+
+/* ---------- existing logic (your code, unchanged) ---------- */
 const K={profile:"apt_profile", preapprove:"apt_preapprove", visits:"apt_visits", deliveries:"apt_deliveries", complaints:"apt_complaints", notices:"apt_notices", bookings:"apt_bookings"};
 const $=id=>document.getElementById(id);
 const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
@@ -162,7 +159,7 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
 const today=()=>new Date().toISOString().slice(0,10);
 
-// tab switching
+// tabs
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
   t.classList.add("active");
@@ -241,35 +238,5 @@ window.delPA=(id)=>{ let arr=jget(K.preapprove); arr=arr.filter(x=>x.id!==id); j
 function renderAll(){ renderBookings(); renderMyComplaints(); renderNotices(); renderVisitorLog(); renderPre(); }
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 loadProfile(); renderAll();
-</script>
-
-<!-- ===== THEME + LANG (same as index) ===== -->
-<script>
-(function initTheme(){
-  const saved = localStorage.getItem("apt_theme") || "light";
-  if(saved==="dark"){ document.documentElement.setAttribute("data-theme","dark"); }
-  document.getElementById("themeBtn").textContent = saved==="dark" ? "☀️" : "🌙";
-})();
-document.getElementById("themeBtn").onclick = ()=>{
-  const dark = document.documentElement.getAttribute("data-theme")==="dark";
-  if(dark){ document.documentElement.removeAttribute("data-theme"); localStorage.setItem("apt_theme","light"); document.getElementById("themeBtn").textContent="🌙";}
-  else{ document.documentElement.setAttribute("data-theme","dark"); localStorage.setItem("apt_theme","dark"); document.getElementById("themeBtn").textContent="☀️";}
-};
-function getLang(){ return localStorage.getItem("apt_lang") || "en"; }
-function setLang(l){ localStorage.setItem("apt_lang", l); applyI18N && applyI18N(); }
-document.getElementById("langEN").onclick = ()=> setLang("en");
-document.getElementById("langTE").onclick = ()=> setLang("te");
-// minimal keys if lang.js not present
-if(typeof applyI18N!=="function"){
-  const I18N = {
-    en:{residents_title:"Residents",tab_dashboard:"Dashboard",tab_bookings:"Bookings",tab_complaints:"Complaints",tab_notices:"Notices",tab_log:"Visitor Log",tab_pre:"Pre-Approve a Visitor",flat_number:"Flat Number",name:"Name",phone:"Phone",block:"Block",save:"Save",welcome:"Welcome"},
-    te:{residents_title:"రెసిడెంట్స్",tab_dashboard:"డాష్‌బోర్డ్",tab_bookings:"బుకింగ్స్",tab_complaints:"ఫిర్యాదులు",tab_notices:"నోటీసులు",tab_log:"విజిటర్ లాగ్",tab_pre:"ప్రీ-అప్రూవల్",flat_number:"ఫ్లాట్ నంబర్",name:"పేరు",phone:"ఫోన్",block:"బ్లాక్",save:"సేవ్",welcome:"స్వాగతం"}
-  };
-  window.applyI18N = function(){
-    const L=I18N[getLang()]||I18N.en;
-    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n"); if(L[k]) el.textContent=L[k];});
-  };
-}
-applyI18N();
 </script>
 </body></html>
