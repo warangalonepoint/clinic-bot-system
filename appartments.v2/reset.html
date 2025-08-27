@@ -136,5 +136,13 @@
   // Keep parity with other pages
   if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
   </script>
-</body>
+</body><button style="padding:10px 14px;border-radius:10px;font-weight:700"
+onclick="(async()=>{try{
+  const regs=await navigator.serviceWorker.getRegistrations();
+  for(const r of regs) await r.unregister();
+  if(window.caches){ for(const k of await caches.keys()) await caches.delete(k); }
+  localStorage.setItem('apt_sw','off'); // <- do not register again
+  alert('SW off + caches cleared. Reloading…');
+  location.href='./index.html?v='+Date.now();
+}catch(e){alert('Reset failed');console.error(e);}})()">Unregister SW + Clear Caches</button>
 </html>
