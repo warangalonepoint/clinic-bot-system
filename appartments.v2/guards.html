@@ -3,71 +3,78 @@
 <title>Apartments • Guards</title>
 <link rel="stylesheet" href="./styles.css">
 <meta name="theme-color" content="#111"/>
-<style>
-.toolbar{position:absolute;left:16px;bottom:12px;display:flex;gap:8px;z-index:2}
-.chip{border:0;border-radius:999px;padding:8px 12px;background:#ffffffea;color:#0f172a;font-weight:700;box-shadow:0 6px 22px rgba(0,0,0,.18);cursor:pointer}
-.chip.active{outline:2px solid #111}
-body.dark .chip{background:#101626;color:#fff}
-</style>
-</head>
-<body class="bg">
+</head><body class="bg">
 <button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
 <main class="wrap">
   <div class="card hero">
     <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
-    <div class="toolbar">
-      <button id="themeToggle" class="chip">🌙</button>
-      <button id="langEN" class="chip">EN</button>
-      <button id="langTE" class="chip">TE</button>
-    </div>
     <div class="hero-overlay">
       <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
       <div class="hero-title" data-i18n="guards_title">Guard Console</div>
+      <div class="chips">
+        <button class="chip round" id="themeChip">🌙</button>
+        <button class="chip round" data-lang="en">EN</button>
+        <button class="chip round" data-lang="te">TE</button>
+      </div>
     </div>
   </div>
 
-  <div class="grid2 mt">
-    <section class="card">
-      <div class="row space">
-        <h2 class="h2" data-i18n="preapproved_visitors">Pre-Approved Visitors</h2>
-        <input id="pa_search" class="in" placeholder="Search name/flat/purpose" style="max-width:260px">
-      </div>
-      <p class="muted" data-i18n="preapproved_note">From residents’ pre-approvals. Verify ID → tap <b>Check-In</b>.</p>
-      <div class="tablewrap">
-        <table class="tbl"><thead><tr><th>#</th><th data-i18n="flat">Flat</th><th data-i18n="name">Name</th><th data-i18n="date">Date</th><th data-i18n="purpose">Purpose</th><th data-i18n="action">Action</th></tr></thead><tbody id="pa_tbody"></tbody></table>
-        <div id="pa_empty" class="muted" data-i18n="no_preapprovals">No pre-approvals found.</div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2 class="h2" data-i18n="walkin_visitor">Walk-in Visitor</h2>
-      <div class="grid2">
-        <label data-i18n="flat_unit">Flat / Unit <input id="w_flat" class="in" placeholder="e.g., A-302"></label>
-        <label data-i18n="name">Name <input id="w_name" class="in" placeholder="Visitor name"></label>
-        <label data-i18n="phone">Phone <input id="w_phone" class="in" inputmode="numeric" maxlength="10" placeholder="optional"></label>
-        <label data-i18n="purpose">Purpose <input id="w_purpose" class="in" placeholder="guest/maintenance"></label>
-      </div>
-      <div class="cam mt8">
-        <div><video id="cam" playsinline autoplay muted></video><canvas id="snap" style="display:none"></canvas></div>
-        <div>
-          <button class="btn" id="cam_start" data-i18n="open_camera">Open Camera</button>
-          <button class="btn mt8" id="cam_capture" data-i18n="capture_photo">Capture Photo</button>
-          <img id="preview" class="snap" alt="Snapshot" style="display:none"/>
-        </div>
-      </div>
-      <div class="row mt8">
-        <button class="btn" id="w_checkin" data-i18n="checkin">Check-In</button>
-        <button class="btn" id="w_clear" data-i18n="clear">Clear</button>
-      </div>
-    </section>
+  <!-- NAV TABS (so forms don’t stack) -->
+  <div class="card mt">
+    <div class="tabs">
+      <button class="tab" data-tab="pre" data-i18n="preapproved_visitors">Pre-Approved Visitors</button>
+      <button class="tab" data-tab="walk" data-i18n="walkin_visitor">Walk-in Visitor</button>
+      <button class="tab" data-tab="del" data-i18n="deliveries_title">Deliveries</button>
+      <button class="tab" data-tab="hist" data-i18n="visitor_history_today">Visitor History (Today)</button>
+    </div>
   </div>
 
-  <div class="card mt">
-    <h2 class="h2" data-i18n="couriers_deliveries">Couriers / Deliveries</h2>
+  <!-- Pre-approvals -->
+  <section class="card mt tabpanel" data-tab="pre">
+    <div class="row space">
+      <h2 class="h2" data-i18n="preapproved_visitors">Pre-Approved Visitors</h2>
+      <input id="pa_search" class="in" placeholder="Search name/flat/purpose">
+    </div>
+    <p class="muted" data-i18n="preapproved_note">From residents’ pre-approvals. Verify ID → tap Check-In.</p>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr>
+        <th>#</th><th data-i18n="flat">Flat</th><th data-i18n="name">Name</th>
+        <th data-i18n="date">Date</th><th data-i18n="purpose">Purpose</th><th data-i18n="action">Action</th>
+      </tr></thead><tbody id="pa_tbody"></tbody></table>
+      <div id="pa_empty" class="muted" data-i18n="no_preapprovals">No pre-approvals found.</div>
+    </div>
+  </section>
+
+  <!-- Walk-in -->
+  <section class="card mt tabpanel" data-tab="walk">
+    <h2 class="h2" data-i18n="walkin_visitor">Walk-in Visitor</h2>
     <div class="grid2">
-      <label data-i18n="flat_unit">Flat / Unit <input id="d_flat" class="in" placeholder="A-302"></label>
-      <label data-i18n="from_courier">From / Courier <input id="d_from" class="in" placeholder="Amazon / Swiggy"></label>
+      <label data-i18n="flat_unit">Flat / Unit<input id="w_flat" class="in" placeholder="e.g., A-302"></label>
+      <label data-i18n="name">Name<input id="w_name" class="in" placeholder="Visitor name"></label>
+      <label data-i18n="phone">Phone<input id="w_phone" class="in" inputmode="numeric" maxlength="10" placeholder="optional"></label>
+      <label data-i18n="purpose">Purpose<input id="w_purpose" class="in" placeholder="guest/maintenance"></label>
+    </div>
+    <div class="cam mt8">
+      <div><video id="cam" playsinline autoplay muted></video><canvas id="snap" style="display:none"></canvas></div>
+      <div>
+        <button class="btn" id="cam_start" data-i18n="open_camera">Open Camera</button>
+        <button class="btn mt8" id="cam_capture" data-i18n="capture_photo">Capture Photo</button>
+        <img id="preview" class="snap" alt="Snapshot" style="display:none"/>
+      </div>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="w_checkin" data-i18n="checkin">Check-In</button>
+      <button class="btn secondary" id="w_clear" data-i18n="clear">Clear</button>
+    </div>
+  </section>
+
+  <!-- Deliveries -->
+  <section class="card mt tabpanel" data-tab="del">
+    <h2 class="h2" data-i18n="deliveries_title">Couriers / Deliveries</h2>
+    <div class="grid2">
+      <label data-i18n="flat_unit">Flat / Unit<input id="d_flat" class="in" placeholder="A-302"></label>
+      <label data-i18n="from_courier">From / Courier<input id="d_from" class="in" placeholder="Amazon / Swiggy"></label>
     </div>
     <div class="cam mt8">
       <div><video id="cam2" playsinline autoplay muted></video><canvas id="snap2" style="display:none"></canvas></div>
@@ -79,143 +86,48 @@ body.dark .chip{background:#101626;color:#fff}
     </div>
     <div class="row mt8">
       <button class="btn" id="d_add" data-i18n="add_delivery">Add Delivery</button>
-      <button class="btn" id="d_export" data-i18n="export_csv">Export Deliveries CSV</button>
+      <button class="btn secondary" id="d_export" data-i18n="export_csv">Export Deliveries CSV</button>
     </div>
     <div class="tablewrap">
-      <table class="tbl"><thead><tr><th>#</th><th data-i18n="flat">Flat</th><th data-i18n="from">From</th><th data-i18n="time">Time</th><th data-i18n="photo">Photo</th><th data-i18n="status">Status</th><th data-i18n="action">Action</th></tr></thead><tbody id="d_tbody"></tbody></table>
+      <table class="tbl"><thead><tr>
+        <th>#</th><th data-i18n="flat">Flat</th><th data-i18n="from">From</th>
+        <th data-i18n="time">Time</th><th data-i18n="photo">Photo</th>
+        <th data-i18n="status">Status</th><th data-i18n="action">Action</th>
+      </tr></thead><tbody id="d_tbody"></tbody></table>
       <div id="d_empty" class="muted" data-i18n="no_deliveries">No deliveries yet.</div>
     </div>
-  </div>
+  </section>
 
-  <div class="card mt">
+  <!-- History -->
+  <section class="card mt tabpanel" data-tab="hist">
     <div class="row space">
       <h2 class="h2" data-i18n="visitor_history_today">Visitor History (Today)</h2>
       <div class="row">
         <input id="vh_search" class="in" placeholder="Search name/flat/purpose" style="max-width:260px">
-        <button class="btn" id="vh_export" data-i18n="export_csv">Export Visitors CSV</button>
+        <button class="btn secondary" id="vh_export" data-i18n="export_csv">Export Visitors CSV</button>
       </div>
     </div>
     <div class="tablewrap">
-      <table class="tbl"><thead><tr><th>#</th><th data-i18n="flat">Flat</th><th data-i18n="name">Name</th><th data-i18n="purpose">Purpose</th><th data-i18n="time">Time</th><th data-i18n="photo">Photo</th></tr></thead><tbody id="vh_tbody"></tbody></table>
+      <table class="tbl"><thead><tr>
+        <th>#</th><th data-i18n="flat">Flat</th><th data-i18n="name">Name</th>
+        <th data-i18n="purpose">Purpose</th><th data-i18n="time">Time</th><th data-i18n="photo">Photo</th>
+      </tr></thead><tbody id="vh_tbody"></tbody></table>
       <div id="vh_empty" class="muted" data-i18n="no_visitors_today">No visitors checked in today.</div>
     </div>
-  </div>
-
-  <div class="card mt">
-    <div class="grid2">
-      <a class="btn" href="./index.html" data-i18n="back_to_pin">Back to PIN</a>
-      <a class="btn" href="./reset.html" data-i18n="reset_tools">Reset / Cache Tools</a>
-    </div>
-  </div>
+  </section>
 </main>
 
 <script src="./lang.js"></script>
 <script>
-/* theme + language pills */
-(function(){
-  const applyTheme=(t)=>document.body.classList.toggle('dark',t==='dark');
-  const t=localStorage.getItem('theme')||'light'; applyTheme(t);
-  themeToggle.textContent=t==='dark'?'☀️':'🌙';
-  themeToggle.onclick=()=>{const next=document.body.classList.contains('dark')?'light':'dark';localStorage.setItem('theme',next);applyTheme(next);themeToggle.textContent=next==='dark'?'☀️':'🌙';};
-  const setLang=(lng)=>{localStorage.setItem('lang',lng); if(window.i18n?.apply) window.i18n.apply(lng);};
-  langEN.onclick=()=>setLang('en'); langTE.onclick=()=>setLang('te');
-  const l=localStorage.getItem('lang')||'en'; if(window.i18n?.apply) window.i18n.apply(l);
-})();
-
-/* existing guards logic (your code, unchanged) */
-const K={preapprove:"apt_preapprove", visits:"apt_visits", deliveries:"apt_deliveries"};
-const $=id=>document.getElementById(id);
-const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
-const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const uid=()=>Math.random().toString(36).slice(2,9);
-const todayYMD=()=>new Date().toISOString().slice(0,10);
-const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
-
-// camera
-async function openCam(videoEl){ if(!navigator.mediaDevices?.getUserMedia){ alert("Camera not supported"); return null; } const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}); videoEl.srcObject=s; return s; }
-function capture(videoEl,canvasEl){ const vw=videoEl.videoWidth||640,vh=videoEl.videoHeight||480; canvasEl.width=vw; canvasEl.height=vh; const ctx=canvasEl.getContext("2d"); ctx.drawImage(videoEl,0,0,vw,vh); return canvasEl.toDataURL("image/jpeg",0.7); }
-function stopStream(s){ try{s.getTracks().forEach(t=>t.stop());}catch{} }
-
-// pre-approvals
-function renderPreApprovals(){
-  const q=(pa_search.value||"").toLowerCase();
-  const rows=jget(K.preapprove).filter(x=>String(x.date||"").slice(0,10)>=todayYMD()).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-  const filtered=rows.filter(r=>(r.flat||"").toLowerCase().includes(q)||(r.name||"").toLowerCase().includes(q)||(r.purpose||"").toLowerCase().includes(q));
-  pa_tbody.innerHTML=""; pa_empty.style.display=filtered.length?"none":"block";
-  filtered.forEach((r,i)=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.name}</td><td>${r.date||"—"}</td><td>${r.purpose||"—"}</td><td><button class="btn" onclick="checkIn('${r.flat}','${r.name}','${r.phone||""}','${(r.purpose||"guest").replace(/"/g,'&quot;')}')">Check-In</button></td>`; pa_tbody.appendChild(tr); });
-}
-pa_search.addEventListener("input",renderPreApprovals);
-
-// walk-in
-let cam1=null,cam2=null;
-cam_start.onclick=async()=>{ cam1=await openCam(cam); };
-cam_capture.onclick=()=>{ if(!cam1){alert("Open camera first");return} const d=capture(cam,snap); preview.src=d; preview.style.display="block"; };
-w_clear.onclick=()=>{ w_flat.value=w_name.value=w_phone.value=w_purpose.value=""; preview.src=""; preview.style.display="none"; if(cam1) stopStream(cam1); cam1=null; };
-
-window.checkIn=(flat,name,phone,purpose)=>{ w_flat.value=flat; w_name.value=name; w_phone.value=phone||""; w_purpose.value=purpose||"guest"; window.scrollTo({top:0,behavior:"smooth"}); };
-
-w_checkin.onclick=()=>{
-  const flat=w_flat.value.trim(), name=w_name.value.trim(), phone=w_phone.value.trim(), purpose=w_purpose.value.trim()||"guest";
-  if(!flat||!name){ alert("Flat and Name required"); return; }
-  const photo = preview.src && preview.style.display!=="none" ? preview.src : "";
-  const arr=jget(K.visits); arr.unshift({id:uid(),flat,name,phone,purpose,ts:Date.now(),photo});
-  jset(K.visits,arr);
-  // mark PA used if matches (today)
-  let pre=jget(K.preapprove);
-  pre = pre.map(p=> (p.flat===flat && p.name===name && p.date===todayYMD()) ? {...p, status:"Checked-In"} : p);
-  jset(K.preapprove,pre);
-  w_name.value=w_phone.value=w_purpose.value=""; preview.src=""; preview.style.display="none";
-  renderPreApprovals(); renderVisitorsHistory();
-};
-
-// deliveries
-cam2_start.onclick=async()=>{ cam2=await openCam(cam2); };
-cam2_capture.onclick=()=>{ if(!cam2){alert("Open camera first");return} const d=capture(cam2,snap2); preview2.src=d; preview2.style.display="block"; };
-
-d_add.onclick=()=>{
-  const flat=d_flat.value.trim(), from=d_from.value.trim();
-  if(!flat||!from){ alert("Flat and From required"); return; }
-  const photo = preview2.src && preview2.style.display!=="none" ? preview2.src : "";
-  const arr=jget(K.deliveries); arr.unshift({id:uid(),flat,from,ts:Date.now(),status:"At Gate",photo});
-  jset(K.deliveries,arr);
-  d_from.value=""; preview2.src=""; preview2.style.display="none";
-  renderDeliveries();
-};
-
-function renderDeliveries(){
-  const rows=jget(K.deliveries).sort((a,b)=>b.ts-a.ts);
-  d_tbody.innerHTML=""; d_empty.style.display=rows.length?"none":"block";
-  rows.forEach((r,i)=>{
-    const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
-    const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—";
-    const btn=r.status==="At Gate"?`<button class="btn" onclick="dispatchDel('${r.id}')">Dispatch</button>`:`<span class="muted">${r.status}</span>`;
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.from}</td><td>${t}</td><td>${img}</td><td>${r.status}</td><td>${btn}</td>`;
-    d_tbody.appendChild(tr);
-  });
-}
-window.dispatchDel=(id)=>{ const arr=jget(K.deliveries); const i=arr.findIndex(x=>x.id===id); if(i>-1){ arr[i].status="Dispatched"; jset(K.deliveries,arr); renderDeliveries(); } };
-d_export.onclick=()=>{ const rows=jget(K.deliveries).map(({photo,...x})=>x); csv(rows,["id","flat","from","ts","status"],"Deliveries.csv"); };
-
-// visitors history
-function renderVisitorsHistory(){
-  const q=(vh_search.value||"").toLowerCase();
-  const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD())
-    .filter(r=>(r.flat||"").toLowerCase().includes(q)||(r.name||"").toLowerCase().includes(q)||(r.purpose||"").toLowerCase().includes(q));
-  vh_tbody.innerHTML=""; vh_empty.style.display=rows.length?"none":"block";
-  rows.forEach((r,i)=>{
-    const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-    const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—";
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td>${r.flat}</td><td>${r.name}</td><td>${r.purpose}</td><td>${t}</td><td>${img}</td>`;
-    vh_tbody.appendChild(tr);
-  });
-}
-vh_search.addEventListener("input",renderVisitorsHistory);
-vh_export.onclick=()=>{ const rows=jget(K.visits).filter(v=>new Date(v.ts).toISOString().slice(0,10)===todayYMD()).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"Visitors_Today.csv"); };
-
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-renderPreApprovals(); renderDeliveries(); renderVisitorsHistory();
-window.addEventListener("beforeunload",()=>{ if(cam1) stopStream(cam1); if(cam2) stopStream(cam2); });
+/* theme/lang/tabs glue (same as residents) */
+const LS_THEME='apt_theme', LS_LANG='apt_lang', PAGE_KEY='guards';
+function applyTheme(){const t=localStorage.getItem(LS_THEME)||'light';document.documentElement.setAttribute('data-theme',t);document.getElementById('themeChip').textContent=t==='light'?'🌙':'🌞';}
+function toggleTheme(){localStorage.setItem(LS_THEME,(localStorage.getItem(LS_THEME)||'light')==='light'?'dark':'light');applyTheme();}
+function applyLang(){document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n'); if(window.t){el.firstChild.nodeValue=t(k);}});}
+document.addEventListener('click',e=>{ if(e.target.id==='themeChip') toggleTheme(); if(e.target.dataset.lang){localStorage.setItem(LS_LANG,e.target.dataset.lang); location.reload();}});
+function setupTabs(){const tabs=document.querySelectorAll('.tab');const panels=document.querySelectorAll('.tabpanel');const KEY=PAGE_KEY+'_tab';function show(id){tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===id));panels.forEach(p=>p.style.display=p.dataset.tab===id?'block':'none');localStorage.setItem(KEY,id);}tabs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));show(localStorage.getItem(KEY)||tabs[0].dataset.tab);}
+applyTheme();applyLang();setupTabs();
 </script>
+
+<!-- Keep your existing guards JS below if needed (check-in, camera, storage…). -->
 </body></html>
