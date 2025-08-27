@@ -1,143 +1,250 @@
-/* PING / Modychat Look – High-fidelity skin
-   Load AFTER your existing CSS (or after ping-ui.css) */
+/* PING UI PLUS — Schools PWA Skin
+   ------------------------------------------------------
+   - Bright glassmorphism + crisp navy headers
+   - Works with your existing HTML/JS (no rewrites)
+   - Dark mode: either <html class="dark"> or [data-theme="dark"]
+   - Copy this file as ping-ui-plus.css and include after styles.css
+*/
 
+/* ---------- TOKENS ---------- */
 :root{
-  --ping-bg1:#ffccdf;      /* warm pink */
-  --ping-bg2:#f1e7ff;      /* soft violet */
-  --ping-bg3:#fdf8ff;      /* near white */
-  --ping-navy:#0a1130;     /* deep header */
-  --ping-navy-2:#0f1a44;
-  --ping-pill:#ffffff;
-  --ping-pill-ring:#ffffff3a;
-  --ping-ink:#0e1328;
-  --ping-muted:#7a86a5;
-  --ping-glow: 0 18px 40px rgba(0,0,0,.18);
-  --ping-soft: 0 12px 26px rgba(13,19,54,.18);
-}
-:root.dark{
-  --ping-bg1:#221f3a;
-  --ping-bg2:#12192f;
-  --ping-bg3:#0b1024;
-  --ping-navy:#060d24;
-  --ping-navy-2:#0a1433;
-  --ping-pill:#0e142b;
-  --ping-pill-ring:#ffffff25;
-  --ping-ink:#e9eef9;
-  --ping-muted:#a1abc7;
-  --ping-glow: 0 20px 50px rgba(0,0,0,.55);
-  --ping-soft: 0 14px 30px rgba(0,0,0,.45);
+  /* Background gradient */
+  --bg-a: #ffe8f4;           /* warm pink */
+  --bg-b: #e6f1ff;           /* cool blue */
+  --bg-c: #fffafc;           /* near white */
+
+  /* Text */
+  --ink:   #0b1026;
+  --muted: #5b6b8a;
+
+  /* Brand */
+  --navy-1: #0a123a;         /* deep header top */
+  --navy-2: #00071f;         /* deep header bottom */
+  --accent: #ff3d6e;         /* hot pink accent */
+
+  /* Surfaces / Glass */
+  --card:   rgba(255,255,255,.74);
+  --glass:  blur(16px) saturate(160%);
+  --stroke: rgba(255,255,255,.66);
+
+  /* Shapes / Shadows */
+  --r-xl: 32px;
+  --r-lg: 26px;
+  --r-md: 18px;
+  --shadow-1: 0 18px 50px rgba(11,16,38,.22);
+  --shadow-2: 0 12px 28px rgba(11,16,38,.14);
+  --ring: rgba(255,61,110,.20); /* accent ring on focus */
+
+  /* Controls */
+  --btn-grad-1: #0b153f;
+  --btn-grad-2: #040a24;
+
+  /* Table */
+  --row-bg: #ffffff;
+  --row-bd: #e9edff;
 }
 
-/* Background: brighter gradient */
-body{
-  color:var(--ping-ink);
+/* DARK MODE TOKENS (supports html.dark OR [data-theme="dark"]) */
+html.dark, [data-theme="dark"]{
+  --bg-a: #1a1f38;
+  --bg-b: #0f1530;
+  --bg-c: #0b1026;
+
+  --ink:   #e8eefc;
+  --muted: #a1abc7;
+
+  --navy-1: #060d24;
+  --navy-2: #0a1433;
+  --accent: #ff79a0;
+
+  --card:   rgba(12,16,39,.78);
+  --glass:  blur(16px) saturate(160%);
+  --stroke: rgba(255,255,255,.08);
+
+  --shadow-1: 0 20px 50px rgba(0,0,0,.55);
+  --shadow-2: 0 14px 30px rgba(0,0,0,.35);
+
+  --btn-grad-1: #2b37ff;
+  --btn-grad-2: #1b27e0;
+
+  --row-bg: #0f1733;
+  --row-bd: #1b2548;
+}
+
+/* ---------- CANVAS ---------- */
+body,
+body.bg{
+  margin:0;
+  color:var(--ink);
   background:
-    radial-gradient(1200px 900px at 10% -10%, var(--ping-bg1) 0%, var(--ping-bg2) 55%, var(--ping-bg3) 100%);
+    radial-gradient(1200px 760px at 85% -10%, #ffc6df 0%, #ffd6ea 26%, transparent 56%),
+    radial-gradient(1100px 720px at -10% 10%, #cbe1ff 0%, #dcedff 26%, transparent 56%),
+    linear-gradient(180deg, var(--bg-b), var(--bg-a) 40%, var(--bg-c));
 }
 
-/* HERO: navy slab with rounded corners */
+/* ---------- WRAPPER ---------- */
+.wrap{ max-width:1100px; margin:20px auto; padding:12px }
+
+/* ---------- HERO (Header banner) ---------- */
+.card.hero,
 .hero{
-  background: linear-gradient(180deg, var(--ping-navy), var(--ping-navy-2));
-  border-radius:32px;
-  box-shadow: var(--ping-glow);
+  position:relative;
+  overflow:hidden;
+  border-radius:var(--r-xl);
+  background: linear-gradient(180deg, var(--navy-1), var(--navy-2));
+  box-shadow: 0 14px 40px rgba(0,7,31,.45);
+  padding:0;
 }
-.hero .banner{
-  height:220px; opacity:.22; filter:saturate(1.2) contrast(1.05);
+.banner{
+  width:100%; height:220px; object-fit:cover; display:block;
+  opacity:.22; filter:saturate(1.15) contrast(1.05);
 }
-.hero::after{
-  background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.45) 100%);
+.hero-overlay{
+  position:absolute; inset:0; display:flex; align-items:flex-end; padding:16px;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.45) 100%);
 }
-.brand-badge{
-  width:72px;height:72px;border-radius:26px;
+.logo{
+  position:absolute; top:14px; left:14px;
+  width:72px; height:72px; border-radius:26px; background:#fff; padding:10px;
+  box-shadow:0 10px 24px rgba(255,255,255,.25), inset 0 -2px 6px #00000010;
 }
-.hero-title{ font-size:32px; letter-spacing:.3px }
+.hero-title{
+  margin:0 0 12px 90px;
+  font-weight:900; font-size:32px; letter-spacing:.3px; color:#fff;
+  text-shadow:0 2px 10px rgba(0,0,0,.35);
+}
 
-/* Header controls = chunky pills */
-.hero-controls .pill{
-  height:46px; min-width:60px; padding:10px 16px;
-  background:var(--ping-pill);
-  border:1px solid var(--ping-pill-ring);
-  color:#0e1328;
+/* Header chips (theme / language) */
+.chips{ position:absolute; right:14px; top:14px; display:flex; gap:10px; z-index:3 }
+.chip{
+  background:#fff; color:var(--navy-1); border:1px solid #ffffff55;
+  border-radius:999px; padding:10px 14px; font-weight:800;
+  box-shadow:0 10px 18px rgba(255,255,255,.25);
+}
+html.dark .chip, [data-theme="dark"] .chip{
+  background:#0f1733; color:#e8eefc; border-color:#ffffff22;
 }
 
-/* Cards: more round & glassy */
+/* Optional logout pill */
+.logout{
+  position:absolute; right:14px; top:64px; z-index:3;
+  padding:10px 14px; border-radius:16px; border:0;
+  background: linear-gradient(180deg, var(--btn-grad-1), var(--btn-grad-2));
+  color:#fff; font-weight:800; box-shadow:0 12px 26px rgba(4,10,36,.4);
+  cursor:pointer;
+}
+
+/* ---------- CARDS (glass) ---------- */
 .card{
-  border-radius:30px;
-  background: rgba(255,255,255,.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--ping-soft);
-  border:1px solid rgba(255,255,255,.55);
+  margin:16px 0; padding:16px;
+  border-radius:var(--r-lg);
+  background: var(--card);
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+  border:1px solid var(--stroke);
+  box-shadow: var(--shadow-1);
 }
-:root.dark .card{
-  background: rgba(15,19,46,.72);
-  border-color: rgba(255,255,255,.06);
-}
+.h2, .card h2{ margin:4px 2px 12px; font-size:28px; font-weight:900; letter-spacing:.2px; color:var(--ink) }
+.muted{ color:var(--muted) }
 
-/* Tabs → Ping chips */
-.tabs{ gap:14px }
-.tab{
-  padding:14px 20px; border-radius:999px;
-  background:#eaf0ff; border:1px solid #d9e2ff;
-  color:#0e1328; font-weight:800; letter-spacing:.2px;
-  transition:transform .12s ease, box-shadow .12s ease;
-}
-.tab:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(13,19,54,.12) }
-.tab.active{
-  background:#fff; color:#0e1328; border-color:#fff;
-  box-shadow:0 10px 26px rgba(13,19,54,.18);
-}
+/* ---------- GRID / ROWS ---------- */
+.row{ display:flex; gap:12px; flex-wrap:wrap; align-items:center }
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+@media(max-width:900px){ .grid2{ grid-template-columns:1fr } }
+.gridWide{ display:grid; grid-template-columns:1.2fr 1fr; gap:12px }
+@media(max-width:1000px){ .gridWide{ grid-template-columns:1fr } }
+.mt{ margin-top:14px } .mt8{ margin-top:8px } .w100{ width:100% } .hidden{ display:none !important }
+.span2{ grid-column:1/-1 }
 
-/* Inputs */
+/* ---------- INPUTS & BUTTONS ---------- */
 .in, select, textarea{
-  border-radius:18px; border:1px solid #e6e9f4; background:#fff;
+  width:100%; padding:14px 14px; font-size:16px;
+  border-radius:var(--r-md);
+  background:#fff; color:var(--ink);
+  border:1px solid #e3e7ff;
+  outline:none; box-shadow: inset 0 2px 6px rgba(0,0,0,.04);
 }
-:root.dark .in, :root.dark select, :root.dark textarea{
-  background:#0f1733; border-color:#1b2548;
+.in:focus, select:focus, textarea:focus{
+  box-shadow: 0 0 0 4px var(--ring);
+  border-color:#d8deff;
+}
+html.dark .in, html.dark select, html.dark textarea,
+[data-theme="dark"] .in, [data-theme="dark"] select, [data-theme="dark"] textarea{
+  background:#0f1733; color:#e8eefc; border-color:#1b2548;
 }
 
-/* Buttons */
 .btn{
-  border-radius:18px;
-  box-shadow: 0 12px 30px rgba(255,106,69,.28);
-  background: linear-gradient(180deg,#ff9a7c,#ff6a45 78%);
+  padding:12px 18px; border-radius:var(--r-md); border:0;
+  font-weight:800; letter-spacing:.3px; color:#fff; cursor:pointer;
+  background:linear-gradient(180deg, var(--btn-grad-1), var(--btn-grad-2));
+  box-shadow:0 12px 26px rgba(4,10,36,.4);
 }
-.btn.dark{ background: linear-gradient(180deg,#4657ff,#2d3bff) }
+.btn:hover{ transform:translateY(-1px) }
+.btn:active{ transform:translateY(0) }
+.btn.secondary{
+  background:#ffffff26; color:var(--ink); border:1px solid #e3e7ff;
+}
+.btn.danger{
+  background:linear-gradient(180deg,#ff7b9a,#ff3d6e);
+  box-shadow:0 12px 30px rgba(255,61,110,.28);
+}
 
-/* “Chat list” look for any .list of .cell */
-.list{ display:flex; flex-direction:column; gap:14px }
-.cell{
-  background:#fff; border-radius:22px; padding:16px 18px;
-  display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center;
-  box-shadow: 0 10px 24px rgba(13,19,54,.12);
-  border:1px solid #f2f4fb;
+/* ---------- TABS (pill group) ---------- */
+.tabs{
+  display:flex; gap:10px; flex-wrap:wrap;
+  background:#00000035; padding:7px; border-radius:999px; width:max-content;
+  border:1px solid #ffffff25;
 }
-:root.dark .cell{ background:#0f1733; border-color:#16204b }
-.cell .av{
-  width:50px;height:50px;border-radius:16px; display:grid; place-items:center;
-  background: radial-gradient(100px 100px at 30% 20%, #ffe9e1 0%, #efe9ff 65%, #ffffff 100%);
-  font-weight:900; color:#1a2140;
+.tab{
+  border:0; padding:9px 16px; border-radius:999px;
+  font-weight:800; color:#e8ecff; background:transparent; cursor:pointer; letter-spacing:.2px;
 }
-.cell .meta{ color:#7a86a5; font-size:13px }
+.tab.active{
+  background:#fff; color:var(--navy-1); border:0;
+  box-shadow:0 10px 18px rgba(255,255,255,.25);
+}
+html.dark .tabs{ background:#ffffff10; border-color:#ffffff20 }
+html.dark .tab{ color:#e8eefc }
+html.dark .tab.active{ background:#0f1733; color:#e8eefc; box-shadow:0 10px 18px rgba(0,0,0,.25) }
 
-/* Table: neumorphic rows */
-.tbl{ border-collapse:separate; border-spacing:0 12px }
+/* ---------- TABLES (soft cards rows) ---------- */
+.tablewrap{ margin-top:12px; overflow:auto }
+.tbl{ width:100%; border-collapse:separate; border-spacing:0 12px }
+.tbl thead th{ padding:4px 10px; color:var(--muted); font-size:13px; text-align:left }
 .tbl tbody tr{
-  background:#fff; box-shadow: 0 10px 24px rgba(13,19,54,.10);
+  background: var(--row-bg);
+  box-shadow: var(--shadow-2);
 }
-.tbl tbody td{ border-top:1px solid #f1f4fb; border-bottom:1px solid #f1f4fb }
-:root.dark .tbl tbody tr{ background:#0f1733; box-shadow: 0 10px 24px rgba(0,0,0,.35) }
-:root.dark .tbl tbody td{ border-color:#18224d }
+.tbl tbody td{
+  padding:12px 10px;
+  border-top:1px solid var(--row-bd);
+  border-bottom:1px solid var(--row-bd);
+  color:var(--ink);
+}
+.tbl tbody tr td:first-child{ border-radius:14px 0 0 14px }
+.tbl tbody tr td:last-child{  border-radius:0 14px 14px 0 }
+html.dark .tbl tbody td{ color:#e8eefc }
 
-/* Floating bottom dock (optional) */
-.dock{
-  position:sticky; bottom:12px; display:flex; gap:18px; justify-content:space-around;
-  background: linear-gradient(180deg, var(--ping-navy), var(--ping-navy-2));
-  padding:14px 18px; border-radius:26px; margin:10px auto 0; max-width:640px;
-  box-shadow: var(--ping-glow); border:1px solid rgba(255,255,255,.06);
+/* ---------- CAMERA BLOCKS ---------- */
+.cam{ display:grid; grid-template-columns:1fr 180px; gap:12px }
+@media(max-width:520px){ .cam{ grid-template-columns:1fr } }
+video, canvas, img.snap{
+  width:100%; max-height:240px; object-fit:cover;
+  border-radius:20px; background:#000;
 }
-.dock .ic{
-  width:58px;height:58px;border-radius:18px;
-  display:grid; place-items:center; background:rgba(255,255,255,.08);
-  color:#fff; font-size:22px; border:1px solid rgba(255,255,255,.12);
+
+/* ---------- PILLS (counters, small tags) ---------- */
+.pill{
+  background:#0b1026; color:#fff; border:0; border-radius:999px;
+  padding:6px 12px; display:inline-block; font-weight:800;
+  box-shadow:0 8px 16px rgba(11,16,38,.25)
 }
+html.dark .pill{ background:#1a2250 }
+
+/* ---------- LINKS AS BUTTONS ---------- */
+a.btn{ display:inline-flex; align-items:center; justify-content:center; text-decoration:none }
+
+/* ---------- UTILITIES ---------- */
+.divider{ border:none; border-top:1px solid #e9edff; margin:14px 0 }
+html.dark .divider{ border-top-color:#1b2548 }
+.wraptags{ flex-wrap:wrap; gap:8px }
