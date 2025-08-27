@@ -1,165 +1,196 @@
-/* ======= Design tokens ======= */
+/* ===============================
+   Onestop Apartments – Peach/Teal Theme
+   – Keep your existing HTML/JS; this is UI-only
+   – Inspired by the Pinterest board (peach canvas, teal accents)
+   =============================== */
+
+/* ---------- Design tokens ---------- */
 :root{
-  --bg: #f7faf7;
-  --ink: #0f172a;
-  --muted:#64748b;
+  /* Core palette from the reference */
+  --peach-50:  #FFF1E6;
+  --peach-100: #FFE7D6;
+  --peach-200: #FFDCC2;
+  --peach-300: #FFC9A3;
+  --peach-400: #FFB07E;
+  --peach-500: #F4A261; /* Mango/Peach (secondary) */
+  --peach-600: #E07A3E;
 
-  --glass-bg: rgba(255,255,255,.68);
-  --glass-br: 22px;
-  --glass-blur: 14px;
-  --glass-brd: rgba(255,255,255,.55);
+  --teal-50:  #E7F7F4;
+  --teal-100: #CFF0EA;
+  --teal-200: #A9E3D9;
+  --teal-300: #78D2C4;
+  --teal-400: #48BFB0;
+  --teal-500: #2A9D8F; /* Teal (primary) */
+  --teal-600: #1F7E73;
 
-  --brand:#fb7b5b;      /* warm coral for primary */
-  --brand-ink:#ffffff;
+  --sun-500:  #E9C46A;
+  --warn-500: #E76F51;
 
-  --chip-bg: rgba(255,255,255,.82);
-  --chip-ink:#0f172a;
+  --ink: #1B2430;      /* Headings */
+  --text: #334155;     /* Body text */
+  --muted:#6b7280;     /* Muted */
+  --white:#ffffff;
 
-  --tab-bg:#eef2ff;
-  --tab-ink:#0f172a;
-  --tab-active-bg:#111827;
-  --tab-active-ink:#fff;
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
 
-  --card-shadow: 0 18px 50px rgba(0,0,0,.12);
-  --soft-shadow: 0 10px 30px rgba(0,0,0,.10);
+  --shadow-card: 0 18px 40px rgba(113, 73, 44, .18);
+  --shadow-soft: 0 10px 28px rgba(0,0,0,.08);
+
+  --ring: 0 0 0 4px rgba(42,157,143,.18); /* teal focus */
 }
 
-/* Dark mode */
-:root.dark{
-  --bg:#0f1720;
-  --ink:#e6edf3;
-  --muted:#94a3b8;
-
-  --glass-bg: rgba(17,24,39,.6);
-  --glass-brd: rgba(255,255,255,.08);
-
-  --tab-bg:#0b1220;
-  --tab-ink:#cbd5e1;
-  --tab-active-bg:#334155;
-  --tab-active-ink:#fff;
-
-  --chip-bg: rgba(15,23,42,.8);
-  --chip-ink:#e6edf3;
-
-  --card-shadow: 0 18px 50px rgba(0,0,0,.35);
-  --soft-shadow: 0 10px 30px rgba(0,0,0,.35);
-}
-
-/* ======= Base ======= */
+/* ---------- Base canvas (peach) ---------- */
 *{box-sizing:border-box}
 html,body{height:100%}
 body.bg{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
-  color:var(--ink);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color:var(--text);
+  /* Peach wallpaper with subtle vignettes like the boards */
   background:
-    radial-gradient(1400px 800px at 10% -10%, #ffe6e0 0%, rgba(255,230,224,0) 40%),
-    radial-gradient(1400px 900px at 110% 10%, #dff7eb 0%, rgba(223,247,235,0) 45%),
-    var(--bg);
+    radial-gradient(900px 600px at 10% 10%, var(--peach-200) 0%, rgba(255,220,194,0) 60%),
+    radial-gradient(900px 650px at 90% 15%, var(--sun-500) 0%, rgba(233,196,106,0) 55%),
+    radial-gradient(1200px 800px at 50% 110%, var(--peach-100) 0%, rgba(255,231,214,0) 60%),
+    var(--peach-50);
 }
+
+/* Page container */
 .wrap{max-width:1100px;margin:18px auto;padding:16px}
 .mt{margin-top:14px}
 .mt8{margin-top:8px}
-.h2{margin:0 0 8px;font-size:28px;letter-spacing:.2px}
+.h2{margin:0 0 10px;font-size:28px;font-weight:800;color:var(--ink);letter-spacing:.2px}
 .muted{color:var(--muted)}
 .w100{width:100%}
-.row{display:flex;gap:10px;flex-wrap:wrap}
+.row{display:flex;gap:12px;flex-wrap:wrap}
 .space{align-items:center;justify-content:space-between}
 .span2{grid-column:1/-1}
 
-/* ======= Glass cards & hero ======= */
+/* ---------- Cards / Panels (rounded, white, soft shadow) ---------- */
 .card{
-  background:var(--glass-bg);
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  backdrop-filter: blur(var(--glass-blur));
-  border-radius:var(--glass-br);
-  border:1px solid var(--glass-brd);
+  background:var(--white);
+  border:1px solid #f0f0f0;
+  border-radius:var(--radius-xl);
   padding:16px;
-  box-shadow:var(--card-shadow);
+  box-shadow:var(--shadow-card);
 }
 
-.hero{position:relative;padding:0;overflow:hidden;border-radius:var(--glass-br)}
-.banner{width:100%;height:200px;object-fit:cover;display:block;border-radius:inherit}
+/* ---------- Hero (rounded banner with title overlay) ---------- */
+.hero{position:relative;padding:0;overflow:hidden;border-radius:var(--radius-xl)}
+.banner{
+  width:100%;height:200px;object-fit:cover;display:block;border-radius:inherit
+}
 @media(max-width:560px){.banner{height:160px}}
 .hero-overlay{
-  position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;
-  background:linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,.42));
+  position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.45));
   border-radius:inherit;
 }
 .logo{
-  position:absolute;top:14px;left:14px;width:64px;height:64px;border-radius:18px;
-  background:#fff;padding:10px;box-shadow:var(--soft-shadow)
+  position:absolute;top:14px;left:14px;width:68px;height:68px;border-radius:20px;
+  background:#fff;padding:10px;box-shadow:var(--shadow-soft)
 }
 .hero-title{
-  margin-left:86px;margin-bottom:8px;font-weight:900;font-size:32px;
-  color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:.3px
+  margin-left:92px;margin-bottom:10px;
+  font-size:34px;font-weight:900;letter-spacing:.3px;
+  color:#fff;text-shadow:0 3px 10px rgba(0,0,0,.45)
 }
 
-/* ======= Inputs & buttons ======= */
+/* ---------- Inputs ---------- */
 .in{
-  width:100%;padding:14px 13px;border-radius:14px;font-size:16px;
-  background:rgba(255,255,255,.9);border:1px solid rgba(0,0,0,.06);
+  width:100%;
+  padding:14px 13px;
+  border-radius:var(--radius-md);
+  font-size:16px;
+  background:#fff;
+  border:1px solid #e7e5e4;
   outline:none;
+  box-shadow:0 2px 0 rgba(0,0,0,.01);
 }
-.in:focus{box-shadow:0 0 0 4px rgba(251,123,91,.18);border-color:#fecaca}
+.in:focus{border-color:var(--teal-300); box-shadow: var(--ring)}
+textarea.in{min-height:90px;resize:vertical}
 
+/* ---------- Buttons ---------- */
 .btn{
-  padding:14px 16px;border:0;border-radius:16px;font-weight:800;
-  background:var(--brand);color:var(--brand-ink);cursor:pointer;text-align:center;
-  box-shadow:0 10px 30px rgba(251,123,91,.35);
+  padding:14px 16px;
+  border:0;border-radius:var(--radius-lg);
+  font-weight:800;font-size:16px;
+  background:var(--teal-500);color:#fff;
+  cursor:pointer;text-align:center;
+  box-shadow:0 10px 30px rgba(42,157,143,.30);
 }
+.btn:hover{filter:saturate(1.05)}
+.btn:active{transform:translateY(1px)}
 .btn.secondary{
-  background:transparent;color:var(--ink);border:1px solid var(--glass-brd);
-  box-shadow:var(--soft-shadow)
+  background:var(--peach-500);color:#fff;
+  box-shadow:0 10px 30px rgba(244,162,97,.28);
+}
+.btn.danger{background:var(--warn-500);box-shadow:0 10px 30px rgba(231,111,81,.28)}
+
+/* ---------- Tabs (rounded chips like the shot) ---------- */
+.tabs{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.tab{
+  padding:10px 16px;border-radius:999px;
+  background:#F3F5FB;color:#0f172a;
+  border:1px solid #e5e7eb;
+  font-weight:800;cursor:pointer;
+  box-shadow:var(--shadow-soft)
+}
+.tab.active{
+  background:var(--teal-500); color:#fff; border-color:transparent;
 }
 
-/* ======= Layout grids ======= */
+/* ---------- Small Pills ---------- */
+.pill{
+  background:#F3F5FB;color:#0f172a;border:1px solid #e5e7eb;
+  border-radius:999px;padding:6px 12px;display:inline-block;font-weight:700
+}
+
+/* ---------- Tables ---------- */
+.tablewrap{margin-top:12px;overflow:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{
+  padding:12px 10px;border-bottom:1px solid #eee;font-size:15px;vertical-align:top
+}
+.tbl thead th{font-weight:800;color:var(--ink)}
+.tbl tbody tr:hover{background:#fafafa}
+
+/* ---------- Camera blocks ---------- */
+.cam{display:grid;grid-template-columns:1fr 180px;gap:12px}
+@media(max-width:520px){.cam{grid-template-columns:1fr}}
+video,canvas,img.snap{
+  width:100%;border-radius:var(--radius-lg);background:#000;max-height:240px;object-fit:cover
+}
+
+/* ---------- Grid helpers ---------- */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .gridWide{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
 @media(max-width:1000px){.gridWide{grid-template-columns:1fr}}
 
-/* ======= Tabs (glass pills) ======= */
-.tabs{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}
-.tab{
-  padding:10px 16px;border-radius:999px;background:var(--tab-bg);cursor:pointer;
-  font-weight:800;border:1px solid rgba(0,0,0,.06);color:var(--tab-ink);
-  box-shadow:var(--soft-shadow)
+/* ---------- Logout & Chips (EN/TE/Theme) ---------- */
+.logout{
+  position:absolute;right:14px;top:14px;z-index:9;
+  padding:10px 14px;border:0;border-radius:16px;font-weight:800;
+  background:#0f172a;color:#fff;box-shadow:var(--shadow-soft)
 }
-.tab.active{background:var(--tab-active-bg);color:var(--tab-active-ink);border-color:transparent}
-.hidden{display:none}
-
-/* ======= Pills ======= */
-.pill{background:var(--tab-bg);border:1px solid rgba(0,0,0,.06);border-radius:999px;padding:6px 12px;display:inline-block}
-
-/* ======= Camera ======= */
-.cam{display:grid;grid-template-columns:1fr 170px;gap:12px}
-@media(max-width:520px){.cam{grid-template-columns:1fr}}
-video,canvas,img.snap{
-  width:100%;border-radius:14px;background:#000;max-height:240px;object-fit:cover
-}
-
-/* ======= Tables ======= */
-.tablewrap{margin-top:10px;overflow:auto}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th,.tbl td{padding:12px;border-bottom:1px solid rgba(0,0,0,.06);font-size:15px;vertical-align:top}
-
-/* ======= Chips (theme/lang) ======= */
 .chips{position:absolute;right:14px;top:14px;display:flex;gap:10px}
 .chip{
-  background:var(--chip-bg);color:var(--chip-ink);
-  border:1px solid var(--glass-brd);border-radius:20px;
-  padding:8px 12px;font-weight:800;box-shadow:var(--soft-shadow);
+  background:#fff;color:#0f172a;border:1px solid #e5e7eb;
+  border-radius:20px;padding:8px 12px;font-weight:800;box-shadow:var(--shadow-soft);
   display:inline-flex;align-items:center;gap:8px
 }
 .chip.round{border-radius:999px;padding:8px 10px}
 
-/* ======= Logout ======= */
-.logout{
-  position:absolute;right:14px;top:14px;z-index:9;padding:10px 14px;border:0;
-  border-radius:16px;font-weight:800;background:#111827;color:#fff;box-shadow:var(--soft-shadow)
-}
-
-/* ======= Misc ======= */
-.divider{border:none;border-top:1px solid rgba(0,0,0,.06);margin:14px 0}
+/* ---------- Dividers & utilities ---------- */
+.divider{border:none;border-top:1px solid #eee;margin:14px 0}
 .wraptags{flex-wrap:wrap;gap:8px}
+
+/* ---------- Make anchor buttons look consistent ---------- */
+a.btn{display:inline-flex;justify-content:center;align-items:center;text-decoration:none}
+
+/* ---------- Form control fixes inside tables ---------- */
+.tbl select,.tbl input[type="text"], .tbl input[type="search"]{
+  border-radius:12px;border:1px solid #e7e5e4;padding:8px 10px;background:#fff
+}
