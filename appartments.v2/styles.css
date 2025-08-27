@@ -1,200 +1,188 @@
-/* ===========================
-   Onestop Apartments — styles.css (final)
-   - Keeps your original class names (so pages work)
-   - Adds glassmorphism + dark mode
-   - Mobile friendly + lightweight (no jank)
-   =========================== */
+/* =========================
+   Peach–Mint Mobile UI Theme
+   (drop-in replacement for styles.css)
+   ========================= */
 
-/* ---------- CSS Vars ---------- */
+/* Tokens */
 :root{
-  --bg: #f5f7fa;
-  --ink: #0f172a;
-  --muted: #667085;
-  --card-glass: rgba(255,255,255,0.28);
-  --card-solid: #ffffff;
-  --accent: #111;
-  --border: #e7e7ea;
-  --shadow: 0 8px 30px rgba(0,0,0,.08);
-  --radius: 18px;
-
-  /* dark */
-  --bg-dark: #0f1115;
-  --ink-dark: #f5f7fa;
-  --card-glass-dark: rgba(0,0,0,0.36);
-  --border-dark: #22252b;
-  --shadow-dark: 0 8px 32px rgba(0,0,0,.55);
+  --bg1:#fff4ec;         /* peach */
+  --bg2:#f0fbf5;         /* mint wash */
+  --ink:#17223b;         /* deep navy text */
+  --muted:#6b7280;       /* muted text */
+  --brand:#ff7b5c;       /* coral CTA */
+  --brand-2:#54d1a9;     /* mint accent */
+  --chip:#f7f9fc;
+  --card:#ffffff;
+  --shadow: 0 8px 24px rgba(20,28,45,.12);
+  --glass: rgba(255,255,255,.65);
+  --radius-xl:24px;
+  --radius-lg:18px;
+  --radius-md:14px;
 }
 
-/* ---------- Base ---------- */
-*{box-sizing:border-box}
+/* Base */
+*{box-sizing:border-box;-webkit-tap-highlight-color: transparent}
 html,body{height:100%}
 body.bg{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   color:var(--ink);
   background:
-    radial-gradient(1200px 1200px at 10% 0%, #dfe8ff 0%, rgba(223,232,255,0) 60%),
-    radial-gradient(1200px 1200px at 100% 40%, #ffe7d3 0%, rgba(255,231,211,0) 60%),
-    var(--bg);
+    radial-gradient(1200px 800px at 90% -10%, #ffe0d4 0%, transparent 60%),
+    radial-gradient(1000px 700px at -10% 20%, #e9fff3 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
 }
 .wrap{max-width:1100px;margin:16px auto;padding:16px}
+
+/* Utils */
 .mt{margin-top:12px}
 .mt8{margin-top:8px}
-.h2{margin:0 0 8px}
+.h2{margin:0 0 8px;font-size:22px;font-weight:800}
 .muted{color:var(--muted)}
 .w100{width:100%}
-.row{display:flex;gap:10px;flex-wrap:wrap}
+.row{display:flex;gap:12px;flex-wrap:wrap}
 .space{align-items:center;justify-content:space-between}
 .span2{grid-column:1/-1}
 
-/* ---------- Cards & Header ---------- */
-/* Glass card (default everywhere) */
+/* Cards + Hero */
 .card{
-  background:var(--card-glass);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
+  background:var(--card);
+  border-radius:var(--radius-xl);
   padding:16px;
   box-shadow:var(--shadow);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border:1px solid rgba(17,24,39,.04);
 }
-
-/* Solid card helper (use .card.solid if needed) */
-.card.solid{
-  background:var(--card-solid);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
+.hero{
+  position:relative;
+  padding:0;
+  overflow:hidden;
+  border-radius:var(--radius-xl);
+  box-shadow: var(--shadow);
 }
-
-/* Hero */
-.hero{position:relative;padding:0;overflow:hidden;border-radius:var(--radius)}
-.banner{width:100%;height:180px;object-fit:cover;display:block;border-radius:var(--radius)}
-@media(max-width:560px){.banner{height:140px}}
-
-/* gradient overlay for hero text legibility */
-.hero::after{
-  content:"";
-  position:absolute;inset:0;
-  background:linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,.38));
-  pointer-events:none;
+.banner{
+  width:100%;height:220px;object-fit:cover;display:block;
+  filter:saturate(1.05) contrast(1.02);
 }
-
-/* floating logo chip */
+@media(max-width:560px){.banner{height:180px}}
+.hero-overlay{
+  position:absolute; inset:0;
+  display:flex; align-items:flex-end;
+  padding:14px;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.35));
+}
 .logo{
-  position:absolute;top:12px;left:12px;
-  width:56px;height:56px;border-radius:999px;background:#fff;
-  padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)
+  position:absolute; top:14px; left:14px;
+  width:64px;height:64px;border-radius:18px;background:#fff;padding:10px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.18);
 }
-
-/* language/theme chip group (top-right) */
-.toggles{
-  position:absolute;top:12px;right:12px;display:flex;gap:8px;
-}
-.toggles .chip{
-  border:1px solid var(--border);
-  background:rgba(255,255,255,.72);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color:#111;
-  font-weight:700;
-  padding:8px 12px;border-radius:999px;cursor:pointer
-}
-.toggles .chip:active{transform:scale(.98)}
-
-/* hero title */
 .hero-title{
-  position:absolute;left:80px;bottom:14px;
-  font-weight:800;font-size:22px;color:#fff;
-  text-shadow:0 2px 6px rgba(0,0,0,.6)
+  margin-left:86px;margin-bottom:10px;
+  font-weight:900;font-size:28px;letter-spacing:.3px;color:#fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
 
-/* ---------- Inputs & Buttons ---------- */
+/* Inputs */
 .in{
-  width:100%;padding:12px;border:1px solid var(--border);
-  border-radius:12px;font-size:15px;background:#fff;outline:none
+  width:100%;padding:14px 14px;
+  border:1px solid rgba(17,24,39,.08);
+  border-radius:16px;font-size:16px;background:#fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+  outline:none; transition: box-shadow .2s, border-color .2s;
 }
-.in:focus{box-shadow:0 0 0 3px rgba(17,17,17,.08)}
+.in:focus{
+  border-color: rgba(84,209,169,.5);
+  box-shadow: 0 0 0 4px rgba(84,209,169,.15);
+}
 
-/* CTA button */
+/* Buttons */
 .btn{
-  padding:12px 16px;border:0;border-radius:12px;
-  font-weight:700;background:var(--accent);color:#fff;
-  cursor:pointer;text-align:center
+  padding:14px 18px;border:0;border-radius:16px;font-weight:800;
+  background:var(--brand); color:#fff; cursor:pointer; text-align:center;
+  letter-spacing:.2px; box-shadow:0 10px 20px rgba(255,123,92,.28);
+  transition: transform .06s ease, filter .2s;
 }
-.btn:active{transform:translateY(1px)}
+.btn:active{ transform: translateY(1px) }
+.btn.secondary{
+  background:#fff; color:var(--ink);
+  border:1px solid rgba(17,24,39,.08);
+  box-shadow: var(--shadow);
+}
 .btn.ghost{
-  background:transparent;color:var(--accent);
-  border:1px solid var(--border)
+  background:transparent; color:var(--brand);
+  border:1.5px solid var(--brand);
 }
 
-/* ---------- Layout grids ---------- */
+/* Chips / Tabs */
+.tabs{
+  display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 2px;
+}
+.tab{
+  padding:10px 14px;border-radius:20px;
+  background:var(--chip); cursor:pointer;font-weight:800;border:1px solid rgba(17,24,39,.06);
+  color:#111;
+}
+.tab.active{
+  background:linear-gradient(135deg,#ffffff, #ffe9e1);
+  border-color: rgba(255,123,92,.35);
+  box-shadow: 0 6px 14px rgba(255,123,92,.20);
+}
+.hidden{display:none}
+
+/* Pills & small chips */
+.pill{
+  display:inline-flex; align-items:center; gap:8px;
+  background:#fff; border:1px solid rgba(17,24,39,.08);
+  border-radius:999px; padding:8px 12px; font-weight:700;
+  box-shadow: var(--shadow);
+}
+
+/* Table look → soft cards */
+.tablewrap{margin-top:10px;overflow:auto}
+.tbl{width:100%;border-collapse:separate;border-spacing:0 12px}
+.tbl th{font-size:13px;color:var(--muted);text-align:left;padding:0 10px}
+.tbl td{
+  background:#fff; padding:14px 12px; font-size:15px; vertical-align:top;
+  border-top:1px solid rgba(17,24,39,.06);
+  border-bottom:1px solid rgba(17,24,39,.06);
+}
+.tbl tr td:first-child{border-left:1px solid rgba(17,24,39,.06);border-top-left-radius:14px;border-bottom-left-radius:14px}
+.tbl tr td:last-child{border-right:1px solid rgba(17,24,39,.06);border-top-right-radius:14px;border-bottom-right-radius:14px}
+
+/* Grids */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .gridWide{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
 @media(max-width:1000px){.gridWide{grid-template-columns:1fr}}
 
-/* ---------- Tables ---------- */
-.tablewrap{margin-top:10px;overflow:auto}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th,.tbl td{
-  padding:10px;border-bottom:1px solid var(--border);
-  font-size:14px;vertical-align:top
-}
-
-/* ---------- Tabs ---------- */
-.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
-.tab{
-  padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.7);
-  border:1px solid var(--border);cursor:pointer;font-weight:700
-}
-.tab.active{background:var(--accent);color:#fff;border-color:transparent}
-.hidden{display:none}
-
-/* ---------- Pills ---------- */
-.pill{
-  background:rgba(255,255,255,.7);
-  border:1px solid var(--border);
-  border-radius:999px;padding:6px 12px;display:inline-block
-}
-
-/* ---------- Camera ---------- */
-.cam{display:grid;grid-template-columns:1fr 160px;gap:10px}
+/* Camera blocks */
+.cam{display:grid;grid-template-columns:1fr 180px;gap:12px}
 @media(max-width:520px){.cam{grid-template-columns:1fr}}
 video,canvas,img.snap{
-  width:100%;border-radius:12px;background:#000;max-height:240px;object-fit:cover
+  width:100%;border-radius:16px;background:#000;max-height:240px;object-fit:cover;
+  box-shadow: var(--shadow);
 }
 
-/* ---------- Logout ---------- */
+/* Floating logout button */
 .logout{
-  position:fixed;right:14px;top:14px;z-index:9;
-  padding:10px 14px;border:0;border-radius:12px;font-weight:700;
-  background:var(--accent);color:#fff
+  position:fixed; right:16px; top:16px; z-index:9;
+  padding:10px 14px; border:0; border-radius:999px; font-weight:800;
+  background:rgba(23,34,59,.85); color:#fff; backdrop-filter: blur(8px);
+  box-shadow: var(--shadow);
 }
 
-/* ---------- Dividers & helpers ---------- */
-.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+/* Divider + tag wrap */
+.divider{border:none;border-top:1px dashed rgba(17,24,39,.12);margin:14px 0}
 .wraptags{flex-wrap:wrap;gap:8px}
 
-/* ===========================
-   DARK MODE
-   =========================== */
-body.dark{
-  background:
-    radial-gradient(900px 900px at 0% 0%, #1b2331 0%, rgba(27,35,49,0) 55%),
-    radial-gradient(1200px 1400px at 100% 50%, #2a1f2d 0%, rgba(42,31,45,0) 60%),
-    var(--bg-dark);
-  color:var(--ink-dark);
+/* Glass utility (for small overlay toolbars) */
+.glass{
+  background:var(--glass); backdrop-filter: blur(10px);
+  border:1px solid rgba(255,255,255,.4); box-shadow: var(--shadow);
+  border-radius: 18px;
+  color:var(--ink);
 }
-body.dark .card{
-  background:var(--card-glass-dark);
-  border:1px solid var(--border-dark);
-  box-shadow:var(--shadow-dark);
-  color:var(--ink-dark);
+
+/* Optional: big section headers like the reference */
+.section-title{
+  font-size:28px; font-weight:900; margin:4px 0 12px;
 }
-body.dark .card.solid{background:#121418;border-color:#20242c}
-body.dark .in{background:#0f131a;border-color:#1f2430;color:#dfe3ea}
-body.dark .in::placeholder{color:#8891a1}
-body.dark .tab{background:rgba(255,255,255,.06);border-color:#262a33;color:#dde3ec}
-body.dark .pill{background:rgba(255,255,255,.06);border-color:#262a33;color:#dde3ec}
-body.dark .toggles .chip{background:rgba(0,0,0,.35);color:#e8ecf2;border-color:#2a2f3a}
-body.dark .tbl th, body.dark .tbl td{border-color:#232731}
