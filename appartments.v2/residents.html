@@ -1,424 +1,237 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Apartments • Residents</title>
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css">
-  <meta name="theme-color" content="#111"/>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Apartments • Residents</title>
+<link rel="stylesheet" href="./styles.css">
+<meta name="theme-color" content="#111"/>
+<script src="./lang.js" defer></script>
 </head>
 <body class="bg">
-  <!-- Language Toggle -->
-  <button id="langToggle" class="lang-toggle" aria-label="Toggle language" title="తెలుగుకు మారండి">TE</button>
+<button class="logout" onclick="sessionStorage.clear();location.href='./index.html'">Logout</button>
 
-  <main class="wrap">
-    <!-- Header -->
-    <div class="card hero">
-      <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
-      <div class="hero-overlay">
-        <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
-        <div class="hero-title" data-i18n="Residents">Residents</div>
-      </div>
+<main class="wrap">
+  <div class="card hero">
+    <img class="banner" src="./assets/apartments_banner.png" alt="Apartments">
+    <div class="hero-overlay">
+      <img class="logo" src="./assets/logo.png" onerror="this.style.display='none'">
+      <div class="hero-title" data-i18n="Residents">Residents</div>
     </div>
-
-    <!-- Tabs -->
-    <div class="tabs mt">
-      <button class="tab active" data-t="#t_profile" data-i18n="Dashboard">Dashboard</button>
-      <button class="tab" data-t="#t_bookings" data-i18n="Bookings">Bookings</button>
-      <button class="tab" data-t="#t_complaints" data-i18n="Complaints">Complaints</button>
-      <button class="tab" data-t="#t_notices" data-i18n="Notices">Notices</button>
-      <button class="tab" data-t="#t_log" data-i18n="Visitor Log">Visitor Log</button>
-      <button class="tab" data-t="#t_pre" data-i18n="Pre-Approve a Visitor">Pre-Approve a Visitor</button>
+    <div class="hero-tools">
+      <button id="themeToggle" class="chip">🌙</button>
+      <button class="chip" onclick="AppI18N.setLang('en')">EN</button>
+      <button class="chip" onclick="AppI18N.setLang('te')">TE</button>
     </div>
+  </div>
 
-    <!-- Profile -->
-    <section class="card" id="t_profile">
-      <h2 class="h2" data-i18n="Residents">Residents</h2>
-      <p class="muted" id="p_msg"></p>
-      <div class="grid2 mt8">
-        <label data-i18n="Flat Number">Flat Number
-          <input id="p_flat" class="in" data-i18n-placeholder="Flat Number" placeholder="Flat Number">
-        </label>
-        <label data-i18n="Name">Name
-          <input id="p_name" class="in" data-i18n-placeholder="Name" placeholder="Name">
-        </label>
-        <label data-i18n="Phone">Phone
-          <input id="p_phone" class="in" inputmode="numeric" maxlength="10" data-i18n-placeholder="Phone" placeholder="Phone">
-        </label>
-        <label data-i18n="Block">Block
-          <input id="p_block" class="in" data-i18n-placeholder="Block" placeholder="Block">
-        </label>
-      </div>
-      <div class="row mt8">
-        <button class="btn" id="p_save" data-i18n="Save">Save</button>
-      </div>
-      <hr class="divider">
-      <div class="pill" data-i18n="Welcome">Welcome</div>
-    </section>
+  <!-- Tabs -->
+  <div class="tabs card">
+    <button class="tab active" data-t="#t_profile" data-i18n="Residents">Residents</button>
+    <button class="tab" data-t="#t_bookings" data-i18n="Bookings">Bookings</button>
+    <button class="tab" data-t="#t_complaints" data-i18n="Complaints">Complaints</button>
+    <button class="tab" data-t="#t_notices" data-i18n="Notices">Notices</button>
+    <button class="tab" data-t="#t_log" data-i18n="Visitor Log">Visitor Log</button>
+    <button class="tab" data-t="#t_pre" data-i18n="Pre-Approve a Visitor">Pre-Approve a Visitor</button>
+  </div>
 
-    <!-- My Bookings -->
-    <section class="card hidden" id="t_bookings">
-      <h2 class="h2" data-i18n="Bookings">Bookings</h2>
-      <div class="grid2">
-        <label data-i18n="Amenity">Amenity
-          <input id="b_amen" class="in" data-i18n-placeholder="Amenity" placeholder="Amenity">
-        </label>
-        <label data-i18n="Date">Date
-          <input id="b_date" class="in" type="date">
-        </label>
-        <label data-i18n="Time">Time
-          <input id="b_time" class="in" data-i18n-placeholder="Time" placeholder="Time">
-        </label>
-      </div>
-      <div class="row mt8">
-        <button class="btn" id="b_add" data-i18n="Add">Add</button>
-        <button class="btn" id="b_export" data-i18n="Export">Export</button>
-        <button class="btn" id="b_clear" data-i18n="Clear My Bookings">Clear My Bookings</button>
-      </div>
-      <div class="tablewrap">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th data-i18n="Amenity">Amenity</th>
-              <th data-i18n="Date">Date</th>
-              <th data-i18n="Time">Time</th>
-              <th data-i18n="Flat Number">Flat Number</th>
-              <th data-i18n="Action">Action</th>
-            </tr>
-          </thead>
-          <tbody id="b_tbody"></tbody>
-        </table>
-        <div id="b_empty" class="muted" data-i18n="No bookings yet.">No bookings yet.</div>
-      </div>
-    </section>
+  <!-- Profile -->
+  <section class="card" id="t_profile">
+    <h2 class="h2" data-i18n="Residents">Residents</h2>
+    <div class="grid2">
+      <label data-i18n="Flat Number">Flat Number <input id="p_flat" class="in" placeholder="A-302"></label>
+      <label data-i18n="Name">Name <input id="p_name" class="in" placeholder="Your name"></label>
+      <label data-i18n="Phone">Phone <input id="p_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit"></label>
+      <label data-i18n="Block">Block <input id="p_block" class="in" placeholder="A/B/C"></label>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="p_save" data-i18n="Save">Save</button>
+    </div>
+    <div id="p_msg" class="muted mt8">Welcome</div>
+  </section>
 
-    <!-- My Complaints -->
-    <section class="card hidden" id="t_complaints">
-      <h2 class="h2" data-i18n="Complaints">Complaints</h2>
-      <div class="grid2">
-        <label data-i18n="Category">Category
-          <input id="c_cat" class="in" data-i18n-placeholder="Category" placeholder="Category">
-        </label>
-        <label data-i18n="Priority">Priority
-          <input id="c_pri" class="in" data-i18n-placeholder="Priority" placeholder="Priority">
-        </label>
-      </div>
-      <label class="mt8" data-i18n="Description">Description
-        <input id="c_desc" class="in" data-i18n-placeholder="Description" placeholder="Description">
+  <!-- Bookings -->
+  <section class="card hidden" id="t_bookings">
+    <h2 class="h2" data-i18n="Bookings">Bookings</h2>
+    <div class="grid2">
+      <label>Amenity <select id="b_amen" class="in"><option>Clubhouse</option><option>Party Hall</option><option>Tennis Court</option></select></label>
+      <label>Date <input id="b_date" class="in" type="date"></label>
+      <label>Time <input id="b_time" class="in" placeholder="e.g., 6–8 PM"></label>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="b_add">Add</button>
+      <button class="btn" id="b_export">Export CSV</button>
+      <button class="btn" id="b_clear">Clear My Bookings</button>
+    </div>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Amenity</th><th>Date</th><th>Time</th><th>Flat</th><th>Action</th></tr></thead><tbody id="b_tbody"></tbody></table>
+      <div id="b_empty" class="muted">No bookings yet.</div>
+    </div>
+  </section>
+
+  <!-- Complaints -->
+  <section class="card hidden" id="t_complaints">
+    <h2 class="h2" data-i18n="Complaints">Complaints</h2>
+    <div class="grid2">
+      <label>Category
+        <select id="c_cat" class="in"><option>Plumbing</option><option>Electrical</option><option>Security</option><option>Cleanliness</option></select>
       </label>
-      <div class="row mt8">
-        <button class="btn" id="c_add" data-i18n="Submit">Submit</button>
-        <button class="btn" id="c_export" data-i18n="Export">Export</button>
-      </div>
-      <div class="tablewrap">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th data-i18n="Time">Time</th>
-              <th data-i18n="Category">Category</th>
-              <th data-i18n="Priority">Priority</th>
-              <th data-i18n="Status">Status</th>
-              <th data-i18n="Assigned To">Assigned To</th>
-              <th data-i18n="Description">Description</th>
-            </tr>
-          </thead>
-          <tbody id="c_tbody"></tbody>
-        </table>
-        <div id="c_empty" class="muted" data-i18n="No complaints yet.">No complaints yet.</div>
-      </div>
-    </section>
+      <label>Priority
+        <select id="c_pri" class="in"><option>Low</option><option>Medium</option><option>High</option></select>
+      </label>
+      <label class="span2">Description <input id="c_desc" class="in" placeholder="Short issue summary"></label>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="c_add">Submit</button>
+      <button class="btn" id="c_export">Export CSV</button>
+    </div>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>When</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Details</th></tr></thead><tbody id="c_tbody"></tbody></table>
+      <div id="c_empty" class="muted">No complaints yet.</div>
+    </div>
+  </section>
 
-    <!-- Notices (from your snippet) -->
-    <section class="card hidden" id="t_notices">
-      <h2 class="h2" data-i18n="Notices">Notices</h2>
-      <div class="tablewrap">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th data-i18n="Notice">Notice</th>
-              <th data-i18n="Audience">Audience</th>
-              <th data-i18n="Time">Time</th>
-              <th data-i18n="Action">Action</th>
-            </tr>
-          </thead>
-          <tbody id="n_tbody"></tbody>
-        </table>
-        <div id="n_empty" class="muted" data-i18n="No notices yet.">No notices yet.</div>
-      </div>
-    </section>
+  <!-- Notices -->
+  <section class="card hidden" id="t_notices">
+    <h2 class="h2" data-i18n="Notices">Notices</h2>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Notice</th><th>Audience</th><th>Time</th><th>Action</th></tr></thead><tbody id="n_tbody"></tbody></table>
+      <div id="n_empty" class="muted">No notices yet.</div>
+    </div>
+  </section>
 
-    <!-- Visitor Log (from your snippet) -->
-    <section class="card hidden" id="t_log">
-      <h2 class="h2" data-i18n="Visitor Log">Visitor Log</h2>
-      <div class="row space">
-        <input id="v_search" class="in" style="max-width:260px"
-               placeholder="Search name/purpose"
-               data-i18n-placeholder="Search name/purpose">
-        <button class="btn" id="v_export" data-i18n="Export CSV">Export CSV</button>
-      </div>
-      <div class="tablewrap">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th data-i18n="Name">Name</th>
-              <th data-i18n="Purpose">Purpose</th>
-              <th data-i18n="Time">Time</th>
-              <th data-i18n="Photo">Photo</th>
-            </tr>
-          </thead>
-          <tbody id="v_tbody"></tbody>
-        </table>
-        <div id="v_empty" class="muted" data-i18n="No visitors yet.">No visitors yet.</div>
-      </div>
-    </section>
+  <!-- Visitor Log -->
+  <section class="card hidden" id="t_log">
+    <h2 class="h2" data-i18n="Visitor Log">Visitor Log</h2>
+    <div class="row space">
+      <input id="v_search" class="in" placeholder="Search name/purpose" style="max-width:260px">
+      <button class="btn" id="v_export">Export CSV</button>
+    </div>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Purpose</th><th>Time</th><th>Photo</th></tr></thead><tbody id="v_tbody"></tbody></table>
+      <div id="v_empty" class="muted">No visitors yet.</div>
+    </div>
+  </section>
 
-    <!-- Pre-Approval (from your snippet) -->
-    <section class="card hidden" id="t_pre">
-      <h2 class="h2" data-i18n="Pre-Approve a Visitor">Pre-Approve a Visitor</h2>
-      <div class="grid2">
-        <label data-i18n="Visitor Name">Visitor Name
-          <input id="pa_name" class="in" data-i18n-placeholder="Visitor Name" placeholder="e.g., Courier / Friend">
-        </label>
-        <label data-i18n="Phone">Phone
-          <input id="pa_phone" class="in" inputmode="numeric" maxlength="10" data-i18n-placeholder="Phone" placeholder="10-digit (optional)">
-        </label>
-        <label data-i18n="Date">Date
-          <input id="pa_date" class="in" type="date">
-        </label>
-        <label data-i18n="Purpose">Purpose
-          <input id="pa_purpose" class="in" data-i18n-placeholder="Purpose" placeholder="e.g., Delivery, Guest">
-        </label>
-      </div>
-      <div class="row mt8">
-        <button class="btn" id="pa_add" data-i18n="Add">Add</button>
-        <button class="btn" id="pa_export" data-i18n="Export CSV">Export CSV</button>
-        <button class="btn" id="pa_clear" data-i18n="Clear My Pre-Approvals">Clear My Pre-Approvals</button>
-      </div>
-      <div class="tablewrap">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th data-i18n="Name">Name</th>
-              <th data-i18n="Date">Date</th>
-              <th data-i18n="Purpose">Purpose</th>
-              <th data-i18n="Status">Status</th>
-              <th data-i18n="Action">Action</th>
-            </tr>
-          </thead>
-          <tbody id="pa_tbody"></tbody>
-        </table>
-        <div id="pa_empty" class="muted" data-i18n="No pre-approvals yet.">No pre-approvals yet.</div>
-      </div>
-    </section>
-  </main>
+  <!-- Pre-Approval -->
+  <section class="card hidden" id="t_pre">
+    <h2 class="h2" data-i18n="Pre-Approve a Visitor">Pre-Approve a Visitor</h2>
+    <div class="grid2">
+      <label>Visitor Name <input id="pa_name" class="in" placeholder="e.g., Courier / Friend"></label>
+      <label>Phone <input id="pa_phone" class="in" inputmode="numeric" maxlength="10" placeholder="10-digit (optional)"></label>
+      <label>Date <input id="pa_date" class="in" type="date"></label>
+      <label>Purpose <input id="pa_purpose" class="in" placeholder="e.g., Delivery, Guest"></label>
+    </div>
+    <div class="row mt8">
+      <button class="btn" id="pa_add">Add</button>
+      <button class="btn" id="pa_export">Export CSV</button>
+      <button class="btn" id="pa_clear">Clear My Pre-Approvals</button>
+    </div>
+    <div class="tablewrap">
+      <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Date</th><th>Purpose</th><th>Status</th><th>Action</th></tr></thead><tbody id="pa_tbody"></tbody></table>
+      <div id="pa_empty" class="muted">No pre-approvals yet.</div>
+    </div>
+  </section>
+</main>
 
-  <!-- Logout -->
-  <button class="logout" onclick="location.replace('./index.html')" data-i18n="Logout">Logout</button>
+<script>
+/* theme */
+(function(){
+  const btn=document.getElementById('themeToggle'); if(!btn) return;
+  const apply=(m)=>{ document.body.classList.toggle('dark', m==='dark'); btn.textContent=m==='dark'?'☀️':'🌙'; localStorage.setItem('theme',m); };
+  apply(localStorage.getItem('theme')||'light');
+  btn.addEventListener('click',()=>apply(document.body.classList.contains('dark')?'light':'dark'));
+})();
 
-  <!-- i18n script -->
-  <script src="./lang.js" defer></script>
+/* SW */
+if ("serviceWorker" in navigator && localStorage.getItem("apt_sw") !== "off") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
 
-  <script>
-  // ===== helpers from your snippet =====
-  const K={profile:"apt_profile", preapprove:"apt_preapprove", visits:"apt_visits", deliveries:"apt_deliveries", complaints:"apt_complaints", notices:"apt_notices", bookings:"apt_bookings"};
-  const $=id=>document.getElementById(id);
-  const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
-  const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-  const uid=()=>Math.random().toString(36).slice(2,9);
-  const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
-  const today=()=>new Date().toISOString().slice(0,10);
+/* ====== data + helpers ====== */
+const K={profile:"apt_profile", preapprove:"apt_preapprove", visits:"apt_visits", deliveries:"apt_deliveries", complaints:"apt_complaints", notices:"apt_notices", bookings:"apt_bookings"};
+const $=id=>document.getElementById(id);
+const jget=k=>JSON.parse(localStorage.getItem(k)||"[]");
+const jset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const csv=(rows,heads,name)=>{const out=[heads.join(",")];rows.forEach(r=>out.push(heads.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download=name;a.click();};
+const today=()=>new Date().toISOString().slice(0,10);
 
-  // translator helper for runtime text
-  function tr(key){ return (window.AppI18N && AppI18N.t) ? AppI18N.t(key) : key; }
+/* tabs */
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.querySelectorAll("section.card").forEach(s=>{ if(s.id.startsWith("t_")) s.classList.add("hidden"); });
+  document.querySelector(t.dataset.t).classList.remove("hidden");
+});
 
-  // tabs
-  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    t.classList.add("active");
-    document.querySelectorAll("section.card").forEach(s=>{ if(s.id.startsWith("t_")) s.classList.add("hidden"); });
-    document.querySelector(t.dataset.t).classList.remove("hidden");
+/* profile */
+function loadProfile(){ const p=JSON.parse(localStorage.getItem(K.profile)||"{}"); p_flat.value=p.flat||""; p_name.value=p.name||""; p_phone.value=p.phone||""; p_block.value=p.block||""; }
+p_save.onclick=()=>{ const data={flat:p_flat.value.trim(),name:p_name.value.trim(),phone:p_phone.value.trim(),block:p_block.value.trim()}; localStorage.setItem(K.profile,JSON.stringify(data)); p_msg.textContent="Saved locally."; setTimeout(()=>p_msg.textContent="",1800); renderAll(); };
+
+/* bookings */
+function renderBookings(){
+  const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
+  const arr=jget(K.bookings).filter(b=>b.flat===flat).sort((a,b)=>b.ts-a.ts);
+  b_tbody.innerHTML=""; b_empty.style.display=arr.length?"none":"block";
+  arr.forEach((r,i)=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${r.amen}</td><td>${r.date}</td><td>${r.time}</td><td>${r.flat}</td><td><button class="btn" onclick="delBooking('${r.id}')">Cancel</button></td>`; b_tbody.appendChild(tr); });
+}
+b_add.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),amen:b_amen.value,date:b_date.value||today(),time:b_time.value.trim(),flat:me.flat,ts:Date.now()}; const arr=jget(K.bookings); arr.unshift(row); jset(K.bookings,arr); renderBookings(); };
+b_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.bookings).filter(b=>b.flat===(me.flat||"")); csv(rows,["id","amen","date","time","flat","ts"],"My_Bookings.csv"); };
+b_clear.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const arr=jget(K.bookings).filter(b=>b.flat!==me.flat); jset(K.bookings,arr); renderBookings(); };
+window.delBooking=(id)=>{ let arr=jget(K.bookings); arr=arr.filter(x=>x.id!==id); jset(K.bookings,arr); renderBookings(); };
+
+/* complaints */
+function renderMyComplaints(){
+  const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
+  const arr=jget(K.complaints).filter(c=>c.flat===flat).sort((a,b)=>b.ts-a.ts);
+  c_tbody.innerHTML=""; c_empty.style.display=arr.length?"none":"block";
+  arr.forEach((r,i)=>{ const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}); const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${t}</td><td>${r.cat}</td><td>${r.priority}</td><td>${r.status}</td><td>${r.assign||"—"}</td><td>${r.desc||""}</td>`; c_tbody.appendChild(tr); });
+}
+c_add.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),flat:me.flat,cat:c_cat.value,priority:c_pri.value,desc:c_desc.value.trim(),status:"Open",assign:"",ts:Date.now()}; const arr=jget(K.complaints); arr.unshift(row); jset(K.complaints,arr); c_desc.value=""; renderMyComplaints(); };
+c_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.complaints).filter(c=>c.flat===(me.flat||"")); csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"My_Complaints.csv"); };
+
+/* notices */
+function renderNotices(){
+  const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const block=me.block||"";
+  const arr=jget(K.notices).slice().sort((a,b)=>b.ts-a.ts);
+  n_tbody.innerHTML=""; n_empty.style.display=arr.length?"none":"block";
+  arr.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+    const show = (r.aud==="All" || r.aud===block || r.aud===me.flat);
+    if(!show) return;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td><b>${r.title||"Notice"}</b><br>${r.msg||""}</td><td>${r.aud||"All"}</td><td>${t}</td><td><button class="btn" onclick="rmNotice('${r.id}')">Mark Read</button></td>`;
+    n_tbody.appendChild(tr);
   });
+  if(!n_tbody.children.length) n_empty.style.display="block";
+}
+window.rmNotice=(id)=>{ const read=JSON.parse(localStorage.getItem("apt_notices_read")||"[]"); if(!read.includes(id)) read.push(id); localStorage.setItem("apt_notices_read",JSON.stringify(read)); renderNotices(); };
 
-  // profile
-  function loadProfile(){
-    const p=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    p_flat.value=p.flat||"";
-    p_name.value=p.name||"";
-    p_phone.value=p.phone||"";
-    p_block.value=p.block||"";
-  }
-  p_save.onclick=()=>{
-    const data={
-      flat:p_flat.value.trim(),
-      name:p_name.value.trim(),
-      phone:p_phone.value.trim(),
-      block:p_block.value.trim()
-    };
-    localStorage.setItem(K.profile,JSON.stringify(data));
-    p_msg.textContent=tr("Saved locally.");
-    setTimeout(()=>p_msg.textContent="",1800);
-    renderAll();
-  };
+/* visitor log */
+function renderVisitorLog(){
+  const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
+  const q=(v_search.value||"").toLowerCase();
+  const rows=jget(K.visits).filter(v=>v.flat===flat).filter(v=>(v.name||"").toLowerCase().includes(q)||(v.purpose||"").toLowerCase().includes(q)).sort((a,b)=>b.ts-a.ts);
+  v_tbody.innerHTML=""; v_empty.style.display=rows.length?"none":"block";
+  rows.forEach((r,i)=>{
+    const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+    const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.purpose}</td><td>${t}</td><td>${img}</td>`;
+    v_tbody.appendChild(tr);
+  });
+}
+v_search.addEventListener("input",renderVisitorLog);
+v_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.visits).filter(v=>v.flat===(me.flat||"")).map(({photo,...x})=>x); csv(rows,["id","flat","name","phone","purpose","ts"],"My_Visitors.csv"); };
 
-  // bookings
-  function renderBookings(){
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
-    const arr=jget(K.bookings).filter(b=>b.flat===flat).sort((a,b)=>b.ts-a.ts);
-    b_tbody.innerHTML=""; b_empty.style.display=arr.length?"none":"block";
-    arr.forEach((r,i)=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${i+1}</td><td>${r.amen}</td><td>${r.date}</td><td>${r.time}</td><td>${r.flat}</td>
-        <td><button class="btn" onclick="delBooking('${r.id}')" data-i18n="Cancel">${tr("Cancel")}</button></td>`;
-      b_tbody.appendChild(tr);
-    });
-  }
-  b_add.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    if(!me.flat){ alert(tr("Save your flat first.")); return; }
-    const row={id:uid(),amen:b_amen.value,date:b_date.value||today(),time:b_time.value.trim(),flat:me.flat,ts:Date.now()};
-    const arr=jget(K.bookings); arr.unshift(row); jset(K.bookings,arr); renderBookings();
-  };
-  b_export.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    const rows=jget(K.bookings).filter(b=>b.flat===(me.flat||""));
-    csv(rows,["id","amen","date","time","flat","ts"],"My_Bookings.csv");
-  };
-  b_clear.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    const arr=jget(K.bookings).filter(b=>b.flat!==me.flat);
-    jset(K.bookings,arr); renderBookings();
-  };
-  window.delBooking=(id)=>{
-    let arr=jget(K.bookings); arr=arr.filter(x=>x.id!==id); jset(K.bookings,arr); renderBookings();
-  };
+/* pre-approvals */
+function renderPre(){ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||""; const arr=jget(K.preapprove).filter(p=>p.flat===flat).sort((a,b)=>b.ts-a.ts); pa_tbody.innerHTML=""; pa_empty.style.display=arr.length?"none":"block"; arr.forEach((r,i)=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.date||"—"}</td><td>${r.purpose||"—"}</td><td>${r.status||"Queued"}</td><td><button class="btn" onclick="delPA('${r.id}')">Delete</button></td>`; pa_tbody.appendChild(tr); }); }
+pa_add.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); if(!me.flat){alert("Save your flat first.");return;} const row={id:uid(),flat:me.flat,name:pa_name.value.trim(),phone:pa_phone.value.trim(),date:pa_date.value||today(),purpose:pa_purpose.value.trim()||"guest",status:"Queued",ts:Date.now()}; if(!row.name){alert("Name required");return;} const arr=jget(K.preapprove); arr.unshift(row); jset(K.preapprove,arr); pa_name.value=pa_phone.value=pa_purpose.value=""; renderPre(); };
+pa_export.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const rows=jget(K.preapprove).filter(p=>p.flat===(me.flat||"")); csv(rows,["id","flat","name","phone","date","purpose","status","ts"],"My_PreApprovals.csv"); };
+pa_clear.onclick=()=>{ const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const arr=jget(K.preapprove).filter(p=>p.flat!==me.flat); jset(K.preapprove,arr); renderPre(); };
+window.delPA=(id)=>{ let arr=jget(K.preapprove); arr=arr.filter(x=>x.id!==id); jset(K.preapprove,arr); renderPre(); };
 
-  // complaints
-  function renderMyComplaints(){
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
-    const arr=jget(K.complaints).filter(c=>c.flat===flat).sort((a,b)=>b.ts-a.ts);
-    c_tbody.innerHTML=""; c_empty.style.display=arr.length?"none":"block";
-    arr.forEach((r,i)=>{
-      const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${i+1}</td><td>${t}</td><td>${r.cat}</td><td>${r.priority}</td><td>${r.status}</td><td>${r.assign||"—"}</td><td>${r.desc||""}</td>`;
-      c_tbody.appendChild(tr);
-    });
-  }
-  c_add.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    if(!me.flat){ alert(tr("Save your flat first.")); return; }
-    const row={id:uid(),flat:me.flat,cat:c_cat.value,priority:c_pri.value,desc:c_desc.value.trim(),status:"Open",assign:"",ts:Date.now()};
-    const arr=jget(K.complaints); arr.unshift(row); jset(K.complaints,arr); c_desc.value=""; renderMyComplaints();
-  };
-  c_export.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    const rows=jget(K.complaints).filter(c=>c.flat===(me.flat||""));
-    csv(rows,["id","flat","cat","priority","desc","status","assign","ts"],"My_Complaints.csv");
-  };
-
-  // notices
-  function renderNotices(){
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const block=me.block||"";
-    const arr=jget(K.notices).slice().sort((a,b)=>b.ts-a.ts);
-    n_tbody.innerHTML=""; n_empty.style.display=arr.length?"none":"block";
-    arr.forEach((r,i)=>{
-      const t=new Date(r.ts).toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
-      const show = (r.aud==="All" || r.aud===block || r.aud===me.flat);
-      if(!show) return;
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${i+1}</td>
-        <td><b>${r.title||tr("Notice")}</b><br>${r.msg||""}</td>
-        <td>${r.aud||"All"}</td>
-        <td>${t}</td>
-        <td><button class="btn" onclick="rmNotice('${r.id}')" data-i18n="Mark Read">${tr("Mark Read")}</button></td>`;
-      n_tbody.appendChild(tr);
-    });
-    if(!n_tbody.children.length) n_empty.style.display="block";
-  }
-  window.rmNotice=(id)=>{
-    const read=JSON.parse(localStorage.getItem("apt_notices_read")||"[]");
-    if(!read.includes(id)) read.push(id);
-    localStorage.setItem("apt_notices_read",JSON.stringify(read));
-    renderNotices();
-  };
-
-  // visitor log
-  function renderVisitorLog(){
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
-    const q=(v_search.value||"").toLowerCase();
-    const rows=jget(K.visits)
-      .filter(v=>v.flat===flat)
-      .filter(v=>(v.name||"").toLowerCase().includes(q)||(v.purpose||"").toLowerCase().includes(q))
-      .sort((a,b)=>b.ts-a.ts);
-    v_tbody.innerHTML=""; v_empty.style.display=rows.length?"none":"block";
-    rows.forEach((r,i)=>{
-      const t=new Date(r.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-      const img=r.photo?`<img src="${r.photo}" style="width:70px;height:50px;object-fit:cover;border-radius:8px">`:"—";
-      const trEl=document.createElement("tr");
-      trEl.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.purpose}</td><td>${t}</td><td>${img}</td>`;
-      v_tbody.appendChild(trEl);
-    });
-  }
-  v_search.addEventListener("input",renderVisitorLog);
-  v_export.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    const rows=jget(K.visits).filter(v=>v.flat===(me.flat||"")).map(({photo,...x})=>x);
-    csv(rows,["id","flat","name","phone","purpose","ts"],"My_Visitors.csv");
-  };
-
-  // pre-approvals
-  function renderPre(){
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}"); const flat=me.flat||"";
-    const arr=jget(K.preapprove).filter(p=>p.flat===flat).sort((a,b)=>b.ts-a.ts);
-    pa_tbody.innerHTML=""; pa_empty.style.display=arr.length?"none":"block";
-    arr.forEach((r,i)=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${i+1}</td><td>${r.name}</td><td>${r.date||"—"}</td><td>${r.purpose||"—"}</td><td>${r.status||"Queued"}</td>
-        <td><button class="btn" onclick="delPA('${r.id}')" data-i18n="Delete">${tr("Delete")}</button></td>`;
-      pa_tbody.appendChild(tr);
-    });
-  }
-  pa_add.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    if(!me.flat){ alert(tr("Save your flat first.")); return; }
-    const row={
-      id:uid(), flat:me.flat,
-      name:pa_name.value.trim(),
-      phone:pa_phone.value.trim(),
-      date:pa_date.value||today(),
-      purpose:pa_purpose.value.trim()||"guest",
-      status:"Queued", ts:Date.now()
-    };
-    if(!row.name){ alert(tr("Name required")); return; }
-    const arr=jget(K.preapprove); arr.unshift(row); jset(K.preapprove,arr);
-    pa_name.value=pa_phone.value=pa_purpose.value="";
-    renderPre();
-  };
-  pa_export.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    const rows=jget(K.preapprove).filter(p=>p.flat===(me.flat||""));
-    csv(rows,["id","flat","name","phone","date","purpose","status","ts"],"My_PreApprovals.csv");
-  };
-  pa_clear.onclick=()=>{
-    const me=JSON.parse(localStorage.getItem(K.profile)||"{}");
-    const arr=jget(K.preapprove).filter(p=>p.flat!==me.flat);
-    jset(K.preapprove,arr); renderPre();
-  };
-  window.delPA=(id)=>{
-    let arr=jget(K.preapprove); arr=arr.filter(x=>x.id!==id); jset(K.preapprove,arr); renderPre();
-  };
-
-  // render all
-  if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
-  loadProfile();
-  function renderAll(){ renderBookings(); renderMyComplaints(); renderNotices(); renderVisitorLog(); renderPre(); }
-  renderAll();
-  </script>
-</body>
-</html>
+/* render all */
+function renderAll(){ renderBookings(); renderMyComplaints(); renderNotices(); renderVisitorLog(); renderPre(); }
+if("serviceWorker" in navigator){/* already registered conditionally above */ }
+loadProfile(); renderAll();
+</script>
+</body></html>
