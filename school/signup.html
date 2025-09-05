@@ -28,26 +28,30 @@ const msg  = document.getElementById("msg");
 
 form.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const fullName = document.getElementById("name").value;
-  const email    = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { data, error } = await sb.auth.signUp({ email, password });
   msg.hidden = false;
-  if (error) {
-    msg.textContent = "❌ " + error.message;
-    return;
+  msg.textContent = "Creating account…";
+  const full_name = document.getElementById("name").value.trim();
+  const email     = document.getElementById("email").value.trim();
+  const password  = document.getElementById("password").value;
+
+  // 1) Sign up
+  const { data, error } = await sb.auth.signUp({
+    email, password, options: { data: { full_name } }
+  });
+  if (error) { msg.textContent = "❌ " + error.message; return; }
+
+  // 2) If no session (e.g., confirm-email was on earlier), auto login
+  if (!data.session) {
+    const { error: e2 } = await sb.auth.signInWithPassword({ email, password });
+    if (e2) { msg.textContent = "❌ " + e2.message; return; }
   }
 
-  // Insert profile row (default role = parent in DB)
-  if (data.user) {
-    await sb.from("profiles").insert({
-      user_id: data.user.id,
-      full_name: fullName
-    }).catch(()=>{});
-  }
+  // 3) Ensure a profile row has the name (trigger creates row; this updates name)
+  const userId = (await sb.auth.getUser()).data.user?.id;
+  if (userId) { await sb.from("profiles").update({ full_name }).eq("user_id", userId).catch(()=>{}); }
 
-  msg.textContent = "✅ Account created. Please login.";
+  msg.textContent = "✅ Account ready. Redirecting…";
+  setTimeout(()=> location.href = "index.html", 600);
 });
 </script>
 </body>
