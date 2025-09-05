@@ -167,3 +167,8 @@ footer{ height:32px }
 }
 .toast.show{ opacity:1; transform:translate(-50%,-4px); }
 body.light .toast{ background:#0f1430; color:#fff; }
+.banner {
+  margin-top: 10px;
+  max-width: 100%;
+  border-radius: 12px;
+}
