@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body class="wrap">
+  <h2>Login</h2>
+  <div class="card">
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button id="loginBtn">Login</button>
+    <p class="muted">No account? <a href="./signup.html">Sign up</a></p>
+  </div>
+
+<script type="module">
+import { sb } from "./js/supabase.js";
+
+document.querySelector("#loginBtn").onclick = async () => {
+  const email = document.querySelector("#email").value.trim();
+  const password = document.querySelector("#password").value;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) alert(error.message);
+  else location.href = "./parents.html"; // change target if needed
+};
+</script>
+</body>
+</html>
