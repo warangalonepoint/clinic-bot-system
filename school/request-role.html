@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Request Role</title>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body class="dark">
+<div class="wrapper">
+  <section class="accent-slate glass inner">
+    <h1>Request Role</h1>
+    <p class="text-dim">Submit your details. Admin will approve.</p>
+
+    <div class="h2 mt-12">Parent</div>
+    <div class="form-grid">
+      <input class="input" id="adm" placeholder="Admission No"/>
+      <button class="btn btn-indigo" id="btnParent">Request Parent</button>
+    </div>
+
+    <div class="h2 mt-12">Teacher</div>
+    <div class="form-grid">
+      <input class="input" id="emp" placeholder="Employee ID"/>
+      <button class="btn btn-blue" id="btnTeacher">Request Teacher</button>
+    </div>
+
+    <div class="h2 mt-12">Coordinator</div>
+    <div class="form-grid">
+      <select class="input" id="desig">
+        <option>Coordinator</option>
+        <option>Head Coordinator</option>
+        <option>Vice Principal</option>
+        <option>Principal</option>
+      </select>
+      <button class="btn btn-violet" id="btnCoord">Request Coordinator</button>
+    </div>
+
+    <div id="msg" class="note" hidden></div>
+  </section>
+</div>
+
+<script type="module">
+import { requireLogin, sb } from "./js/supabase.js";
+await requireLogin();
+const msg = document.getElementById('msg');
+async function notify(promise) {
+  msg.hidden = false;
+  msg.textContent = 'Submitting…';
+  const { error } = await promise;
+  msg.textContent = error ? '❌ '+error.message : '✅ Submitted for approval';
+}
+document.getElementById('btnParent').onclick = ()=> 
+  notify(sb.rpc('request_role', { p_requested_role:'parent', p_admission_no: document.getElementById('adm').value.trim() }));
+document.getElementById('btnTeacher').onclick = ()=> 
+  notify(sb.rpc('request_role', { p_requested_role:'teacher', p_emp_id: document.getElementById('emp').value.trim() }));
+document.getElementById('btnCoord').onclick = ()=> 
+  notify(sb.rpc('request_role', { p_requested_role:'coordinator', p_designation: document.getElementById('desig').value }));
+</script>
+</body>
+</html>
