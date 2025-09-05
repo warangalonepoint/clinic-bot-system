@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
+  <meta http-equiv="Cache-Control" content="no-store, must-revalidate"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>School PWA</title>
   <link rel="stylesheet" href="styles.css"/>
@@ -9,63 +10,98 @@
   <meta name="theme-color" content="#0b0f19"/>
 </head>
 <body class="dark">
-<div class="wrapper">
-  <section class="accent-violet">
-    <div class="glass header">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div>
-          <div class="h1">School PWA</div>
-          <div class="text-dim">Role-based demo</div>
-        </div>
-        <div class="row" style="gap:8px">
-          <a class="btn" href="./login.html">Login</a>
-          <a class="btn btn-outline" href="./signup.html">Sign up</a>
-          <button class="btn" onclick="toggleTheme()">Theme</button>
+  <div class="wrapper">
+
+    <!-- Header -->
+    <section class="accent-violet">
+      <div class="glass header">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div>
+            <div class="h1">School PWA</div>
+            <div class="text-dim">Role-based demo</div>
+          </div>
+          <div class="row" style="gap:8px">
+            <a class="btn" href="./login.html">Login</a>
+            <a class="btn btn-outline" href="./signup.html">Sign up</a>
+            <button class="btn" onclick="toggleTheme()">Theme</button>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="accent-slate">
-    <div class="glass inner" id="auth-strip" hidden>
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div>
-          <div class="h2" id="hello"></div>
-          <div class="text-dim" id="roleLine"></div>
+    <!-- Auth strip (visible briefly if already logged in) -->
+    <section class="accent-slate">
+      <div class="glass inner" id="auth-strip" hidden>
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div>
+            <div class="h2" id="hello"></div>
+            <div class="text-dim" id="roleLine"></div>
+          </div>
+          <a class="btn" href="./logout.html">Logout</a>
         </div>
-        <a class="btn" href="./logout.html">Logout</a>
       </div>
-    </div>
-  </section>
-</div>
+    </section>
 
-<script type="module">
-import { sb } from "./js/supabase.js";
+  </div>
 
-// service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
-const { data: { user } } = await sb.auth.getUser();
-if (user) {
-  const { data: prof } = await sb.from('profiles')
-    .select('full_name, role').eq('user_id', user.id).maybeSingle();
+  <!-- App boot -->
+  <script type="module">
+    import { sb } from "./js/supabase.js";
 
-  const role = prof?.role || 'parent'; // fallback
-  const name = prof?.full_name || user.email || 'User';
+    // 1) Register the SW (non-blocking)
+    if ('serviceWorker' in navigator) {
+      try { navigator.serviceWorker.register('./sw.js'); } catch {}
+    }
 
-  const strip = document.getElementById('auth-strip');
-  strip.hidden = false;
-  document.getElementById('hello').textContent = `Hello, ${name}`;
-  document.getElementById('roleLine').textContent = `Signed in as ${role}`;
+    // 2) If logged in, redirect to the correct dashboard
+    try {
+      const { data: { user } } = await sb.auth.getUser();
 
-  const roleMap = { parent:'parents.html', teacher:'teacher.html', coordinator:'coordinator.html', admin:'admin.html' };
-  const theme = localStorage.getItem('theme') || 'dark';
-  location.href = `${roleMap[role]}?theme=${theme}`;
-}
+      if (user) {
+        // Show quick strip while we resolve role
+        const strip = document.getElementById('auth-strip');
+        strip.hidden = false;
+        document.getElementById('hello').textContent = `Hello, ${user.email}`;
 
-}
-</script>
-<script type="module" src="ui.js"></script>
+        // Try to fetch role from profiles; if missing, default to 'parent'
+        let role = 'parent';
+        let fullName = null;
+
+        try {
+          const { data: prof, error } = await sb
+            .from('profiles')
+            .select('full_name, role')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (!error && prof) {
+            role = prof.role || 'parent';
+            fullName = prof.full_name || null;
+          }
+        } catch {}
+
+        document.getElementById('roleLine').textContent = `Signed in as ${role}`;
+
+        // Map role -> page and hard-redirect
+        const pages = {
+          parent: 'parents.html',
+          teacher: 'teacher.html',
+          coordinator: 'coordinator.html',
+          admin: 'admin.html'
+        };
+
+        const target = pages[role] || pages.parent;
+        const theme = localStorage.getItem('theme') || 'dark';
+        const ts = Date.now();
+        location.replace(`${target}?theme=${theme}&t=${ts}`);
+      }
+    } catch (e) {
+      // If anything fails, we just stay on index and let user use Login/Sign up
+      console.warn('Index bootstrap error:', e);
+    }
+  </script>
+
+  <!-- UI helpers (theme toggle etc.) -->
+  <script type="module" src="ui.js"></script>
 </body>
 </html>
