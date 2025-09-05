@@ -23,11 +23,11 @@
           <div class="h1">Teacher Panel</div>
         </div>
         <div class="row" style="gap:8px">
-          <a class="btn" href="./logout.html">Logout</a>
           <button class="btn" onclick="toggleTheme()">Theme</button>
+          <button class="btn" onclick="resetApp()">Reset</button>
+          <button class="btn" onclick="clearCache()">Clear Cache</button>
         </div>
       </div>
-
       <div class="tab-row" id="tabs">
         <button class="chip chip-indigo" data-tab="diary">Diary</button>
         <button class="chip chip-blue"   data-tab="homework">Homework</button>
@@ -39,7 +39,6 @@
     </div>
   </section>
 
-  <!-- Diary -->
   <section id="panel-diary" class="glass inner panel">
     <div class="h1">Post Diary</div>
     <form id="diaryForm" class="form-grid mt-12">
@@ -50,7 +49,6 @@
     <div id="diaryMsg" class="note" hidden></div>
   </section>
 
-  <!-- Homework -->
   <section id="panel-homework" class="glass inner panel" hidden>
     <div class="h1">Assign Homework</div>
     <form id="hwForm" class="form-grid mt-12">
@@ -62,7 +60,6 @@
     <div id="hwMsg" class="note" hidden></div>
   </section>
 
-  <!-- Attendance -->
   <section id="panel-attendance" class="glass inner panel" hidden>
     <div class="h1">Mark Attendance</div>
     <form id="attForm" class="form-grid mt-12">
@@ -76,7 +73,6 @@
     <div id="attMsg" class="note" hidden></div>
   </section>
 
-  <!-- Marks -->
   <section id="panel-marks" class="glass inner panel" hidden>
     <div class="h1">Enter Marks</div>
     <form id="marksForm" class="form-grid mt-12">
@@ -88,13 +84,11 @@
     <div id="marksMsg" class="note" hidden></div>
   </section>
 
-  <!-- Announcements -->
   <section id="panel-announcements" class="glass inner panel" hidden>
     <div class="h1">Announcements</div>
     <div id="annList" class="mt-12"><div class="note">Loading…</div></div>
   </section>
 
-  <!-- Events -->
   <section id="panel-events" class="glass inner panel" hidden>
     <div class="h1">Events</div>
     <div id="evList" class="mt-12"><div class="note">Loading…</div></div>
@@ -102,18 +96,17 @@
 
 </div>
 
-<!-- Tabs -->
 <script type="module">
   import {initTabs} from './ui.js';
   initTabs(document);
 </script>
 
-<!-- Supabase wiring -->
 <script type="module">
-  import { requireLogin, sb } from "./js/supabase.js";
-  await requireLogin();
+  import { sb } from "./js/supabase.js";
+  window.clearCache = async function(){ try{ localStorage.clear(); if('caches'in window){const n=await caches.keys(); await Promise.all(n.map(x=>caches.delete(x)));} if('serviceWorker'in navigator){const r=await navigator.serviceWorker.getRegistrations(); for(const rr of r) await rr.unregister();} alert('✅ Cache cleared'); }catch(e){ alert('❌ '+e.message);} location.reload(true); };
+  window.resetApp = function(){ try{ localStorage.removeItem('coord_scope'); localStorage.removeItem('admin_scope'); }catch{} location.href='index.html?t='+Date.now(); };
 
-  // Diary
+  // Writes (will succeed if your RLS allows anon/demo writes; otherwise you’ll see an error message)
   const diaryForm = document.getElementById("diaryForm");
   const diaryMsg  = document.getElementById("diaryMsg");
   diaryForm.addEventListener("submit", async e=>{
@@ -129,7 +122,6 @@
     if (!error) diaryForm.reset();
   });
 
-  // Homework
   const hwForm = document.getElementById("hwForm");
   const hwMsg  = document.getElementById("hwMsg");
   hwForm.addEventListener("submit", async e=>{
@@ -145,7 +137,6 @@
     if (!error) hwForm.reset();
   });
 
-  // Attendance
   const attForm = document.getElementById("attForm");
   const attMsg  = document.getElementById("attMsg");
   attForm.addEventListener("submit", async e=>{
@@ -161,7 +152,6 @@
     if (!error) attForm.reset();
   });
 
-  // Marks
   const marksForm = document.getElementById("marksForm");
   const marksMsg  = document.getElementById("marksMsg");
   marksForm.addEventListener("submit", async e=>{
@@ -177,41 +167,34 @@
     if (!error) marksForm.reset();
   });
 
-  // Announcements (read-only)
   async function loadAnnouncements(){
-    const { data, error } = await sb.from("announcements").select("*")
-      .order("created_at",{ascending:false}).limit(20);
-    const target = document.getElementById("annList");
-    if (error) { target.innerHTML = `<div class="note">Error loading announcements</div>`; return; }
-    if (!data.length) { target.innerHTML = `<div class="note">No announcements</div>`; return; }
-    target.innerHTML = data.map(a=>`
+    const { data, error } = await sb.from("announcements").select("*").order("created_at",{ascending:false}).limit(20);
+    const el = document.getElementById("annList");
+    if (error) { el.innerHTML = `<div class="note">Error loading announcements</div>`; return; }
+    if (!data.length) { el.innerHTML = `<div class="note">No announcements</div>`; return; }
+    el.innerHTML = data.map(a=>`
       <div class="card">
         <div class="row"><b>Announcement</b><span class="muted">${new Date(a.created_at).toLocaleString()}</span></div>
         <div>${a.body}</div>
       </div>`).join("");
   }
-
-  // Events (read-only)
   async function loadEvents(){
-    const { data, error } = await sb.from("events").select("*")
-      .order("event_date",{ascending:true}).limit(20);
-    const target = document.getElementById("evList");
-    if (error) { target.innerHTML = `<div class="note">Error loading events</div>`; return; }
-    if (!data.length) { target.innerHTML = `<div class="note">No events</div>`; return; }
-    target.innerHTML = data.map(ev=>`
+    const { data, error } = await sb.from("events").select("*").order("event_date",{ascending:true}).limit(20);
+    const el = document.getElementById("evList");
+    if (error) { el.innerHTML = `<div class="note">Error loading events</div>`; return; }
+    if (!data.length) { el.innerHTML = `<div class="note">No events</div>`; return; }
+    el.innerHTML = data.map(ev=>`
       <div class="card">
         <div class="row"><b>${ev.title}</b><span class="muted">${ev.event_date||''}</span></div>
       </div>`).join("");
   }
-
-  loadAnnouncements();
-  loadEvents();
-
+  loadAnnouncements(); loadEvents();
   sb.channel("teacher-rt")
     .on("postgres_changes",{event:"*",schema:"public",table:"announcements"},loadAnnouncements)
     .on("postgres_changes",{event:"*",schema:"public",table:"events"},loadEvents)
     .subscribe();
 </script>
+
 <script type="module" src="ui.js"></script>
 </body>
 </html>
