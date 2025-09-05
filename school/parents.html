@@ -1,97 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Parents — School PWA</title>
-  <link rel="stylesheet" href="./styles.css" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#0b0f19" />
-  <style>
-    .header {display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0}
-    .brand {font-weight:800;font-size:20px}
-    .muted{opacity:.7}
-    .row{display:flex;justify-content:space-between;gap:12px;align-items:center}
-    .wrap{max-width:920px;margin:0 auto;padding:16px}
-    .card{background:#121826;border:1px solid #232a3a;border-radius:16px;padding:16px;margin:12px 0}
-    .pill{border-radius:999px;padding:8px 12px;border:1px solid #232a3a;background:#0f1523}
-    .note{padding:14px;border:1px dashed #36415c;border-radius:12px;background:#0e1422}
-    .buttons{display:flex;flex-wrap:wrap;gap:10px}
-    button, .btn{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;background:#3b82f6;color:white;font-weight:600}
-    .btn-outline{background:transparent;border:1px solid #36415c;color:#cbd5e1}
-    input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #2a344a;background:#0c1220;color:#e5e7eb}
-    .grid{display:grid;grid-template-columns:1fr;gap:12px}
-    @media(min-width:700px){ .grid{grid-template-columns:1fr 1fr} }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Parents</title>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  .note{padding:10px;margin:10px 0;border:1px solid #2a344a;border-radius:10px;background:#101623;color:#cbd5e1}
+  .muted{opacity:.7}
+  .card{background:#121826;border:1px solid #232a3a;border-radius:14px;padding:12px;margin:8px 0}
+  .row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+  .wrap{max-width:900px;margin:0 auto;padding:16px}
+</style>
 </head>
-<body>
-  <div class="wrap">
-    <!-- Top bar -->
-    <div class="header">
-      <div class="brand">Parents</div>
-      <div class="buttons">
-        <a class="btn-outline" href="./index.html">Home</a>
-        <a class="btn-outline" href="./logout.html">Logout</a>
-      </div>
-    </div>
+<body class="dark">
+<div class="wrapper">
 
-    <!-- Quick actions (static links you already have; keep/edit as you like) -->
-    <div class="card">
-      <div class="buttons">
-        <a class="btn-outline" href="./parents.html#diary">Class Diary</a>
-        <a class="btn-outline" href="./homework.html">Homework</a>
-        <a class="btn-outline" href="./messages.html">Messages</a>
-        <a class="btn-outline" href="./attendance.html">Attendance</a>
-        <a class="btn-outline" href="./events.html">Events</a>
-        <a class="btn-outline" href="./leaves.html">Leaves</a>
-        <a class="btn-outline" href="./requests.html">Requests</a>
-        <a class="btn-outline" href="./complaints.html">Complaints</a>
-      </div>
-    </div>
-
-    <!-- Class Diary: live from Supabase -->
-    <div id="diary" class="card">
-      <div class="row">
-        <h2>Today’s Class Diary</h2>
-        <span class="muted">Teacher notes for the selected class</span>
-      </div>
-
-      <div class="grid" style="margin-top:10px">
+  <section class="accent-indigo">
+    <div class="glass header">
+      <div class="row" style="justify-content:space-between;align-items:center">
         <div>
-          <label class="muted">Pick a date</label>
-          <input type="date" id="diary-date" />
+          <div class="eyebrow">Stay updated with your child’s class</div>
+          <div class="h1">Parent Dashboard</div>
         </div>
-        <div style="align-self:end">
-          <button id="reloadBtn">Load Diary</button>
+        <div class="row" style="gap:8px">
+          <a class="btn" href="./logout.html">Logout</a>
+          <button class="btn" onclick="toggleTheme()">Theme</button>
         </div>
       </div>
-
-      <div id="diary-list" style="margin-top:12px">
-        <div class="note">Loading…</div>
+      <div class="tab-row" id="tabs">
+        <button class="chip chip-blue" data-tab="diary">Diary</button>
+        <button class="chip chip-teal" data-tab="homework">Homework</button>
+        <button class="chip chip-fuchsia" data-tab="announcements">Announcements</button>
+        <button class="chip chip-violet" data-tab="events">Events</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Scripts -->
-  <script type="module">
-    // import client + helpers
-    import { requireLogin } from "./js/supabase.js";
-    import { loadDiary } from "./js/diary.js";
+  <!-- Diary -->
+  <section id="panel-diary" class="glass inner panel">
+    <div class="h1">Class Diary</div>
+    <div id="diaryList" class="mt-12">
+      <div class="note">Loading…</div>
+    </div>
+  </section>
 
-    // ensure user is logged in
-    await requireLogin();
+  <!-- Homework -->
+  <section id="panel-homework" class="glass inner panel" hidden>
+    <div class="h1">Homework</div>
+    <div id="hwList" class="mt-12">
+      <div class="note">Loading…</div>
+    </div>
+  </section>
 
-    // set date input default to today
-    const dateEl = document.querySelector('#diary-date');
-    dateEl.value = new Date().toISOString().slice(0,10);
+  <!-- Announcements -->
+  <section id="panel-announcements" class="glass inner panel" hidden>
+    <div class="h1">Announcements</div>
+    <div id="annList" class="mt-12">
+      <div class="note">Loading…</div>
+    </div>
+  </section>
 
-    // initial load
-    loadDiary('#diary-list', dateEl.value);
+  <!-- Events -->
+  <section id="panel-events" class="glass inner panel" hidden>
+    <div class="h1">Events</div>
+    <div id="evList" class="mt-12">
+      <div class="note">Loading…</div>
+    </div>
+  </section>
 
-    // reload on click
-    document.querySelector('#reloadBtn').addEventListener('click', () => {
-      loadDiary('#diary-list', dateEl.value);
-    });
-  </script>
+</div>
+
+<!-- Tabs -->
+<script type="module">
+  import {initTabs} from './ui.js';
+  initTabs(document);
+</script>
+
+<!-- Supabase wiring -->
+<script type="module">
+  import { requireLogin, sb } from "./js/supabase.js";
+
+  await requireLogin();
+
+  // --- Diary ---
+  async function loadDiary(){
+    const { data, error } = await sb.from("diary").select("*")
+      .order("date",{ascending:false}).limit(20);
+    const target = document.getElementById("diaryList");
+    if (error) { target.innerHTML = `<div class="note">Error loading diary</div>`; return; }
+    if (!data.length) { target.innerHTML = `<div class="note">No diary entries yet.</div>`; return; }
+    target.innerHTML = data.map(d=>`
+      <div class="card">
+        <div class="row"><b>${d.subject}</b><span class="muted">${d.date}</span></div>
+        <div>${d.note||''}</div>
+      </div>`).join("");
+  }
+
+  // --- Homework ---
+  async function loadHomework(){
+    const { data, error } = await sb.from("homework").select("*")
+      .order("due_date",{ascending:true}).limit(20);
+    const target = document.getElementById("hwList");
+    if (error) { target.innerHTML = `<div class="note">Error loading homework</div>`; return; }
+    if (!data.length) { target.innerHTML = `<div class="note">No homework found.</div>`; return; }
+    target.innerHTML = data.map(h=>`
+      <div class="card">
+        <div class="row"><b>${h.subject}</b><span class="muted">${h.due_date||''}</span></div>
+        <div>${h.task||''}</div>
+      </div>`).join("");
+  }
+
+  // --- Announcements ---
+  async function loadAnnouncements(){
+    const { data, error } = await sb.from("announcements").select("*")
+      .order("created_at",{ascending:false}).limit(20);
+    const target = document.getElementById("annList");
+    if (error) { target.innerHTML = `<div class="note">Error loading announcements</div>`; return; }
+    if (!data.length) { target.innerHTML = `<div class="note">No announcements yet.</div>`; return; }
+    target.innerHTML = data.map(a=>`
+      <div class="card">
+        <div class="row"><b>Announcement</b><span class="muted">${new Date(a.created_at).toLocaleString()}</span></div>
+        <div>${a.body}</div>
+      </div>`).join("");
+  }
+
+  // --- Events ---
+  async function loadEvents(){
+    const { data, error } = await sb.from("events").select("*")
+      .order("event_date",{ascending:true}).limit(20);
+    const target = document.getElementById("evList");
+    if (error) { target.innerHTML = `<div class="note">Error loading events</div>`; return; }
+    if (!data.length) { target.innerHTML = `<div class="note">No events yet.</div>`; return; }
+    target.innerHTML = data.map(ev=>`
+      <div class="card">
+        <div class="row"><b>${ev.title}</b><span class="muted">${ev.event_date||''}</span></div>
+      </div>`).join("");
+  }
+
+  // Initial loads
+  loadDiary(); loadHomework(); loadAnnouncements(); loadEvents();
+
+  // Realtime refresh (optional)
+  sb.channel("parent-rt")
+    .on("postgres_changes",{event:"*",schema:"public",table:"diary"},loadDiary)
+    .on("postgres_changes",{event:"*",schema:"public",table:"homework"},loadHomework)
+    .on("postgres_changes",{event:"*",schema:"public",table:"announcements"},loadAnnouncements)
+    .on("postgres_changes",{event:"*",schema:"public",table:"events"},loadEvents)
+    .subscribe();
+</script>
+<script type="module" src="ui.js"></script>
 </body>
 </html>
