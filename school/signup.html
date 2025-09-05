@@ -1,51 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sign Up</title>
-<link rel="stylesheet" href="./styles.css">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sign up</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="wrap">
-  <h2>Create Account</h2>
-  <div class="card">
-    <input id="name" type="text" placeholder="Full name" />
-    <input id="email" type="email" placeholder="Email" />
-    <input id="password" type="password" placeholder="Password (min 6)" />
-    <select id="role">
-      <option value="parent">Parent</option>
-      <option value="teacher">Teacher</option>
-      <option value="coordinator">Coordinator</option>
-      <option value="admin">Admin</option>
-    </select>
-    <button id="signupBtn">Create account</button>
-    <p class="muted">Have an account? <a href="./login.html">Login</a></p>
-  </div>
+<body class="dark">
+<div class="wrapper">
+  <section class="accent-teal glass inner">
+    <h1>Sign up</h1>
+    <form id="signupForm" class="form-grid mt-12">
+      <input class="input full" type="text" id="name" placeholder="Full Name" required/>
+      <input class="input full" type="email" id="email" placeholder="Email" required/>
+      <input class="input full" type="password" id="password" placeholder="Password" required/>
+      <button class="btn btn-indigo" type="submit">Create Account</button>
+    </form>
+    <div id="msg" class="note" hidden></div>
+  </section>
+</div>
 
 <script type="module">
 import { sb } from "./js/supabase.js";
 
-document.querySelector("#signupBtn").onclick = async () => {
-  const full_name = document.querySelector("#name").value.trim();
-  const email = document.querySelector("#email").value.trim();
-  const password = document.querySelector("#password").value;
-  const role = document.querySelector("#role").value;
+const form = document.getElementById("signupForm");
+const msg  = document.getElementById("msg");
 
-  const { data, error } = await sb.auth.signUp({
-    email, password,
-    options: { data: { full_name } } // flows to handle_new_user()
-  });
-  if (error) return alert(error.message);
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const fullName = document.getElementById("name").value;
+  const email    = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-  // update profile with chosen role (RLS lets user update own profile)
-  const userId = data.user?.id;
-  if (userId) {
-    const { error: e2 } = await sb.from("profiles").update({ full_name, role }).eq("user_id", userId);
-    if (e2) console.warn(e2.message);
+  const { data, error } = await sb.auth.signUp({ email, password });
+  msg.hidden = false;
+  if (error) {
+    msg.textContent = "❌ " + error.message;
+    return;
   }
 
-  alert("Account created. You can login now.");
-  location.href = "./login.html";
-};
+  // Insert profile row (default role = parent in DB)
+  if (data.user) {
+    await sb.from("profiles").insert({
+      user_id: data.user.id,
+      full_name: fullName
+    }).catch(()=>{});
+  }
+
+  msg.textContent = "✅ Account created. Please login.";
+});
 </script>
 </body>
 </html>
