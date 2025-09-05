@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign Up</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body class="wrap">
+  <h2>Create Account</h2>
+  <div class="card">
+    <input id="name" type="text" placeholder="Full name" />
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password (min 6)" />
+    <select id="role">
+      <option value="parent">Parent</option>
+      <option value="teacher">Teacher</option>
+      <option value="coordinator">Coordinator</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button id="signupBtn">Create account</button>
+    <p class="muted">Have an account? <a href="./login.html">Login</a></p>
+  </div>
+
+<script type="module">
+import { sb } from "./js/supabase.js";
+
+document.querySelector("#signupBtn").onclick = async () => {
+  const full_name = document.querySelector("#name").value.trim();
+  const email = document.querySelector("#email").value.trim();
+  const password = document.querySelector("#password").value;
+  const role = document.querySelector("#role").value;
+
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { full_name } } // flows to handle_new_user()
+  });
+  if (error) return alert(error.message);
+
+  // update profile with chosen role (RLS lets user update own profile)
+  const userId = data.user?.id;
+  if (userId) {
+    const { error: e2 } = await sb.from("profiles").update({ full_name, role }).eq("user_id", userId);
+    if (e2) console.warn(e2.message);
+  }
+
+  alert("Account created. You can login now.");
+  location.href = "./login.html";
+};
+</script>
+</body>
+</html>
