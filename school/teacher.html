@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Teacher</title>
 <link rel="stylesheet" href="styles.css"/>
+<style>
+  .note{padding:10px;margin:10px 0;border:1px solid #2a344a;border-radius:10px;background:#101623;color:#cbd5e1}
+</style>
 </head>
 <body class="dark">
 <div class="wrapper">
@@ -16,7 +19,10 @@
           <div class="eyebrow"></div>
           <div class="h1">Teacher</div>
         </div>
-        <button class="btn" onclick="toggleTheme()">Theme</button>
+        <div class="buttons">
+          <button class="btn" onclick="toggleTheme()">Theme</button>
+          <a class="btn" href="./logout.html">Logout</a>
+        </div>
       </div>
 
       <div class="tab-row" id="tabs">
@@ -45,13 +51,16 @@
 
   <section id="panel-diary" class="glass inner panel" hidden>
     <div class="h1">Post to Class Diary</div>
-    <form class="form-grid mt-12" data-queue="t-diary">
-      <select class="input full" name="subject">
+    <form id="diaryForm" class="form-grid mt-12">
+      <input class="input full" name="class" placeholder="Class (e.g., 5-A)" required/>
+      <select class="input full" name="subject" required>
         <option>Maths</option><option>Science</option><option>English</option>
       </select>
-      <textarea class="input full" name="notes" placeholder="What was taught / notes..."></textarea>
-      <button class="btn btn-blue">Post</button>
+      <textarea class="input full" name="notes" placeholder="What was taught / notes..." required></textarea>
+      <input class="input" type="date" name="date"/>
+      <button class="btn btn-blue" type="submit">Post</button>
     </form>
+    <div id="diaryStatus" class="note" hidden></div>
   </section>
 
   <section id="panel-homework" class="glass inner panel" hidden>
@@ -102,9 +111,42 @@
 
 </div>
 <div class="toast" aria-live="polite"></div>
+
+<!-- Tabs + form binding -->
 <script type="module">
   import {initTabs, bindQueueForms} from './ui.js';
   initTabs(document); bindQueueForms(document);
+</script>
+
+<!-- Supabase hook for Class Diary -->
+<script type="module">
+  import { requireLogin } from "./js/supabase.js";
+  import { addDiary } from "./js/diary.js";
+
+  // Force login
+  await requireLogin();
+
+  const form = document.querySelector("#diaryForm");
+  const status = document.querySelector("#diaryStatus");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const ok = await addDiary({
+      klass: fd.get("class"),
+      subject: fd.get("subject"),
+      note: fd.get("notes"),
+      date: fd.get("date") || new Date().toISOString().slice(0,10)
+    });
+    if (ok) {
+      status.hidden = false;
+      status.textContent = "✅ Note posted to diary.";
+      form.reset();
+    } else {
+      status.hidden = false;
+      status.textContent = "❌ Failed to post. Check role or network.";
+    }
+  });
 </script>
 <script type="module" src="ui.js"></script>
 </body>
