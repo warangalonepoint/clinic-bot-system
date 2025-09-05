@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-store, must-revalidate"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>School PWA (PIN Mode)</title>
+  <title>School PWA (PIN)</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <meta name="theme-color" content="#0b0f19"/>
@@ -12,22 +12,21 @@
 <body class="dark">
   <div class="wrapper">
 
-    <!-- Header -->
     <section class="accent-violet">
       <div class="glass header">
         <div class="row" style="justify-content:space-between;align-items:center">
           <div>
             <div class="h1">School PWA</div>
-            <div class="text-dim">Role-based demo (PIN login)</div>
+            <div class="text-dim">Role router (PIN)</div>
           </div>
           <div class="row" style="gap:8px">
             <button class="btn" onclick="toggleTheme()">Theme</button>
+            <button class="btn" onclick="clearCache()">Clear Cache</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PIN -->
     <section class="accent-cyan">
       <div class="glass inner">
         <div class="h1">Enter PIN</div>
@@ -47,48 +46,48 @@
   </div>
 
   <script type="module">
-    // Minimal helpers (theme toggle lives in ui.js)
-    import { showLoadedPins } from './ui.js'; // optional helper; safe if present
+    // SW (non-blocking)
+    if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('./sw.js'); } catch {} }
 
-    // Load pins.json; fallback to hard-coded map if not found.
+    // Cache nuker (used on all pages)
+    window.clearCache = async function(){
+      try{
+        localStorage.clear();
+        if ('caches' in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(n => caches.delete(n)));
+        }
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const r of regs) await r.unregister();
+        }
+        alert('✅ Cache cleared. Reloading…');
+      } catch(e){ alert('❌ Cache clear failed: ' + e.message); }
+      location.reload(true);
+    };
+
+    // PIN loading
     let pinMap = { "1111":"parents", "2222":"teacher", "3333":"coordinator", "4444":"admin" };
-
     try {
       const r = await fetch(new URL('pins.json', location.href), { cache:'no-store' });
-      if (r.ok) {
-        const j = await r.json();
-        if (j && typeof j === 'object') pinMap = j;
-      }
-      showLoadedPins?.(Object.keys(pinMap)); // just prints small info if implemented
+      if (r.ok) { const j = await r.json(); if (j && typeof j === 'object') pinMap = j; }
       document.getElementById('pin-info').textContent = 'PINs loaded.';
-    } catch (e) {
-      document.getElementById('pin-info').textContent = 'Using fallback PINs (pins.json not found).';
-    }
+    } catch { document.getElementById('pin-info').textContent = 'Using fallback PINs.'; }
 
     const $ = (id)=>document.getElementById(id);
-    const input = $('pin-input');
-    const msg   = $('pin-msg');
-    const form  = $('pin-form');
+    const input = $('pin-input'), msg = $('pin-msg'), form = $('pin-form');
 
     function route(e){
       e?.preventDefault();
-      const pin = (input.value || '').trim();
+      const pin = (input.value||'').trim();
       if (!pin) { msg.textContent = 'Enter a PIN.'; return; }
       const role = pinMap[pin];
-      if (!role) { msg.textContent = 'Unknown PIN. Please try again.'; return; }
+      if (!role) { msg.textContent = 'Unknown PIN. Try again.'; return; }
       const theme = localStorage.getItem('theme') || 'dark';
       location.replace(`${role}.html?theme=${theme}&t=${Date.now()}`);
     }
-
     form.addEventListener('submit', route);
-
-    // Optional: submit on Enter from the input on some mobile keyboards
-    input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') route(e); });
-
-    // Register SW (non-blocking)
-    if ('serviceWorker' in navigator) {
-      try { navigator.serviceWorker.register('./sw.js'); } catch {}
-    }
+    input.addEventListener('keydown', e=>{ if (e.key==='Enter') route(e); });
   </script>
 
   <script type="module" src="ui.js"></script>
