@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="styles.css"/>
 <style>
   .note{padding:10px;margin:10px 0;border:1px solid #2a344a;border-radius:10px;background:#101623;color:#cbd5e1}
+  .muted{opacity:.7}
+  .card{background:#121826;border:1px solid #232a3a;border-radius:14px;padding:12px;margin:8px 0}
+  .row{display:flex;justify-content:space-between;gap:12px;align-items:center}
 </style>
 </head>
 <body class="dark">
@@ -16,151 +19,198 @@
     <div class="glass header">
       <div class="row" style="justify-content:space-between;align-items:center">
         <div>
-          <div class="eyebrow"></div>
-          <div class="h1">Teacher</div>
+          <div class="eyebrow">Class management</div>
+          <div class="h1">Teacher Panel</div>
         </div>
-        <div class="buttons">
-          <button class="btn" onclick="toggleTheme()">Theme</button>
+        <div class="row" style="gap:8px">
           <a class="btn" href="./logout.html">Logout</a>
+          <button class="btn" onclick="toggleTheme()">Theme</button>
         </div>
       </div>
 
       <div class="tab-row" id="tabs">
-        <button class="chip chip-indigo" data-tab="setup">Class Setup</button>
-        <button class="chip chip-blue"   data-tab="diary">Class Diary</button>
-        <button class="chip chip-teal"   data-tab="homework">Homework</button>
+        <button class="chip chip-indigo" data-tab="diary">Diary</button>
+        <button class="chip chip-blue"   data-tab="homework">Homework</button>
         <button class="chip chip-amber"  data-tab="attendance">Attendance</button>
-        <button class="chip chip-fuchsia"data-tab="leaves">Leaves</button>
-        <button class="chip chip-violet" data-tab="requests">Requests</button>
         <button class="chip chip-cyan"   data-tab="marks">Marks</button>
+        <button class="chip chip-fuchsia"data-tab="announcements">Announcements</button>
+        <button class="chip chip-violet" data-tab="events">Events</button>
       </div>
     </div>
   </section>
 
-  <!-- Panels -->
-  <section id="panel-setup" class="glass inner panel">
-    <div class="h1">My Class</div>
-    <form class="form-grid mt-12" data-queue="t-setup">
-      <input class="input full" placeholder="Class e.g., 5"   name="class"/>
-      <input class="input full" placeholder="Section e.g., A" name="section"/>
-      <input class="input full" placeholder="Your Name"       name="teacher"/>
-      <input class="input full" placeholder="Subject e.g., Maths" name="subject"/>
-      <button class="btn btn-indigo">Save</button>
-    </form>
-  </section>
-
-  <section id="panel-diary" class="glass inner panel" hidden>
-    <div class="h1">Post to Class Diary</div>
+  <!-- Diary -->
+  <section id="panel-diary" class="glass inner panel">
+    <div class="h1">Post Diary</div>
     <form id="diaryForm" class="form-grid mt-12">
-      <input class="input full" name="class" placeholder="Class (e.g., 5-A)" required/>
-      <select class="input full" name="subject" required>
-        <option>Maths</option><option>Science</option><option>English</option>
-      </select>
-      <textarea class="input full" name="notes" placeholder="What was taught / notes..." required></textarea>
-      <input class="input" type="date" name="date"/>
-      <button class="btn btn-blue" type="submit">Post</button>
+      <input class="input" name="subject" placeholder="Subject" required/>
+      <textarea class="input full" name="note" placeholder="What was taught…" required></textarea>
+      <button class="btn btn-indigo">Post</button>
     </form>
-    <div id="diaryStatus" class="note" hidden></div>
+    <div id="diaryMsg" class="note" hidden></div>
   </section>
 
+  <!-- Homework -->
   <section id="panel-homework" class="glass inner panel" hidden>
-    <div class="h1">Give Homework</div>
+    <div class="h1">Assign Homework</div>
     <form id="hwForm" class="form-grid mt-12">
-      <input class="input full" name="class" placeholder="Class (e.g., 5-A)" required/>
-      <select class="input full" name="subject" required>
-        <option>Maths</option><option>Science</option><option>English</option>
-      </select>
-      <input class="input" name="due" type="date" />
-      <textarea class="input full" name="task" placeholder="Exercise / description…" required></textarea>
-      <button class="btn btn-teal" type="submit">Assign</button>
+      <input class="input" name="subject" placeholder="Subject" required/>
+      <input class="input" type="date" name="due_date" required/>
+      <textarea class="input full" name="task" placeholder="Homework task…" required></textarea>
+      <button class="btn btn-blue">Assign</button>
     </form>
-    <div id="hwStatus" class="note" hidden></div>
+    <div id="hwMsg" class="note" hidden></div>
   </section>
 
+  <!-- Attendance -->
   <section id="panel-attendance" class="glass inner panel" hidden>
     <div class="h1">Mark Attendance</div>
-    <form class="form-grid mt-12" data-queue="t-attendance">
-      <input class="input" type="date" name="date"/>
-      <select class="input" name="status">
+    <form id="attForm" class="form-grid mt-12">
+      <input class="input" type="date" name="date" required/>
+      <input class="input" name="student" placeholder="Roll / Name" required/>
+      <select class="input" name="status" required>
         <option>Present</option><option>Absent</option><option>Late</option>
       </select>
-      <input class="input full" name="student" placeholder="Roll / Name"/>
       <button class="btn btn-amber">Save</button>
     </form>
+    <div id="attMsg" class="note" hidden></div>
   </section>
 
-  <section id="panel-leaves" class="glass inner panel" hidden>
-    <div class="h1">Leave Approvals</div>
-    <div class="list mt-12">
-      <div class="item"><span>R-21 — Fever (1 day)</span><button class="btn btn-teal">Approve</button></div>
-    </div>
-  </section>
-
-  <section id="panel-requests" class="glass inner panel" hidden>
-    <div class="h1">Parent Requests</div>
-    <div class="list mt-12"><div class="item"><span>No requests</span></div></div>
-  </section>
-
+  <!-- Marks -->
   <section id="panel-marks" class="glass inner panel" hidden>
     <div class="h1">Enter Marks</div>
-    <form class="form-grid mt-12" data-queue="t-marks">
-      <input class="input" placeholder="Exam e.g., Unit Test 1" name="exam"/>
-      <input class="input" placeholder="Roll No" name="roll"/>
-      <input class="input" placeholder="Marks / 100" name="marks" inputmode="numeric"/>
+    <form id="marksForm" class="form-grid mt-12">
+      <input class="input" name="exam" placeholder="Exam (e.g., Unit Test 1)" required/>
+      <input class="input" name="roll" placeholder="Roll No" required/>
+      <input class="input" name="marks" type="number" placeholder="Marks / 100" required/>
       <button class="btn btn-cyan">Save</button>
     </form>
+    <div id="marksMsg" class="note" hidden></div>
+  </section>
+
+  <!-- Announcements -->
+  <section id="panel-announcements" class="glass inner panel" hidden>
+    <div class="h1">Announcements</div>
+    <div id="annList" class="mt-12"><div class="note">Loading…</div></div>
+  </section>
+
+  <!-- Events -->
+  <section id="panel-events" class="glass inner panel" hidden>
+    <div class="h1">Events</div>
+    <div id="evList" class="mt-12"><div class="note">Loading…</div></div>
   </section>
 
 </div>
-<div class="toast" aria-live="polite"></div>
 
-<!-- Tabs + basic UI helpers -->
+<!-- Tabs -->
 <script type="module">
-  import {initTabs, bindQueueForms} from './ui.js';
-  initTabs(document); bindQueueForms(document);
+  import {initTabs} from './ui.js';
+  initTabs(document);
 </script>
 
-<!-- Supabase: Diary + Homework submits -->
+<!-- Supabase wiring -->
 <script type="module">
-  import { requireLogin } from "./js/supabase.js";
-  import { addDiary } from "./js/diary.js";
-  import { addHomework } from "./js/homework.js";
-
+  import { requireLogin, sb } from "./js/supabase.js";
   await requireLogin();
 
-  // Diary submit
-  const diaryForm = document.querySelector("#diaryForm");
-  const diaryStatus = document.querySelector("#diaryStatus");
-  diaryForm.addEventListener("submit", async (e) => {
+  // Diary
+  const diaryForm = document.getElementById("diaryForm");
+  const diaryMsg  = document.getElementById("diaryMsg");
+  diaryForm.addEventListener("submit", async e=>{
     e.preventDefault();
     const fd = new FormData(diaryForm);
-    const ok = await addDiary({
-      klass: fd.get("class"),
+    const { error } = await sb.from("diary").insert({
       subject: fd.get("subject"),
-      note: fd.get("notes"),
-      date: fd.get("date") || new Date().toISOString().slice(0,10)
+      note: fd.get("note"),
+      date: new Date().toISOString().slice(0,10)
     });
-    diaryStatus.hidden = false;
-    diaryStatus.textContent = ok ? "✅ Note posted to diary." : "❌ Failed to post.";
-    if (ok) diaryForm.reset();
+    diaryMsg.hidden = false;
+    diaryMsg.textContent = error ? "❌ "+error.message : "✅ Diary posted";
+    if (!error) diaryForm.reset();
   });
 
-  // Homework submit
-  const hwForm = document.querySelector("#hwForm");
-  const hwStatus = document.querySelector("#hwStatus");
-  hwForm.addEventListener("submit", async (e) => {
+  // Homework
+  const hwForm = document.getElementById("hwForm");
+  const hwMsg  = document.getElementById("hwMsg");
+  hwForm.addEventListener("submit", async e=>{
     e.preventDefault();
     const fd = new FormData(hwForm);
-    const ok = await addHomework({
-      klass: fd.get("class"),
+    const { error } = await sb.from("homework").insert({
       subject: fd.get("subject"),
-      task: fd.get("task"),
-      due: fd.get("due") || null
+      due_date: fd.get("due_date"),
+      task: fd.get("task")
     });
-    hwStatus.hidden = false;
-    hwStatus.textContent = ok ? "✅ Homework assigned." : "❌ Failed to assign.";
-    if (ok) hwForm.reset();
+    hwMsg.hidden = false;
+    hwMsg.textContent = error ? "❌ "+error.message : "✅ Homework assigned";
+    if (!error) hwForm.reset();
   });
+
+  // Attendance
+  const attForm = document.getElementById("attForm");
+  const attMsg  = document.getElementById("attMsg");
+  attForm.addEventListener("submit", async e=>{
+    e.preventDefault();
+    const fd = new FormData(attForm);
+    const { error } = await sb.from("attendance").insert({
+      date: fd.get("date"),
+      student: fd.get("student"),
+      status: fd.get("status")
+    });
+    attMsg.hidden = false;
+    attMsg.textContent = error ? "❌ "+error.message : "✅ Attendance saved";
+    if (!error) attForm.reset();
+  });
+
+  // Marks
+  const marksForm = document.getElementById("marksForm");
+  const marksMsg  = document.getElementById("marksMsg");
+  marksForm.addEventListener("submit", async e=>{
+    e.preventDefault();
+    const fd = new FormData(marksForm);
+    const { error } = await sb.from("marks").insert({
+      exam: fd.get("exam"),
+      roll: fd.get("roll"),
+      marks: parseInt(fd.get("marks"),10)
+    });
+    marksMsg.hidden = false;
+    marksMsg.textContent = error ? "❌ "+error.message : "✅ Marks saved";
+    if (!error) marksForm.reset();
+  });
+
+  // Announcements (read-only)
+  async function loadAnnouncements(){
+    const { data, error } = await sb.from("announcements").select("*")
+      .order("created_at",{ascending:false}).limit(20);
+    const target = document.getElementById("annList");
+    if (error) { target.innerHTML = `<div class="note">Error loading announcements</div>`; return; }
+    if (!data.length) { target.innerHTML = `<div class="note">No announcements</div>`; return; }
+    target.innerHTML = data.map(a=>`
+      <div class="card">
+        <div class="row"><b>Announcement</b><span class="muted">${new Date(a.created_at).toLocaleString()}</span></div>
+        <div>${a.body}</div>
+      </div>`).join("");
+  }
+
+  // Events (read-only)
+  async function loadEvents(){
+    const { data, error } = await sb.from("events").select("*")
+      .order("event_date",{ascending:true}).limit(20);
+    const target = document.getElementById("evList");
+    if (error) { target.innerHTML = `<div class="note">Error loading events</div>`; return; }
+    if (!data.length) { target.innerHTML = `<div class="note">No events</div>`; return; }
+    target.innerHTML = data.map(ev=>`
+      <div class="card">
+        <div class="row"><b>${ev.title}</b><span class="muted">${ev.event_date||''}</span></div>
+      </div>`).join("");
+  }
+
+  loadAnnouncements();
+  loadEvents();
+
+  sb.channel("teacher-rt")
+    .on("postgres_changes",{event:"*",schema:"public",table:"announcements"},loadAnnouncements)
+    .on("postgres_changes",{event:"*",schema:"public",table:"events"},loadEvents)
+    .subscribe();
 </script>
 <script type="module" src="ui.js"></script>
 </body>
