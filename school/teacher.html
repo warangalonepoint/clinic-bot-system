@@ -65,14 +65,16 @@
 
   <section id="panel-homework" class="glass inner panel" hidden>
     <div class="h1">Give Homework</div>
-    <form class="form-grid mt-12" data-queue="t-homework">
-      <select class="input full" name="subject">
+    <form id="hwForm" class="form-grid mt-12">
+      <input class="input full" name="class" placeholder="Class (e.g., 5-A)" required/>
+      <select class="input full" name="subject" required>
         <option>Maths</option><option>Science</option><option>English</option>
       </select>
-      <input class="input" name="due" type="date"/>
-      <textarea class="input full" name="task" placeholder="Exercise / description…"></textarea>
-      <button class="btn btn-teal">Assign</button>
+      <input class="input" name="due" type="date" />
+      <textarea class="input full" name="task" placeholder="Exercise / description…" required></textarea>
+      <button class="btn btn-teal" type="submit">Assign</button>
     </form>
+    <div id="hwStatus" class="note" hidden></div>
   </section>
 
   <section id="panel-attendance" class="glass inner panel" hidden>
@@ -112,40 +114,52 @@
 </div>
 <div class="toast" aria-live="polite"></div>
 
-<!-- Tabs + form binding -->
+<!-- Tabs + basic UI helpers -->
 <script type="module">
   import {initTabs, bindQueueForms} from './ui.js';
   initTabs(document); bindQueueForms(document);
 </script>
 
-<!-- Supabase hook for Class Diary -->
+<!-- Supabase: Diary + Homework submits -->
 <script type="module">
   import { requireLogin } from "./js/supabase.js";
   import { addDiary } from "./js/diary.js";
+  import { addHomework } from "./js/homework.js";
 
-  // Force login
   await requireLogin();
 
-  const form = document.querySelector("#diaryForm");
-  const status = document.querySelector("#diaryStatus");
-
-  form.addEventListener("submit", async (e) => {
+  // Diary submit
+  const diaryForm = document.querySelector("#diaryForm");
+  const diaryStatus = document.querySelector("#diaryStatus");
+  diaryForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const fd = new FormData(form);
+    const fd = new FormData(diaryForm);
     const ok = await addDiary({
       klass: fd.get("class"),
       subject: fd.get("subject"),
       note: fd.get("notes"),
       date: fd.get("date") || new Date().toISOString().slice(0,10)
     });
-    if (ok) {
-      status.hidden = false;
-      status.textContent = "✅ Note posted to diary.";
-      form.reset();
-    } else {
-      status.hidden = false;
-      status.textContent = "❌ Failed to post. Check role or network.";
-    }
+    diaryStatus.hidden = false;
+    diaryStatus.textContent = ok ? "✅ Note posted to diary." : "❌ Failed to post.";
+    if (ok) diaryForm.reset();
+  });
+
+  // Homework submit
+  const hwForm = document.querySelector("#hwForm");
+  const hwStatus = document.querySelector("#hwStatus");
+  hwForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(hwForm);
+    const ok = await addHomework({
+      klass: fd.get("class"),
+      subject: fd.get("subject"),
+      task: fd.get("task"),
+      due: fd.get("due") || null
+    });
+    hwStatus.hidden = false;
+    hwStatus.textContent = ok ? "✅ Homework assigned." : "❌ Failed to assign.";
+    if (ok) hwForm.reset();
   });
 </script>
 <script type="module" src="ui.js"></script>
