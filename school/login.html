@@ -21,23 +21,19 @@
 
 <script type="module">
 import { sb } from "./js/supabase.js";
-
 const form = document.getElementById("loginForm");
 const msg  = document.getElementById("msg");
 
 form.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { error } = await sb.auth.signInWithPassword({ email, password });
   msg.hidden = false;
-  if (error) {
-    msg.textContent = "❌ " + error.message;
-  } else {
-    msg.textContent = "✅ Logged in, redirecting…";
-    setTimeout(()=> location.href = "index.html", 800);
-  }
+  msg.textContent = "Signing in…";
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { msg.textContent = "❌ " + error.message; return; }
+  msg.textContent = "✅ Logged in. Redirecting…";
+  setTimeout(()=> location.href = "index.html", 400);
 });
 </script>
 </body>
