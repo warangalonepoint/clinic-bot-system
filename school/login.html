@@ -1,29 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Login</title>
-<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="wrap">
-  <h2>Login</h2>
-  <div class="card">
-    <input id="email" type="email" placeholder="Email" />
-    <input id="password" type="password" placeholder="Password" />
-    <button id="loginBtn">Login</button>
-    <p class="muted">No account? <a href="./signup.html">Sign up</a></p>
-  </div>
+<body class="dark">
+<div class="wrapper">
+  <section class="accent-cyan glass inner">
+    <h1>Login</h1>
+    <form id="loginForm" class="form-grid mt-12">
+      <input class="input full" type="email" id="email" placeholder="Email" required/>
+      <input class="input full" type="password" id="password" placeholder="Password" required/>
+      <button class="btn btn-indigo" type="submit">Login</button>
+    </form>
+    <div id="msg" class="note" hidden></div>
+  </section>
+</div>
 
 <script type="module">
 import { sb } from "./js/supabase.js";
 
-document.querySelector("#loginBtn").onclick = async () => {
-  const email = document.querySelector("#email").value.trim();
-  const password = document.querySelector("#password").value;
+const form = document.getElementById("loginForm");
+const msg  = document.getElementById("msg");
+
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
   const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) alert(error.message);
-  else location.href = "./parents.html"; // change target if needed
-};
+  msg.hidden = false;
+  if (error) {
+    msg.textContent = "❌ " + error.message;
+  } else {
+    msg.textContent = "✅ Logged in, redirecting…";
+    setTimeout(()=> location.href = "index.html", 800);
+  }
+});
 </script>
 </body>
 </html>
