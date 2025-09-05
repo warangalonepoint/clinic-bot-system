@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Homework — School PWA</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <style>
+    .wrap{max-width:920px;margin:0 auto;padding:16px}
+    .card{background:#121826;border:1px solid #232a3a;border-radius:16px;padding:16px;margin:12px 0}
+    .row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .muted{opacity:.7}
+    .note{padding:10px;border:1px dashed #36415c;border-radius:10px;background:#0e1422}
+    input{width:100%;padding:10px;border-radius:10px;border:1px solid #2a344a;background:#0c1220;color:#e5e7eb}
+    button{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;background:#3b82f6;color:#fff;font-weight:600}
+    .grid{display:grid;gap:12px}
+    @media(min-width:700px){ .grid{grid-template-columns:1fr auto} }
+  </style>
+</head>
+<body class="dark">
+  <div class="wrap">
+    <div class="row">
+      <h2>Homework</h2>
+      <a class="btn-outline" href="./index.html" style="color:#cbd5e1">Home</a>
+    </div>
+
+    <div class="card">
+      <div class="grid">
+        <input type="date" id="hw-date"/>
+        <button id="loadBtn">Load</button>
+      </div>
+      <div id="hw-list" style="margin-top:12px">
+        <div class="note">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireLogin } from "./js/supabase.js";
+    import { loadHomework } from "./js/homework.js";
+
+    await requireLogin();
+
+    const d = document.querySelector("#hw-date");
+    d.value = new Date().toISOString().slice(0,10);
+
+    const run = () => loadHomework("#hw-list", d.value);
+    document.querySelector("#loadBtn").addEventListener("click", run);
+    run();
+  </script>
+</body>
+</html>
