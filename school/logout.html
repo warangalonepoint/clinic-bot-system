@@ -1,33 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Logging out…</title>
-  <link rel="stylesheet" href="./styles.css" />
-  <style>
-    .center{min-height:70vh;display:grid;place-items:center}
-    .card{background:#121826;border:1px solid #232a3a;border-radius:16px;padding:20px}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Logout</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body>
-  <div class="center">
-    <div class="card">
-      <h3>Signing you out…</h3>
-      <p class="muted">Please wait.</p>
-    </div>
-  </div>
+<body class="dark">
+<div class="wrapper">
+  <section class="accent-amber glass inner">
+    <h1>Logging out…</h1>
+    <div id="msg" class="note">Please wait</div>
+  </section>
+</div>
 
-  <script type="module">
-    import { sb } from "./js/supabase.js";
-    try {
-      await sb.auth.signOut();
-    } catch (e) {
-      console.warn(e);
-    } finally {
-      // send back to login page
-      location.href = "./login.html";
-    }
-  </script>
+<script type="module">
+import { sb } from "./js/supabase.js";
+await sb.auth.signOut();
+document.getElementById("msg").textContent = "✅ Signed out. Redirecting…";
+setTimeout(()=> location.href = "index.html", 800);
+</script>
 </body>
 </html>
