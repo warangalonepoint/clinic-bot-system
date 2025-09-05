@@ -174,23 +174,4 @@ body.light .toast{ background:#0f1430; color:#fff; }
   overflow: hidden;            /* hide any overflow */
 }
 
-/* Faint banner image behind existing header content */
-.glass.header::after {
-  content: "";
-  position: absolute;
-  inset: 0;                    /* cover entire header */
-  background: url("./assets/banner.png") center / cover no-repeat;
-  opacity: 0.18;               /* subtle so text stays readable */
-  pointer-events: none;        /* never block clicks */
-  filter: saturate(1.05) contrast(1.05);
-  z-index: 0;
-}
-
-/* Keep your header content above the banner */
-.glass.header > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* If any page needs no banner, add .no-banner to the header section */
-.no-banner.glass.header::after { display: none; }
+/
