@@ -2,36 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-store, must-revalidate"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>School PWA (PIN)</title>
+  <title>School PWA (PIN Mode)</title>
   <link rel="stylesheet" href="styles.css"/>
-  <link rel="manifest" href="./manifest.webmanifest"/>
-  <meta name="theme-color" content="#0b0f19"/>
 </head>
 <body class="dark">
   <div class="wrapper">
-<section class="accent-violet">
-  <div class="glass header">
-    <div class="row" style="justify-content:space-between;align-items:center">
-      <div>
-        <div class="h1">School PWA</div>
-        <div class="text-dim">Role router (PIN)</div>
-        <img src="./assets/banner.png" alt="School Banner" class="banner"/>
-      </div>
-      <div class="row" style="gap:8px">
-        <button class="btn" onclick="toggleTheme()">Theme</button>
-        <button class="btn" onclick="clearCache()">Clear Cache</button>
-      </div>
-    </div>
-  </div>
-</section>
+
+    <!-- Header with Banner -->
     <section class="accent-violet">
       <div class="glass header">
         <div class="row" style="justify-content:space-between;align-items:center">
           <div>
             <div class="h1">School PWA</div>
-            <div class="text-dim">Role router (PIN)</div>
+            <div class="text-dim">Role router (PIN login)</div>
+            <img src="./assets/banner.png" alt="School Banner" class="banner"/>
           </div>
           <div class="row" style="gap:8px">
             <button class="btn" onclick="toggleTheme()">Theme</button>
@@ -41,31 +26,58 @@
       </div>
     </section>
 
+    <!-- PIN login -->
     <section class="accent-cyan">
       <div class="glass inner">
         <div class="h1">Enter PIN</div>
         <p class="text-dim">You’ll be routed to your role panel.</p>
-
         <form id="pin-form" class="form-grid mt-12">
           <input id="pin-input" class="input full" inputmode="numeric" maxlength="8"
-                 placeholder="4–8 digit PIN" autocomplete="one-time-code"/>
+            placeholder="4–8 digit PIN" autocomplete="one-time-code"/>
           <button id="pin-go" class="btn btn-indigo" type="submit">Continue</button>
         </form>
-
         <div id="pin-msg" class="text-dim mt-12"></div>
         <div id="pin-info" class="mt-12 text-dim" style="font-size:12px"></div>
       </div>
     </section>
-
   </div>
 
   <script type="module">
-    // SW (non-blocking)
-    if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('./sw.js'); } catch {} }
+    import { showLoadedPins } from './ui.js';
 
-    // Cache nuker (used on all pages)
-    window.clearCache = async function(){
-      try{
+    let pinMap = { "1111":"parents", "2222":"teacher", "3333":"coordinator", "4444":"admin" };
+
+    try {
+      const r = await fetch(new URL('pins.json', location.href), { cache:'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        if (j && typeof j === 'object') pinMap = j;
+      }
+      showLoadedPins?.(Object.keys(pinMap));
+      document.getElementById('pin-info').textContent = 'PINs loaded.';
+    } catch {
+      document.getElementById('pin-info').textContent = 'Using fallback PINs (pins.json not found).';
+    }
+
+    const input = document.getElementById('pin-input');
+    const msg   = document.getElementById('pin-msg');
+    const form  = document.getElementById('pin-form');
+
+    function route(e){
+      e?.preventDefault();
+      const pin = (input.value || '').trim();
+      if (!pin) { msg.textContent = 'Enter a PIN.'; return; }
+      const role = pinMap[pin];
+      if (!role) { msg.textContent = 'Unknown PIN.'; return; }
+      const theme = localStorage.getItem('theme') || 'dark';
+      location.replace(`${role}.html?theme=${theme}&t=${Date.now()}`);
+    }
+    form.addEventListener('submit', route);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') route(e); });
+
+    // Clear Cache
+    window.clearCache = async function () {
+      try {
         localStorage.clear();
         if ('caches' in window) {
           const names = await caches.keys();
@@ -73,37 +85,15 @@
         }
         if ('serviceWorker' in navigator) {
           const regs = await navigator.serviceWorker.getRegistrations();
-          for (const r of regs) await r.unregister();
+          for (let r of regs) await r.unregister();
         }
-        alert('✅ Cache cleared. Reloading…');
-      } catch(e){ alert('❌ Cache clear failed: ' + e.message); }
-      location.reload(true);
+        alert("✅ Cache cleared. Reloading…");
+        location.reload(true);
+      } catch (err) {
+        alert("❌ Cache clear failed: " + err.message);
+      }
     };
-
-    // PIN loading
-    let pinMap = { "1111":"parents", "2222":"teacher", "3333":"coordinator", "4444":"admin" };
-    try {
-      const r = await fetch(new URL('pins.json', location.href), { cache:'no-store' });
-      if (r.ok) { const j = await r.json(); if (j && typeof j === 'object') pinMap = j; }
-      document.getElementById('pin-info').textContent = 'PINs loaded.';
-    } catch { document.getElementById('pin-info').textContent = 'Using fallback PINs.'; }
-
-    const $ = (id)=>document.getElementById(id);
-    const input = $('pin-input'), msg = $('pin-msg'), form = $('pin-form');
-
-    function route(e){
-      e?.preventDefault();
-      const pin = (input.value||'').trim();
-      if (!pin) { msg.textContent = 'Enter a PIN.'; return; }
-      const role = pinMap[pin];
-      if (!role) { msg.textContent = 'Unknown PIN. Try again.'; return; }
-      const theme = localStorage.getItem('theme') || 'dark';
-      location.replace(`${role}.html?theme=${theme}&t=${Date.now()}`);
-    }
-    form.addEventListener('submit', route);
-    input.addEventListener('keydown', e=>{ if (e.key==='Enter') route(e); });
   </script>
-
   <script type="module" src="ui.js"></script>
 </body>
 </html>
